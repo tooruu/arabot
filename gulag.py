@@ -1,21 +1,28 @@
 import os
 from datetime import datetime, timedelta
+import asyncio
 import time
 import discord
+from discord.ext import commands
 
-client = discord.Client()
+client = commands.Bot(command_prefix=";")
 
 
 @client.event
 async def on_ready():
+	print("Ready!")
 	now = datetime.now
 
 	resets = [0, 3, 5, 7]
 
+	async def arange(it):
+		for v in range(it):
+			yield v
+
 	while True:
 
 		# Find next event reset date
-		for i in range(len(resets)):
+		async for i in arange(len(resets)):
 			today = now()
 			if resets[i] <= today.weekday() < resets[i + 1]:
 				reset = (today +
@@ -25,7 +32,7 @@ async def on_ready():
 
 		# Count down
 		while True:
-			time.sleep(20)
+			await asyncio.sleep(20)
 			totalSeconds = (reset - now()).total_seconds()
 			if totalSeconds <= 0:
 				break
@@ -36,19 +43,28 @@ async def on_ready():
 			)
 
 
-@client.event
-async def on_message(msg):
-	if msg.author == client.user:
-		return
-	if msg.content == "?":
-		await msg.channel.send("!")
-	elif msg.content == ";stop":
-		await client.logout()
-	elif msg.content.startswith(";rename"):
-		msgParts = msg.content.split(" ")
-		if len(msgParts) >= 3 and msgParts[1].isdigit():
-			await client.get_channel(int(msgParts[1])
-				).edit(name=" ".join(map(str, msgParts[2:])))
+@client.command()
+async def stop(ctx):
+	await ctx.send("Stopping!")
+	await client.logout()
 
-token = os.environ["token"]
-client.run(token)
+
+@client.command()
+async def rename(ctx, chanId, *, name):
+	if chanId.isdigit():
+		channel = await client.get_channel(int(chanId))
+		oldName = channel.name
+		try:
+			channel.edit(name=name)
+			await ctx.send(f"Renamed {oldName} to {channel.name}")
+		except:
+			await ctx.send(f"Failed renaming {oldName} to {name}")
+
+
+#@client.event
+#async def on_message(ctx):
+#	if ctx.content == "?" and not ctx.author == client.user:
+#		await ctx.channel.send("!")
+
+#token = os.environ["token"]
+client.run("Njc3OTgyNDA4OTEzNTg0MTMw.XkcNhQ.p92-2LRTHkI2lKTY0iLY6t1zn9k")
