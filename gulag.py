@@ -50,5 +50,5 @@ async def on_message(msg):
 			await client.get_channel(int(msgParts[1])
 				).edit(name=" ".join(map(str, msgParts[2:])))
 
-	token = os.environ["token"]
-	client.run(token)
+token = os.environ["token"]
+client.run(token)
