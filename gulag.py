@@ -1,8 +1,5 @@
-import os
 from datetime import datetime, timedelta
 import asyncio
-import time
-import discord
 from discord.ext import commands
 
 client = commands.Bot(command_prefix=";")
@@ -52,19 +49,15 @@ async def stop(ctx):
 @client.command()
 async def rename(ctx, chanId, *, name):
 	if chanId.isdigit():
-		channel = await client.get_channel(int(chanId))
-		oldName = channel.name
-		try:
-			channel.edit(name=name)
-			await ctx.send(f"Renamed {oldName} to {channel.name}")
-		except:
-			await ctx.send(f"Failed renaming {oldName} to {name}")
+		channel = client.get_channel(int(chanId))
+		if channel is not None:
+			oldName = channel.name
+			try:
+				await channel.edit(name=name)
+				await ctx.send(f"Renamed **{oldName}** to **{channel.name}**")
+			except:
+				await ctx.send(f"Failed renaming **{oldName}** to **{name}**")
 
-
-#@client.event
-#async def on_message(ctx):
-#	if ctx.content == "?" and not ctx.author == client.user:
-#		await ctx.channel.send("!")
 
 #token = os.environ["token"]
 client.run("Njc3OTgyNDA4OTEzNTg0MTMw.XkcNhQ.p92-2LRTHkI2lKTY0iLY6t1zn9k")
