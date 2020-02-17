@@ -82,5 +82,5 @@ async def lerolero(ctx):
 	)
 
 
-#token = os.environ["token"]
-client.run("Njc3OTgyNDA4OTEzNTg0MTMw.XkcNhQ.p92-2LRTHkI2lKTY0iLY6t1zn9k")
+token = os.environ["token"]
+client.run(token)
