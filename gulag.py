@@ -81,6 +81,10 @@ async def status(ctx, _type, name):
 		return
 	await setPresence(int(_type), name)
 
+@client.command()
+async def _177013(ctx):
+	await setPresence(discord.ActivityType.watching, "177013 with your mum")
+
 
 @client.command()
 async def ping(ctx):
