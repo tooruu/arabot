@@ -2,15 +2,15 @@ from datetime import datetime, timedelta
 from http.client import HTTPException
 from asyncio import sleep
 import discord
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, errors, CommandNotFound
 
 client = Bot(command_prefix=";")
 
 
-async def setPresence(_type, name, status=None):
+async def setPresence(_type, name, _status=None):
 	await client.change_presence(
-		status=status or discord.Status.dnd,
-		activity=discord.Activity(name = name, type = _type )
+		status=_status or discord.Status.dnd,
+		activity=discord.Activity(name=name, type=_type)
 	)
 
 
@@ -27,7 +27,7 @@ async def startTimer():
 
 		# Find next event reset date
 		async for i in arange(len(resets)):
-			today = now() #- timedelta(hours=5)
+			today = now()
 			if resets[i] <= today.weekday() < resets[i + 1]:
 				reset = (today +
 					timedelta(days=resets[i + 1] - today.weekday()
@@ -50,7 +50,7 @@ async def startTimer():
 @client.event
 async def on_ready():
 	await setPresence(discord.ActivityType.watching, "#lewd")
-	client.load_extension("cogs.lerolero")
+	client.load_extension("cogs.communism")
 	print("Ready!")
 	await startTimer()
 
@@ -77,13 +77,14 @@ async def rename(ctx, chanId, *, name):
 
 @client.command()
 async def status(ctx, _type, name):
-	if not int(_type) in [0,1,2,3]:
+	if int(_type) not in [0, 1, 2, 3]:
 		return
 	await setPresence(int(_type), name)
 
+
 @client.command()
 async def _177013(ctx):
-	await setPresence(discord.ActivityType.watching, "177013 with your mum")
+	await setPresence(discord.ActivityType.watching, "177013 with yo mama")
 
 
 @client.command()
@@ -91,19 +92,43 @@ async def ping(ctx):
 	await ctx.send(":ping_pong: Pong!")
 
 
-@client.command(alises=["cogs"])
-async def cog(ctx, mode, *, cogs):
-	cogs = cogs.split(" ")
-	if mode == "load":
-		for i in cogs:
+@client.group()
+async def cog(ctx):
+	pass
+
+
+@cog.command()
+async def load(ctx, *cogs):
+	for i in cogs:
+		try:
 			client.load_extension(f"cogs.{i}")
-	elif mode == "unload":
-		for i in cogs:
+			await ctx.send(f"Loaded **{i}**")
+		except errors.ExtensionNotFound:
+			await ctx.send(f"**{i}** was not found")
+		except errors.ExtensionAlreadyLoaded:
+			pass
+
+
+@cog.command()
+async def unload(ctx, *cogs):
+	for i in cogs:
+		try:
 			client.unload_extension(f"cogs.{i}")
-	elif mode == "reload":
-		for i in cogs:
-			client.unload_extension(f"cogs.{i}")
-			client.load_extension(f"cogs.{i}")
+		except errors.ExtensionNotLoaded:
+			pass
+
+
+@cog.command()
+async def reload(ctx, *cogs):
+	await unload(ctx, *cogs)
+	await load(ctx, *cogs)
+
+
+@client.event
+async def on_command_error(ctx, error):
+	if isinstance(error, CommandNotFound):
+		return
+	raise error
 
 
 if __name__ == "__main__":
