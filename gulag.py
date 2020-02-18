@@ -10,7 +10,7 @@ client = Bot(command_prefix=";")
 async def setPresence(_type, name, status=None):
 	await client.change_presence(
 		status=status or discord.Status.dnd,
-		activity=discord.Activity(name, type = _type )
+		activity=discord.Activity(name = name, type = _type )
 	)
 
 
@@ -36,7 +36,7 @@ async def startTimer():
 
 		# Count down
 		while True:
-			await asyncio.sleep(60)
+			await sleep(60)
 			totalSeconds = (reset - now()).total_seconds()
 			if totalSeconds <= 0:
 				break
