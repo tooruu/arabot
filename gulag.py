@@ -1,20 +1,20 @@
 from datetime import datetime, timedelta
 from http.client import HTTPException
-import asyncio
+from asyncio import sleep
 import discord
-from discord.ext import commands
+from discord.ext.commands import Bot
 
-client = commands.Bot(command_prefix=";")
+client = Bot(command_prefix=";")
 
 
-async def setPresence():
+async def setPresence(_type, name, status=None):
 	await client.change_presence(
-		status=discord.Status.dnd,
-		activity=discord.Activity(name="#lewd", type=discord.ActivityType.watching)
+		status=status or discord.Status.dnd,
+		activity=discord.Activity(name, type = _type )
 	)
 
 
-async def timer():
+async def startTimer():
 	now = datetime.now
 
 	resets = [0, 3, 5, 7]
@@ -27,7 +27,7 @@ async def timer():
 
 		# Find next event reset date
 		async for i in arange(len(resets)):
-			today = now() - timedelta(hours=5)
+			today = now() #- timedelta(hours=5)
 			if resets[i] <= today.weekday() < resets[i + 1]:
 				reset = (today +
 					timedelta(days=resets[i + 1] - today.weekday()
@@ -36,8 +36,8 @@ async def timer():
 
 		# Count down
 		while True:
-			await asyncio.sleep(20)
-			totalSeconds = (reset - (now() - timedelta(hours=5))).total_seconds()
+			await asyncio.sleep(60)
+			totalSeconds = (reset - now()).total_seconds()
 			if totalSeconds <= 0:
 				break
 			hours = int(totalSeconds / 3600)
@@ -49,9 +49,10 @@ async def timer():
 
 @client.event
 async def on_ready():
+	await setPresence(discord.ActivityType.watching, "#lewd")
+	client.load_extension("cogs.lerolero")
 	print("Ready!")
-	await setPresence()
-	await timer()
+	await startTimer()
 
 
 @client.command()
@@ -75,31 +76,30 @@ async def rename(ctx, chanId, *, name):
 
 
 @client.command()
+async def status(ctx, _type, name):
+	  if not int(_type) in [0,1,2,3]:
+        return
+    await setPresence(int(_type), name)
+
+
+@client.command()
 async def ping(ctx):
 	await ctx.send(":ping_pong: Pong!")
 
 
-@client.command()
-async def lerolero(ctx):
-	await ctx.send(
-		""":b::b::b::b::b::b::b::b::b::b::b::b::b::b::b:
-:b::b::b::b::b::b::b::b:<:CommuThink:676973669796544542>:b::b::b::b::b::b:
-:b::b::b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b::b::b:
-:b::b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b::b:
-:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:
-:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:
-:b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:"""
-	)
-	await ctx.send(
-		"""
-:b::b::b::b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:
-:b::b::b::b::b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:
-:b::b::b::b:<:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:
-:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:
-:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:
-:b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:
-:b::b::b::b::b::b::b::b::b::b::b::b::b::b::b:"""
-	)
+@client.command(alises=["cogs"])
+async def cog(ctx, mode, *, cogs):
+	cogs = cogs.split(" ")
+	if mode == "load":
+		for i in cogs:
+			client.load_extension(f"cogs.{i}")
+	elif mode == "unload":
+		for i in cogs:
+			client.unload_extension(f"cogs.{i}")
+	elif mode == "reload":
+		for i in cogs:
+			client.unload_extension(f"cogs.{i}")
+			client.load_extension(f"cogs.{i}")
 
 
 if __name__ == "__main__":
