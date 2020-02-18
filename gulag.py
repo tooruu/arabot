@@ -77,9 +77,9 @@ async def rename(ctx, chanId, *, name):
 
 @client.command()
 async def status(ctx, _type, name):
-	  if not int(_type) in [0,1,2,3]:
-        return
-    await setPresence(int(_type), name)
+	if not int(_type) in [0,1,2,3]:
+		return
+	await setPresence(int(_type), name)
 
 
 @client.command()
