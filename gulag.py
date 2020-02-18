@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 from http.client import HTTPException
 from asyncio import sleep
 import discord
-from discord.ext.commands import Bot, errors, CommandNotFound
+from discord.ext import commands
 
-client = Bot(command_prefix=";")
+client = commands.Bot(command_prefix=";")
 
 
-async def setPresence(_type, name, _status=None):
+async def setPresence(_type: int, name, _status=None):
 	await client.change_presence(
 		status=_status or discord.Status.dnd,
 		activity=discord.Activity(name=name, type=_type)
@@ -19,7 +19,7 @@ async def startTimer():
 
 	resets = [0, 3, 5, 7]
 
-	async def arange(it):
+	async def arange(it: int):
 		for v in range(it):
 			yield v
 
@@ -56,6 +56,7 @@ async def on_ready():
 
 
 @client.command()
+@commands.has_permissions(administrator=True)
 async def stop(ctx):
 	await ctx.send("Stopping!")
 	print("Stopping!")
@@ -63,6 +64,7 @@ async def stop(ctx):
 
 
 @client.command()
+@commands.has_permissions(manage_messages=True)
 async def rename(ctx, chanId, *, name):
 	if chanId.isdigit():
 		channel = client.get_channel(int(chanId))
@@ -76,6 +78,7 @@ async def rename(ctx, chanId, *, name):
 
 
 @client.command()
+@commands.check(lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417))
 async def status(ctx, _type, name):
 	if int(_type) not in [0, 1, 2, 3]:
 		return
@@ -98,35 +101,58 @@ async def cog(ctx):
 
 
 @cog.command()
+@commands.has_permissions(administrator=True)
 async def load(ctx, *cogs):
 	for i in cogs:
 		try:
 			client.load_extension(f"cogs.{i}")
 			await ctx.send(f"Loaded **{i}**")
-		except errors.ExtensionNotFound:
+		except commands.errors.ExtensionNotFound:
 			await ctx.send(f"**{i}** was not found")
-		except errors.ExtensionAlreadyLoaded:
+		except commands.errors.ExtensionAlreadyLoaded:
 			pass
 
 
 @cog.command()
+@commands.has_permissions(administrator=True)
 async def unload(ctx, *cogs):
 	for i in cogs:
 		try:
 			client.unload_extension(f"cogs.{i}")
-		except errors.ExtensionNotLoaded:
+		except commands.errors.ExtensionNotLoaded:
 			pass
 
 
 @cog.command()
+@commands.has_permissions(administrator=True)
 async def reload(ctx, *cogs):
 	await unload(ctx, *cogs)
 	await load(ctx, *cogs)
 
 
+@client.command(aliases=["purge", "prune"])
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx, amount):
+	await ctx.channel.purge(limit=int(amount) + 1)
+
+
+@clear.error
+async def bad_usage(ctx, error):
+	if isinstance(
+		error, (
+		commands.errors.BadArgument, commands.errors.MissingRequiredArgument,
+		commands.errors.CommandInvokeError
+		)
+	):
+		await ctx.message.delete()
+
+
 @client.event
 async def on_command_error(ctx, error):
-	if isinstance(error, CommandNotFound):
+	if isinstance(error, commands.CommandNotFound) or ctx.command.name == "clear":
+		return
+	elif isinstance(error, commands.errors.MissingPermissions):
+		print(f"Missing permissions: {ctx.author}: {ctx.message.content}")
 		return
 	raise error
 
