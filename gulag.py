@@ -43,7 +43,7 @@ async def startTimer():
 			hours = int(totalSeconds / 3600)
 			minutes = int(totalSeconds % 3600 / 60) + 1
 			await client.get_channel(678423053306298389).edit(
-				name=f"OW: {hours}h {minutes}m"
+				name=f"🌍 Ongoing {hours}h {minutes}m"
 			)
 
 
