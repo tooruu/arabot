@@ -8,8 +8,9 @@ class Communism(Cog):
 
 	@event()
 	async def on_message(self, msg):
-		if not msg.content[
-			0] == ";" and "communism" in msg.content and not msg.author == self.client.user:
+		if msg.content is not None and msg.content[
+			0
+		] != self.client.command_prefix and msg.author != self.client.user and "communism" in msg.content:
 			await msg.channel.send(
 				""":b::b::b::b::b::b::b::b::b::b::b::b::b::b::b:
 :b::b::b::b::b::b::b::b:<:CommuThink:676973669796544542>:b::b::b::b::b::b:
@@ -29,7 +30,6 @@ class Communism(Cog):
 :b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:<:CommuThink:676973669796544542><:CommuThink:676973669796544542>:b::b:
 :b::b::b::b::b::b::b::b::b::b::b::b::b::b::b:"""
 			)
-			await self.client.process_commands(msg) # this prevents on_message blocking code
 
 
 def setup(client):

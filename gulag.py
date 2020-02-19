@@ -1,17 +1,20 @@
 from datetime import datetime, timedelta
-from http.client import HTTPException
 from asyncio import sleep
 import discord
 from discord.ext import commands
 
 client = commands.Bot(command_prefix=";")
 
+isDev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417)
 
-async def setPresence(_type: int, name, _status=None):
-	await client.change_presence(
-		status=_status or discord.Status.dnd,
-		activity=discord.Activity(name=name, type=_type)
-	)
+
+async def setPresence(_type: int, name: str, _status=None):
+	if isinstance(_status, discord.Status):
+		await client.change_presence(
+			status=_status, activity=discord.Activity(name=name, type=_type)
+		)
+		return
+	await client.change_presence(activity=discord.Activity(name=name, type=_type))
 
 
 async def startTimer():
@@ -56,7 +59,7 @@ async def on_ready():
 
 
 @client.command()
-@commands.has_permissions(administrator=True)
+@commands.check(isDev)
 async def stop(ctx):
 	await ctx.send("Stopping!")
 	print("Stopping!")
@@ -64,44 +67,38 @@ async def stop(ctx):
 
 
 @client.command()
-@commands.has_permissions(manage_messages=True)
-async def rename(ctx, chanId, *, name):
-	if chanId.isdigit():
-		channel = client.get_channel(int(chanId))
-		if channel is not None:
-			oldName = channel.name
-			try:
-				await channel.edit(name=name)
-				await ctx.send(f"Renamed **{oldName}** to **{channel.name}**")
-			except HTTPException:
-				await ctx.send(f"Failed renaming **{oldName}** to **{name}**")
+@commands.has_permissions(manage_guild=True)
+async def rename(ctx, chan: discord.TextChannel, *, name):
+	oldName = chan.name
+	await chan.edit(name=name)
+	await ctx.send(f"Renamed **{oldName}** to **{chan.name}**")
 
 
 @client.command()
-@commands.check(lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417))
-async def status(ctx, _type, name):
-	if int(_type) not in [0, 1, 2, 3]:
+@commands.check(isDev)
+async def status(ctx, _type: int, *, name):
+	if _type not in (0, 1, 2, 3):
 		return
-	await setPresence(int(_type), name)
+	await setPresence(_type, name)
 
 
-@client.command()
+@client.command(name="177013")
 async def _177013(ctx):
-	await setPresence(discord.ActivityType.watching, "177013 with yo mama")
+	await setPresence(3, "177013 with yo mama")
 
 
 @client.command()
 async def ping(ctx):
-	await ctx.send(":ping_pong: Pong!")
+	await ctx.send(f":ping_pong: Pong after {round(client.latency, 3)}ms!")
 
 
-@client.group()
+@client.group(aliases=["cogs"])
+@commands.check(isDev)
 async def cog(ctx):
 	pass
 
 
 @cog.command()
-@commands.has_permissions(administrator=True)
 async def load(ctx, *cogs):
 	for i in cogs:
 		try:
@@ -110,21 +107,20 @@ async def load(ctx, *cogs):
 		except commands.errors.ExtensionNotFound:
 			await ctx.send(f"**{i}** was not found")
 		except commands.errors.ExtensionAlreadyLoaded:
-			pass
+			await ctx.send(f"**{i}** is already loaded")
 
 
 @cog.command()
-@commands.has_permissions(administrator=True)
 async def unload(ctx, *cogs):
 	for i in cogs:
 		try:
 			client.unload_extension(f"cogs.{i}")
+			await ctx.send(f"Unloaded **{i}**")
 		except commands.errors.ExtensionNotLoaded:
 			pass
 
 
 @cog.command()
-@commands.has_permissions(administrator=True)
 async def reload(ctx, *cogs):
 	await unload(ctx, *cogs)
 	await load(ctx, *cogs)
@@ -132,8 +128,8 @@ async def reload(ctx, *cogs):
 
 @client.command(aliases=["purge", "prune"])
 @commands.has_permissions(manage_messages=True)
-async def clear(ctx, amount):
-	await ctx.channel.purge(limit=int(amount) + 1)
+async def clear(ctx, amount: int):
+	await ctx.channel.purge(limit=amount + 1)
 
 
 @clear.error
@@ -145,14 +141,21 @@ async def bad_usage(ctx, error):
 		)
 	):
 		await ctx.message.delete()
+		return
+	raise error
 
 
 @client.event
 async def on_command_error(ctx, error):
-	if isinstance(error, commands.CommandNotFound) or ctx.command.name == "clear":
+	if hasattr(ctx.command, "on_error"):
 		return
-	elif isinstance(error, commands.errors.MissingPermissions):
-		print(f"Missing permissions: {ctx.author}: {ctx.message.content}")
+	if isinstance(error, commands.CommandNotFound):
+		return
+	if isinstance(
+		error, (commands.errors.MissingPermissions, commands.errors.CheckFailure)
+	):
+		await ctx.send(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
+		print(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
 		return
 	raise error
 
