@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 from asyncio import sleep
 import discord
@@ -5,7 +6,22 @@ from discord.ext import commands
 
 client = commands.Bot(command_prefix=";")
 
+
+@client.event
+async def on_ready():
+	await setPresence(discord.ActivityType.watching, "#lewd")
+	for fname in os.listdir("./cogs"):
+		if fname.endswith(".py"):
+			client.load_extension(f"cogs.{fname[:-3]}")
+	print("Ready!")
+	await startTimer()
+
+
 isDev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417)
+
+isValid = lambda msg, invocator: msg.content is not None and msg.content[
+	0] != client.command_prefix and msg.author != client.user and invocator.lower(
+	) in msg.content.lower()
 
 
 async def setPresence(_type: int, name: str, _status=None):
@@ -48,14 +64,6 @@ async def startTimer():
 			await client.get_channel(678423053306298389).edit(
 				name=f"🌍 Ongoing {hours}h {minutes}m"
 			)
-
-
-@client.event
-async def on_ready():
-	await setPresence(discord.ActivityType.watching, "#lewd")
-	client.load_extension("cogs.communism")
-	print("Ready!")
-	await startTimer()
 
 
 @client.command()
@@ -146,6 +154,21 @@ async def bad_usage(ctx, error):
 
 
 @client.event
+async def on_message(msg):
+	if isValid(msg, "lewd") and (await client.get_context(msg)).voice_client is None:
+		for channel in msg.guild.voice_channels:
+			if channel.members:
+				channel = await channel.connect()
+				channel.play(
+					await discord.FFmpegOpusAudio.from_probe("aroro.ogg"),
+					after=lambda e: asyncio.
+					run_coroutine_threadsafe(channel.disconnect(), client.loop).result()
+				)
+				break
+	await client.process_commands(msg)
+
+
+@client.event
 async def on_command_error(ctx, error):
 	if hasattr(ctx.command, "on_error"):
 		return
@@ -155,7 +178,6 @@ async def on_command_error(ctx, error):
 		error, (commands.errors.MissingPermissions, commands.errors.CheckFailure)
 	):
 		await ctx.send(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
-		print(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
 		return
 	raise error
 
