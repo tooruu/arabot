@@ -4,15 +4,15 @@ from asyncio import sleep
 import discord
 from discord.ext import commands
 
-client = commands.Bot(command_prefix=";")
+bot = commands.Bot(command_prefix=";")
 
 
-@client.event
+@bot.event
 async def on_ready():
 	await setPresence(discord.ActivityType.watching, "#lewd")
 	for fname in os.listdir("./cogs"):
 		if fname.endswith(".py"):
-			client.load_extension(f"cogs.{fname[:-3]}")
+			bot.load_extension(f"cogs.{fname[:-3]}")
 	print("Ready!")
 	await startTimer()
 
@@ -20,17 +20,17 @@ async def on_ready():
 isDev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417)
 
 isValid = lambda msg, invocator: msg.content is not None and msg.content[
-	0] != client.command_prefix and msg.author != client.user and invocator.lower(
+	0] != bot.command_prefix and msg.author != bot.user and invocator.lower(
 	) in msg.content.lower()
 
 
 async def setPresence(_type: int, name: str, _status=None):
 	if isinstance(_status, discord.Status):
-		await client.change_presence(
+		await bot.change_presence(
 			status=_status, activity=discord.Activity(name=name, type=_type)
 		)
 		return
-	await client.change_presence(activity=discord.Activity(name=name, type=_type))
+	await bot.change_presence(activity=discord.Activity(name=name, type=_type))
 
 
 async def startTimer():
@@ -61,20 +61,20 @@ async def startTimer():
 				break
 			hours = int(totalSeconds / 3600)
 			minutes = int(totalSeconds % 3600 / 60) + 1
-			await client.get_channel(678423053306298389).edit(
+			await bot.get_channel(678423053306298389).edit(
 				name=f"🌍 Ongoing {hours}h {minutes}m"
 			)
 
 
-@client.command()
+@bot.command()
 @commands.check(isDev)
 async def stop(ctx):
 	await ctx.send("Stopping!")
 	print("Stopping!")
-	await client.logout()
+	await bot.logout()
 
 
-@client.command()
+@bot.command()
 @commands.has_permissions(manage_guild=True)
 async def rename(ctx, chan: discord.TextChannel, *, name):
 	oldName = chan.name
@@ -82,7 +82,7 @@ async def rename(ctx, chan: discord.TextChannel, *, name):
 	await ctx.send(f"Renamed **{oldName}** to **{chan.name}**")
 
 
-@client.command()
+@bot.command()
 @commands.check(isDev)
 async def status(ctx, _type: int, *, name):
 	if _type not in (0, 1, 2, 3):
@@ -90,17 +90,17 @@ async def status(ctx, _type: int, *, name):
 	await setPresence(_type, name)
 
 
-@client.command(name="177013")
+@bot.command(name="177013")
 async def _177013(ctx):
 	await setPresence(3, "177013 with yo mama")
 
 
-@client.command()
+@bot.command()
 async def ping(ctx):
-	await ctx.send(f":ping_pong: Pong after {round(client.latency, 3)}ms!")
+	await ctx.send(f":ping_pong: Pong after {round(bot.latency, 3)}ms!")
 
 
-@client.group(aliases=["cogs"])
+@bot.group(aliases=["cogs"])
 @commands.check(isDev)
 async def cog(ctx):
 	pass
@@ -110,7 +110,7 @@ async def cog(ctx):
 async def load(ctx, *cogs):
 	for i in cogs:
 		try:
-			client.load_extension(f"cogs.{i}")
+			bot.load_extension(f"cogs.{i}")
 			await ctx.send(f"Loaded **{i}**")
 		except commands.errors.ExtensionNotFound:
 			await ctx.send(f"**{i}** was not found")
@@ -122,7 +122,7 @@ async def load(ctx, *cogs):
 async def unload(ctx, *cogs):
 	for i in cogs:
 		try:
-			client.unload_extension(f"cogs.{i}")
+			bot.unload_extension(f"cogs.{i}")
 			await ctx.send(f"Unloaded **{i}**")
 		except commands.errors.ExtensionNotLoaded:
 			pass
@@ -134,7 +134,7 @@ async def reload(ctx, *cogs):
 	await load(ctx, *cogs)
 
 
-@client.command(aliases=["purge", "prune"])
+@bot.command(aliases=["purge", "prune"])
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount: int):
 	await ctx.channel.purge(limit=amount + 1)
@@ -153,22 +153,22 @@ async def bad_usage(ctx, error):
 	raise error
 
 
-@client.event
+@bot.event
 async def on_message(msg):
-	if isValid(msg, "lewd") and (await client.get_context(msg)).voice_client is None:
+	if isValid(msg, "lewd") and (await bot.get_context(msg)).voice_bot is None:
 		for channel in msg.guild.voice_channels:
 			if channel.members:
 				channel = await channel.connect()
 				channel.play(
 					await discord.FFmpegOpusAudio.from_probe("aroro.ogg"),
 					after=lambda e: asyncio.
-					run_coroutine_threadsafe(channel.disconnect(), client.loop).result()
+					run_coroutine_threadsafe(channel.disconnect(), bot.loop).result()
 				)
 				break
-	await client.process_commands(msg)
+	await bot.process_commands(msg)
 
 
-@client.event
+@bot.event
 async def on_command_error(ctx, error):
 	if hasattr(ctx.command, "on_error"):
 		return
@@ -189,4 +189,4 @@ if __name__ == "__main__":
 	except KeyError:
 		with open("secret") as s:
 			token = s.read()
-	client.run(token)
+	bot.run(token)

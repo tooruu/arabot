@@ -9,8 +9,8 @@ class FindMember(MemberConverter):
 			return await MemberConverter().convert(ctx, argument)
 		except errors.BadArgument:
 			return find(
-				lambda member: member.name.lower().startswith(argument.lower()) and not member
-				.bot, ctx.guild.members
+				lambda member: not member.bot and member.name.lower().
+				startswith(argument.lower()), ctx.guild.members
 			) or argument
 
 
