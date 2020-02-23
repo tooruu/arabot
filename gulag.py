@@ -155,7 +155,7 @@ async def bad_usage(ctx, error):
 
 @bot.event
 async def on_message(msg):
-	if isValid(msg, "lewd") and (await bot.get_context(msg)).voice_bot is None:
+	if isValid(msg, "lewd") and (await bot.get_context(msg)).voice_client is None:
 		for channel in msg.guild.voice_channels:
 			if channel.members:
 				channel = await channel.connect()
