@@ -119,7 +119,7 @@ async def source(ctx, image_url=None):
 				params={
 					"anilist_id": response['anilist_id'],
 					"file": quote(response['filename']),
-					"t": response['at'],
+					"t": str(response['at']),
 					"token": response['tokenthumb']
 				}
 			) as preview:
