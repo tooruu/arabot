@@ -2,4 +2,3 @@ discord	# THIS BOT. LITERALLY.
 PyNaCl	# ara ara
 aiohttp	# asynchronous web requests
 jikanpy	# MyAnimeList API wrapper
-urllib	# url encode
