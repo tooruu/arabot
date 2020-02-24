@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 from asyncio import sleep
 import discord
 from discord.ext import commands
+from aiohttp import ClientSession as WebSession
+from jikanpy import AioJikan
+from urllib.parse import quote
+from io import BytesIO
 
 bot = commands.Bot(command_prefix=";")
 
@@ -19,9 +23,9 @@ async def on_ready():
 
 isDev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417)
 
-isValid = lambda msg, invocator: msg.content is not None and msg.content[
-	0] != bot.command_prefix and msg.author != bot.user and invocator.lower(
-	) in msg.content.lower()
+isValid = lambda msg, invocator: not msg.content.startswith(
+	bot.command_prefix
+) and msg.author != bot.user and invocator.lower() in msg.content.lower()
 
 
 async def setPresence(_type: int, name: str, _status=None):
@@ -100,6 +104,45 @@ async def ping(ctx):
 	await ctx.send(f":ping_pong: Pong after {round(bot.latency, 3)}ms!")
 
 
+@bot.command(aliases=["sauce"]) # response = trace.moe, sauce = MAL
+async def source(ctx, image_url=None):
+	image_url = ctx.message.attachments[0].url if ctx.message.attachments else image_url
+	if image_url is not None:
+		async with WebSession(loop=bot.loop) as session:
+			async with session.get(
+				"https://trace.moe/api/search", params={"url": image_url}
+			) as response:
+				response = (await response.json())["docs"][0]
+				sauce = (await AioJikan(session=session).anime(response["mal_id"]))
+			async with session.get(
+				f"https://trace.moe/preview.php?anilist_id={response['anilist_id']}&file={quote(response['filename'])}&t={response['at']}&token={response['tokenthumb']}"
+			) as preview:
+				preview = await preview.read()
+		embed = discord.Embed(
+			color=32767,
+			description=
+			f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
+		)
+		embed.set_author(name=sauce["title"], url=sauce["url"])
+		embed.set_thumbnail(url=sauce["image_url"])
+		sauce["synopsis"] = sauce["synopsis"].partition(" [")[0]
+		embed.add_field(
+			name="Synopsis",
+			value=sauce["synopsis"] if len(sauce["synopsis"]) <= 600 else
+			".".join(sauce["synopsis"][:600].split(".")[0:-1]) + "..."
+		)
+		embed.set_footer(
+			text=f"Requested by {ctx.author.nick} | Powered by trace.moe",
+			icon_url=str(ctx.author.avatar_url)
+		)
+		await ctx.send(
+			f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
+			file=discord.File(BytesIO(preview), response['filename']),
+			embed=embed
+		)
+
+
+####################################### COG
 @bot.group(aliases=["cogs"])
 @commands.check(isDev)
 async def cog(ctx):
@@ -134,6 +177,10 @@ async def reload(ctx, *cogs):
 	await load(ctx, *cogs)
 
 
+#######################################
+
+
+####################################### CLEAR
 @bot.command(aliases=["purge", "prune"])
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount: int):
@@ -151,6 +198,9 @@ async def bad_usage(ctx, error):
 		await ctx.message.delete()
 		return
 	raise error
+
+
+#######################################
 
 
 @bot.event
