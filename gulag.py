@@ -115,7 +115,13 @@ async def source(ctx, image_url=None):
 				response = (await response.json())["docs"][0]
 				sauce = (await AioJikan(session=session).anime(response["mal_id"]))
 			async with session.get(
-				f"https://trace.moe/preview.php?anilist_id={response['anilist_id']}&file={quote(response['filename'])}&t={response['at']}&token={response['tokenthumb']}"
+				"https://trace.moe/preview.php",
+				params={
+					"anilist_id": response['anilist_id'],
+					"file": quote(response['filename']),
+					"t": response['at'],
+					"token": response['tokenthumb']
+				}
 			) as preview:
 				preview = await preview.read()
 		embed = discord.Embed(
