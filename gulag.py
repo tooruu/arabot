@@ -37,14 +37,15 @@ async def setPresence(_type: int, name: str, _status=None):
 	await bot.change_presence(activity=discord.Activity(name=name, type=_type))
 
 
+async def arange(it: int):
+	for v in range(it):
+		yield v
+
+
 async def startTimer():
 	now = datetime.now
 
 	resets = [0, 3, 5, 7]
-
-	async def arange(it: int):
-		for v in range(it):
-			yield v
 
 	while True:
 
@@ -117,10 +118,10 @@ async def source(ctx, image_url=None):
 			async with session.get(
 				"https://trace.moe/preview.php",
 				params={
-					"anilist_id": response['anilist_id'],
-					"file": quote(response['filename']),
-					"t": str(response['at']),
-					"token": response['tokenthumb']
+				"anilist_id": response['anilist_id'],
+				"file": quote(response['filename']),
+				"t": str(response['at']),
+				"token": response['tokenthumb']
 				}
 			) as preview:
 				preview = await preview.read()
@@ -236,6 +237,22 @@ async def on_command_error(ctx, error):
 		await ctx.send(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
 		return
 	raise error
+
+
+@bot.listen("on_message")
+async def za_warudo(msg):
+	if isValid(msg, "za warudo"):
+		await msg.channel.set_permissions(msg.guild.default_role, send_messages=False)
+		await msg.channel.send("<:KonoDioDa:676949860502732803>")
+		await msg.channel.send("***Toki yo tomare!***")
+		for i in ("Ichi", "Ni", "San", "Shi", "Go"):
+			await sleep(2)
+			await msg.channel.send(content=f"*{i} byou keika*")
+		await sleep(2)
+		await msg.channel.send("Soshite, toki wa ugoki dasu")
+		await sleep(2)
+		await msg.channel.purge(limit=8)
+		await msg.channel.set_permissions(msg.guild.default_role, overwrite=None)
 
 
 if __name__ == "__main__":
