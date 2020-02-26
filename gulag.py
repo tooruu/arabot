@@ -31,9 +31,7 @@ isValid = lambda msg, invocator: not msg.content.startswith(
 
 async def setPresence(_type: int, name: str, _status=None):
 	if isinstance(_status, discord.Status):
-		await bot.change_presence(
-			status=_status, activity=discord.Activity(name=name, type=_type)
-		)
+		await bot.change_presence(status=_status, activity=discord.Activity(name=name, type=_type))
 		return
 	await bot.change_presence(activity=discord.Activity(name=name, type=_type))
 
@@ -54,8 +52,7 @@ async def startTimer():
 		async for i in arange(len(resets)):
 			today = now()
 			if resets[i] <= today.weekday() < resets[i + 1]:
-				reset = (today +
-					timedelta(days=resets[i + 1] - today.weekday()
+				reset = (today + timedelta(days=resets[i + 1] - today.weekday()
 					)).replace(hour=0, minute=0, second=0, microsecond=0)
 				break
 
@@ -67,9 +64,7 @@ async def startTimer():
 				break
 			hours = int(totalSeconds / 3600)
 			minutes = int(totalSeconds % 3600 / 60) + 1
-			await bot.get_channel(678423053306298389).edit(
-				name=f"🌍 Ongoing {hours}h {minutes}m"
-			)
+			await bot.get_channel(678423053306298389).edit(name=f"🌍 Ongoing {hours}h {minutes}m")
 
 
 @bot.command()
@@ -111,9 +106,7 @@ async def source(ctx, image_url=None):
 	image_url = ctx.message.attachments[0].url if ctx.message.attachments else image_url
 	if image_url is not None:
 		async with WebSession(loop=bot.loop) as session:
-			async with session.get(
-				"https://trace.moe/api/search", params={"url": image_url}
-			) as response:
+			async with session.get("https://trace.moe/api/search", params={"url": image_url}) as response:
 				response = (await response.json())["docs"][0]
 				sauce = (await AioJikan(session=session).anime(response["mal_id"]))
 			async with session.get(
@@ -128,20 +121,18 @@ async def source(ctx, image_url=None):
 				preview = await preview.read()
 		embed = discord.Embed(
 			color=32767,
-			description=
-			f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
+			description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
 		)
 		embed.set_author(name=sauce["title"], url=sauce["url"])
 		embed.set_thumbnail(url=sauce["image_url"])
 		sauce["synopsis"] = sauce["synopsis"].partition(" [")[0]
 		embed.add_field(
 			name="Synopsis",
-			value=sauce["synopsis"] if len(sauce["synopsis"]) <= 600 else
-			".".join(sauce["synopsis"][:600].split(".")[0:-1]) + "..."
+			value=sauce["synopsis"]
+			if len(sauce["synopsis"]) <= 600 else ".".join(sauce["synopsis"][:600].split(".")[0:-1]) + "..."
 		)
 		embed.set_footer(
-			text=f"Requested by {ctx.author.nick} | Powered by trace.moe",
-			icon_url=str(ctx.author.avatar_url)
+			text=f"Requested by {ctx.author.nick} | Powered by trace.moe", icon_url=str(ctx.author.avatar_url)
 		)
 		await ctx.send(
 			f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
@@ -198,10 +189,7 @@ async def clear(ctx, amount: int):
 @clear.error
 async def bad_usage(ctx, error):
 	if isinstance(
-		error, (
-		commands.errors.BadArgument, commands.errors.MissingRequiredArgument,
-		commands.errors.CommandInvokeError
-		)
+		error, (commands.errors.BadArgument, commands.errors.MissingRequiredArgument, commands.errors.CommandInvokeError)
 	):
 		await ctx.message.delete()
 		return
@@ -219,8 +207,7 @@ async def on_message(msg):
 				channel = await channel.connect()
 				channel.play(
 					await discord.FFmpegOpusAudio.from_probe("aroro.ogg"),
-					after=lambda e: asyncio.
-					run_coroutine_threadsafe(channel.disconnect(), bot.loop).result()
+					after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), bot.loop).result()
 				)
 				break
 	await bot.process_commands(msg)
@@ -232,9 +219,7 @@ async def on_command_error(ctx, error):
 		return
 	if isinstance(error, commands.CommandNotFound):
 		return
-	if isinstance(
-		error, (commands.errors.MissingPermissions, commands.errors.CheckFailure)
-	):
+	if isinstance(error, (commands.errors.MissingPermissions, commands.errors.CheckFailure)):
 		await ctx.send(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
 		return
 	raise error
@@ -242,10 +227,7 @@ async def on_command_error(ctx, error):
 
 @bot.command()
 async def avatar(ctx, target: FindMember):
-	await ctx.send(
-		target.avatar_url if isinstance(target, discord.
-		Member) else f"User **{target}** not found"
-	)
+	await ctx.send(target.avatar_url if isinstance(target, discord.Member) else f"User **{target}** not found")
 
 
 @bot.listen("on_message")
@@ -254,11 +236,11 @@ async def za_warudo(msg):
 		await msg.channel.set_permissions(msg.guild.default_role, send_messages=False)
 		await msg.channel.send("<:KonoDioDa:676949860502732803>")
 		await msg.channel.send("***Toki yo tomare!***")
-		for i in ("Ichi", "Ni", "San", "Shi", "Go"):
+		for i in ("Ichi", "Ni", "San", "Yon", "Go"): # Ichi Ni San Yon Go Roku Nana Hachi Kyu
 			await sleep(2)
 			await msg.channel.send(content=f"*{i} byou keika*")
-		await sleep(2)
-		await msg.channel.send("Soshite, toki wa ugoki dasu")
+		await sleep(1)
+		await msg.channel.send("Toki wa ugoki dasu")
 		await sleep(2)
 		await msg.channel.purge(limit=8)
 		await msg.channel.set_permissions(msg.guild.default_role, overwrite=None)
