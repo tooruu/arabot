@@ -7,6 +7,7 @@ from aiohttp import ClientSession as WebSession
 from jikanpy import AioJikan
 from urllib.parse import quote
 from io import BytesIO
+from cogs.love import FindMember
 
 bot = commands.Bot(command_prefix=";")
 
@@ -237,6 +238,14 @@ async def on_command_error(ctx, error):
 		await ctx.send(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
 		return
 	raise error
+
+
+@bot.command()
+async def avatar(ctx, target: FindMember):
+	await ctx.send(
+		target.avatar_url if isinstance(target, discord.
+		Member) else f"User **{target}** not found"
+	)
 
 
 @bot.listen("on_message")
