@@ -1,5 +1,5 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
-from ..utils import *
+from .._utils import *
 import discord
 
 # sauce
@@ -129,8 +129,8 @@ class Commands(Cog):
 	async def bad_usage(self, ctx, error):
 		if isinstance(error, (errors.BadArgument, errors.MissingRequiredArgument, errors.CommandInvokeError)):
 			await ctx.message.delete()
-			return
-		raise error
+		else:
+			raise error
 
 	#######################################
 	@command()

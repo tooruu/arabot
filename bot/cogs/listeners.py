@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord.ext.commands import Cog
 from discord.ext.commands.errors import *
-from os import walk
 #import discord
 
 
@@ -9,17 +8,6 @@ class Listeners(Cog):
 	def __init__(self, client):
 		self.bot = client
 
-	@Cog.listener()
-	async def on_ready(self):
-		# LOAD ALL COGS
-		for root, _, files in walk("./cogs"):
-			for cog in files:
-				if cog.endswith(".py"):
-					self.bot.load_extension(f"{root}.{cog[:-3]}")
-					print(f"Loaded {root}/{cog}.py")
-
-		#await setPresence(discord.ActivityType.watching, "#lewd")
-		print("Ready!")
 		#await startTimer()
 
 	"""

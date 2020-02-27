@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog #, command
 from discord.ext.commands.Cog import listener
-from ..utils import isValid
+from .._utils import isValid
 import discord
 import asyncio
 
