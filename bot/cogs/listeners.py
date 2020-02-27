@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import Cog
 from discord.ext.commands.errors import *
+from ._utils import setPresence
 #import discord
 
 
@@ -8,6 +9,10 @@ class Listeners(Cog):
 	def __init__(self, client):
 		self.bot = client
 
+	@Cog.listener()
+	async def on_ready(self):
+		await setPresence(self.bot, 3, "#lewd")
+		print("Ready!")
 		#await startTimer()
 
 	"""
@@ -36,8 +41,7 @@ class Listeners(Cog):
 """
 
 	@Cog.listener()
-	@staticmethod
-	async def on_command_error(ctx, error):
+	async def on_command_error(self, ctx, error):
 		if hasattr(ctx.command, "on_error"):
 			return
 		if isinstance(error, commands.CommandNotFound):

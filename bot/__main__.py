@@ -17,9 +17,6 @@ class AraBot(Bot):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 
-	async def on_ready(self):
-		print("Ready!")
-
 
 if __name__ == "__main__":
 	try:
