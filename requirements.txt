@@ -1,4 +1,4 @@
 discord	# THIS BOT. LITERALLY.
-PyNaCl	# ara ara
+PyNaCl	# voice chat
 aiohttp	# asynchronous web requests
 jikanpy	# MyAnimeList API wrapper
