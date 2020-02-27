@@ -14,8 +14,11 @@ class Commands(Cog):
 		self.bot = client
 
 	@command()
-	@staticmethod
-	async def love(ctx, target: FindMember):
+	async def ping(self, ctx):
+		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!")
+
+	@command()
+	async def love(self, ctx, target: FindMember):
 		await ctx.send(f"{ctx.author.mention} loves {target.mention} :heart:" if target else f"Love partner not found")
 
 	@command()
@@ -27,8 +30,7 @@ class Commands(Cog):
 
 	@command()
 	@has_permissions(manage_guild=True)
-	@staticmethod
-	async def rename(ctx, chan: discord.TextChannel, *, name):
+	async def rename(self, ctx, chan: discord.TextChannel, *, name):
 		oldName = chan.name
 		await chan.edit(name=name)
 		await ctx.send(f"Renamed **{oldName}** to **{chan.name}**")
@@ -43,10 +45,6 @@ class Commands(Cog):
 	@command(name="177013")
 	async def _177013(self, ctx):
 		await setPresence(self.bot, 3, "177013 with yo mama")
-
-	@command()
-	async def ping(self, ctx):
-		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!")
 
 	@command(aliases=["sauce"]) # response = trace.moe, sauce = MAL
 	async def source(self, ctx, image_url=None):
@@ -134,8 +132,7 @@ class Commands(Cog):
 
 	#######################################
 	@command()
-	@staticmethod
-	async def avatar(ctx, target: FindMember):
+	async def avatar(self, ctx, target: FindMember):
 		await ctx.send(target.avatar_url if isinstance(target, discord.Member) else f"User **{target}** not found")
 
 

@@ -1,15 +1,15 @@
 from discord.ext.commands import Cog #, command
-from discord.ext.commands.Cog import listener
 from .._utils import isValid
 import discord
 import asyncio
+import os
 
 
 class EasterEggs(Cog):
 	def __init__(self, client):
 		self.bot = client
 
-	@listener("on_message")
+	@Cog.listener("on_message")
 	async def communism(self, msg):
 		if isValid(self.bot, msg, "communism"):
 			await msg.channel.send(
@@ -32,19 +32,20 @@ class EasterEggs(Cog):
 :b::b::b::b::b::b::b::b::b::b::b::b::b::b::b:"""
 			)
 
-	@listener("on_message")
+	@Cog.listener("on_message")
 	async def lewd(self, msg):
 		if isValid(self.bot, msg, "lewd") and (await self.bot.get_context(msg)).voice_client is None:
 			for channel in msg.guild.voice_channels:
 				if channel.members:
 					channel = await channel.connect()
+					print(os.getcwd())
 					channel.play(
-						await discord.FFmpegOpusAudio.from_probe("aroro.ogg"),
+						await discord.FFmpegOpusAudio.from_probe("./bot/res/aroro.ogg"),
 						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
 					)
 					break
 
-	@listener("on_message")
+	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
 		if isValid(self.bot, msg, "za warudo"):
 			await msg.channel.set_permissions(msg.guild.default_role, send_messages=False)
