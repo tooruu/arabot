@@ -1,1 +1,1 @@
-worker: python gulag.py
+worker: python bot
