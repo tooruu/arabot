@@ -1,5 +1,5 @@
+#.vscode/
 #secret
 __pycache__/
 *.pyc
-.vscode/
 *test*
