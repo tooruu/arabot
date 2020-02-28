@@ -18,8 +18,8 @@ class Commands(Cog):
 		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!")
 
 	@command()
-	async def love(self, ctx, target: FindMember):
-		await ctx.send(f"{ctx.author.mention} loves {target.mention} :heart:" if target else f"Love partner not found")
+	async def love(self, ctx, partner: FindMember):
+		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else f"Love partner not found")
 
 	@command()
 	@check(isDev)
@@ -85,7 +85,6 @@ class Commands(Cog):
 				embed=embed
 			)
 
-	####################################### COG
 	@group(aliases=["cogs"])
 	@check(isDev)
 	async def cog(self, ctx):
@@ -117,7 +116,6 @@ class Commands(Cog):
 			self.bot.reload_extension(i)
 			await ctx.send(f"Reloaded **{i}**")
 
-	####################################### CLEAR
 	@command(aliases=["purge", "prune"])
 	@has_permissions(manage_messages=True)
 	async def clear(self, ctx, amount: int):
@@ -130,10 +128,13 @@ class Commands(Cog):
 		else:
 			raise error
 
-	#######################################
 	@command()
 	async def avatar(self, ctx, target: FindMember):
-		await ctx.send(target.avatar_url if isinstance(target, discord.Member) else f"User **{target}** not found")
+		await ctx.send(target.avatar_url if target else "User not found")
+
+	@command(aliases=["emote"])
+	async def emoji(self, ctx, emoji: FindEmoji):
+		await ctx.send(str(emoji.url) if emoji else "Emoji not found")
 
 
 def setup(client):
