@@ -21,7 +21,7 @@ class Commands(Cog):
 	async def love(self, ctx, partner: FindMember):
 		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else f"Love partner not found")
 
-	@command()
+	@command(aliases=["exit", "quit"])
 	@check(isDev)
 	async def stop(self, ctx):
 		await ctx.send("Stopping!")
@@ -88,7 +88,7 @@ class Commands(Cog):
 	@group(aliases=["cogs"])
 	@check(isDev)
 	async def cog(self, ctx):
-		pass
+		await ctx.send("Loaded cogs: " + ", ".join(c for c in self.bot.cogs.keys()))
 
 	@cog.command()
 	async def load(self, ctx, *cogs):
@@ -135,6 +135,24 @@ class Commands(Cog):
 	@command(aliases=["emote"])
 	async def emoji(self, ctx, emoji: FindEmoji):
 		await ctx.send(str(emoji.url) if emoji else "Emoji not found")
+
+	@command()
+	async def call(self, ctx, target: MemberConverter): # Disable smart member lookup
+		if target is not None:
+			await ctx.send(f"Sending DM to {target.mention}")
+			if target.dm_channel is None:
+				await target.create_dm()
+			await target.dm_channel.send(f"{ctx.author.mention} wants you to show up in **{ctx.guild.name}**.")
+		else:
+			ctx.send("User not found")
+
+	@command()
+	async def inspire(self, ctx):
+		async with WebSession(loop=self.bot.loop) as session:
+			async with session.get("http://inspirobot.me/api?generate=true") as url:
+				url = (await url.read()).decode()
+				async with session.get(url) as img:
+					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))
 
 
 def setup(client):
