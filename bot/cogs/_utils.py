@@ -17,11 +17,6 @@ def isValid(client, msg, invocator):
 		) and msg.author != client.user and invocator.lower() in msg.content.lower()
 
 
-async def arange(it: int):
-	for v in range(it):
-		yield v
-
-
 async def setPresence(client, _type: int, name: str, _status: Status = None):
 	if isinstance(_status, Status):
 		await client.change_presence(status=_status, activity=Activity(name=name, type=_type))

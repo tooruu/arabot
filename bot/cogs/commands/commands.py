@@ -103,7 +103,7 @@ class Commands(Cog):
 				await ctx.send(f"**{i}** is already loaded")
 			except (errors.ExtensionFailed, errors.NoEntryPointError):
 				await ctx.send(f"**{i}** is an invalid extension")
-		await ctx.send("Loaded " + ", ".join(loaded) if loaded else "nothing")
+		await ctx.send("Loaded " + (", ".join(loaded) or "nothing"))
 
 	@cog.command(aliases=["remove"])
 	async def unload(self, ctx, *cogs):
@@ -114,7 +114,7 @@ class Commands(Cog):
 				unloaded.append(f"**{i}**")
 			except errors.ExtensionNotLoaded:
 				pass
-		await ctx.send("Unloaded " + ", ".join(unloaded) if unloaded else "nothing")
+		await ctx.send("Unloaded " + (", ".join(unloaded) or "nothing"))
 
 	@cog.command()
 	async def reload(self, ctx, *cogs):
@@ -130,7 +130,7 @@ class Commands(Cog):
 				reloaded.append(f"**{i}**")
 			except (errors.ExtensionFailed, errors.NoEntryPointError):
 				await ctx.send(f"**{i}** is an invalid extension")
-		await ctx.send("Reloaded " + ", ".join(reloaded) if reloaded else "nothing")
+		await ctx.send("Reloaded " + (", ".join(reloaded) or "nothing"))
 
 	@command(aliases=["purge", "prune"])
 	@has_permissions(manage_messages=True)
