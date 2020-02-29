@@ -85,48 +85,60 @@ class Commands(Cog):
 				embed=embed
 			)
 
-	@group(aliases=["cogs"])
+	@group(aliases=["cogs"], invoke_without_command=True)
 	@check(isDev)
 	async def cog(self, ctx):
-		await ctx.send("Loaded cogs: " + ", ".join(c for c in self.bot.cogs.keys()))
+		await ctx.send("Loaded cogs: " + ", ".join(f"**{c}**" for c in self.bot.cogs.keys()))
 
-	@cog.command()
+	@cog.command(aliases=["add"])
 	async def load(self, ctx, *cogs):
+		loaded = []
 		for i in cogs:
 			try:
 				self.bot.load_extension(f"cogs.{i}")
-				await ctx.send(f"Loaded **{i}**")
+				loaded.append(f"**{i}**")
 			except errors.ExtensionNotFound:
 				await ctx.send(f"**{i}** was not found")
 			except errors.ExtensionAlreadyLoaded:
 				await ctx.send(f"**{i}** is already loaded")
+			except (errors.ExtensionFailed, errors.NoEntryPointError):
+				await ctx.send(f"**{i}** is an invalid extension")
+		await ctx.send("Loaded " + ", ".join(loaded) if loaded else "nothing")
 
-	@cog.command()
+	@cog.command(aliases=["remove"])
 	async def unload(self, ctx, *cogs):
+		unloaded = []
 		for i in cogs:
 			try:
 				self.bot.unload_extension(f"cogs.{i}")
-				await ctx.send(f"Unloaded **{i}**")
+				unloaded.append(f"**{i}**")
 			except errors.ExtensionNotLoaded:
 				pass
+		await ctx.send("Unloaded " + ", ".join(unloaded) if unloaded else "nothing")
 
-	@command()
+	@cog.command()
 	async def reload(self, ctx, *cogs):
+		reloaded = []
 		for i in cogs:
-			self.bot.reload_extension(i)
-			await ctx.send(f"Reloaded **{i}**")
+			try:
+				self.bot.reload_extension(f"cogs.{i}")
+				reloaded.append(f"**{i}**")
+			except errors.ExtensionNotFound:
+				await ctx.send(f"**{i}** was not found")
+			except errors.ExtensionNotLoaded:
+				self.bot.load_extension(f"cogs.{i}")
+				reloaded.append(f"**{i}**")
+			except (errors.ExtensionFailed, errors.NoEntryPointError):
+				await ctx.send(f"**{i}** is an invalid extension")
+		await ctx.send("Reloaded " + ", ".join(reloaded) if reloaded else "nothing")
 
 	@command(aliases=["purge", "prune"])
 	@has_permissions(manage_messages=True)
-	async def clear(self, ctx, amount: int):
-		await ctx.channel.purge(limit=amount + 1)
-
-	@clear.error
-	async def bad_usage(self, ctx, error):
-		if isinstance(error, (errors.BadArgument, errors.MissingRequiredArgument, errors.CommandInvokeError)):
-			await ctx.message.delete()
+	async def clear(self, ctx, amount: int = None):
+		if amount is not None:
+			await ctx.channel.purge(limit=amount + 1)
 		else:
-			raise error
+			await ctx.message.delete()
 
 	@command()
 	async def avatar(self, ctx, target: FindMember):
@@ -137,19 +149,18 @@ class Commands(Cog):
 		await ctx.send(str(emoji.url) if emoji else "Emoji not found")
 
 	@command()
-	async def call(self, ctx, target: MemberConverter): # Disable smart member lookup
+	async def call(self, ctx, target: MemberConverter): # Not use smart lookup
 		if target is not None:
-			await ctx.send(f"Sending DM to {target.mention}")
 			if target.dm_channel is None:
 				await target.create_dm()
 			await target.dm_channel.send(f"{ctx.author.mention} wants you to show up in **{ctx.guild.name}**.")
 		else:
-			ctx.send("User not found")
+			await ctx.send("User not found")
 
 	@command()
 	async def inspire(self, ctx):
 		async with WebSession(loop=self.bot.loop) as session:
-			async with session.get("http://inspirobot.me/api?generate=true") as url:
+			async with session.get("https://inspirobot.me/api", params={"generate": "true"}) as url:
 				url = (await url.read()).decode()
 				async with session.get(url) as img:
 					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))

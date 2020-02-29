@@ -42,13 +42,15 @@ class Listeners(Cog):
 
 	@Cog.listener()
 	async def on_command_error(self, ctx, error):
-		if hasattr(ctx.command, "on_error"):
-			return
-		if isinstance(error, commands.CommandNotFound):
-			return
-		if isinstance(error, (commands.errors.MissingPermissions, commands.errors.CheckFailure)):
-			print(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
-			await ctx.send(f"Missing permissions: {ctx.author}: {ctx.message.content[1:]}")
+		if hasattr(ctx.command, "on_error") or isinstance(
+			error, ( # Ignore following errors
+			commands.CommandNotFound,
+			MissingPermissions,
+			CheckFailure,
+			BadArgument,
+			MissingRequiredArgument,
+			)
+		):
 			return
 		raise error
 
