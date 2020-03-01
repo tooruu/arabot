@@ -152,7 +152,7 @@ class Commands(Cog):
 	async def emoji(self, ctx, emoji: FindEmoji):
 		await ctx.message.delete()
 		await ctx.send(
-			file=discord.File(BytesIO(await emoji.url_as(static_format="png").read()),
+			file=discord.File(BytesIO(await emoji.url.read()),
 			str(emoji.url).split("/")[-1]) if emoji else "Emoji not found"
 		)
 
