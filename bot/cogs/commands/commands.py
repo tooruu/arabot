@@ -143,9 +143,10 @@ class Commands(Cog):
 	@command(aliases=["a"])
 	async def avatar(self, ctx, target: FindMember):
 		await ctx.send(
-			file=discord.
-			File(BytesIO(await target.avatar_url_as(static_format="png").read()),
-			str(target.avatar_url).split("/")[-1]) if target else "User not found"
+			file=discord.File(
+			BytesIO(await target.avatar_url_as(static_format="png").read()),
+			str(target.avatar_url_as(static_format="png")).split("/")[-1].partition("?")[0]
+			) if target else "User not found"
 		)
 
 	@command(aliases=["emote", "e"])
