@@ -81,7 +81,7 @@ class Commands(Cog):
 			)
 			await ctx.send(
 				f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
-				file=discord.File(BytesIO(preview), response['filename']),
+				file=discord.File(BytesIO(preview), response["filename"]),
 				embed=embed
 			)
 
@@ -132,7 +132,7 @@ class Commands(Cog):
 				await ctx.send(f"**{i}** is an invalid extension")
 		await ctx.send("Reloaded " + (", ".join(reloaded) or "nothing"))
 
-	@command(aliases=["purge", "prune"])
+	@command(aliases=["purge", "prune", "d"])
 	@has_permissions(manage_messages=True)
 	async def clear(self, ctx, amount: int = None):
 		if amount is not None:
@@ -140,13 +140,21 @@ class Commands(Cog):
 		else:
 			await ctx.message.delete()
 
-	@command()
+	@command(aliases=["a"])
 	async def avatar(self, ctx, target: FindMember):
-		await ctx.send(target.avatar_url if target else "User not found")
+		await ctx.send(
+			file=discord.
+			File(BytesIO(await target.avatar_url_as(static_format="png").read()),
+			str(target.avatar_url).split("/")[-1]) if target else "User not found"
+		)
 
-	@command(aliases=["emote"])
+	@command(aliases=["emote", "e"])
 	async def emoji(self, ctx, emoji: FindEmoji):
-		await ctx.send(str(emoji.url) if emoji else "Emoji not found")
+		await ctx.message.delete()
+		await ctx.send(
+			file=discord.File(BytesIO(await emoji.url_as(static_format="png").read()),
+			str(emoji.url).split("/")[-1]) if emoji else "Emoji not found"
+		)
 
 	@command()
 	async def call(self, ctx, target: MemberConverter): # Not use smart lookup
@@ -154,6 +162,7 @@ class Commands(Cog):
 			if target.dm_channel is None:
 				await target.create_dm()
 			await target.dm_channel.send(f"{ctx.author.mention} wants you to show up in **{ctx.guild.name}**.")
+			await ctx.send(f"Called {target.mention} to show up")
 		else:
 			await ctx.send("User not found")
 
