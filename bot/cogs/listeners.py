@@ -27,6 +27,9 @@ class Listeners(Cog):
 			)
 		):
 			return
+		if isinstance(error, CommandOnCooldown):
+			await ctx.send(error)
+			return
 		raise error
 
 
