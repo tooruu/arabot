@@ -1,5 +1,5 @@
 from random import choice, choices
-from discord.ext.commands import command, Cog, cooldown, BucketType
+from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCooldown
 
 
 class Gacha(Cog):
@@ -75,6 +75,11 @@ class Gacha(Cog):
 			if "Stig" not in i else f"{choice(self.pool[supply.lower()][i])} ({choice(('T', 'M', 'B'))})" for i in types
 		]
 		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply, "\n".join(drops)))
+
+	@gacha.error
+	async def no_cooldown(self, ctx, error): # reset cd if command was invoked incorrecetly
+		if not isinstance(error, CommandOnCooldown):
+			self.gacha.reset_cooldown(ctx)
 
 
 def setup(client):

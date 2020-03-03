@@ -17,6 +17,9 @@ class Listeners(Cog):
 
 	@Cog.listener()
 	async def on_command_error(self, ctx, error):
+		if isinstance(error, CommandOnCooldown):
+			await ctx.send(error)
+			return
 		if hasattr(ctx.command, "on_error") or isinstance(
 			error, ( # Ignore following errors
 			commands.CommandNotFound,
@@ -26,9 +29,6 @@ class Listeners(Cog):
 			MissingRequiredArgument,
 			)
 		):
-			return
-		if isinstance(error, CommandOnCooldown):
-			await ctx.send(error)
 			return
 		raise error
 
