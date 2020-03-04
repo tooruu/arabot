@@ -27,9 +27,9 @@ async def setPresence(client, _type: int, name: str, _status: Status = None):
 class Finder(Converter):
 	"""
 	Abstract class to convert *argument* to desired class.
-	1.	Try to convert via derived class's second parent's
-		`convert` method (implemented in discord.py)
-	2. Try to find via `discord.utils.find` using custom lambda
+	1.	Try to convert via subclass's parents'
+		`convert` methods (implemented in discord.py)
+	2. Try to find via subclass's method `find`
 
 	# Example usage:
    class FindObject(Finder, commands.ObjectConverter):
@@ -37,15 +37,20 @@ class Finder(Converter):
 		def find(ctx, argument):
 			return lambda obj: obj.att == argument, ctx.obj_list
     """
+	def __init__(self):
+		if len(type(self).__bases__) == 1:
+			raise IndexError(f"<'{type(self).__name__}'> must have at least 2 parents")
+		for base in type(self).__bases__[1:]:
+			if not issubclass(base, Converter):
+				raise TypeError(f"Parents of <'{type(self).__name__}'> are not derived from Converter")
+
 	async def convert(self, ctx, argument):
-		try:
-			if not issubclass(type(self).__bases__[1], Converter):
-				raise TypeError
-			return await type(self).__bases__[1].convert(self, ctx, argument)
-		except BadArgument:
-			return find(*self.find(ctx, argument))
-		except (IndexError, TypeError):
-			raise TypeError(f"2nd parent of <'{type(self).__name__}'> is not Converter")
+		for conv in type(self).__bases__[1:]:
+			try:
+				return await conv().convert(ctx, argument)
+			except BadArgument:
+				pass
+		return self.find(ctx, argument)
 
 	def find(self, ctx, argument):
 		raise NotImplementedError("Derived classes need to implement this.")
@@ -53,22 +58,29 @@ class Finder(Converter):
 
 class FindMember(Finder, MemberConverter):
 	def find(self, ctx, argument):
-		return lambda member: not member.bot and member.name.lower().startswith(argument.lower()), ctx.guild.members
+		return find(lambda member: not member.bot and member.name.lower().startswith(argument.lower()), ctx.guild.members)
 
 
 class FindEmoji(Finder, EmojiConverter):
 	def find(self, ctx, argument):
-		return lambda emoji: emoji.name.lower().startswith(argument.lower()), ctx.guild.emojis
+		return find(lambda emoji: emoji.name.lower().startswith(argument.lower()), ctx.guild.emojis)
 
 
 class FindTxChl(Finder, TextChannelConverter):
 	def find(self, ctx, argument):
-		return lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.text_channels
+		return find(lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.text_channels)
 
 
 class FindVcChl(Finder, VoiceChannelConverter):
 	def find(self, ctx, argument):
-		return lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.voice_channels
+		return find(lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.voice_channels)
+
+
+class FindChl(Finder, TextChannelConverter, VoiceChannelConverter):
+	def find(self, ctx, argument):
+		return find(
+			lambda chl: chl.name.lower().startswith(argument.lower()), ctx.guild.text_channels + ctx.guild.voice_channels
+		)
 
 
 class FindRole(Finder, RoleConverter):

@@ -49,7 +49,7 @@ class Commands(Cog):
 	@command(aliases=["sauce"]) # response = trace.moe, sauce = MAL
 	async def source(self, ctx, image_url=None):
 		image_url = ctx.message.attachments[0].url if ctx.message.attachments else image_url
-		if image_url is not None:
+		if image_url:
 			async with WebSession(loop=self.bot.loop) as session:
 				async with session.get("https://trace.moe/api/search", params={"url": image_url}) as response:
 					response = (await response.json())["docs"][0]
@@ -135,7 +135,7 @@ class Commands(Cog):
 	@command(aliases=["purge", "prune", "d"])
 	@has_permissions(manage_messages=True)
 	async def clear(self, ctx, amount: int = None):
-		if amount is not None:
+		if amount:
 			await ctx.channel.purge(limit=amount + 1)
 		else:
 			await ctx.message.delete()
@@ -159,7 +159,7 @@ class Commands(Cog):
 
 	@command()
 	async def call(self, ctx, target: MemberConverter): # Not use smart lookup
-		if target is not None:
+		if target:
 			if target.dm_channel is None:
 				await target.create_dm()
 			await target.dm_channel.send(f"{ctx.author.mention} wants you to show up in **{ctx.guild.name}**.")

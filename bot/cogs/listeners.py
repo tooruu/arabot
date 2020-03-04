@@ -13,7 +13,6 @@ class Listeners(Cog):
 	async def on_ready(self):
 		await setPresence(self.bot, 3, "#lewd")
 		print("Ready!")
-		#await startTimer()
 
 	@Cog.listener()
 	async def on_command_error(self, ctx, error):

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, group
 from discord.ext.tasks import loop
+from ._utils import FindChl
 now = datetime.now
 
 
@@ -8,9 +9,9 @@ class Timer(Cog):
 	def __init__(self, client):
 		self.bot = client
 		self.reset = self.resetTime()
-		self.countdown.start()
 
 	resets = [0, 3, 5, 7]
+	channel = None
 
 	def resetTime(self):
 		today = now()
@@ -31,7 +32,37 @@ class Timer(Cog):
 	@countdown.before_loop
 	async def wait(self):
 		await self.bot.wait_until_ready()
-		self.channel = self.bot.get_channel(678423053306298389)
+
+	@group(invoke_without_command=True)
+	async def timer(self, ctx):
+		task = self.countdown.get_task()
+		if task and not task.done():
+			status = "Active, running"
+		else:
+			status = "Stopped"
+		channel = f"**{self.channel.name}**" if self.channel else "Not set"
+		await ctx.send(f"Channel: {channel}\nStatus: {status}")
+
+	@timer.command(name="set")
+	async def _set(self, ctx, chan: FindChl):
+		if chan:
+			self.channel = chan
+			await ctx.send(f"Channel set to **{chan.name}**")
+		else:
+			await ctx.send("Channel not found")
+
+	@timer.command()
+	async def start(self, ctx):
+		if self.channel:
+			self.countdown.start()
+			await ctx.send("Started timer")
+		else:
+			await ctx.send("Channel not set!")
+
+	@timer.command(aliases=["stop"]) # stop() != cancel()
+	async def cancel(self, ctx):
+		self.countdown.cancel()
+		await ctx.send("Stopping timer")
 
 	def cog_unload(self):
 		self.countdown.cancel()
