@@ -77,7 +77,7 @@ class Gacha(Cog):
 		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply, "\n".join(drops)))
 
 	@gacha.error
-	async def no_cooldown(self, ctx, error): # reset cd if command was invoked incorrecetly
+	async def no_cooldown(self, ctx, error): # reset cd if command was invoked incorrectly
 		if not isinstance(error, CommandOnCooldown):
 			self.gacha.reset_cooldown(ctx)
 

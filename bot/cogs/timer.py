@@ -8,10 +8,9 @@ now = datetime.now
 class Timer(Cog):
 	def __init__(self, client):
 		self.bot = client
+		self.resets = 0, 3, 5, 7
 		self.reset = self.resetTime()
-
-	resets = [0, 3, 5, 7]
-	channel = None
+		self.channel = None
 
 	def resetTime(self):
 		today = now()

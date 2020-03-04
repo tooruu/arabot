@@ -2,7 +2,6 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 from discord.ext.commands.errors import *
 from ._utils import setPresence
-#import discord
 
 
 class Listeners(Cog):
