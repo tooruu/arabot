@@ -63,27 +63,20 @@ class Commands(Cog):
 					"token": response['tokenthumb']
 					}
 				) as preview:
-					preview = await preview.read()
-			embed = discord.Embed(
-				color=32767,
-				description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
-			)
-			embed.set_author(name=sauce["title"], url=sauce["url"])
-			embed.set_thumbnail(url=sauce["image_url"])
-			sauce["synopsis"] = sauce["synopsis"].partition(" [")[0]
-			embed.add_field(
-				name="Synopsis",
-				value=sauce["synopsis"]
-				if len(sauce["synopsis"]) <= 600 else ".".join(sauce["synopsis"][:600].split(".")[0:-1]) + "..."
-			)
-			embed.set_footer(
-				text=f"Requested by {ctx.author.nick} | Powered by trace.moe", icon_url=str(ctx.author.avatar_url)
-			)
-			await ctx.send(
-				f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
-				file=discord.File(BytesIO(preview), response["filename"]),
-				embed=embed
-			)
+					await ctx.send(
+						f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
+						file=discord.File(BytesIO(await preview.read()), response["filename"]),
+						embed=discord.Embed(
+						color=32767,
+						description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
+						).set_author(name=sauce["title"], url=sauce["url"]).set_thumbnail(url=sauce["image_url"]).add_field(
+						name="Synopsis",
+						value=sauce["synopsis"].partition(" [")[0] if len(sauce["synopsis"].partition(" [")[0]) <= 600 else
+						".".join(sauce["synopsis"].partition(" [")[0][:600].split(".")[0:-1]) + "..."
+						).set_footer(
+						text=f"Requested by {ctx.author.nick} | Powered by trace.moe", icon_url=ctx.author.avatar_url
+						)
+					)
 
 	@group(aliases=["cogs"], invoke_without_command=True)
 	@check(isDev)
