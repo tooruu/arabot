@@ -32,11 +32,10 @@ class Finder(Converter):
 	2. Try to find via subclass's method `find`
 
 	# Example usage:
-   class FindObject(Finder, commands.ObjectConverter):
-		@staticmethod
-		def find(ctx, argument):
-			return lambda obj: obj.att == argument, ctx.obj_list
-    """
+	class FindObject(Finder, AConverter, BConverter):
+		def find(self, ctx, argument):
+			return utils.find(lambda obj: obj.att == argument, ctx.obj_list)
+	"""
 	def __init__(self):
 		if len(type(self).__bases__) == 1:
 			raise IndexError(f"<'{type(self).__name__}'> must have at least 2 parents")

@@ -5,11 +5,11 @@ from ._utils import FindChl
 now = datetime.now
 
 
+#pylint: disable=attribute-defined-outside-init
 class Timer(Cog):
 	def __init__(self, client):
 		self.bot = client
 		self.resets = 0, 3, 5, 7
-		self.reset = self.resetTime()
 		self.channel = None
 
 	def resetTime(self):
@@ -31,6 +31,7 @@ class Timer(Cog):
 	@countdown.before_loop
 	async def wait(self):
 		await self.bot.wait_until_ready()
+		self.reset = self.resetTime()
 
 	@group(invoke_without_command=True)
 	async def timer(self, ctx):
