@@ -86,3 +86,31 @@ class FindChl(Finder, TextChannelConverter, VoiceChannelConverter):
 class FindRole(Finder, RoleConverter):
 	def find(self, ctx, argument):
 		return lambda role: role.name.lower().startswith(argument.lower()), ctx.guild.roles
+
+
+class Conveyor:
+	def __init__(self, size):
+		self._items = [0] * size
+		self._limit = size
+
+	def __repr__(self):
+		return self._items
+
+	def __len__(self):
+		return self._limit
+
+	def __str__(self):
+		return str(self._items)
+
+	def __getitem__(self, key):
+		return self._items[key]
+
+	def push(self, item):
+		del self._items[0]
+		self._items.append(item)
+
+	def items(self):
+		return self._items
+
+	def size(self):
+		return len(self.items)

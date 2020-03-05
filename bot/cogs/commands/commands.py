@@ -1,12 +1,15 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
 from .._utils import *
 import discord
-
-# sauce
 from aiohttp import ClientSession as WebSession
 from jikanpy import AioJikan
 from urllib.parse import quote
 from io import BytesIO
+from datetime import datetime, timedelta
+from matplotlib import use
+use("AGG")
+from matplotlib import pyplot as plt, dates as md
+from random import choices
 
 
 class Commands(Cog):
@@ -19,7 +22,24 @@ class Commands(Cog):
 
 	@command()
 	async def ping(self, ctx):
-		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!")
+		x = [datetime.now() + timedelta(minutes=i) for i in range(-60, 1)]
+		y = choices(range(1, 200), k=61)
+		fig, ax = plt.subplots()
+		plt.plot(x, y)
+		plt.ylabel("Ping (ms)")
+		plt.xlabel("The last hour")
+		#plt.ylim(top=)
+		ax.set_xlim(x[0], x[-1])
+		ax.xaxis.set_major_locator(md.MinuteLocator(interval=1))
+		ax.xaxis.set_major_formatter(md.DateFormatter(""))
+		#fig.autofmt_xdate()
+
+		# Send figure
+		buf = BytesIO()
+		plt.savefig(buf, format="png")
+		buf.seek(0)
+		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!", file=discord.File(buf, "ping.png"))
+		plt.clf() # Delete opened figure
 
 	@command()
 	async def love(self, ctx, partner: FindMember):
