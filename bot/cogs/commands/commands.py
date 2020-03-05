@@ -15,7 +15,7 @@ class Commands(Cog):
 
 	@command(aliases=["ver", "v"])
 	async def version(self, ctx):
-		ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
+		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
 	@command()
 	async def ping(self, ctx):
