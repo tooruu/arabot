@@ -20,19 +20,17 @@ class Commands(Cog):
 	async def version(self, ctx):
 		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
-	@command()
-	async def ping(self, ctx):
-		x = [datetime.now() + timedelta(minutes=i) for i in range(-60, 1)]
-		y = choices(range(1, 200), k=61)
-		fig, ax = plt.subplots()
-		plt.plot(x, y)
-		plt.ylabel("Ping (ms)")
-		plt.xlabel("The last hour")
-		#plt.ylim(top=)
-		ax.set_xlim(x[0], x[-1])
-		ax.xaxis.set_major_locator(md.MinuteLocator(interval=1))
-		ax.xaxis.set_major_formatter(md.DateFormatter(""))
-		#fig.autofmt_xdate()
+		#@command()
+		#async def ping(self, ctx):
+		#	x = [datetime.now() + timedelta(minutes=i) for i in range(-60, 1)]
+		#	y = choices(range(1, 200), k=61)
+		#	ax = plt.subplots()[1]
+		#	plt.plot(x, y)
+		#	plt.ylabel("Ping (ms)")
+		#	plt.xlabel("The last hour")
+		#	ax.set_xlim(x[0], x[-1])
+		#	ax.xaxis.set_major_locator(md.MinuteLocator(interval=1))
+		#	ax.xaxis.set_major_formatter(md.DateFormatter(""))
 
 		# Send figure
 		buf = BytesIO()
@@ -98,7 +96,8 @@ class Commands(Cog):
 						value=sauce["synopsis"].partition(" [")[0] if len(sauce["synopsis"].partition(" [")[0]) <= 600 else
 						".".join(sauce["synopsis"].partition(" [")[0][:600].split(".")[0:-1]) + "..."
 						).set_footer(
-						text=f"Requested by {ctx.author.nick} | Powered by trace.moe", icon_url=ctx.author.avatar_url
+						text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
+						icon_url=ctx.author.avatar_url
 						)
 					)
 
@@ -169,10 +168,13 @@ class Commands(Cog):
 	@command(aliases=["emote", "e"])
 	async def emoji(self, ctx, emoji: FindEmoji):
 		await ctx.message.delete()
-		await ctx.send(
-			file=discord.File(BytesIO(await emoji.url.read()),
-			str(emoji.url).split("/")[-1]) if emoji else "Emoji not found"
-		)
+		if emoji:
+			await ctx.send(
+				embed=discord.Embed().set_image(url=emoji.url).
+				set_footer(text="reacted", icon_url=ctx.author.avatar_url_as(static_format="png"))
+			)
+		else:
+			await ctx.send("Emoji not found")
 
 	@command()
 	async def call(self, ctx, target: MemberConverter): # Not use smart lookup

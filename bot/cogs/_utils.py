@@ -6,7 +6,7 @@ from discord.utils import find
 from discord import Status, Activity
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.5.2"
+BOT_VERSION = "0.5.6"
 
 
 def isDev(ctx):
@@ -88,16 +88,16 @@ class FindRole(Finder, RoleConverter):
 		return lambda role: role.name.lower().startswith(argument.lower()), ctx.guild.roles
 
 
-class Conveyor:
-	def __init__(self, size):
-		self._items = [0] * size
-		self._limit = size
+class Queue:
+	def __init__(self, maxsize):
+		self._items = [0] * maxsize
+		self.size = maxsize
 
 	def __repr__(self):
 		return self._items
 
 	def __len__(self):
-		return self._limit
+		return self.size
 
 	def __str__(self):
 		return str(self._items)
@@ -105,12 +105,9 @@ class Conveyor:
 	def __getitem__(self, key):
 		return self._items[key]
 
-	def push(self, item):
+	def enqueue(self, item=0):
 		del self._items[0]
 		self._items.append(item)
 
 	def items(self):
 		return self._items
-
-	def size(self):
-		return len(self.items)
