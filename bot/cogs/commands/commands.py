@@ -13,6 +13,10 @@ class Commands(Cog):
 	def __init__(self, client):
 		self.bot = client
 
+	@command(aliases=["ver", "v"])
+	async def version(self, ctx):
+		ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
+
 	@command()
 	async def ping(self, ctx):
 		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!")

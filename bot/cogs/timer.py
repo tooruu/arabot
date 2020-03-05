@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from discord.ext.commands import Cog, group
+from discord.ext.commands import Cog, group, has_permissions
 from discord.ext.tasks import loop
 from ._utils import FindChl
 now = datetime.now
@@ -34,6 +34,7 @@ class Timer(Cog):
 		self.reset = self.resetTime()
 
 	@group(invoke_without_command=True)
+	@has_permissions(manage_guild=True)
 	async def timer(self, ctx):
 		task = self.countdown.get_task()
 		if task and not task.done():

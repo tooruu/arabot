@@ -5,7 +5,8 @@ from discord.ext.commands.errors import BadArgument
 from discord.utils import find
 from discord import Status, Activity
 
-#__all__ = ["isDev", "isValid", "arange", "FindMember", "setPresence", "FFindMember"]
+BOT_NAME = "AraBot"
+BOT_VERSION = "0.5.2"
 
 
 def isDev(ctx):
