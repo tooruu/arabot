@@ -46,11 +46,11 @@ class Gacha(Cog):
 		"Divine Prayer", "Yamabuki Armor", "Valkyrie Triumph", "Arctic Kriegsmesser", "Snowy Sniper",
 		"Scarlet Fusion"
 		],
-		"Weap4": ["Keys of the Void", "Path to Acheron", "Key of Reason", "Blood Dance"],
+		"Weap4": ["Keys of the Void", "Path to Acheron", "Key of Reason", "Blood Dance", "Hekate's Gloom"],
 		"Weap3": ["Azure Storm", "Nitro Crystal", "Dark Crusher"],
 		"Stig4": [
 		"Sirin", "Shakespeare", "Rasputin", "Nobel", "Beethoven", "Caravaggio", "Michelangelo", "Oath of Judah",
-		"Hekate's Gloom", "Jin Shengtan"
+		"Jin Shengtan"
 		],
 		"Stig3": [
 		"Charlemagne", "Elizabeth Bathory", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen", "Nikola Tesla",
