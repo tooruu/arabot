@@ -2,3 +2,4 @@ discord         # Discord API wrapper
 PyNaCl          # voice chat
 aiohttp         # asynchronous web requests
 jikanpy         # MyAnimeList API wrapper
+matplotlib      # ping graph
