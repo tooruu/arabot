@@ -1,3 +1,4 @@
+from discord import File
 from discord.ext.commands import command, Cog
 from datetime import datetime, timedelta
 from discord.ext.tasks import loop
@@ -6,19 +7,18 @@ from io import BytesIO
 from matplotlib import use
 use("AGG")
 from matplotlib import pyplot as plt, dates as md
-from random import choices
-from discord import File
 
 
 class Ping(Cog):
 	def __init__(self, client):
 		self.bot = client
+		self.old = self.bot.remove_command("ping")
 		self.log = Queue(60)
 		self.store.start()
 
 	@loop(minutes=1)
 	async def store(self):
-		self.log.enqueue(self.bot.latency * 1000)
+		self.log.enqueue(round(self.bot.latency * 1000))
 
 	@store.before_loop
 	async def wait(self):
@@ -28,7 +28,12 @@ class Ping(Cog):
 	async def ping(self, ctx):
 		x = [datetime.now() + timedelta(minutes=i) for i in range(-self.log.size, 0)]
 		y = self.log
-		ax = plt.subplots()[1]
+		y = [
+			102, 101, 105, 100, 100, 100, 102, 115, 100, 101, 102, 104, 102, 98, 103, 106, 100, 100, 130, 102, 103, 100,
+			101, 100, 101, 110, 101, 109, 102, 101, 101, 101, 101, 100, 103, 100, 100, 102, 106, 101, 102, 101, 102, 100,
+			102, 113, 101, 101, 110, 102, 103, 100, 111, 103, 102, 102, 99, 101, 102, 109
+		]
+		ax = plt.subplots(figsize=(4, 1))[1]
 		plt.plot(x, y)
 		plt.ylabel("Ping (ms)")
 		plt.xlabel("The last hour")
@@ -48,7 +53,9 @@ class Ping(Cog):
 		await ctx.send(str(self.log))
 
 	def cog_unload(self):
-		self.countdown.cancel()
+		self.store.cancel()
+		self.bot.remove_command("ping")
+		self.bot.add_command(self.old)
 
 
 def setup(client):
