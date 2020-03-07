@@ -5,11 +5,6 @@ from aiohttp import ClientSession as WebSession
 from jikanpy import AioJikan
 from urllib.parse import quote
 from io import BytesIO
-from datetime import datetime, timedelta
-from matplotlib import use
-use("AGG")
-from matplotlib import pyplot as plt, dates as md
-from random import choices
 
 
 class Commands(Cog):
@@ -20,24 +15,9 @@ class Commands(Cog):
 	async def version(self, ctx):
 		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
-		#@command()
-		#async def ping(self, ctx):
-		#	x = [datetime.now() + timedelta(minutes=i) for i in range(-60, 1)]
-		#	y = choices(range(1, 200), k=61)
-		#	ax = plt.subplots()[1]
-		#	plt.plot(x, y)
-		#	plt.ylabel("Ping (ms)")
-		#	plt.xlabel("The last hour")
-		#	ax.set_xlim(x[0], x[-1])
-		#	ax.xaxis.set_major_locator(md.MinuteLocator(interval=1))
-		#	ax.xaxis.set_major_formatter(md.DateFormatter(""))
-
-		# Send figure
-		buf = BytesIO()
-		plt.savefig(buf, format="png")
-		buf.seek(0)
-		await ctx.send(f":ping_pong: Pong after {round(self.bot.latency, 3)}ms!", file=discord.File(buf, "ping.png"))
-		plt.clf() # Delete opened figure
+	@command()
+	async def ping(self, ctx):
+		await ctx.send(f":ping_pong: Pong after {self.bot.latency*1000:.0f}ms!")
 
 	@command()
 	async def love(self, ctx, partner: FindMember):
