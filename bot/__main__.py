@@ -20,9 +20,9 @@ if __name__ == "__main__":
 		bot.g_api_key = environ["g_api_key"]
 		bot.g_cx = environ["g_cx"]
 	except KeyError:
-		with open("./secret") as s:
-			token = s.readline()
-			bot.g_api_key = s.readline()
-			bot.g_cx = s.readline()
+		with open("./.env") as s:
+			locals().update({line.partition("=")[0]: line.partition("=")[-1] for line in s.read().splitlines()})
+		bot.g_api_key = g_api_key
+		bot.g_cx = g_cx
 	load_ext(bot)
 	bot.run(token)

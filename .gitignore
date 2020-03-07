@@ -3,3 +3,4 @@ secret
 __pycache__/
 *.pyc
 *test*
+.env
