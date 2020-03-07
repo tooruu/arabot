@@ -3,6 +3,7 @@ from discord.ext.commands import command, Cog
 from discord.ext.tasks import loop
 from .._utils import Queue
 from io import BytesIO
+from matplotlib.ticker import MaxNLocator
 from matplotlib import use
 use("AGG")
 from matplotlib import pyplot as plt
@@ -35,7 +36,8 @@ class Ping(Cog):
 		plt.ylabel("Ping (ms)", fontsize=7)
 		plt.xlabel("The last hour", fontsize=8)
 		ax.set_xlim(x[0], x[-1])
-		ax.set_ylim(min(y) - 5, max(y) + 5)
+		ax.set_ylim((min(y) if y[0] != 0 else sorted(set(y))[1]) - 5, max(y) + 5)
+		ax.get_yaxis().set_major_locator(MaxNLocator(integer=True, nbins=4))
 		plt.fill_between(x, y, color="cyan", alpha=0.45)
 
 		# Send figure
