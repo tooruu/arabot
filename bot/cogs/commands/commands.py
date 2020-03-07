@@ -174,6 +174,21 @@ class Commands(Cog):
 				async with session.get(url) as img:
 					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))
 
+	@command(aliases=["i", "img"])
+	async def image(self, ctx, *, query):
+		async with WebSession(loop=self.bot.loop) as session:
+			async with session.get(
+				"https://www.googleapis.com/customsearch/v1",
+				params={
+				"key": self.bot.g_api_key,
+				"cx": self.bot.g_cx,
+				"q": query,
+				"num": 1,
+				"searchType": "image"
+				}
+			) as response:
+				await ctx.send((await response.json())["items"][0]["link"])
+
 
 def setup(client):
 	client.add_cog(Commands(client))
