@@ -7,7 +7,7 @@ def load_ext(client):
 	path = ""
 	for root, _, files in walk("./bot/cogs"):
 		path += basename(root) + "."
-		for cog in files:
+		for cog in sorted(files):
 			if cog.endswith(".py") and not cog.startswith("_"):
 				client.load_extension(path + cog[:-3])
 				print(f"Loaded {path}{cog[:-3]}")

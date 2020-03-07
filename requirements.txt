@@ -1,4 +1,4 @@
-discord         # Discord API wrapper
+discord[voice]  # Discord API wrapper
 PyNaCl          # voice chat
 aiohttp         # asynchronous web requests
 jikanpy         # MyAnimeList API wrapper
