@@ -60,6 +60,19 @@ class EasterEggs(Cog):
 			await msg.channel.purge(limit=8)
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=None)
 
+	@Cog.listener("on_message")
+	async def tuna(self, msg):
+		if isValid(self.bot, msg, "tuna") and (await self.bot.get_context(msg)).voice_client is None:
+			for channel in msg.guild.voice_channels:
+				if channel.members:
+					channel = await channel.connect()
+					print(os.getcwd())
+					channel.play(
+						await discord.FFmpegOpusAudio.from_probe("./bot/res/nekocharm.ogg"),
+						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
+					) #TODO: Generalize voice easter egg creation
+					break
+
 
 def setup(client):
 	client.add_cog(EasterEggs(client))
