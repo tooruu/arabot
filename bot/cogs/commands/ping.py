@@ -5,7 +5,7 @@ from .._utils import Queue
 from io import BytesIO
 from matplotlib.ticker import MaxNLocator
 from matplotlib import use
-use("AGG")
+use("AGG") #pylint: disable=wrong-import-position
 from matplotlib import pyplot as plt
 
 

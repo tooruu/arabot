@@ -22,6 +22,7 @@ if __name__ == "__main__":
 	except KeyError:
 		with open("./.env") as s:
 			locals().update({line.partition("=")[0]: line.partition("=")[-1] for line in s.read().splitlines()})
+		#pylint: disable=undefined-variable
 		bot.g_api_key = g_api_key
 		bot.g_cx = g_cx
 	load_ext(bot)
