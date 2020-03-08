@@ -69,17 +69,19 @@ class Gacha(Cog):
 	@cooldown(1, 60, BucketType.user)
 	@command()
 	async def gacha(self, ctx, supply="dorm", pulls: int = 10):
-		types = choices([key for key in self.rates], self.rates.values(), k=pulls)
+		types = choices([*self.rates.keys()], self.rates.values(), k=pulls)
 		drops = [
 			choice(self.pool[supply.lower()][i])
 			if "Stig" not in i else f"{choice(self.pool[supply.lower()][i])} ({choice(('T', 'M', 'B'))})" for i in types
 		]
-		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply, "\n".join(drops)))
+		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply.capitalize(), "\n".join(drops)))
 
 	@gacha.error
-	async def no_cooldown(self, ctx, error): # reset cd if command was invoked incorrectly
-		if not isinstance(error, CommandOnCooldown):
-			self.gacha.reset_cooldown(ctx)
+	async def on_error(self, ctx, error):
+		if isinstance(error, CommandOnCooldown): # reset cd if command was invoked incorrectly
+			return
+		self.gacha.reset_cooldown(ctx)
+		raise error
 
 
 def setup(client):

@@ -2,12 +2,24 @@ from discord.ext.commands import Cog #, command
 from .._utils import isValid
 import discord
 import asyncio
-import os
+from sys import _getframe
 
 
 class EasterEggs(Cog):
 	def __init__(self, client):
 		self.bot = client
+
+	async def VoiceReaction(self, msg, vorbis, trigger=None):
+		if isValid(self.bot, msg,
+			_getframe(1).f_code.co_name.replace("_", " ")
+			if trigger is None else trigger) and (await self.bot.get_context(msg)).voice_client is None:
+			for channel in msg.guild.voice_channels:
+				if channel.members:
+					(channel := await channel.connect()).play(
+						await discord.FFmpegOpusAudio.from_probe(f"./bot/res/{vorbis}.ogg"),
+						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
+					)
+					break
 
 	@Cog.listener("on_message")
 	async def communism(self, msg):
@@ -34,16 +46,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def lewd(self, msg):
-		if isValid(self.bot, msg, "lewd") and (await self.bot.get_context(msg)).voice_client is None:
-			for channel in msg.guild.voice_channels:
-				if channel.members:
-					channel = await channel.connect()
-					print(os.getcwd())
-					channel.play(
-						await discord.FFmpegOpusAudio.from_probe("./bot/res/aroro.ogg"),
-						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
-					)
-					break
+		await self.VoiceReaction(msg, "aroro")
 
 	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
@@ -62,16 +65,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def tuna(self, msg):
-		if isValid(self.bot, msg, "tuna") and (await self.bot.get_context(msg)).voice_client is None:
-			for channel in msg.guild.voice_channels:
-				if channel.members:
-					channel = await channel.connect()
-					print(os.getcwd())
-					channel.play(
-						await discord.FFmpegOpusAudio.from_probe("./bot/res/nekocharm.ogg"),
-						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
-					) #TODO: Generalize voice easter egg creation
-					break
+		await self.VoiceReaction(msg, "nekocharm")
 
 
 def setup(client):

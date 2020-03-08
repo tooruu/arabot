@@ -46,10 +46,6 @@ class Ping(Cog):
 		buf.seek(0)
 		await ctx.send(f":ping_pong: Pong after {self.bot.latency * 1000:.0f}ms!", file=File(buf, "ping.png"))
 
-	@command()
-	async def showlog(self, ctx):
-		await ctx.send(str(self.log))
-
 	def cog_unload(self):
 		self.store.cancel()
 		self.bot.remove_command("ping")

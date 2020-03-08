@@ -16,7 +16,7 @@ class Listeners(Cog):
 	@Cog.listener()
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, CommandOnCooldown):
-			await ctx.send(error)
+			await ctx.send(f"Cooldown expires in {error.retry_after:.0f} seconds")
 			return
 		if hasattr(ctx.command, "on_error") or isinstance(
 			error, ( # Ignore following errors

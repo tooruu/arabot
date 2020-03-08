@@ -30,9 +30,9 @@ class Commands(Cog):
 		print("Stopping!")
 		await self.bot.close()
 
-	@command()
+	@command(aliases=["cren"])
 	@has_permissions(manage_guild=True)
-	async def rename(self, ctx, chan: discord.TextChannel, *, name):
+	async def crename(self, ctx, chan: FindChl, *, name):
 		oldName = chan.name
 		await chan.edit(name=name)
 		await ctx.send(f"Renamed **{oldName}** to **{chan.name}**")
@@ -50,12 +50,10 @@ class Commands(Cog):
 
 	@command(aliases=["sauce"]) # response = trace.moe, sauce = MAL
 	async def source(self, ctx, image_url=None):
-		image_url = ctx.message.attachments[0].url if ctx.message.attachments else image_url
-		if image_url:
+		if image_url:=ctx.message.attachments[0].url if ctx.message.attachments else image_url:
 			async with WebSession(loop=self.bot.loop) as session:
 				async with session.get("https://trace.moe/api/search", params={"url": image_url}) as response:
-					response = (await response.json())["docs"][0]
-					sauce = (await AioJikan(session=session).anime(response["mal_id"]))
+					sauce = (await AioJikan(session=session).anime((response:=(await response.json())["docs"][0])["mal_id"]))
 				async with session.get(
 					"https://trace.moe/preview.php",
 					params={
@@ -65,6 +63,7 @@ class Commands(Cog):
 					"token": response['tokenthumb']
 					}
 				) as preview:
+					#pylint: disable=used-before-assignment
 					await ctx.send(
 						f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
 						file=discord.File(BytesIO(await preview.read()), response["filename"]),
@@ -73,8 +72,8 @@ class Commands(Cog):
 						description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
 						).set_author(name=sauce["title"], url=sauce["url"]).set_thumbnail(url=sauce["image_url"]).add_field(
 						name="Synopsis",
-						value=sauce["synopsis"].partition(" [")[0] if len(sauce["synopsis"].partition(" [")[0]) <= 600 else
-						".".join(sauce["synopsis"].partition(" [")[0][:600].split(".")[0:-1]) + "..."
+						value=s if len(s:=sauce["synopsis"].partition(" [")[0]) <= (maxlength:=600) else
+						".".join(s[:maxlength].split(".")[0:-1]) + "..."
 						).set_footer(
 						text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
 						icon_url=ctx.author.avatar_url
@@ -138,12 +137,15 @@ class Commands(Cog):
 
 	@command(aliases=["a"])
 	async def avatar(self, ctx, target: FindMember):
-		await ctx.send(
+		if target:
+			await ctx.send(
 			file=discord.File(
 			BytesIO(await target.avatar_url_as(static_format="png").read()),
 			str(target.avatar_url_as(static_format="png")).split("/")[-1].partition("?")[0]
-			) if target else "User not found"
+			)
 		)
+		else:
+			await ctx.send("User not found")
 
 	@command(aliases=["emote", "e"])
 	async def emoji(self, ctx, emoji: FindEmoji):
@@ -161,8 +163,8 @@ class Commands(Cog):
 		if target:
 			if target.dm_channel is None:
 				await target.create_dm()
-			await target.dm_channel.send(f"{ctx.author.mention} wants you to show up in **{ctx.guild.name}**.")
-			await ctx.send(f"Called {target.mention} to show up")
+			await target.dm_channel.send(f"{ctx.author.name} wants you to show up in **{ctx.guild.name}**.")
+			await ctx.send(f"Notified {target.mention}")
 		else:
 			await ctx.send("User not found")
 
@@ -170,8 +172,7 @@ class Commands(Cog):
 	async def inspire(self, ctx):
 		async with WebSession(loop=self.bot.loop) as session:
 			async with session.get("https://inspirobot.me/api", params={"generate": "true"}) as url:
-				url = (await url.read()).decode()
-				async with session.get(url) as img:
+				async with session.get(url:=(await url.read()).decode()) as img:
 					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))
 
 	@command(aliases=["i", "img"])
