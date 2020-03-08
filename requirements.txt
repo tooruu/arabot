@@ -1,5 +1,4 @@
-discord[voice]  # Discord API wrapper
-PyNaCl          # voice chat
+discord[voice]  # Discord API wrapper + voice support
 aiohttp         # asynchronous web requests
 jikanpy         # MyAnimeList API wrapper
 matplotlib      # ping graph
