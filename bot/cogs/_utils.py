@@ -6,7 +6,7 @@ from discord.utils import find
 from discord import Status, Activity
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.7.2" #TODO: UPDATE!
+BOT_VERSION = "0.7.3" #TODO: UPDATE!
 
 
 def isDev(ctx):
@@ -63,7 +63,9 @@ class FindMember(Finder, MemberConverter):
 
 class FindEmoji(Finder, EmojiConverter):
 	def find(self, ctx, argument):
-		return find(lambda emoji: emoji.name.lower().startswith(argument.lower()), ctx.guild.emojis)
+		for guild in ctx.bot.guilds:
+			if emote:=find(lambda emoji: argument.lower() in (emoji.name.lower(), str(emoji.id)), guild.emojis):
+				return emote
 
 
 class FindTxChl(Finder, TextChannelConverter):
