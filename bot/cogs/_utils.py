@@ -63,6 +63,7 @@ class FindMember(Finder, MemberConverter):
 
 class FindEmoji(Finder, EmojiConverter):
 	def find(self, ctx, argument):
+		ctx.bot.guilds.insert(0, ctx.bot.guilds.pop(ctx.bot.guilds.index(ctx.guild)))
 		for guild in ctx.bot.guilds:
 			if emote:=find(lambda emoji: argument.lower() in emoji.name.lower() or argument.lower() == str(emoji.id), guild.emojis):
 				return emote
