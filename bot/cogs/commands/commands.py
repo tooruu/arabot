@@ -181,14 +181,17 @@ class Commands(Cog):
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
-				"key": self.bot.g_api_key,
-				"cx": self.bot.g_cx,
-				"q": query,
+				"key": self.bot.g_isearch_key,
+				"cx": self.bot.g_cse,
+				"q": quote(query, safe=""),
 				"num": 1,
 				"searchType": "image"
 				}
 			) as response:
-				await ctx.send((await response.json())["items"][0]["link"])
+				try:
+					await ctx.send((await response.json())["items"][0]["link"])
+				except KeyError:
+					await ctx.send("No images found")
 
 	@command(aliases=["g"])
 	async def google(self, ctx, *, query):
@@ -196,16 +199,41 @@ class Commands(Cog):
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
-				"key": self.bot.g_api_key,
-				"cx": self.bot.g_cx,
-				"q": query,
+				"key": self.bot.g_search_key,
+				"cx": self.bot.g_cse,
+				"q": quote(query, safe=""),
 				"num": 3
 				}
 			) as response:
 				embed = discord.Embed(title="Google search results", description="Showing top 3 search results", url="https://google.com/search?q=" + quote(query))
-				for result in (await response.json())["items"]:
-					embed.add_field(name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False)
-				await ctx.send(embed=embed)
+				try:
+					for result in (await response.json())["items"]:
+						embed.add_field(name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False)
+				except KeyError:
+					await ctx.send("No results found")
+				else:
+					await ctx.send(embed=embed)
+
+	@command(aliases=["yt"])
+	async def youtube(self, ctx, *, query): #TODO: Use YouTube API
+		async with WebSession(loop=self.bot.loop) as session:
+			async with session.get(
+				"https://www.googleapis.com/customsearch/v1",
+				params={
+				"key": self.bot.g_search_key,
+				"cx": self.bot.g_cse,
+				"q": quote(query + " site:youtube.com/watch", safe=""),
+				"num": 3
+				}
+			) as response:
+				embed = discord.Embed(title="Google search results", description="Showing top 3 search results", url="https://google.com/search?q=" + quote(query + "+site:youtube.com/watch", safe="+"))
+				try:
+					for result in (await response.json())["items"]:
+						embed.add_field(name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False)
+				except KeyError:
+					await ctx.send("No videos found")
+				else:
+					await ctx.send(embed=embed)
 
 
 def setup(client):

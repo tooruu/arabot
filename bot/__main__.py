@@ -13,17 +13,20 @@ def load_ext(client):
 				print(f"Loaded {path}{cog[:-3]}")
 
 
+def load_env(client):
+	if environ.get("token"):
+		for k, v in environ.items():
+			setattr(client, k, v)
+			print("Assigned Bot." + k)
+	else:
+		with open("./.env") as s:
+			for k, v in (line.split("=") for line in s.read().splitlines()):
+				setattr(client, k, v)
+				print("Assigned Bot." + k)
+
+
 if __name__ == "__main__":
 	bot = Bot(command_prefix=";")
-	try:
-		token = environ["token"]
-		bot.g_api_key = environ["g_api_key"]
-		bot.g_cx = environ["g_cx"]
-	except KeyError:
-		with open("./.env") as s:
-			locals().update({line.partition("=")[0]: line.partition("=")[-1] for line in s.read().splitlines()})
-		#pylint: disable=undefined-variable
-		bot.g_api_key = g_api_key
-		bot.g_cx = g_cx
 	load_ext(bot)
-	bot.run(token)
+	load_env(bot)
+	bot.run(bot.token)

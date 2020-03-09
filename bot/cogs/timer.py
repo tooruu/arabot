@@ -29,23 +29,24 @@ class Timer(Cog):
 		await self.channel.edit(name=f"🌍 {hours}h {minutes}m")
 
 	@countdown.before_loop
-	async def wait(self):
-		await self.bot.wait_until_ready()
+	async def set_reset_time(self):
 		self.reset = self.resetTime()
+
+	@Cog.listener()
+	async def on_ready(self):
+		self.channel = self.bot.get_channel(678423053306298389)
+		self.countdown.start()
 
 	@group(invoke_without_command=True)
 	@has_permissions(manage_guild=True)
 	async def timer(self, ctx):
-		task = self.countdown.get_task()
-		if task and not task.done():
-			status = "Active, running"
-		else:
-			status = "Stopped"
+		#pylint: disable=used-before-assignment
+		status = "Active, running" if (task:=self.countdown.get_task()) and not task.done() else "Stopped"
 		channel = f"**{self.channel.name}**" if self.channel else "Not set"
 		await ctx.send(f"Channel: {channel}\nStatus: {status}")
 
 	@timer.command(name="set")
-	async def _set(self, ctx, chan: FindChl):
+	async def set_(self, ctx, chan: FindChl):
 		if chan:
 			self.channel = chan
 			await ctx.send(f"Channel set to **{chan.name}**")
