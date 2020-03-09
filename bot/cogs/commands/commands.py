@@ -190,6 +190,23 @@ class Commands(Cog):
 			) as response:
 				await ctx.send((await response.json())["items"][0]["link"])
 
+	@command(aliases=["g"])
+	async def google(self, ctx, *, query):
+		async with WebSession(loop=self.bot.loop) as session:
+			async with session.get(
+				"https://www.googleapis.com/customsearch/v1",
+				params={
+				"key": self.bot.g_api_key,
+				"cx": self.bot.g_cx,
+				"q": query,
+				"num": 3
+				}
+			) as response:
+				embed = discord.Embed(title="Google search results", description="Showing top 3 search results", url="https://google.com/search?q=" + quote(query))
+				for result in (await response.json())["items"]:
+					embed.add_field(name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False)
+				await ctx.send(embed=embed)
+
 
 def setup(client):
 	client.add_cog(Commands(client))

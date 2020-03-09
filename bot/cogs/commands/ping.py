@@ -37,7 +37,7 @@ class Ping(Cog):
 		plt.xlabel("The last hour", fontsize=8)
 		ax.set_xlim(x[0], x[-1])
 		ax.set_ylim((min(y) if y[0] != 0 else sorted(set(y))[1]) - 5, max(y) + 5)
-		ax.get_yaxis().set_major_locator(MaxNLocator(integer=True, nbins=4))
+		ax.get_yaxis().set_major_locator(MaxNLocator(integer=True, nbins=5))
 		plt.fill_between(x, y, color="cyan", alpha=0.45)
 
 		# Send figure

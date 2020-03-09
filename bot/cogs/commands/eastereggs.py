@@ -45,10 +45,6 @@ class EasterEggs(Cog):
 			)
 
 	@Cog.listener("on_message")
-	async def lewd(self, msg):
-		await self.VoiceReaction(msg, "aroro")
-
-	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
 		if isValid(self.bot, msg, "za warudo"):
 			await msg.channel.set_permissions(msg.guild.default_role, send_messages=False)
@@ -62,6 +58,11 @@ class EasterEggs(Cog):
 			await asyncio.sleep(2)
 			await msg.channel.purge(limit=8)
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=None)
+
+
+	@Cog.listener("on_message")
+	async def lewd(self, msg):
+		await self.VoiceReaction(msg, "aroro")
 
 	@Cog.listener("on_message")
 	async def tuna(self, msg):

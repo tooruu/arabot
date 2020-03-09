@@ -6,7 +6,7 @@ from discord.utils import find
 from discord import Status, Activity
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.7.0" #TODO: UPDATE!
+BOT_VERSION = "0.7.2" #TODO: UPDATE!
 
 
 def isDev(ctx):
