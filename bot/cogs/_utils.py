@@ -5,10 +5,9 @@ from discord.ext.commands.errors import BadArgument
 from discord.utils import find
 from discord import Status, Activity
 from os import environ
-import re
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.9.0" #TODO: UPDATE!
+BOT_VERSION = "0.9.1" #TODO: UPDATE!
 
 
 def isDev(ctx):
