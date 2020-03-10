@@ -8,7 +8,7 @@ from os import environ
 import re
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.8.5" #TODO: UPDATE!
+BOT_VERSION = "0.9.0" #TODO: UPDATE!
 
 
 def isDev(ctx):
