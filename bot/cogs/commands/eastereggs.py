@@ -68,6 +68,9 @@ class EasterEggs(Cog):
 	async def tuna(self, msg):
 		await self.VoiceReaction(msg, "nekocharm")
 
+	@Cog.listener("on_message")
+	async def teri(self, msg):
+		await self.VoiceReaction(msg, "teri")
 
 def setup(client):
 	client.add_cog(EasterEggs(client))
