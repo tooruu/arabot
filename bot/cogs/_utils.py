@@ -4,9 +4,10 @@ from discord.ext.commands import (
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
 from discord import Status, Activity
+from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.8.3" #TODO: UPDATE!
+BOT_VERSION = "0.8.5" #TODO: UPDATE!
 
 
 def isDev(ctx):
@@ -114,3 +115,14 @@ class Queue:
 
 	def items(self):
 		return self._items
+
+def load_env(*keys):
+	if environ.get("token"):
+		if len(keys) == 1:
+			return environ[keys[0]]
+		return (environ[k] for k in keys)
+	with open("./.env") as s:
+		secret = {line.partition("=")[0]: line.partition("=")[-1] for line in s.read().splitlines()}
+	if len(keys) == 1:
+		return secret[keys[0]]
+	return (secret[k] for k in keys)

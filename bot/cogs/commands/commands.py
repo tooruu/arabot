@@ -10,6 +10,13 @@ from io import BytesIO
 class Commands(Cog):
 	def __init__(self, client):
 		self.bot = client
+		(
+			self.token,
+			self.g_search_key,
+			self.g_isearch_key,
+			self.g_cse,
+			self.g_yt_key,
+		) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
 
 	@command(aliases=["ver", "v"])
 	async def version(self, ctx):
@@ -181,8 +188,8 @@ class Commands(Cog):
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
-				"key": self.bot.g_isearch_key,
-				"cx": self.bot.g_cse,
+				"key": self.g_isearch_key,
+				"cx": self.g_cse,
 				"q": quote(query, safe=""),
 				"num": 1,
 				"searchType": "image"
@@ -199,8 +206,8 @@ class Commands(Cog):
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
-				"key": self.bot.g_search_key,
-				"cx": self.bot.g_cse,
+				"key": self.g_search_key,
+				"cx": self.g_cse,
 				"q": quote(query, safe=""),
 				"num": 3
 				}
@@ -220,13 +227,13 @@ class Commands(Cog):
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
-				"key": self.bot.g_search_key,
-				"cx": self.bot.g_cse,
+				"key": self.g_search_key,
+				"cx": self.g_cse,
 				"q": quote(query + " site:youtube.com/watch", safe=""),
 				"num": 3
 				}
 			) as response:
-				embed = discord.Embed(title="Google search results", description="Showing top 3 search results", url="https://google.com/search?q=" + quote(query + "+site:youtube.com/watch", safe="+"))
+				embed = discord.Embed(title="YouTube search results", description="Showing top 3 search results", url="https://google.com/search?q=" + quote(query + "+site:youtube.com/watch", safe="+"))
 				try:
 					for result in (await response.json())["items"]:
 						embed.add_field(name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False)
