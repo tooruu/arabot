@@ -15,6 +15,6 @@ def load_ext(client):
 
 
 if __name__ == "__main__":
-	bot = Bot(command_prefix=";")
+	bot = Bot(command_prefix=";", case_insensitive=True)
 	load_ext(bot)
 	bot.run(load_env("token"))

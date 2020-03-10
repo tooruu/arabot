@@ -58,34 +58,35 @@ class Commands(Cog):
 	@command(aliases=["sauce"]) # response = trace.moe, sauce = MAL
 	async def source(self, ctx, image_url=None):
 		if image_url:=ctx.message.attachments[0].url if ctx.message.attachments else image_url:
-			async with WebSession(loop=self.bot.loop) as session:
-				async with session.get("https://trace.moe/api/search", params={"url": image_url}) as response:
-					sauce = (await AioJikan(session=session).anime((response:=(await response.json())["docs"][0])["mal_id"]))
-				async with session.get(
-					"https://trace.moe/preview.php",
-					params={
-					"anilist_id": response['anilist_id'],
-					"file": quote(response['filename']),
-					"t": str(response['at']),
-					"token": response['tokenthumb']
-					}
-				) as preview:
-					#pylint: disable=used-before-assignment
-					await ctx.send(
-						f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
-						file=discord.File(BytesIO(await preview.read()), response["filename"]),
-						embed=discord.Embed(
-						color=32767,
-						description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
-						).set_author(name=sauce["title"], url=sauce["url"]).set_thumbnail(url=sauce["image_url"]).add_field(
-						name="Synopsis",
-						value=s if len(s:=sauce["synopsis"].partition(" [")[0]) <= (maxlength:=600) else
-						".".join(s[:maxlength].split(".")[0:-1]) + "..."
-						).set_footer(
-						text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
-						icon_url=ctx.author.avatar_url
+			async with ctx.typing():
+				async with WebSession(loop=self.bot.loop) as session:
+					async with session.get("https://trace.moe/api/search", params={"url": image_url}) as response:
+						sauce = (await AioJikan(session=session).anime((response:=(await response.json())["docs"][0])["mal_id"]))
+					async with session.get(
+						"https://trace.moe/preview.php",
+						params={
+						"anilist_id": response['anilist_id'],
+						"file": quote(response['filename']),
+						"t": str(response['at']),
+						"token": response['tokenthumb']
+						}
+					) as preview:
+						#pylint: disable=used-before-assignment
+						await ctx.send(
+							f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
+							file=discord.File(BytesIO(await preview.read()), response["filename"]),
+							embed=discord.Embed(
+							color=32767,
+							description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
+							).set_author(name=sauce["title"], url=sauce["url"]).set_thumbnail(url=sauce["image_url"]).add_field(
+							name="Synopsis",
+							value=s if len(s:=sauce["synopsis"].partition(" [")[0]) <= (maxlength:=600) else
+							".".join(s[:maxlength].split(".")[0:-1]) + "..."
+							).set_footer(
+							text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
+							icon_url=ctx.author.avatar_url
+							)
 						)
-					)
 
 	@group(aliases=["cogs"], invoke_without_command=True)
 	@check(isDev)
@@ -154,16 +155,39 @@ class Commands(Cog):
 		else:
 			await ctx.send("User not found")
 
-	@command(aliases=["emote", "e"])
-	async def emoji(self, ctx, emoji: FindEmoji):
-		await ctx.message.delete()
+	@command(aliases=["r"])
+	async def reaction(self, ctx, emoji: FindEmoji):
 		if emoji:
+			await ctx.message.delete()
 			await ctx.send(
 				embed=discord.Embed().set_image(url=emoji.url).
 				set_footer(text="reacted", icon_url=ctx.author.avatar_url_as(static_format="png"))
 			)
 		else:
 			await ctx.send("Emoji not found")
+
+	@command(aliases=["emote", "e"])
+	async def emoji(self, ctx, *emojis: FindEmoji):
+		files = []
+		async with ctx.typing():
+			async with WebSession(loop=self.bot.loop) as session:
+				for emoji in emojis:
+					if isinstance(emoji, discord.Emoji):
+						files.append(discord.File(
+							BytesIO(await emoji.url.read()),
+							str(emoji.url).split("/")[-1].partition("?")[0]
+						))
+					elif isinstance(emoji, str):
+						async with session.get(emoji) as img:
+							files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
+			if files:
+				if len(files) <= 10:
+					await ctx.send(files=files)
+				else:
+					await ctx.send("Too many emojis passed, sending first 10", files=files[:10])
+			else:
+				await ctx.send("No emojis found")
+
 
 	@command()
 	async def call(self, ctx, target: MemberConverter): # Not use smart lookup

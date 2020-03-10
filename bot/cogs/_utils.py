@@ -5,6 +5,7 @@ from discord.ext.commands.errors import BadArgument
 from discord.utils import find
 from discord import Status, Activity
 from os import environ
+import re
 
 BOT_NAME = "AraBot"
 BOT_VERSION = "0.8.5" #TODO: UPDATE!
@@ -68,6 +69,7 @@ class FindEmoji(Finder, EmojiConverter):
 		for guild in ctx.bot.guilds:
 			if emote:=find(lambda emoji: argument.lower() in emoji.name.lower() or argument.lower() == str(emoji.id), guild.emojis):
 				return emote
+		return f"https://raw.githubusercontent.com/astronautlevel2/twemoji/gh-pages/128x128/{format(ord(argument), 'x')}.png" if len(argument) == 1 else None
 
 
 class FindTxChl(Finder, TextChannelConverter):
