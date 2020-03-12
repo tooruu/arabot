@@ -146,12 +146,7 @@ class Commands(Cog):
 	@command(aliases=["a"])
 	async def avatar(self, ctx, target: FindMember):
 		if target:
-			await ctx.send(
-			file=discord.File(
-			BytesIO(await target.avatar_url_as(static_format="png").read()),
-			str(target.avatar_url_as(static_format="png")).split("/")[-1].partition("?")[0]
-			)
-		)
+			await ctx.send(embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))).set_footer(text=(target.nick or target.name) + "'s avatar"))
 		else:
 			await ctx.send("User not found")
 
