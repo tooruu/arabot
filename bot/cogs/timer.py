@@ -37,7 +37,7 @@ class Timer(Cog):
 		self.channel = self.bot.get_channel(678423053306298389)
 		self.countdown.start()
 
-	@group(invoke_without_command=True)
+	@group(invoke_without_command=True, hidden=True)
 	@has_permissions(manage_guild=True)
 	async def timer(self, ctx):
 		#pylint: disable=used-before-assignment

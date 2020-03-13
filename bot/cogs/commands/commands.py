@@ -18,7 +18,7 @@ class Commands(Cog):
 			self.g_yt_key,
 		) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
 
-	@command(aliases=["ver", "v"])
+	@command(aliases=["ver", "v"], brief="| Show currently running bot's version")
 	async def version(self, ctx):
 		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
@@ -26,25 +26,25 @@ class Commands(Cog):
 	async def ping(self, ctx):
 		await ctx.send(f":ping_pong: Pong after {self.bot.latency*1000:.0f}ms!")
 
-	@command()
+	@command(brief="<user> | Make everyone know you love someone")
 	async def love(self, ctx, partner: FindMember):
 		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else f"Love partner not found")
 
-	@command(aliases=["exit", "quit"])
+	@command(aliases=["exit", "quit"], hidden=True)
 	@check(isDev)
 	async def stop(self, ctx):
 		await ctx.send("Stopping!")
 		print("Stopping!")
 		await self.bot.close()
 
-	@command(aliases=["cren"])
+	@command(aliases=["cren"], hidden=True)
 	@has_permissions(manage_guild=True)
 	async def crename(self, ctx, chan: FindChl, *, name):
 		oldName = chan.name
 		await chan.edit(name=name)
 		await ctx.send(f"Renamed **{oldName}** to **{chan.name}**")
 
-	@command()
+	@command(hidden=True)
 	@check(isDev)
 	async def status(self, ctx, _type: int, *, name):
 		if _type not in (0, 1, 2, 3):
@@ -55,7 +55,7 @@ class Commands(Cog):
 	async def _177013(self, ctx):
 		await setPresence(self.bot, 3, "177013 with yo mama")
 
-	@command(aliases=["source"])
+	@command(aliases=["source"], brief="<link|attachment> | Find anime source for an image")
 	async def sauce(self, ctx, image_url=None):
 		if image_url:=ctx.message.attachments[0].url if ctx.message.attachments else image_url if image_url.startswith("http") else None:
 			async with ctx.typing():
@@ -92,7 +92,7 @@ class Commands(Cog):
 									)
 								)
 
-	@group(aliases=["cogs"], invoke_without_command=True)
+	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
 	@check(isDev)
 	async def cog(self, ctx):
 		await ctx.send("Loaded cogs: " + ", ".join(f"**{c}**" for c in self.bot.cogs.keys()))
@@ -139,7 +139,7 @@ class Commands(Cog):
 				await ctx.send(f"**{i}** is an invalid extension")
 		await ctx.send("Reloaded " + (", ".join(reloaded) or "nothing"))
 
-	@command(aliases=["purge", "prune", "d"])
+	@command(aliases=["purge", "prune", "d"], hidden=True)
 	@has_permissions(manage_messages=True)
 	async def clear(self, ctx, amount: int = None):
 		if amount:
@@ -147,14 +147,14 @@ class Commands(Cog):
 		else:
 			await ctx.message.delete()
 
-	@command(aliases=["a"])
+	@command(aliases=["a"], brief="<user> | Show full-sized version of user's avatar")
 	async def avatar(self, ctx, target: FindMember):
 		if target:
 			await ctx.send(embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))).set_footer(text=(target.nick or target.name) + "'s avatar"))
 		else:
 			await ctx.send("User not found")
 
-	@command(aliases=["r"])
+	@command(aliases=["r"], brief="<emoji> | Show your big reaction to everyone")
 	async def reaction(self, ctx, emoji: FindEmoji):
 		if emoji:
 			await ctx.message.delete()
@@ -165,7 +165,7 @@ class Commands(Cog):
 		else:
 			await ctx.send("Emoji not found")
 
-	@command(aliases=["emote", "e"])
+	@command(aliases=["emote", "e"], brief="<emoji...> | Show full-sized versions of emoji(s)")
 	async def emoji(self, ctx, *emojis: FindEmoji):
 		files = []
 		async with ctx.typing():
@@ -188,7 +188,7 @@ class Commands(Cog):
 				await ctx.send("No emojis found")
 
 
-	@command()
+	@command(brief="<user> | DM the user to make him come")
 	async def call(self, ctx, target: MemberConverter): # Not use smart lookup
 		if target:
 			if target.dm_channel is None:
@@ -198,14 +198,14 @@ class Commands(Cog):
 		else:
 			await ctx.send("User not found")
 
-	@command()
+	@command(brief="| Get a random inspirational quote")
 	async def inspire(self, ctx):
 		async with WebSession() as session:
 			async with session.get("https://inspirobot.me/api", params={"generate": "true"}) as url:
 				async with session.get(url:=(await url.read()).decode()) as img:
 					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))
 
-	@command(aliases=["i", "img"])
+	@command(aliases=["i", "img"], brief="<query> | Top 3 search results from Google Images")
 	async def image(self, ctx, *, query):
 		async with WebSession() as session:
 			async with session.get(
@@ -223,7 +223,7 @@ class Commands(Cog):
 				except KeyError:
 					await ctx.send("No images found")
 
-	@command(aliases=["g"])
+	@command(aliases=["g"], brief="<query> | Top 3 search results from Google")
 	async def google(self, ctx, *, query):
 		async with WebSession() as session:
 			async with session.get(
@@ -244,7 +244,7 @@ class Commands(Cog):
 				else:
 					await ctx.send(embed=embed)
 
-	@command(aliases=["yt"])
+	@command(aliases=["yt"], brief="<query> | Top 3 search results from YouTube")
 	async def youtube(self, ctx, *, query): #TODO: Use YouTube API
 		async with WebSession() as session:
 			async with session.get(

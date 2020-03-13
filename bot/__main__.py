@@ -7,6 +7,8 @@ from cogs._utils import load_env
 def load_ext(client):
 	path = ""
 	for root, _, files in walk("./bot/cogs"):
+		if root[0] == "_":
+			continue
 		path += basename(root) + "."
 		for cog in sorted(files):
 			if cog.endswith(".py") and cog[0] != "_":
