@@ -1,7 +1,7 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
 from .._utils import *
 import discord
-from aiohttp import ClientSession as WebSession
+from aiohttp import ClientSession as WebSession, ContentTypeError
 from jikanpy import AioJikan
 from urllib.parse import quote
 from io import BytesIO
@@ -55,38 +55,42 @@ class Commands(Cog):
 	async def _177013(self, ctx):
 		await setPresence(self.bot, 3, "177013 with yo mama")
 
-	@command(aliases=["sauce"]) # response = trace.moe, sauce = MAL
-	async def source(self, ctx, image_url=None):
-		if image_url:=ctx.message.attachments[0].url if ctx.message.attachments else image_url:
+	@command(aliases=["source"])
+	async def sauce(self, ctx, image_url=None):
+		if image_url:=ctx.message.attachments[0].url if ctx.message.attachments else image_url if image_url.startswith("http") else None:
 			async with ctx.typing():
-				async with WebSession(loop=self.bot.loop) as session:
-					async with session.get("https://trace.moe/api/search", params={"url": image_url}) as response:
-						sauce = (await AioJikan(session=session).anime((response:=(await response.json())["docs"][0])["mal_id"]))
-					async with session.get(
-						"https://trace.moe/preview.php",
-						params={
-						"anilist_id": response['anilist_id'],
-						"file": quote(response['filename']),
-						"t": str(response['at']),
-						"token": response['tokenthumb']
-						}
-					) as preview:
-						#pylint: disable=used-before-assignment
-						await ctx.send(
-							f"*Episode {response['episode']} ({int(response['at']/60)}:{int(response['at']%60)})*",
-							file=discord.File(BytesIO(await preview.read()), response["filename"]),
-							embed=discord.Embed(
-							color=32767,
-							description=f"Similarity: {response['similarity']:.1%} | Score: {sauce['score']} | {sauce['status']}"
-							).set_author(name=sauce["title"], url=sauce["url"]).set_thumbnail(url=sauce["image_url"]).add_field(
-							name="Synopsis",
-							value=s if len(s:=sauce["synopsis"].partition(" [")[0]) <= (maxlength:=600) else
-							".".join(s[:maxlength].split(".")[0:-1]) + "..."
-							).set_footer(
-							text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
-							icon_url=ctx.author.avatar_url
-							)
-						)
+				async with WebSession() as session:
+					async with session.get("https://trace.moe/api/search", params={"url": image_url}) as tmoe_resp:
+						try:
+							mal_resp = (await AioJikan(session=session).anime((tmoe_resp:=(await tmoe_resp.json())["docs"][0])["mal_id"]))
+						except ContentTypeError:
+							await ctx.send("Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find the sauce manually at\nhttps://trace.moe/?url=" + quote(image_url, safe=""))
+						else:
+							async with session.get(
+								"https://trace.moe/preview.php",
+								params={
+								"anilist_id": tmoe_resp["anilist_id"],
+								"file": quote(tmoe_resp["filename"]),
+								"t": str(tmoe_resp["at"]),
+								"token": tmoe_resp["tokenthumb"]
+								}
+							) as preview:
+								#pylint: disable=used-before-assignment
+								await ctx.send(
+									f"*Episode {tmoe_resp['episode']} ({int(tmoe_resp['at']/60)}:{int(tmoe_resp['at']%60)})*",
+									file=discord.File(BytesIO(await preview.read()), tmoe_resp["filename"]),
+									embed=discord.Embed(
+									color=32767,
+									description=f"Similarity: {tmoe_resp['similarity']:.1%} | Score: {mal_resp['score']} | {mal_resp['status']}"
+									).set_author(name=mal_resp["title"], url=mal_resp["url"]).set_thumbnail(url=mal_resp["image_url"]).add_field(
+									name="Synopsis",
+									value=s if len(s:=mal_resp["synopsis"].partition(" [")[0]) <= (maxlength:=600) else
+									".".join(s[:maxlength].split(".")[0:-1]) + "..."
+									).set_footer(
+									text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
+									icon_url=ctx.author.avatar_url
+									)
+								)
 
 	@group(aliases=["cogs"], invoke_without_command=True)
 	@check(isDev)
@@ -165,7 +169,7 @@ class Commands(Cog):
 	async def emoji(self, ctx, *emojis: FindEmoji):
 		files = []
 		async with ctx.typing():
-			async with WebSession(loop=self.bot.loop) as session:
+			async with WebSession() as session:
 				for emoji in emojis:
 					if isinstance(emoji, discord.Emoji):
 						files.append(discord.File(
@@ -196,14 +200,14 @@ class Commands(Cog):
 
 	@command()
 	async def inspire(self, ctx):
-		async with WebSession(loop=self.bot.loop) as session:
+		async with WebSession() as session:
 			async with session.get("https://inspirobot.me/api", params={"generate": "true"}) as url:
 				async with session.get(url:=(await url.read()).decode()) as img:
 					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))
 
 	@command(aliases=["i", "img"])
 	async def image(self, ctx, *, query):
-		async with WebSession(loop=self.bot.loop) as session:
+		async with WebSession() as session:
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
@@ -221,7 +225,7 @@ class Commands(Cog):
 
 	@command(aliases=["g"])
 	async def google(self, ctx, *, query):
-		async with WebSession(loop=self.bot.loop) as session:
+		async with WebSession() as session:
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
@@ -242,7 +246,7 @@ class Commands(Cog):
 
 	@command(aliases=["yt"])
 	async def youtube(self, ctx, *, query): #TODO: Use YouTube API
-		async with WebSession(loop=self.bot.loop) as session:
+		async with WebSession() as session:
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
 				params={
