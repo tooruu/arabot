@@ -16,7 +16,8 @@ class Commands(Cog):
 			self.g_isearch_key,
 			self.g_cse,
 			self.g_yt_key,
-		) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
+			self.faceit_key
+		) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key", "faceit_key")
 
 	@command(aliases=["ver", "v"], brief="| Show currently running bot's version")
 	async def version(self, ctx):
@@ -264,6 +265,21 @@ class Commands(Cog):
 					await ctx.send("No videos found")
 				else:
 					await ctx.send(embed=embed)
+
+	@command(brief="<nickname> | View player's FACEIT profile")
+	async def faceit(self, ctx, nickname):
+		async with WebSession(headers={"Authorization": "Bearer " + self.faceit_key}) as session:
+			async with session.get(f"https://open.faceit.com/data/v4/search/players?nickname={nickname}&limit=1") as player_search:
+				async with session.get("https://open.faceit.com/data/v4/players/" + (await player_search.json())["items"][0]["player_id"]) as player:
+					player = await player.json()
+		embed = discord.Embed(color=0xFF5500, description=f"[Steam profile](https://www.steamcommunity.com/profiles/{player['steam_id_64']})\nCountry: {player['country'].upper()} | Friends: {len(player['friends_ids'])} | Bans: {len(player['bans'])}\nFACEIT membership type: {player['membership_type']}").set_author(name=player["nickname"], url=player["faceit_url"].format(lang="en")).set_thumbnail(url=player["avatar"])
+		for game in player["games"]:
+			embed.add_field(name=game.replace("_", " ").upper(),
+			value=f"""Player name: {player['games'][game]['game_player_name']}
+			Region: {player['games'][game]['region']}
+			Skill level: {player['games'][game]['skill_level']}
+			ELO: {player['games'][game]['faceit_elo']}""", inline=True)
+		await ctx.send(embed=embed)
 
 
 def setup(client):
