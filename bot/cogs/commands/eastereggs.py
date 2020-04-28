@@ -15,7 +15,7 @@ class EasterEggs(Cog):
 			if trigger is None else trigger) and (await self.bot.get_context(msg)).voice_client is None:
 			for channel in msg.guild.voice_channels:
 				if channel.members:
-					(channel := await channel.connect()).play(
+					(channel:=await channel.connect()).play(
 						await discord.FFmpegOpusAudio.from_probe(f"./bot/res/{vorbis}.ogg"),
 						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
 					)

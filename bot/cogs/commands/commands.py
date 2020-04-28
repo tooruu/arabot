@@ -1,5 +1,7 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
-from .._utils import *
+from .._utils import (
+	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, load_env
+)
 import discord
 from aiohttp import ClientSession as WebSession, ContentTypeError
 from jikanpy import AioJikan
@@ -29,7 +31,7 @@ class Commands(Cog):
 
 	@command(brief="<user> | Make everyone know you love someone")
 	async def love(self, ctx, partner: FindMember):
-		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else f"Love partner not found")
+		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
 
 	@command(aliases=["exit", "quit"], hidden=True)
 	@check(isDev)
