@@ -7,7 +7,7 @@ from discord import Status, Activity
 from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.9.8" #TODO: UPDATE!
+BOT_VERSION = "0.9.9" #TODO: UPDATE!
 
 
 def isDev(ctx):
@@ -99,7 +99,7 @@ class Queue:
 		self.size = maxsize
 
 	def __repr__(self):
-		return self._items
+		return str(self._items)
 
 	def __len__(self):
 		return self.size
@@ -109,6 +109,10 @@ class Queue:
 
 	def __getitem__(self, key):
 		return self._items[key]
+
+	def __iadd__(self, item):
+		self.enqueue(item)
+		return self
 
 	def enqueue(self, item=0):
 		del self._items[0]

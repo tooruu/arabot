@@ -8,7 +8,6 @@ from matplotlib import use
 use("AGG") #pylint: disable=wrong-import-position
 from matplotlib import pyplot as plt
 
-
 class Ping(Cog):
 	def __init__(self, client, old_ping):
 		self.bot = client
@@ -18,7 +17,7 @@ class Ping(Cog):
 
 	@loop(minutes=1)
 	async def store(self):
-		self.log.enqueue(round(self.bot.latency * 1000))
+		self.log += round(self.bot.latency * 1000)
 
 	@store.before_loop
 	async def wait(self):
@@ -45,12 +44,13 @@ class Ping(Cog):
 		plt.savefig(buf, dpi=180, format="png", transparent=False)
 		buf.seek(0)
 		await ctx.send(f":ping_pong: Pong after {self.bot.latency * 1000:.0f}ms!", file=File(buf, "ping.png"))
+		plt.close()
+		del buf
 
 	def cog_unload(self):
 		self.store.cancel()
 		self.bot.remove_command("ping")
 		self.bot.add_command(self.old)
-
 
 def setup(client):
 	client.add_cog(Ping(client, client.remove_command("ping")))
