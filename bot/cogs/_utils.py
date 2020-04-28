@@ -7,7 +7,7 @@ from discord import Status, Activity
 from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.9.9" #TODO: UPDATE!
+BOT_VERSION = "0.9.10" #TODO: UPDATE!
 
 
 def isDev(ctx):
