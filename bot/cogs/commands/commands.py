@@ -283,6 +283,16 @@ class Commands(Cog):
 			ELO: {player['games'][game]['faceit_elo']}""", inline=True)
 		await ctx.send(embed=embed)
 
+	@command(brief="<term> | Search term in Urban Dictionary", aliases=["ud"])
+	async def urban(self, ctx, *, term):
+		async with WebSession() as session:
+			async with session.get(f"https://api.urbandictionary.com/v0/define?term={quote(term)}") as ud:
+				if ud:=(await ud.json())["list"]:
+					await ctx.send(embed=discord.Embed(description="\n---------------------------------\n".join([result["definition"].replace("[", "").replace("]", "") for result in ud[:3]])).set_author(name=term, url="https://www.urbandictionary.com/define.php?term=" + quote(term)))
+				else:
+					await ctx.send(f"Definition for **{term}** not found")
+
+
 
 def setup(client):
 	client.add_cog(Commands(client))
