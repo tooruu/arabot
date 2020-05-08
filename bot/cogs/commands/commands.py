@@ -247,8 +247,8 @@ class Commands(Cog):
 				else:
 					await ctx.send(embed=embed)
 
-	@command(aliases=["yt"], brief="<query> | Top 3 search results from YouTube")
-	async def youtube(self, ctx, *, query): #TODO: Use YouTube API
+	@command(aliases=["yt3"], brief="<query> | Top 3 search results from YouTube")
+	async def youtube3(self, ctx, *, query): #TODO: Use YouTube API
 		async with WebSession() as session:
 			async with session.get(
 				"https://www.googleapis.com/customsearch/v1",
@@ -267,6 +267,23 @@ class Commands(Cog):
 					await ctx.send("No videos found")
 				else:
 					await ctx.send(embed=embed)
+
+	@command(aliases=["yt"], brief="<query> | Top search result from YouTube")
+	async def youtube(self, ctx, *, query): #TODO: Use YouTube API
+		async with WebSession() as session:
+			async with session.get(
+				"https://www.googleapis.com/customsearch/v1",
+				params={
+				"key": self.g_search_key,
+				"cx": self.g_cse,
+				"q": quote(query + " site:youtube.com/watch", safe=""),
+				"num": 1
+				}
+			) as response:
+				try:
+					await ctx.send((await response.json())["items"][0]["link"])
+				except KeyError:
+					await ctx.send("No videos found")
 
 	@command(brief="<nickname> | View player's FACEIT profile")
 	async def faceit(self, ctx, nickname):
