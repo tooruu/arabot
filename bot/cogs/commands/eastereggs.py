@@ -49,5 +49,40 @@ class EasterEggs(Cog):
 	async def teri(self, msg):
 		await self.VoiceReaction(msg, "teri")
 
+	@Cog.listener("on_message")
+	async def everyone(self, msg):
+		if msg.mention_everyone:
+			await msg.delete()
+
+	@Cog.listener("on_message")
+	async def gaygames(self, msg):
+		if not msg.content.startswith(self.bot.command_prefix) and msg.author != self.bot.user:
+			for gaygame in (
+				"кс",
+				"cs",
+				"мм",
+				"mm",
+				"рафт",
+				"raft",
+				"фортнайт",
+				"fortnite"
+				"раст",
+				"rust",
+				"osu",
+				"осу",
+				"destiny",
+				"дестини",
+				"дестени",
+				"minecraft",
+				"майнкрафт",
+				):
+				if gaygame in msg.content.lower():
+					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
+					await msg.channel.set_permissions(msg.author, send_messages=False)
+					await asyncio.sleep(60)
+					await msg.channel.set_permissions(msg.author, overwrite=None)
+					break
+
+
 def setup(client):
 	client.add_cog(EasterEggs(client))
