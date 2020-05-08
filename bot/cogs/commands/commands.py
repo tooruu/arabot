@@ -181,7 +181,8 @@ class Commands(Cog):
 						))
 					elif isinstance(emoji, str):
 						async with session.get(emoji) as img:
-							files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
+							if img.status == 200:
+								files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
 			if files:
 				if len(files) <= 10:
 					await ctx.send(files=files)
