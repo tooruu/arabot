@@ -73,8 +73,6 @@ class EasterEggs(Cog):
 				"destiny",
 				"дестини",
 				"дестени",
-				"minecraft",
-				"майнкрафт",
 				):
 				if gaygame in msg.content.lower():
 					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
