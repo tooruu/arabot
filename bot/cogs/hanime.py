@@ -9,7 +9,7 @@ class HAnime(Cog):
 		self.bot = client
 		self.channel = None
 
-	@loop(seconds=20)
+	@loop(hours=1)
 	async def check(self):
 		connection = cfscrape.create_scraper().get("https://hanime.tv")
 		if connection.status_code == 200:
