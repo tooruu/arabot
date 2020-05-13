@@ -8,6 +8,7 @@ class HAnime(Cog):
 	def __init__(self, client):
 		self.bot = client
 		self.channel = None
+		self.latest = None
 
 	@loop(hours=1)
 	async def check(self):
@@ -16,6 +17,9 @@ class HAnime(Cog):
 			hanime = BeautifulSoup(connection.content.decode("utf-8"), "html.	parser")
 			new_release = hanime.find_all(class_="htv-carousel__slider")[1][0]
 			title = new_release.find(class_="hv-title").string.strip()
+			if title == self.latest:
+				return
+			self.latest = title
 			link = new_release.a["href"]
 			cover = new_release.find("img")["src"]
 			await self.channel.send(
