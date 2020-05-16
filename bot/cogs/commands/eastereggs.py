@@ -58,21 +58,21 @@ class EasterEggs(Cog):
 	async def gaygames(self, msg):
 		if not msg.content.startswith(self.bot.command_prefix) and msg.author != self.bot.user and msg.guild.id == 433298614564159488:
 			for gaygame in (
-				"кс",
-				"cs",
-				"мм",
-				"mm",
-				"рафт",
-				"raft",
-				"фортнайт",
-				"fortnite"
-				"раст",
-				"rust",
-				"osu",
-				"осу",
-				"destiny",
-				"дестини",
-				"дестени",
+				" кс",
+				" cs",
+				" мм",
+				" mm",
+				" рафт",
+				" raft",
+				" фортнайт",
+				" fortnite"
+				" раст",
+				" rust",
+				" osu",
+				" осу",
+				" destiny",
+				" дестини",
+				" дестени",
 				):
 				if gaygame in msg.content.lower():
 					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
