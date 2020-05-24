@@ -1,6 +1,6 @@
 from random import choice, choices
 from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCooldown
-from ...res.gacha import pool
+from json import load
 
 class Gacha(Cog):
 	def __init__(self, client):
@@ -20,6 +20,9 @@ class Gacha(Cog):
 		"EquEXP": .1474,
 		"Coins": .0737,
 	}
+
+	with open("./bot/res/gacha.json") as data:
+		pool = load(data)
 
 	@cooldown(1, 60, BucketType.user)
 	@command()
