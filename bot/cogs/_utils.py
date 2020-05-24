@@ -7,24 +7,20 @@ from discord import Status, Activity
 from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "0.9.22" #TODO: UPDATE!
-
+BOT_VERSION = "0.9.23" #TODO: UPDATE!
 
 def isDev(ctx):
 	return ctx.author.id in (337343326095409152, 447138372121788417)
 
-
 def isValid(client, msg, invocator):
 	return not msg.content.startswith(client.command_prefix
-		) and msg.author != client.user and invocator.lower() in msg.content.lower()
-
+													) and msg.author != client.user and invocator.lower() in msg.content.lower()
 
 async def setPresence(client, _type: int, name: str, _status: Status = None):
 	if isinstance(_status, Status):
 		await client.change_presence(status=_status, activity=Activity(name=name, type=_type))
 	else:
 		await client.change_presence(activity=Activity(name=name, type=_type))
-
 
 class Finder(Converter):
 	"""
@@ -56,30 +52,29 @@ class Finder(Converter):
 	def find(self, ctx, argument):
 		raise NotImplementedError("Derived classes need to implement this.")
 
-
 class FindMember(Finder, MemberConverter):
 	def find(self, ctx, argument):
 		return find(lambda member: not member.bot and member.name.lower().startswith(argument.lower()), ctx.guild.members)
-
 
 class FindEmoji(Finder, EmojiConverter):
 	def find(self, ctx, argument):
 		ctx.bot.guilds.insert(0, ctx.bot.guilds.pop(ctx.bot.guilds.index(ctx.guild)))
 		for guild in ctx.bot.guilds:
-			if emote:=find(lambda emoji: argument.lower() in emoji.name.lower() or argument.lower() == str(emoji.id), guild.emojis):
+			if emote := find(
+				lambda emoji: argument.lower() in emoji.name.lower() or argument.lower() == str(emoji.id), guild.emojis
+			):
 				return emote
-		return f"https://raw.githubusercontent.com/astronautlevel2/twemoji/gh-pages/128x128/{format(ord(argument), 'x')}.png" if len(argument) == 1 else None
-
+		return f"https://raw.githubusercontent.com/astronautlevel2/twemoji/gh-pages/128x128/{format(ord(argument), 'x')}.png" if len(
+			argument
+		) == 1 else None
 
 class FindTxChl(Finder, TextChannelConverter):
 	def find(self, ctx, argument):
 		return find(lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.text_channels)
 
-
 class FindVcChl(Finder, VoiceChannelConverter):
 	def find(self, ctx, argument):
 		return find(lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.voice_channels)
-
 
 class FindChl(Finder, TextChannelConverter, VoiceChannelConverter):
 	def find(self, ctx, argument):
@@ -87,11 +82,9 @@ class FindChl(Finder, TextChannelConverter, VoiceChannelConverter):
 			lambda chl: chl.name.lower().startswith(argument.lower()), ctx.guild.text_channels + ctx.guild.voice_channels
 		)
 
-
 class FindRole(Finder, RoleConverter):
 	def find(self, ctx, argument):
 		return lambda role: role.name.lower().startswith(argument.lower()), ctx.guild.roles
-
 
 class Queue:
 	def __init__(self, maxsize):

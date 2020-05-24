@@ -68,6 +68,7 @@ class Gacha(Cog):
 				drop = f"**{drop}**"
 			if "Frag" in typ:
 				drop += f" frags x{choice((3,4,5,6))}"
+			drops.append(drop)
 		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply.capitalize(), "\n".join(drops)))
 
 	@gacha.error
