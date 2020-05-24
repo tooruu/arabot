@@ -14,7 +14,7 @@ class HAnime(Cog):
 	async def check(self):
 		connection = cfscrape.create_scraper().get("https://hanime.tv")
 		if connection.status_code == 200:
-			hanime = BeautifulSoup(connection.content.decode("utf-8"), "html.	parser")
+			hanime = BeautifulSoup(connection.content.decode("utf-8"), "html.parser")
 			new_release = hanime.find_all(class_="htv-carousel__slider")[1][0]
 			title = new_release.find(class_="hv-title").string.strip()
 			if title == self.latest:
@@ -30,7 +30,7 @@ class HAnime(Cog):
 	@Cog.listener()
 	async def on_ready(self):
 		self.channel = self.bot.get_channel(676893776840753155)
-		self.check.start()
+		#self.check.start() TODO: Account for lazy loading
 
 def setup(client):
 	client.add_cog(HAnime(client))
