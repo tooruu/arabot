@@ -13,6 +13,7 @@ class HAnime(Cog):
 
 	@loop(hours=1)
 	async def check(self):
+		pass
 		#connection = cfscrape.create_scraper().get("https://hanime.tv")
 		#if connection.status_code == 200:
 		#	hanime = BeautifulSoup(connection.content.decode("utf-8"), "html.parser")
@@ -34,5 +35,5 @@ class HAnime(Cog):
 		#self.check.start() TODO: Account for lazy loading
 
 def setup(client):
-	#client.add_cog(HAnime(client))
 	pass
+	#client.add_cog(HAnime(client))
