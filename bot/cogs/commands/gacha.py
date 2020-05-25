@@ -31,12 +31,12 @@ class Gacha(Cog):
 		drops = []
 		for typ in types:
 			drop = choice(self.pool[supply.lower()][typ])
-			if "Stig" in typ:
+			if "Stig" in typ and "(" not in drop:
 				drop += f" ({choice(('T', 'M', 'B'))})"
 			if typ in ("ValkS", "Weap4", "Stig4"):
 				drop = f"**{drop}**"
 			if "Frag" in typ:
-				drop += f" frags x{choice((3,4,5,6))}"
+				drop += f" frags x{choice((4,5,6))}"
 			drops.append(drop)
 		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply.capitalize(), "\n".join(drops)))
 
