@@ -10,7 +10,19 @@
 		"Stig4": 0.0073,
 		"Stig3": 0.225,
 		"UpMats": 0.1474,
-		"EquEXP": 0.1474,
+		"EqExp": 0.1474,
 		"Coins": 0.0737
+	},
+	"expa": {
+		"ValkS+": 0.015,
+		"ValkA+": 0.045,
+		"ValkA": 0.09,
+		"FragS+": 0.0225,
+		"FragA+": 0.15,
+		"FragA": 0.09,
+		"SklMats": 0.1,
+		"EqExp": 0.2641,
+		"ChrExp": 0.1117,
+		"Coins": 0.1117
 	}
 }

@@ -8,18 +8,17 @@ class Gacha(Cog):
 		with open("./bot/res/gacha_pool.json") as gacha:
 			self.pool = {
 				supply: {
-				typ: [stig if '(' in stig else f"{stig} ({slot})" for slot in ('T', 'M', 'B')
+				typ: [stig if stig[-1] == ')' else f"{stig} ({slot})" for slot in ('T', 'M', 'B')
 				for stig in items] if "Stig" in typ else items
 				for typ, items in pool.items()
 				}
 				for supply, pool in load(gacha).items()
 			}
-			print(self.pool)
 		with open("./bot/res/gacha_rates.json") as rates:
 			self.rates = load(rates)
 
 	@cooldown(1, 60, BucketType.user)
-	@command()
+	@command(aliases=["pull"])
 	async def gacha(self, ctx, supply="dorm", pulls: int = 10):
 		if not self.pool.get(supply := supply.lower()):
 			await ctx.send("Invalid supply")
@@ -32,10 +31,10 @@ class Gacha(Cog):
 		drops = []
 		for typ in types:
 			drop = choice(self.pool[supply][typ])
-			if typ in ("ValkS", "Weap4", "Stig4"):
-				drop = f"**{drop}**"
 			if "Frag" in typ:
-				drop += f" frags x{choice((4,5,6))}"
+				drop += f" {'soul' if drop in awk else 'fragment'} x{choice((5,6,7,8) if drop in awk else (4,5,6))}"
+			if typ in ("ValkS+", "ValkS", "Weap4", "Stig4"):
+				drop = f"**{drop}**"
 			drops.append(drop)
 		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply.capitalize(), "\n".join(drops)))
 
@@ -45,6 +44,23 @@ class Gacha(Cog):
 			return
 		self.gacha.reset_cooldown(ctx)
 		raise error
+
+awk = (
+	"Goushinnso Memento",
+	"Herrscher of Reason",
+	"Ritual Imayoh",
+	"Gyakushinn Miko",
+	"Flame Sakitama",
+	"Wolf's Dawn",
+	"Luna Kindred",
+	"Sixth Serenade",
+	"Black Nucleus",
+	"Sündenjäger",
+	"Arctic Kriegsmesser",
+	"Herrscher of the Void",
+	"Vermillion Knight: Eclipse",
+	"Azure Empyrea",
+)
 
 def setup(client):
 	client.add_cog(Gacha(client))

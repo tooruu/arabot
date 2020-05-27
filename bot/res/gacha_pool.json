@@ -169,7 +169,7 @@
 			"Microreactor",
 			"Phase Shifter"
 		],
-		"EquEXP": [
+		"EqExp": [
 			"Twin Soul Crystal",
 			"Soul Crystal",
 			"Twin Soul Shard",
@@ -182,6 +182,41 @@
 			"HOWO Chest",
 			"HOLA Chest",
 			"HOMI Chest"
+		]
+	},
+	"expa": {
+		"ValkS+": [
+			"Bright Knight: Excelsis"
+		],
+		"ValkA+": ["Phantom Iron"],
+		"ValkA": [
+			"Arctic Kriegsmesser", "Valkyrie Bladestrike", "Valkyrie Gloria"
+		],
+		"FragS+": [
+			"Bright Knight: Excelsis"
+		],
+		"FragA+": [
+			"Phantom Iron"
+		],
+		"FragA": [
+			"Arctic Kriegsmesser", "Valkyrie Bladestrike", "Valkyrie Gloria"
+		],
+		"SklMats": [
+			"Advanced Skill Material"
+		],
+		"EqExp": [
+			"Phase Shifter",
+			"Microreactor"
+		],
+		"ChrExp": [
+			"Super EXP Chip",
+			"ADV EXP Chip"
+		],
+		"Coins": [
+			"Mithril",
+			"HOMI Chest",
+			"HOMEI Chest",
+			"HOLI Chest"
 		]
 	}
 }
