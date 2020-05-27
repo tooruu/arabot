@@ -188,9 +188,13 @@
 		"ValkS+": [
 			"Bright Knight: Excelsis"
 		],
-		"ValkA+": ["Phantom Iron"],
+		"ValkA+": [
+			"Phantom Iron"
+		],
 		"ValkA": [
-			"Arctic Kriegsmesser", "Valkyrie Bladestrike", "Valkyrie Gloria"
+			"Arctic Kriegsmesser",
+			"Valkyrie Bladestrike",
+			"Valkyrie Gloria"
 		],
 		"FragS+": [
 			"Bright Knight: Excelsis"
@@ -199,7 +203,9 @@
 			"Phantom Iron"
 		],
 		"FragA": [
-			"Arctic Kriegsmesser", "Valkyrie Bladestrike", "Valkyrie Gloria"
+			"Arctic Kriegsmesser",
+			"Valkyrie Bladestrike",
+			"Valkyrie Gloria"
 		],
 		"SklMats": [
 			"Advanced Skill Material"

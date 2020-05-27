@@ -19,7 +19,13 @@ class Gacha(Cog):
 
 	@cooldown(1, 60, BucketType.user)
 	@command(aliases=["pull"])
-	async def gacha(self, ctx, supply="dorm", pulls: int = 10):
+	async def gacha(self, ctx, supply=None, pulls: int = 10):
+		if not supply:
+			await ctx.send(
+				"__The following supplies are available:__\n" +
+				"\n".join([f"**{supply.capitalize()}**" for supply in self.rates])
+			)
+			return
 		if not self.pool.get(supply := supply.lower()):
 			await ctx.send("Invalid supply")
 			raise TypeError
