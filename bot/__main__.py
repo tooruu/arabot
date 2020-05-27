@@ -5,7 +5,7 @@ from cogs._utils import load_env
 
 def load_ext(client):
 	for path, _, files in walk("bot/cogs"):
-		if basename(path:=path[4:])[0] != "_":
+		if basename(path := path[4:])[0] != "_":
 			path = path.replace("/", ".").replace("\\", ".") + "."
 			for cog in sorted(files):
 				if cog[0] != "_" and cog.endswith(".py"):

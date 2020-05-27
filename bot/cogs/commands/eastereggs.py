@@ -4,7 +4,6 @@ import discord
 import asyncio
 from sys import _getframe
 
-
 class EasterEggs(Cog):
 	def __init__(self, client):
 		self.bot = client
@@ -15,7 +14,7 @@ class EasterEggs(Cog):
 			if trigger is None else trigger) and (await self.bot.get_context(msg)).voice_client is None:
 			for channel in msg.guild.voice_channels:
 				if channel.members:
-					(channel:=await channel.connect()).play(
+					(channel := await channel.connect()).play(
 						await discord.FFmpegOpusAudio.from_probe(f"./bot/res/{vorbis}.ogg"),
 						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
 					)
@@ -36,7 +35,6 @@ class EasterEggs(Cog):
 			await msg.channel.purge(limit=7)
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=None)
 
-
 	@Cog.listener("on_message")
 	async def lewd(self, msg):
 		await self.VoiceReaction(msg, "aroro")
@@ -56,7 +54,9 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def gaygames(self, msg):
-		if not msg.content.startswith(self.bot.command_prefix) and msg.author != self.bot.user and msg.guild.id == 433298614564159488:
+		if not msg.content.startswith(
+			self.bot.command_prefix
+		) and msg.author != self.bot.user and msg.guild.id == 433298614564159488:
 			for gaygame in (
 				" кс",
 				" cs",
@@ -73,14 +73,13 @@ class EasterEggs(Cog):
 				" destiny",
 				" дестини",
 				" дестени",
-				):
+			):
 				if gaygame in msg.content.lower():
 					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
 					await msg.channel.set_permissions(msg.author, send_messages=False)
 					await asyncio.sleep(60)
 					await msg.channel.set_permissions(msg.author, overwrite=None)
 					break
-
 
 def setup(client):
 	client.add_cog(EasterEggs(client))

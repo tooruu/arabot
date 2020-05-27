@@ -4,7 +4,6 @@ from discord.ext.tasks import loop
 from ._utils import FindChl
 now = datetime.now
 
-
 #pylint: disable=attribute-defined-outside-init
 class Timer(Cog):
 	def __init__(self, client):
@@ -16,8 +15,8 @@ class Timer(Cog):
 		today = now()
 		for i in range(len(self.resets)):
 			if self.resets[i] <= today.weekday() < self.resets[i + 1]:
-				return (today + timedelta(days=self.resets[i + 1] - today.weekday()
-					)).replace(hour=0, minute=0, second=0, microsecond=0)
+				return (today +
+					timedelta(days=self.resets[i + 1] - today.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
 
 	@loop(minutes=1)
 	async def countdown(self):
@@ -41,7 +40,7 @@ class Timer(Cog):
 	@has_permissions(manage_guild=True)
 	async def timer(self, ctx):
 		#pylint: disable=used-before-assignment
-		status = "Active, running" if (task:=self.countdown.get_task()) and not task.done() else "Stopped"
+		status = "Active, running" if (task := self.countdown.get_task()) and not task.done() else "Stopped"
 		channel = f"**{self.channel.name}**" if self.channel else "Not set"
 		await ctx.send(f"Channel: {channel}\nStatus: {status}")
 
@@ -61,14 +60,13 @@ class Timer(Cog):
 		else:
 			await ctx.send("Channel not set!")
 
-	@timer.command(aliases=["stop"]) # stop() != cancel()
+	@timer.command(aliases=["stop"])
 	async def cancel(self, ctx):
-		self.countdown.cancel()
+		self.countdown.cancel() # cancel() != stop()
 		await ctx.send("Stopping timer")
 
 	def cog_unload(self):
 		self.countdown.cancel()
-
 
 def setup(client):
 	client.add_cog(Timer(client))
