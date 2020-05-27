@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import Cog
 from discord.ext.commands.errors import (
-	CommandOnCooldown, MissingPermissions, CheckFailure, BadArgument, MissingRequiredArgument
+	CommandOnCooldown, MissingPermissions, CheckFailure, BadArgument, MissingRequiredArgument, ExpectedClosingQuoteError
 )
 from ._utils import setPresence
 
@@ -29,6 +29,7 @@ class Listeners(Cog):
 			CheckFailure,
 			BadArgument,
 			MissingRequiredArgument,
+			ExpectedClosingQuoteError
 			)
 		):
 			return
