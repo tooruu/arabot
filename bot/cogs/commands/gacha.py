@@ -8,7 +8,7 @@ class Gacha(Cog):
 		with open("./bot/res/gacha_pool.json") as pool:
 			self.pool = {
 				typ: [stig if '(' in stig else f"{stig} ({slot})" for slot in ('T', 'M', 'B')
-				for stig in items] if typ == "Stig4" else items
+				for stig in items] if "Stig" in typ else items
 				for typ, items in load(pool).items()
 			}
 		with open("./bot/res/gacha_rates.json") as rates:
