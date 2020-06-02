@@ -1,5 +1,5 @@
 from random import choice, choices
-from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCooldown, MissingRequiredArgument, BadArgument, ExpectedClosingQuoteError
+from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCooldown, MissingRequiredArgument, BadArgument
 from json import load
 
 class Gacha(Cog):
