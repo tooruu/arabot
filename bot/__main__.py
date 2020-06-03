@@ -13,6 +13,6 @@ def load_ext(client):
 					print(f"Loaded {path}{cog[:-3]}")
 
 if __name__ == "__main__":
-	bot = Bot(command_prefix=";", case_insensitive=True)
+	bot = Bot(command_prefix="-", case_insensitive=True)
 	load_ext(bot)
 	bot.run(load_env("token"))

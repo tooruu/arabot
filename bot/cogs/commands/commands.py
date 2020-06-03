@@ -1,18 +1,19 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
 from .._utils import (
-	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, load_env
+	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, load_env, bold
 )
 import discord
 from aiohttp import ClientSession as WebSession, ContentTypeError
 from jikanpy import AioJikan
-from urllib.parse import quote
+from urllib.parse import quote_plus as safe, quote
 from io import BytesIO
+from json import loads
 
 class Commands(Cog):
 	def __init__(self, client):
 		self.bot = client
-		(self.token, self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key,
-			self.faceit_key) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key", "faceit_key")
+		(self.token, self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key, self.faceit_key, self.wolfram_id
+			) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key", "faceit_key", "wolfram_id")
 
 	@command(aliases=["ver", "v"], brief="| Show currently running bot's version")
 	async def version(self, ctx):
@@ -38,7 +39,7 @@ class Commands(Cog):
 	async def crename(self, ctx, chan: FindChl, *, name):
 		oldName = chan.name
 		await chan.edit(name=name)
-		await ctx.send(f"Renamed **{oldName}** to **{chan.name}**")
+		await ctx.send(f"Renamed {bold(oldName)} to {bold(chan.name)}")
 
 	@command(hidden=True)
 	@check(isDev)
@@ -67,14 +68,14 @@ class Commands(Cog):
 						except ContentTypeError:
 							await ctx.send(
 								"Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find the sauce manually at\nhttps://trace.moe/?url="
-								+ quote(image_url, safe="")
+								+ safe(image_url)
 							)
 						else:
 							async with session.get(
 								"https://trace.moe/preview.php",
 								params={
 								"anilist_id": tmoe_resp["anilist_id"],
-								"file": quote(tmoe_resp["filename"]),
+								"file": safe(tmoe_resp["filename"]),
 								"t": str(tmoe_resp["at"]),
 								"token": tmoe_resp["tokenthumb"]
 								}
@@ -101,7 +102,7 @@ class Commands(Cog):
 	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
 	@check(isDev)
 	async def cog(self, ctx):
-		await ctx.send("Loaded cogs: " + ", ".join(f"**{c}**" for c in self.bot.cogs.keys()))
+		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs.keys()))
 
 	@cog.command(aliases=["add"])
 	async def load(self, ctx, *cogs):
@@ -109,13 +110,13 @@ class Commands(Cog):
 		for i in cogs:
 			try:
 				self.bot.load_extension(f"cogs.{i}")
-				loaded.append(f"**{i}**")
+				loaded.append(bold(i))
 			except errors.ExtensionNotFound:
-				await ctx.send(f"**{i}** was not found")
+				await ctx.send(bold(i) + " was not found")
 			except errors.ExtensionAlreadyLoaded:
-				await ctx.send(f"**{i}** is already loaded")
+				await ctx.send(bold(i) + " is already loaded")
 			except (errors.ExtensionFailed, errors.NoEntryPointError):
-				await ctx.send(f"**{i}** is an invalid extension")
+				await ctx.send(bold(i) + " is an invalid extension")
 		await ctx.send("Loaded " + (", ".join(loaded) or "nothing"))
 
 	@cog.command(aliases=["remove"])
@@ -124,7 +125,7 @@ class Commands(Cog):
 		for i in cogs:
 			try:
 				self.bot.unload_extension(f"cogs.{i}")
-				unloaded.append(f"**{i}**")
+				unloaded.append(bold(i))
 			except errors.ExtensionNotLoaded:
 				pass
 		await ctx.send("Unloaded " + (", ".join(unloaded) or "nothing"))
@@ -135,14 +136,14 @@ class Commands(Cog):
 		for i in cogs:
 			try:
 				self.bot.reload_extension(f"cogs.{i}")
-				reloaded.append(f"**{i}**")
+				reloaded.append(bold(i))
 			except errors.ExtensionNotFound:
-				await ctx.send(f"**{i}** was not found")
+				await ctx.send(bold(i) + " was not found")
 			except errors.ExtensionNotLoaded:
 				self.bot.load_extension(f"cogs.{i}")
-				reloaded.append(f"**{i}**")
+				reloaded.append(bold(i))
 			except (errors.ExtensionFailed, errors.NoEntryPointError):
-				await ctx.send(f"**{i}** is an invalid extension")
+				await ctx.send(bold(i) + " is an invalid extension")
 		await ctx.send("Reloaded " + (", ".join(reloaded) or "nothing"))
 
 	@command(aliases=["purge", "prune", "d"], hidden=True)
@@ -202,7 +203,7 @@ class Commands(Cog):
 		if target:
 			if target.dm_channel is None:
 				await target.create_dm()
-			await target.dm_channel.send(f"{ctx.author.name} wants you to show up in **{ctx.guild.name}**.")
+			await target.dm_channel.send(f"{ctx.author.name} wants you to show up in {bold(ctx.guild.name)}.")
 			await ctx.send(f"Notified {target.mention}")
 		else:
 			await ctx.send("User not found")
@@ -222,7 +223,7 @@ class Commands(Cog):
 				params={
 				"key": self.g_isearch_key,
 				"cx": self.g_cse,
-				"q": quote(query, safe=""),
+				"q": safe(query),
 				"num": 1,
 				"searchType": "image"
 				}
@@ -240,19 +241,19 @@ class Commands(Cog):
 				params={
 				"key": self.g_search_key,
 				"cx": self.g_cse,
-				"q": quote(query, safe=""),
+				"q": safe(query),
 				"num": 3
 				}
 			) as response:
 				embed = discord.Embed(
 					title="Google search results",
 					description="Showing top 3 search results",
-					url="https://google.com/search?q=" + quote(query)
+					url="https://google.com/search?q=" + safe(query)
 				)
 				try:
 					for result in (await response.json())["items"]:
 						embed.add_field(
-							name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False
+							name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
 						)
 				except KeyError:
 					await ctx.send("No results found")
@@ -267,19 +268,19 @@ class Commands(Cog):
 				params={
 				"key": self.g_search_key,
 				"cx": self.g_cse,
-				"q": quote(query + " site:youtube.com/watch", safe=""),
+				"q": safe(query + " site:youtube.com/watch"),
 				"num": 3
 				}
 			) as response:
 				embed = discord.Embed(
 					title="YouTube search results",
 					description="Showing top 3 search results",
-					url="https://google.com/search?q=" + quote(query + "+site:youtube.com/watch", safe="+")
+					url="https://google.com/search?q=" + safe(query + "+site:youtube.com/watch", safe="+")
 				)
 				try:
 					for result in (await response.json())["items"]:
 						embed.add_field(
-							name=result["link"], value=f"**{result['title']}**\n{result['snippet']}", inline=False
+							name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
 						)
 				except KeyError:
 					await ctx.send("No videos found")
@@ -294,7 +295,7 @@ class Commands(Cog):
 				params={
 				"key": self.g_search_key,
 				"cx": self.g_cse,
-				"q": quote(query + " site:youtube.com/watch", safe=""),
+				"q": safe(query + " site:youtube.com/watch"),
 				"num": 1
 				}
 			) as response:
@@ -336,22 +337,62 @@ class Commands(Cog):
 	@command(brief="<term> | Search term in Urban Dictionary", aliases=["ud"])
 	async def urban(self, ctx, *, term):
 		async with WebSession() as session:
-			async with session.get(f"https://api.urbandictionary.com/v0/define?term={quote(term)}") as ud:
-				if ud := (await ud.json())["list"]:
-					await ctx.send(
-						embed=discord.Embed(
-						description="\n---------------------------------\n".
-						join([result["definition"].replace("[", "").replace("]", "") for result in ud[:3]])
-						).set_author(name=term, url="https://www.urbandictionary.com/define.php?term=" + quote(term))
-					)
-				else:
-					await ctx.send(f"Definition for **{term}** not found")
+			async with session.get(f"https://api.urbandictionary.com/v0/define?term={safe(term)}") as ud:
+				ud = await ud.json()
+		if ud["list"]:
+			await ctx.send(
+				embed=discord.Embed(
+				description="\n---------------------------------\n".
+				join([result["definition"].replace("[", "").replace("]", "") for result in ud[:3]])
+				).set_author(name=term, url="https://www.urbandictionary.com/define.php?term=" + safe(term))
+			)
+		else:
+			await ctx.send(f"Definition for {bold(term)} not found")
 
 	@command(hidden=True)
 	@has_permissions(manage_guild=True)
 	async def say(self, ctx, *, msg):
 		await ctx.message.delete()
 		await ctx.send(msg)
+
+	@command(brief="<query> | Answer a question?")
+	async def calc(self, ctx, *, query):
+		async with ctx.typing():
+			async with WebSession() as session:
+				async with session.get(
+					"https://api.wolframalpha.com/v2/query",
+					params={
+					"input": quote(query, safe=""),
+					"format": "plaintext",
+					"output": "json",
+					"appid": self.wolfram_id,
+					"units": "metric"
+					}
+				) as wa:
+					wa = loads(await wa.text())["queryresult"]
+			embed = discord.Embed(title=query,
+				url="https://www.wolframalpha.com/input/?i=" + quote(query, safe="")).set_footer(
+				icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png", text="W|A"
+				)
+			if wa["success"]:
+				if wa.get("warnings"):
+					embed.description = wa["warnings"]["text"]
+				for pod in wa["pods"]:
+					if pod["id"] == "Input":
+						embed.add_field(
+							name="Input",
+							value=
+							f"[{pod['subpods'][0]['plaintext']}](https://www.wolframalpha.com/input/?i={quote(pod['subpods'][0]['plaintext'], safe='')})"
+						)
+					if pod.get("primary"):
+						embed.add_field(
+							name="Result", value="\n".join([subpod["plaintext"] for subpod in pod["subpods"]]), inline=False
+						)
+						break
+			else:
+				if wa.get("tips"):
+					embed.description = wa["tips"]["text"]
+			await ctx.send(embed=embed)
 
 def setup(client):
 	client.add_cog(Commands(client))
