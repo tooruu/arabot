@@ -386,7 +386,7 @@ class Commands(Cog):
 						)
 					if pod.get("primary"):
 						embed.add_field(
-							name="Result", value="\n".join([subpod["plaintext"] for subpod in pod["subpods"]]), inline=False
+							name="Result", value="\n".join(subpod["plaintext"] for subpod in pod["subpods"]), inline=False
 						)
 						break
 			else:
