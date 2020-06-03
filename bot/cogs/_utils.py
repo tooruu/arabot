@@ -7,7 +7,7 @@ from discord import Status, Activity
 from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "1.2.1" #TODO: UPDATE!
+BOT_VERSION = "1.2.2" #TODO: UPDATE!
 
 def isDev(ctx):
 	return ctx.author.id in (337343326095409152, 447138372121788417)
@@ -126,3 +126,5 @@ def load_env(*keys):
 	return (secret[k] for k in keys)
 
 bold = lambda s: "**{}**".format(s.replace('*', '\\*'))
+
+dsafe = lambda s: s.replace('*', '\\*').replace('_', '\\_').replace('~', '\\~').replace('|', '\\|').replace('`', '\\`')

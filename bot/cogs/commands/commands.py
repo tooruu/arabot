@@ -1,6 +1,6 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
 from .._utils import (
-	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, load_env, bold
+	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, load_env, bold, dsafe
 )
 import discord
 from aiohttp import ClientSession as WebSession, ContentTypeError
@@ -357,6 +357,7 @@ class Commands(Cog):
 
 	@command(brief="<query> | Answer a question?")
 	async def calc(self, ctx, *, query):
+		query = query.strip('`')
 		async with ctx.typing():
 			async with WebSession() as session:
 				async with session.get(
@@ -370,10 +371,11 @@ class Commands(Cog):
 					}
 				) as wa:
 					wa = loads(await wa.text())["queryresult"]
-			embed = discord.Embed(title=query,
-				url="https://www.wolframalpha.com/input/?i=" + quote(query, safe="")).set_footer(
-				icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png", text="W|A"
-				)
+			embed = discord.Embed(
+				color=0xf4684c, title=dsafe(query), url="https://www.wolframalpha.com/input/?i=" + quote(query, safe="")
+			).set_footer(
+				icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png", text="Wolfram|Alpha"
+			)
 			if wa["success"]:
 				if wa.get("warnings"):
 					embed.description = wa["warnings"]["text"]
@@ -382,11 +384,13 @@ class Commands(Cog):
 						embed.add_field(
 							name="Input",
 							value=
-							f"[{pod['subpods'][0]['plaintext']}](https://www.wolframalpha.com/input/?i={quote(pod['subpods'][0]['plaintext'], safe='')})"
+							f"[{dsafe(pod['subpods'][0]['plaintext'])}](https://www.wolframalpha.com/input/?i={quote(pod['subpods'][0]['plaintext'], safe='')})"
 						)
 					if pod.get("primary"):
 						embed.add_field(
-							name="Result", value="\n".join(subpod["plaintext"] for subpod in pod["subpods"]), inline=False
+							name="Result",
+							value="\n".join(dsafe(subpod["plaintext"]) for subpod in pod["subpods"]),
+							inline=False
 						)
 						break
 			else:
