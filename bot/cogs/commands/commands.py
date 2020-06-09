@@ -59,7 +59,7 @@ class Commands(Cog):
 		) else None:
 			async with ctx.typing():
 				async with WebSession() as session:
-					async with session.get("https://trace.moe/api/search", params={"url": image_url}) as tmoe_resp:
+					async with session.get("https://trace.moe/api/search?url=" + quote(image_url)) as tmoe_resp:
 						try:
 							mal_resp = (
 								await
@@ -102,7 +102,7 @@ class Commands(Cog):
 	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
 	@check(isDev)
 	async def cog(self, ctx):
-		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs.keys()))
+		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs))
 
 	@cog.command(aliases=["add"])
 	async def load(self, ctx, *cogs):

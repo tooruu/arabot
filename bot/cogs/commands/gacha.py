@@ -5,23 +5,21 @@ from json import load
 class Gacha(Cog):
 	def __init__(self, client):
 		self.bot = client
-		with open("./bot/res/gacha_pool.json") as gacha:
-			self.pool = {
-				supply: {
-				typ: [stig if stig[-1] == ')' else f"{stig} ({slot})" for slot in ('T', 'M', 'B')
-				for stig in items] if "Stig" in typ else items
-				for typ, items in pool.items()
-				}
-				for supply, pool in load(gacha).items()
-			}
-		with open("./bot/res/gacha_rates.json") as rates:
-			self.rates = load(rates)
 		self.gacha.cooldown_after_parsing = True
+		with open("./bot/res/gacha.json") as gacha:
+			self.pool = load(gacha)
+		for supply in self.pool:
+			for typ in self.pool[supply]["pool"]:
+				if "Stig" in typ:
+					self.pool[supply]["pool"][typ] = [
+						stig if stig[-1] == ')' else f"{stig} ({slot})" for slot in ('T', 'M', 'B')
+						for stig in self.pool[supply]["pool"][typ]
+					]
 
 	@cooldown(1, 60, BucketType.user)
 	@command(aliases=["pull"])
 	async def gacha(self, ctx, supply, pulls: int = 10):
-		if not self.pool.get(supply := supply.lower()):
+		if not self.pool.get(supply := supply.lower()) or not self.pool[supply]["available"]:
 			await ctx.send("Invalid supply")
 			self.gacha.reset_cooldown(ctx)
 			return
@@ -30,16 +28,18 @@ class Gacha(Cog):
 			self.gacha.reset_cooldown(ctx)
 			return
 		pulls = min(pulls, 10)
-		types = choices([*self.rates[supply]], self.rates[supply].values(), k=pulls)
+		types = choices([*self.pool[supply]["rates"]], self.pool[supply]["rates"].values(), k=pulls)
 		drops = []
 		for typ in types:
-			drop = choice(self.pool[supply][typ])
+			drop = choice(self.pool[supply]["pool"][typ])
 			if "Frag" in typ:
 				drop += f" {'soul' if drop in awk else 'fragment'} x{choice((5,6,7,8) if drop in awk else (4,5,6))}"
 			if typ in ("ValkS+", "ValkS", "Weap4", "Stig4"):
 				drop = f"**{drop}**"
 			drops.append(drop)
-		await ctx.send("__Your **{}** supply drops:__\n{}".format(supply.capitalize(), "\n".join(drops)))
+		await ctx.send(
+			"__**{}** supply drops:__\n{}".format(self.pool[supply].get("name") or supply.title(), "\n".join(drops))
+		)
 
 	@gacha.error
 	async def on_error(self, ctx, error):
@@ -47,8 +47,9 @@ class Gacha(Cog):
 			return
 		if isinstance(error, MissingRequiredArgument):
 			await ctx.send(
-				"__The following supplies are available:__\n" +
-				"\n".join([f"**{supply.capitalize()}**" for supply in self.rates])
+				"__Currently available supplies:__\n" + "\n".join(
+				[f"*{supply}* - **{self.pool[supply]['name']}**" for supply in self.pool if self.pool[supply]["available"]]
+				)
 			)
 			return
 		self.gacha.reset_cooldown(ctx)

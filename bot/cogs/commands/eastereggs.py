@@ -3,6 +3,7 @@ from .._utils import isValid
 import discord
 import asyncio
 from sys import _getframe
+from discord.ext.commands.errors import CommandOnCooldown
 
 class EasterEggs(Cog):
 	def __init__(self, client):
@@ -22,8 +23,11 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
-		if isValid(self.bot, msg, "za warudo"):
-			await msg.channel.set_permissions(msg.guild.default_role, send_messages=False)
+		if isValid(self.bot, msg, "za warudo") and self.bot.user :
+			old_perms = msg.channel.overwrites_for(msg.guild.default_role)
+			temp_perms = old_perms
+			temp_perms.send_messages = False
+			await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
 			await msg.channel.send("<:KonoDioDa:676949860502732803>")
 			await msg.channel.send("***Toki yo tomare!***")
 			for i in ("Ichi", "Ni", "San", "Yon", "Go"): # Ichi Ni San Yon Go Roku Nana Hachi Kyu
@@ -33,7 +37,7 @@ class EasterEggs(Cog):
 			await msg.channel.send("Toki wa ugoki dasu")
 			await asyncio.sleep(2)
 			await msg.channel.purge(limit=7)
-			await msg.channel.set_permissions(msg.guild.default_role, overwrite=None)
+			await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
 
 	@Cog.listener("on_message")
 	async def lewd(self, msg):
@@ -58,23 +62,23 @@ class EasterEggs(Cog):
 			self.bot.command_prefix
 		) and msg.author != self.bot.user and msg.guild.id == 433298614564159488:
 			for gaygame in (
-				" кс",
-				" cs",
-				" мм",
-				" mm",
-				" рафт",
-				" raft",
-				" фортнайт",
-				" fortnite"
-				" раст",
-				" rust",
-				" osu",
-				" осу",
-				" destiny",
-				" дестини",
-				" дестени",
+				"кс",
+				"cs",
+				"мм",
+				"mm",
+				"рафт",
+				"raft",
+				"фортнайт",
+				"fortnite"
+				"раст",
+				"rust",
+				"osu",
+				"осу",
+				"destiny",
+				"дестини",
+				"дестени",
 			):
-				if gaygame in msg.content.lower():
+				if " " + gaygame in msg.content.lower():
 					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
 					await msg.channel.set_permissions(msg.author, send_messages=False)
 					await asyncio.sleep(60)

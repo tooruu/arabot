@@ -4,4 +4,6 @@
 		"--max-line-length=120",
 		"--ignored-argument-names=ctx"
 	],
+	"python.linting.pylintEnabled": true,
+	"python.linting.enabled": true,
 }

@@ -1,6 +1,23 @@
 {
 	"dorm": {
-		"ValkS": [
+		"available": true,
+		"name": "Dorm",
+		"rates": {
+			"ValkS": 0.015,
+			"ValkA": 0.135,
+			"ValkB": 0.055,
+			"FragS": 0.0127,
+			"FragA": 0.1019,
+			"Weap4": 0.0046,
+			"Weap3": 0.075,
+			"Stig4": 0.0073,
+			"Stig3": 0.225,
+			"UpMats": 0.1474,
+			"EqExp": 0.1474,
+			"Coins": 0.0737
+		},
+		"pool": {
+			"ValkS": [
 			"Celestial Hymn",
 			"Blood Rose",
 			"Shadow Knight",
@@ -14,7 +31,7 @@
 			"Dimensional Breaker",
 			"Violet Executer"
 		],
-		"ValkA": [
+			"ValkA": [
 			"Luna Kindred",
 			"Valkyrie Accipiter",
 			"Valkyrie Pledge",
@@ -34,13 +51,13 @@
 			"Snowy Sniper",
 			"Scarlet Fusion"
 		],
-		"ValkB": [
+			"ValkB": [
 			"Valkyrie Chariot",
 			"Battle Storm",
 			"White Comet",
 			"Crimson Impulse"
 		],
-		"FragS": [
+			"FragS": [
 			"Celestial Hymn",
 			"Blood Rose",
 			"Shadow Knight",
@@ -54,7 +71,7 @@
 			"Dimensional Breaker",
 			"Violet Executer"
 		],
-		"FragA": [
+			"FragA": [
 			"Luna Kindred",
 			"Valkyrie Accipiter",
 			"Valkyrie Pledge",
@@ -74,7 +91,7 @@
 			"Snowy Sniper",
 			"Scarlet Fusion"
 		],
-		"Weap4": [
+			"Weap4": [
 			"2nd Sacred Relic",
 			"3rd Sacred Relic",
 			"5th Sacred Relic",
@@ -97,7 +114,7 @@
 			"Demonblade - Florid Sakura",
 			"Cinder Hawk"
 		],
-		"Weap3": [
+			"Weap3": [
 			"Markov Type A",
 			"Vanguard",
 			"Thermal Cutter",
@@ -111,7 +128,6 @@
 			"Markov Type C",
 			"Dark Suns",
 			"X-01 Azure Eye",
-			"Plasma Lance",
 			"Lightning Soul",
 			"Cathode Type-09",
 			"Raider Missiles",
@@ -122,7 +138,7 @@
 			"CAS-X Saints",
 			"Obisidian Reaper"
 		],
-		"Stig4": [
+			"Stig4": [
 			"Sirin: Ascendant",
 			"Shakespeare",
 			"Planck",
@@ -144,7 +160,7 @@
 			"Mei: Beach Party (M)",
 			"Schrodinger (T)"
 		],
-		"Stig3": [
+			"Stig3": [
 			"Charlemagne",
 			"Elizabeth Bathory",
 			"Galileo",
@@ -161,7 +177,7 @@
 			"Scott",
 			"Wang Zhaojun"
 		],
-		"UpMats": [
+			"UpMats": [
 			"Super EXP Chip",
 			"ADV EXP Chip",
 			"ADV Learning Chip",
@@ -169,13 +185,13 @@
 			"Microreactor",
 			"Phase Shifter"
 		],
-		"EqExp": [
+			"EqExp": [
 			"Twin Soul Crystal",
 			"Soul Crystal",
 			"Twin Soul Shard",
 			"Soul Shard"
 		],
-		"Coins": [
+			"Coins": [
 			"HOMEI Chest",
 			"HOMU Chest",
 			"HOLI Chest",
@@ -183,46 +199,63 @@
 			"HOLA Chest",
 			"HOMI Chest"
 		]
+		}
 	},
-	"expa": {
-		"ValkS+": [
+	"bk": {
+		"available": false,
+		"name": "Bright Knight: Excelsis",
+		"rates": {
+			"ValkS+": 0.015,
+			"ValkA+": 0.045,
+			"ValkA": 0.09,
+			"FragS+": 0.0225,
+			"FragA+": 0.15,
+			"FragA": 0.09,
+			"SklMats": 0.1,
+			"EqExp": 0.2641,
+			"ChrExp": 0.1117,
+			"Coins": 0.1117
+		},
+		"pool": {
+			"ValkS+": [
 			"Bright Knight: Excelsis"
 		],
-		"ValkA+": [
+			"ValkA+": [
 			"Phantom Iron"
 		],
-		"ValkA": [
+			"ValkA": [
 			"Arctic Kriegsmesser",
 			"Valkyrie Bladestrike",
 			"Valkyrie Gloria"
 		],
-		"FragS+": [
+			"FragS+": [
 			"Bright Knight: Excelsis"
 		],
-		"FragA+": [
+			"FragA+": [
 			"Phantom Iron"
 		],
-		"FragA": [
+			"FragA": [
 			"Arctic Kriegsmesser",
 			"Valkyrie Bladestrike",
 			"Valkyrie Gloria"
 		],
-		"SklMats": [
+			"SklMats": [
 			"Advanced Skill Material"
 		],
-		"EqExp": [
+			"EqExp": [
 			"Phase Shifter",
 			"Microreactor"
 		],
-		"ChrExp": [
+			"ChrExp": [
 			"Super EXP Chip",
 			"ADV EXP Chip"
 		],
-		"Coins": [
+			"Coins": [
 			"Mithril",
 			"HOMI Chest",
 			"HOMEI Chest",
 			"HOLI Chest"
 		]
+		}
 	}
 }
