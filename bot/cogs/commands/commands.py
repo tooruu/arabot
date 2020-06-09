@@ -339,7 +339,7 @@ class Commands(Cog):
 		async with WebSession() as session:
 			async with session.get(f"https://api.urbandictionary.com/v0/define?term={safe(term)}") as ud:
 				ud = await ud.json()
-		if ud["list"]:
+		if ud := ud.get("list"):
 			await ctx.send(
 				embed=discord.Embed(
 				description="\n---------------------------------\n".
