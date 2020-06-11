@@ -23,7 +23,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
-		if isValid(self.bot, msg, "za warudo") and self.bot.user :
+		if isValid(self.bot, msg, "za warudo") and self.bot.user:
 			old_perms = msg.channel.overwrites_for(msg.guild.default_role)
 			temp_perms = old_perms
 			temp_perms.send_messages = False
@@ -51,10 +51,11 @@ class EasterEggs(Cog):
 	async def teri(self, msg):
 		await self.VoiceReaction(msg, "teri")
 
-	@Cog.listener("on_message")
-	async def everyone(self, msg):
-		if msg.mention_everyone:
-			await msg.delete()
+	# TODO: toggleable per-server
+	#@Cog.listener("on_message")
+	#async def everyone(self, msg):
+	#	if msg.mention_everyone:
+	#		await msg.delete()
 
 	@Cog.listener("on_message")
 	async def gaygames(self, msg):
