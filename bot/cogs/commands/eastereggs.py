@@ -3,7 +3,6 @@ from .._utils import isValid
 import discord
 import asyncio
 from sys import _getframe
-from discord.ext.commands.errors import CommandOnCooldown
 
 class EasterEggs(Cog):
 	def __init__(self, client):
@@ -85,6 +84,11 @@ class EasterEggs(Cog):
 					await asyncio.sleep(60)
 					await msg.channel.set_permissions(msg.author, overwrite=None)
 					break
+
+	@Cog.listener("on_message")
+	async def shine(self, msg):
+		if "shine" in msg.content.lower():
+			await msg.channel.send("no u")
 
 def setup(client):
 	client.add_cog(EasterEggs(client))
