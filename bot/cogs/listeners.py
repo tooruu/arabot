@@ -20,7 +20,8 @@ class Listeners(Cog):
 			await ctx.send(f"Cooldown expires in {error.retry_after:.0f} seconds")
 			return
 		if isinstance(error, MissingPermissions):
-			await ctx.send("Missing permissions")
+			if not ctx.command.hidden:
+				await ctx.send("Missing permissions")
 			return
 		if hasattr(ctx.command, "on_error") or isinstance(
 			error,
