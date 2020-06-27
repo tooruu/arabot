@@ -24,8 +24,9 @@ class EasterEggs(Cog):
 	async def za_warudo(self, msg):
 		if isValid(self.bot, msg, "za warudo") and self.bot.user:
 			old_perms = msg.channel.overwrites_for(msg.guild.default_role)
-			temp_perms = old_perms
+			temp_perms = msg.channel.overwrites_for(msg.guild.default_role)
 			temp_perms.send_messages = False
+			print(id(temp_perms) == id(old_perms))
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
 			await msg.channel.send("<:KonoDioDa:676949860502732803>")
 			await msg.channel.send("***Toki yo tomare!***")

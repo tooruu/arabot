@@ -27,10 +27,10 @@ class Commands(Cog):
 	async def love(self, ctx, partner: FindMember):
 		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
 
-	@command(aliases=["exit", "quit"], hidden=True)
+	@command(aliases=["exit", "quit", "kill", "shine", "shineo", "die", "kys"], hidden=True)
 	@check(isDev)
 	async def stop(self, ctx):
-		await ctx.send("Stopping!")
+		await ctx.send("Oh no! I'm dying... :cold_face:")
 		print("Stopping!")
 		await self.bot.close()
 

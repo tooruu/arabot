@@ -36,4 +36,4 @@ class HAnime(Cog):
 
 def setup(client):
 	pass
-	#client.add_cog(HAnime(client))
+	client.add_cog(HAnime(client))
