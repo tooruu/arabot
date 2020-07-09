@@ -94,7 +94,7 @@ class Commands(Cog):
 									value=s if len(s := mal_resp["synopsis"].partition(" [")[0]) <=
 									(maxlength := 600) else ".".join(s[:maxlength].split(".")[0:-1]) + "..."
 									).set_footer(
-									text=f"Requested by {ctx.author.nick or ctx.author.name} | Powered by trace.moe",
+									text=f"Requested by {ctx.author.display_name} | Powered by trace.moe",
 									icon_url=ctx.author.avatar_url
 									)
 								)
@@ -159,7 +159,7 @@ class Commands(Cog):
 		if target:
 			await ctx.send(
 				embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))
-															).set_footer(text=(target.nick or target.name) + "'s avatar")
+															).set_footer(text=(target.display_name) + "'s avatar")
 			)
 		else:
 			await ctx.send("User not found")
@@ -203,7 +203,7 @@ class Commands(Cog):
 		if target:
 			if target.dm_channel is None:
 				await target.create_dm()
-			await target.dm_channel.send(f"{ctx.author.name} wants you to show up in {bold(ctx.guild.name)}.")
+			await target.dm_channel.send(f"{ctx.author.display_name} wants you to show up in {bold(ctx.guild.name)}.")
 			await ctx.send(f"Notified {target.mention}")
 		else:
 			await ctx.send("User not found")

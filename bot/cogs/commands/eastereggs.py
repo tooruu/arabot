@@ -3,6 +3,7 @@ from .._utils import isValid
 import discord
 import asyncio
 from sys import _getframe
+from re import search
 
 class EasterEggs(Cog):
 	def __init__(self, client):
@@ -79,11 +80,14 @@ class EasterEggs(Cog):
 				"дестини",
 				"дестени",
 			):
-				if " " + gaygame in msg.content.lower():
+				if search(f"\\b{gaygame}\\b", msg.content.lower()):
 					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
-					await msg.channel.set_permissions(msg.author, send_messages=False)
+					old_perms = msg.channel.overwrites_for(msg.author)
+					temp_perms = msg.channel.overwrites_for(msg.author)
+					temp_perms.send_messages = False
+					await msg.channel.set_permissions(msg.author, overwrite=temp_perms)
 					await asyncio.sleep(60)
-					await msg.channel.set_permissions(msg.author, overwrite=None)
+					await msg.channel.set_permissions(msg.author, overwrite=old_perms)
 					break
 
 	@Cog.listener("on_message")

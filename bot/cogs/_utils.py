@@ -7,7 +7,7 @@ from discord import Status, Activity
 from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "1.3.4" #TODO: UPDATE!
+BOT_VERSION = "1.3.5" #TODO: UPDATE!
 
 def isDev(ctx):
 	return ctx.author.id in (337343326095409152, 447138372121788417)
@@ -54,7 +54,9 @@ class Finder(Converter):
 
 class FindMember(Finder, MemberConverter):
 	def find(self, ctx, argument):
-		return find(lambda member: not member.bot and member.name.lower().startswith(argument.lower()), ctx.guild.members)
+		return find(
+			lambda member: not member.bot and member.display_name.lower().startswith(argument.lower()), ctx.guild.members
+		)
 
 class FindEmoji(Finder, EmojiConverter):
 	def find(self, ctx, argument):

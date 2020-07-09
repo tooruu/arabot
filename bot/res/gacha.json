@@ -202,7 +202,7 @@
 		}
 	},
 	"bk": {
-		"available": false,
+		"available": true,
 		"name": "Bright Knight: Excelsis",
 		"rates": {
 			"ValkS+": 0.015,
