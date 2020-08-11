@@ -7,7 +7,7 @@ from discord import Status, Activity
 from os import environ
 
 BOT_NAME = "AraBot"
-BOT_VERSION = "1.3.5" #TODO: UPDATE!
+BOT_VERSION = "1.3.6" #TODO: UPDATE!
 
 def isDev(ctx):
 	return ctx.author.id in (337343326095409152, 447138372121788417)

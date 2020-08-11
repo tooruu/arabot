@@ -34,7 +34,7 @@ class Gacha(Cog):
 			drop = choice(self.pool[supply]["pool"][typ])
 			if "Frag" in typ:
 				drop += f" {'soul' if drop in awk else 'fragment'} x{choice((5,6,7,8) if drop in awk else (4,5,6))}"
-			if typ in ("ValkS+", "ValkS", "Weap4", "Stig4"):
+			if typ in ("ValkS+", "ValkS", "Weap4+", "Weap4", "Stig4+", "Stig4"):
 				drop = f"**{drop}**"
 			drops.append(drop)
 		await ctx.send(
@@ -73,6 +73,7 @@ awk = (
 	"Herrscher of the Void",
 	"Vermillion Knight: Eclipse",
 	"Azure Empyrea",
+	"Herrscher of Thunder",
 )
 
 def setup(client):

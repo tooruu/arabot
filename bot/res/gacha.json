@@ -202,7 +202,7 @@
 		}
 	},
 	"bk": {
-		"available": true,
+		"available": false,
 		"name": "Bright Knight: Excelsis",
 		"rates": {
 			"ValkS+": 0.015,
@@ -252,6 +252,111 @@
 			],
 			"Coins": [
 				"Mithril",
+				"HOMI Chest",
+				"HOMEI Chest",
+				"HOLI Chest"
+			]
+		}
+	},
+	"hot": {
+		"available": true,
+		"name": "Herrscher of Thunder",
+		"rates": {
+			"ValkS+": 0.015,
+			"ValkA+": 0.045,
+			"ValkA": 0.09,
+			"FragS+": 0.0225,
+			"FragA+": 0.15,
+			"FragA": 0.09,
+			"SklMats": 0.1,
+			"EqExp": 0.2641,
+			"ChrExp": 0.1117,
+			"Coins": 0.1117
+		},
+		"pool": {
+			"ValkS+": [
+				"Herrscher of Thunder"
+			],
+			"ValkA+": [
+				"Valkyrie Gloria"
+			],
+			"ValkA": [
+				"Gyakushinn Miko",
+				"Scarlet Fusion",
+				"Valkyrie Pledge"
+			],
+			"FragS+": [
+				"Herrscher of Thunder"
+			],
+			"FragA+": [
+				"Valkyrie Gloria"
+			],
+			"FragA": [
+				"Gyakushinn Miko",
+				"Scarlet Fusion",
+				"Valkyrie Pledge"
+			],
+			"SklMats": [
+				"Advanced Skill Material"
+			],
+			"EqMats": [
+				"Phase Shifter",
+				"Microreactor"
+			],
+			"ChrExp": [
+				"Super EXP Chip",
+				"ADV EXP Chip"
+			],
+			"Coins": [
+				"Mithril",
+				"HOMI Chest",
+				"HOMEI Chest",
+				"HOLI Chest"
+			]
+		}
+	},
+	"expa": {
+		"available": true,
+		"name": "HoT Equipment",
+		"rates": {
+			"Weap4+": 0.01831,
+			"Weap4": 0.04580,
+			"Weap3": 0.1123,
+			"Stig4+": 0.02748,
+			"Stig4": 0.07815,
+			"Stig3": 0.3369,
+			"UpMats": 0.1707,
+			"EqExp": 0.1707,
+			"Coins": 0.08545
+		},
+		"pool": {
+			"Weap4+": [
+				"Key of Castigation"
+			],
+			"Weap4": [
+				"ARC Serratus", "Sleeping Beauty", "Hekate's Gloom", "Oath of Judah", "Skoll and Hati", "Skadi Ondurgud"
+			],
+			"Weap3": [
+				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell's Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
+			],
+			"Stig4+": [
+				"Benares: Awakening"
+			],
+			"Stig4": [
+				"Beethoven", "Dirac", "Gustav Klimt", "Ishikawa Goemin"
+			],
+			"Stig3": [
+				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
+			],
+			"UpMats": [
+				"Phase Shifter",
+				"Microreactor"
+			],
+			"EqExp": [
+				"Soul Crystal",
+				"Twin Soul Crystal"
+			],
+			"Coins": [
 				"HOMI Chest",
 				"HOMEI Chest",
 				"HOLI Chest"
