@@ -23,14 +23,14 @@ class Commands(Cog):
 	async def ping(self, ctx):
 		await ctx.send(f":ping_pong: Pong after {self.bot.latency*1000:.0f}ms!")
 
-	@command(brief="<user> | Make everyone know you love someone")
+	@command(brief="<user> | Tell chat you love someone")
 	async def love(self, ctx, partner: FindMember):
 		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
 
-	@command(aliases=["exit", "quit", "kill", "shine", "shineo", "die", "kys"], hidden=True)
+	@command(aliases=["exit", "quit", "kill", "shine", "shineo", "die", "kys", "begone", "fuck"], hidden=True)
 	@check(isDev)
 	async def stop(self, ctx):
-		await ctx.send("Oh no! I'm dying... :cold_face:")
+		await ctx.send("I'm dying, master :cold_face:")
 		print("Stopping!")
 		await self.bot.close()
 
@@ -61,7 +61,10 @@ class Commands(Cog):
 				async with WebSession() as session:
 					async with session.get("https://trace.moe/api/search?url=" + quote(image_url)) as tmoe_resp:
 						try:
-							mal_resp = (await AioJikan().anime((tmoe_resp := (await tmoe_resp.json())["docs"][0])["mal_id"]))
+							mal_resp = (
+								await
+								AioJikan(session=session).anime((tmoe_resp := (await tmoe_resp.json())["docs"][0])["mal_id"])
+							)
 						except ContentTypeError:
 							await ctx.send(
 								"Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find the sauce manually at\nhttps://trace.moe/?url="
@@ -72,29 +75,31 @@ class Commands(Cog):
 								"https://trace.moe/preview.php",
 								params={
 								"anilist_id": tmoe_resp["anilist_id"],
-								"file": safe(tmoe_resp["filename"]),
+								"file": quote(tmoe_resp["filename"]),
 								"t": str(tmoe_resp["at"]),
 								"token": tmoe_resp["tokenthumb"]
 								}
 							) as preview:
-								#pylint: disable=used-before-assignment
-								await ctx.send(
-									f"*Episode {tmoe_resp['episode']} ({int(tmoe_resp['at']/60)}:{int(tmoe_resp['at']%60)})*",
-									file=discord.File(BytesIO(await preview.read()), tmoe_resp["filename"]),
-									embed=discord.Embed(
-									color=32767,
-									description=
-									f"Similarity: {tmoe_resp['similarity']:.1%} | Score: {mal_resp['score']} | {mal_resp['status']}"
-									).set_author(name=mal_resp["title"],
-									url=mal_resp["url"]).set_thumbnail(url=mal_resp["image_url"]).add_field(
-									name="Synopsis",
-									value=s if len(s := mal_resp["synopsis"].partition(" [")[0]) <=
-									(maxlength := 600) else ".".join(s[:maxlength].split(".")[0:-1]) + "..."
-									).set_footer(
-									text=f"Requested by {ctx.author.display_name} | Powered by trace.moe",
-									icon_url=ctx.author.avatar_url
-									)
+								preview = await preview.read()
+							#pylint: disable=used-before-assignment
+							await ctx.send(
+								f"Episode {tmoe_resp['episode']} ({int(tmoe_resp['at']/60)}:{int(tmoe_resp['at']%60):02d})"
+								if tmoe_resp["episode"] else None,
+								file=discord.File(BytesIO(preview), tmoe_resp["filename"]),
+								embed=discord.Embed(
+								color=32767,
+								description=
+								f"Similarity: {tmoe_resp['similarity']:.1%} | Score: {mal_resp['score']} | {mal_resp['status']}"
+								).set_author(name=mal_resp["title"],
+								url=mal_resp["url"]).set_thumbnail(url=mal_resp["image_url"]).add_field(
+								name="Synopsis",
+								value=s if len(s := mal_resp["synopsis"].partition(" [")[0]) <=
+								(maxlength := 600) else ".".join(s[:maxlength].split(".")[0:-1]) + "..."
+								).set_footer(
+								text=f"Requested by {ctx.author.display_name} | Powered by trace.moe",
+								icon_url=ctx.author.avatar_url
 								)
+							)
 
 	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
 	@check(isDev)
@@ -272,7 +277,7 @@ class Commands(Cog):
 				embed = discord.Embed(
 					title="YouTube search results",
 					description="Showing top 3 search results",
-					url="https://google.com/search?q=" + safe(query + "+site:youtube.com/watch", safe="+")
+					url="https://google.com/search?q=" + safe(query + " site:youtube.com/watch")
 				)
 				try:
 					for result in (await response.json())["items"]:

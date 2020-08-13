@@ -6,10 +6,10 @@ from discord.utils import find
 from discord import Status, Activity
 from os import environ
 
-BOT_DEBUG = True
+BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";"
-BOT_VERSION = "1.3.7" #TODO: UPDATE!
+BOT_VERSION = "1.3.9" #TODO: UPDATE!
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
