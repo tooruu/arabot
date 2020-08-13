@@ -1,6 +1,6 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
 from .._utils import (
-	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, load_env, bold, dsafe
+	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, getenv, bold, dsafe
 )
 import discord
 from aiohttp import ClientSession as WebSession, ContentTypeError
@@ -13,7 +13,7 @@ class Commands(Cog):
 	def __init__(self, client):
 		self.bot = client
 		(self.token, self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key, self.faceit_key, self.wolfram_id
-			) = load_env("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key", "faceit_key", "wolfram_id")
+			) = getenv("token", "g_search_key", "g_isearch_key", "g_cse", "g_yt_key", "faceit_key", "wolfram_id")
 
 	@command(aliases=["ver", "v"], brief="| Show currently running bot's version")
 	async def version(self, ctx):
@@ -61,10 +61,7 @@ class Commands(Cog):
 				async with WebSession() as session:
 					async with session.get("https://trace.moe/api/search?url=" + quote(image_url)) as tmoe_resp:
 						try:
-							mal_resp = (
-								await
-								AioJikan(session=session).anime((tmoe_resp := (await tmoe_resp.json())["docs"][0])["mal_id"])
-							)
+							mal_resp = (await AioJikan().anime((tmoe_resp := (await tmoe_resp.json())["docs"][0])["mal_id"]))
 						except ContentTypeError:
 							await ctx.send(
 								"Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find the sauce manually at\nhttps://trace.moe/?url="

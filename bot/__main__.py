@@ -1,7 +1,7 @@
 from discord.ext.commands import Bot
 from os import walk
 from os.path import basename
-from cogs._utils import load_env
+from cogs._utils import getenv, BOT_PREFIX
 
 def load_ext(client):
 	for path, _, files in walk("bot/cogs"):
@@ -13,6 +13,6 @@ def load_ext(client):
 					print(f"Loaded {path}{cog[:-3]}")
 
 if __name__ == "__main__":
-	bot = Bot(command_prefix=";", case_insensitive=True)
+	bot = Bot(command_prefix=BOT_PREFIX, case_insensitive=True)
 	load_ext(bot)
-	bot.run(load_env("token"))
+	bot.run(getenv("token"))

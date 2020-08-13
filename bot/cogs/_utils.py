@@ -6,8 +6,12 @@ from discord.utils import find
 from discord import Status, Activity
 from os import environ
 
+BOT_DEBUG = True
 BOT_NAME = "AraBot"
+BOT_PREFIX = "-" if BOT_DEBUG else ";"
 BOT_VERSION = "1.3.7" #TODO: UPDATE!
+if BOT_DEBUG:
+	BOT_VERSION += " (DEBUG MODE)"
 
 def isDev(ctx):
 	return ctx.author.id in (337343326095409152, 447138372121788417)
@@ -116,7 +120,7 @@ class Queue:
 	def items(self):
 		return self._items
 
-def load_env(*keys):
+def getenv(*keys):
 	if environ.get("token"):
 		if len(keys) == 1:
 			return environ[keys[0]]
