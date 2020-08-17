@@ -29,7 +29,7 @@ class HI3Log(Cog):
 
 	@Cog.listener()
 	async def on_ready(self):
-		self.channel = self.bot.get_channel(676894553545900047)
+		self.channel = self.bot.get_channel(676899054688534528)
 		self.check.start()
 
 def setup(client):
