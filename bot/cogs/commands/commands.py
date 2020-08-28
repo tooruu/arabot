@@ -157,14 +157,15 @@ class Commands(Cog):
 			await ctx.message.delete()
 
 	@command(aliases=["a"], brief="<user> | Show full-sized version of user's avatar")
-	async def avatar(self, ctx, target: FindMember):
-		if target:
-			await ctx.send(
-				embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))
-															).set_footer(text=(target.display_name) + "'s avatar")
-			)
-		else:
+	async def avatar(self, ctx, target: FindMember = False):
+		if target is None:
 			await ctx.send("User not found")
+		else:
+			if target is False:
+				target = ctx.author
+			await ctx.send(
+			embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))
+			).set_footer(text=(target.display_name) + "'s avatar"))
 
 	@command(aliases=["r"], brief="<emoji> | Show your big reaction to everyone")
 	async def reaction(self, ctx, emoji: FindEmoji):
