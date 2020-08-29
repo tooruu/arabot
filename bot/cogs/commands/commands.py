@@ -156,7 +156,7 @@ class Commands(Cog):
 		else:
 			await ctx.message.delete()
 
-	@command(aliases=["a"], brief="<user> | Show full-sized version of user's avatar")
+	@command(aliases=["a", "pfp"], brief="<user> | Show full-sized version of user's avatar")
 	async def avatar(self, ctx, target: FindMember = False):
 		if target is None:
 			await ctx.send("User not found")
@@ -168,7 +168,7 @@ class Commands(Cog):
 			).set_footer(text=(target.display_name) + "'s avatar"))
 
 	@command(aliases=["r"], brief="<emoji> | Show your big reaction to everyone")
-	async def reaction(self, ctx, emoji: FindEmoji):
+	async def react(self, ctx, emoji: FindEmoji):
 		if emoji:
 			await ctx.message.delete()
 			await ctx.send(
@@ -202,10 +202,10 @@ class Commands(Cog):
 				await ctx.send("No emojis found")
 
 	@command(brief="<user> | DM the user to make him come")
-	async def call(self, ctx, target: MemberConverter): # Not use smart lookup
+	async def call(self, ctx, target: FindMember):
 		if target:
-			if target.dm_channel is None:
-				await target.create_dm()
+		# 	if target.dm_channel is None:
+		# 		await target.create_dm()
 			await target.dm_channel.send(f"{ctx.author.display_name} wants you to show up in {bold(ctx.guild.name)}.")
 			await ctx.send(f"Notified {target.mention}")
 		else:
@@ -236,7 +236,7 @@ class Commands(Cog):
 				except KeyError:
 					await ctx.send("No images found")
 
-	@command(aliases=["g"], brief="<query> | Top 3 search results from Google")
+	@command(aliases=["g"], brief="<query> | Top Google Search result") #Top 3 Google Search results
 	async def google(self, ctx, *, query):
 		async with WebSession() as session:
 			async with session.get(
@@ -245,23 +245,28 @@ class Commands(Cog):
 				"key": self.g_search_key,
 				"cx": self.g_cse,
 				"q": safe(query),
-				"num": 3
+				"num": 1 #3
 				}
 			) as response:
-				embed = discord.Embed(
-					title="Google search results",
-					description="Showing top 3 search results",
-					url="https://google.com/search?q=" + safe(query)
-				)
+				#embed = discord.Embed(
+				#	title="Google search results",
+				#	description="Showing top 3 search results",
+				#	url="https://google.com/search?q=" + safe(query)
+				#)
+				#try:
+				#	for result in (await response.json())["items"]:
+				#		embed.add_field(
+				#			name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
+				#		)
+				#except KeyError:
+				#	await ctx.send("No results found")
+				#else:
+				#	await ctx.send(embed=embed)
 				try:
-					for result in (await response.json())["items"]:
-						embed.add_field(
-							name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
-						)
+					await ctx.send((await response.json())["items"][0]["link"])
 				except KeyError:
 					await ctx.send("No results found")
-				else:
-					await ctx.send(embed=embed)
+
 
 	@command(aliases=["yt3"], brief="<query> | Top 3 search results from YouTube")
 	async def youtube3(self, ctx, *, query): #TODO: Use YouTube API
@@ -271,14 +276,14 @@ class Commands(Cog):
 				params={
 				"key": self.g_search_key,
 				"cx": self.g_cse,
-				"q": safe(query + " site:youtube.com/watch"),
+				"q": query + " site:youtube.com/watch",
 				"num": 3
 				}
 			) as response:
 				embed = discord.Embed(
 					title="YouTube search results",
 					description="Showing top 3 search results",
-					url="https://google.com/search?q=" + safe(query + " site:youtube.com/watch")
+					url=f"https://google.com/search?q={query} site:youtube.com/watch"
 				)
 				try:
 					for result in (await response.json())["items"]:
@@ -298,10 +303,12 @@ class Commands(Cog):
 				params={
 				"key": self.g_search_key,
 				"cx": self.g_cse,
-				"q": safe(query + " site:youtube.com/watch"),
+				"q": query + " site:youtube.com/watch",
 				"num": 1
 				}
 			) as response:
+				print(response.url)
+				print(response.real_url)
 				try:
 					await ctx.send((await response.json())["items"][0]["link"])
 				except KeyError:
@@ -366,7 +373,7 @@ class Commands(Cog):
 				async with session.get(
 					"https://api.wolframalpha.com/v2/query",
 					params={
-					"input": quote(query, safe=""),
+					"input": query,
 					"format": "plaintext",
 					"output": "json",
 					"appid": self.wolfram_id,
@@ -403,3 +410,6 @@ class Commands(Cog):
 
 def setup(client):
 	client.add_cog(Commands(client))
+
+# TODO: ;replace emoji
+# TODO: "what's {this}" = ;ud
