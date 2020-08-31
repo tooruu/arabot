@@ -12,19 +12,25 @@ class HI3Log(Cog):
 	@loop(hours=3)
 	async def check(self):
 		async with WebSession() as session:
-			async with session.get("https://honkaiimpact3.gamepedia.com/api.php", params={
+			async with session.get(
+				"https://honkaiimpact3.gamepedia.com/api.php",
+				params={
 				"action": "parse",
 				"page": "Update_Log",
 				"section": 1,
 				"format": "json",
 				"prop": "wikitext"
-			}) as response:
+				}
+			) as response:
 				try:
 					self.new = (await response.json())["parse"]["wikitext"]["*"]
 				except Exception as e:
 					print(e)
 		if self.new != self.old:
-			await self.channel.send("Hey, Captain, {} patch is out!\nCheck out the changelog at <https://honkaiimpact3.gamepedia.com/Update_Log>".format(f"v{regex.group(1)}" if (regex:=match(r"==.+((?:\d\.){2}\d)==", self.new)) else "new"))
+			await self.channel.send(
+				"Hey, Captain, {} patch is out!\nCheck out the changelog at <https://honkaiimpact3.gamepedia.com/Update_Log>"
+				.format(f"v{regex.group(1)}" if (regex := match(r"==.+((?:\d\.){2}\d)==", self.new)) else "new")
+			)
 			self.old = self.new
 
 	@Cog.listener()

@@ -9,7 +9,7 @@ from os import environ
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";"
-BOT_VERSION = "1.4.4" #TODO: UPDATE!
+BOT_VERSION = "1.4.5" #TODO: UPDATE!
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
