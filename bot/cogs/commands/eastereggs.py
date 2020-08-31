@@ -95,5 +95,10 @@ class EasterEggs(Cog):
 		if "shine" in msg.content.lower():
 			await msg.channel.send("no u")
 
+	@Cog.listener("on_message")
+	async def urban_listener(self, msg):
+		if regex := search(r"(?:wh?[ao]t|nani)'?\s?i?s\s(.+)", msg.content.lower()):
+			await self.bot.get_command("urban")(await self.bot.get_context(msg), term=regex.group(1))
+
 def setup(client):
 	client.add_cog(EasterEggs(client))

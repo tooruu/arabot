@@ -164,8 +164,9 @@ class Commands(Cog):
 			if target is False:
 				target = ctx.author
 			await ctx.send(
-			embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))
-			).set_footer(text=(target.display_name) + "'s avatar"))
+				embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))
+															).set_footer(text=(target.display_name) + "'s avatar")
+			)
 
 	@command(aliases=["r"], brief="<emoji> | Show your big reaction to everyone")
 	async def react(self, ctx, emoji: FindEmoji):
@@ -204,8 +205,8 @@ class Commands(Cog):
 	@command(brief="<user> | DM the user to make him come")
 	async def call(self, ctx, target: FindMember):
 		if target:
-		# 	if target.dm_channel is None:
-		# 		await target.create_dm()
+			# 	if target.dm_channel is None:
+			# 		await target.create_dm()
 			await target.dm_channel.send(f"{ctx.author.display_name} wants you to show up in {bold(ctx.guild.name)}.")
 			await ctx.send(f"Notified {target.mention}")
 		else:
@@ -266,7 +267,6 @@ class Commands(Cog):
 					await ctx.send((await response.json())["items"][0]["link"])
 				except KeyError:
 					await ctx.send("No results found")
-
 
 	@command(aliases=["yt3"], brief="<query> | Top 3 search results from YouTube")
 	async def youtube3(self, ctx, *, query): #TODO: Use YouTube API
@@ -412,4 +412,3 @@ def setup(client):
 	client.add_cog(Commands(client))
 
 # TODO: ;replace emoji
-# TODO: "what's {this}" = ;ud
