@@ -1,6 +1,6 @@
 from discord.ext.commands import command, Cog, check, has_permissions, group, errors
 from .._utils import (
-	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, MemberConverter, getenv, bold, dsafe
+	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, getenv, bold, dsafe
 )
 import discord
 from aiohttp import ClientSession as WebSession, ContentTypeError
@@ -347,6 +347,13 @@ class Commands(Cog):
 
 	@command(brief="<term> | Search term in Urban Dictionary", aliases=["ud"])
 	async def urban(self, ctx, *, term):
+		if "tooru" in term:
+			await ctx.send(
+				embed=discord.Embed(
+				description="An awesome guy"
+				).set_author(name="tooru", url="https://tooru.wtf")
+			)
+			return
 		async with WebSession() as session:
 			async with session.get(f"https://api.urbandictionary.com/v0/define?term={safe(term)}") as ud:
 				ud = await ud.json()
@@ -413,20 +420,25 @@ class Commands(Cog):
 	async def chemoji(self, ctx, em_before, em_after=None):
 		if not match(r"<:\w{2,32}:\d{18,22}>", em_before):
 			await ctx.send("Choose a valid server emoji to replace")
-			return
-		if em_after and ctx.message.attachments:
+		elif em_after and ctx.message.attachments:
 			await ctx.send("You can only have one suggestion type in submission")
-			return
-		if not em_after and not ctx.message.attachments:
+		elif not em_after and not ctx.message.attachments:
 			await ctx.send("You must include one suggestion type")
-			return
-		if em_after and not match(r"<:\w{2,32}:\d{18,22}>", em_after):
+		elif em_after and not match(r"<:\w{2,32}:\d{18,22}>", em_after):
 			await ctx.send(f"Choose a valid emoji to replace {em_before} with")
-			return
-		em_after = em_after or ctx.message.attachments[0].url
+		else:
+			em_after = em_after or ctx.message.attachments[0].url
+			await ctx.message.add_reaction("👍")
+			await ctx.message.add_reaction("👎")
 
-		await ctx.message.add_reaction("👍")
-		await ctx.message.add_reaction("👎")
+	@command(brief="Who asked?")
+	async def wa(self, ctx):
+		await ctx.message.delete()
+		async for msg in ctx.history(limit=3):
+			if not msg.author.bot:
+				for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", "<:FukaWhy:677955897200476180>":
+					await msg.add_reaction(i)
+				break
 
 def setup(client):
 	client.add_cog(Commands(client))

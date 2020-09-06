@@ -31,12 +31,12 @@ class EasterEggs(Cog):
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
 			await msg.channel.send("<:KonoDioDa:676949860502732803>")
 			await msg.channel.send("***Toki yo tomare!***")
-			for i in ("Ichi", "Ni", "San", "Yon", "Go"): # Ichi Ni San Yon Go Roku Nana Hachi Kyu
+			for i in "Ichi", "Ni", "San", "Yon", "Go": # Ichi Ni San Yon Go Roku Nana Hachi Kyu
 				await asyncio.sleep(2)
 				await msg.channel.send(content=f"*{i} byou keika*")
 			await asyncio.sleep(1)
 			await msg.channel.send("Toki wa ugoki dasu")
-			await asyncio.sleep(2)
+			await asyncio.sleep(1)
 			await msg.channel.purge(limit=7)
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
 
@@ -96,9 +96,12 @@ class EasterEggs(Cog):
 			await msg.channel.send("no u")
 
 	@Cog.listener("on_message")
-	async def urban_listener(self, msg):
-		if regex := search(r"(?:wh?[ao]t|nani)'?\s?i?s\s(.[^?]+)", msg.content.lower()):
-			await self.bot.get_command("urban")(await self.bot.get_context(msg), term=regex.group(1))
+	async def urban_listener(self, msg): # TODO: Ignore some words
+		if regex := search(r"((?:wh?[ao]t|nani)'?\s?i?s\s)(.[^?]+)", msg.content.lower()):
+			if not search(f"{regex.group(1)}(?:up|good|with|it|this|that)", msg.content.lower()):
+				await self.bot.get_command("urban")(await self.bot.get_context(msg), term=regex.group(2))
 
 def setup(client):
 	client.add_cog(EasterEggs(client))
+
+# nani is up

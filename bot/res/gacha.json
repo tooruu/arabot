@@ -201,6 +201,102 @@
 			]
 		}
 	},
+	"foca": {
+		"available": true,
+		"name": "Focused A",
+		"rates": {
+			"Weap4+": 0.0248,
+			"Weap4": 0.0246,
+			"Weap3": 0.1123,
+			"Stig4+": 0.0372,
+			"Stig4": 0.0372,
+			"Stig3": 0.3370,
+			"UpMats": 0.1707,
+			"EqExp": 0.17072,
+			"Coins": 0.08535
+		},
+		"pool": {
+			"Weap4+": [
+				"Key of Reason"
+			],
+			"Weap4": [
+				"Hyper Railguns", "Dawn Breaker: Talwar", "Star Shattere: Vikrant", "11th Sacred Relic", "Cinder Hawk", "Skoll and Hati"
+			],
+			"Weap3": [
+				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell's Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
+			],
+			"Stig4+": [
+				"Welt Yang"
+			],
+			"Stig4": [
+				"Kafka", "Jin Shengtan", "Isaac Newton", "Zorro"
+			],
+			"Stig3": [
+				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
+			],
+			"UpMats": [
+				"Phase Shifter",
+				"Microreactor"
+			],
+			"EqExp": [
+				"Soul Crystal",
+				"Twin Soul Crystal"
+			],
+			"Coins": [
+				"HOMI Chest",
+				"HOMEI Chest",
+				"HOLI Chest"
+			]
+		}
+	},
+	"focb": {
+		"available": true,
+		"name": "Focused B",
+		"rates": {
+			"Weap4+": 0.0248,
+			"Weap4": 0.0246,
+			"Weap3": 0.1123,
+			"Stig4+": 0.0372,
+			"Stig4": 0.0372,
+			"Stig3": 0.3370,
+			"UpMats": 0.1707,
+			"EqExp": 0.17072,
+			"Coins": 0.08535
+		},
+		"pool": {
+			"Weap4+": [
+				"Key of Reason"
+			],
+			"Weap4": [
+				"Hyper Railguns", "Dawn Breaker: Talwar", "Star Shattere: Vikrant", "11th Sacred Relic", "Cinder Hawk", "Skoll and Hati"
+			],
+			"Weap3": [
+				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell's Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
+			],
+			"Stig4+": [
+				"Welt Yang"
+			],
+			"Stig4": [
+				"Kafka", "Jin Shengtan", "Isaac Newton", "Zorro"
+			],
+			"Stig3": [
+				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
+			],
+			"UpMats": [
+				"Phase Shifter",
+				"Microreactor"
+			],
+			"EqExp": [
+				"Soul Crystal",
+				"Twin Soul Crystal"
+			],
+			"Coins": [
+				"HOMI Chest",
+				"HOMEI Chest",
+				"HOLI Chest"
+			]
+		}
+	},
 	"bk": {
 		"available": false,
 		"name": "Bright Knight: Excelsis",
@@ -259,7 +355,7 @@
 		}
 	},
 	"hot": {
-		"available": true,
+		"available": false,
 		"name": "Herrscher of Thunder",
 		"rates": {
 			"ValkS+": 0.015,
@@ -315,8 +411,8 @@
 			]
 		}
 	},
-	"expa": {
-		"available": true,
+	"koc": {
+		"available": false,
 		"name": "HoT Equipment",
 		"rates": {
 			"Weap4+": 0.01831,
@@ -357,6 +453,63 @@
 				"Twin Soul Crystal"
 			],
 			"Coins": [
+				"HOMI Chest",
+				"HOMEI Chest",
+				"HOLI Chest"
+			]
+		}
+	},
+	"hor": {
+		"available": true,
+		"name": "Herrscher of Reason",
+		"rates": {
+			"ValkS+": 0.015,
+			"ValkA+": 0.045,
+			"ValkA": 0.09,
+			"FragS+": 0.0225,
+			"FragA+": 0.15,
+			"FragA": 0.09,
+			"SklMats": 0.1,
+			"EqMats": 0.2641,
+			"ChrExp": 0.1117,
+			"Coins": 0.1117
+		},
+		"pool": {
+			"ValkS+": [
+				"Herrscher of Reason"
+			],
+			"ValkA+": [
+				"Valkyrie Bladestrike"
+			],
+			"ValkA": [
+				"Arctic Kriegsmesser",
+				"Phantom Iron",
+				"Sakuno Rondo"
+			],
+			"FragS+": [
+				"Herrscher of Reason"
+			],
+			"FragA+": [
+				"Valkyrie Bladestrike"
+			],
+			"FragA": [
+				"Arctic Kriegsmesser",
+				"Phantom Iron",
+				"Sakuno Rondo"
+			],
+			"SklMats": [
+				"Advanced Skill Material"
+			],
+			"EqMats": [
+				"Phase Shifter",
+				"Microreactor"
+			],
+			"ChrExp": [
+				"Super EXP Chip",
+				"ADV EXP Chip"
+			],
+			"Coins": [
+				"Mithril",
 				"HOMI Chest",
 				"HOMEI Chest",
 				"HOLI Chest"
