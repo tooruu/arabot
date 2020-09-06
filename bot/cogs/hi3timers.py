@@ -63,15 +63,12 @@ class HI3Timers(Cog):
 			await ctx.send("Channel not found")
 
 	@timer.command()
-	async def start(self, ctx, t):
-		if self.timers[t].channel:
-			self.countdown.start()
-			await ctx.send("Started timer")
-		else:
-			await ctx.send("Channel not set!")
+	async def start(self, ctx):
+		self.countdown.start()
+		await ctx.send("Started timer")
 
-	@timer.command(aliases=["stop"])
-	async def cancel(self, ctx):
+	@timer.command()
+	async def stop(self, ctx):
 		self.countdown.cancel() # cancel() != stop()
 		await ctx.send("Stopping timer")
 
