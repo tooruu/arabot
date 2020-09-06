@@ -35,7 +35,7 @@ class Timer:
 class HI3Timers(Cog):
 	def __init__(self, client):
 		self.bot = client
-		self.timers = {}
+		self.timers = {"ow": Timer(self.bot.get_channel(678423053306298389), {0:(time(hour=4), "Ongoing"),3:(time(hour=4), "Ongoing"),5:(time(hour=4), "Ongoing"),7:(time(hour=4), "Ongoing")})}
 
 	@loop(minutes=1)
 	async def countdown(self):
