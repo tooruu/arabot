@@ -44,7 +44,7 @@ class HI3Timers(Cog):
 
 	@Cog.listener()
 	async def on_ready(self):
-		self.timers["ow"] = Timer(self.bot.get_channel(678423053306298389), {0:(time(), "Ongoing"),3:(time(), "Ongoing"),5:(time(), "Ongoing"),7:(time(), "Ongoing")})
+		self.timers["ow"] = Timer(self.bot.get_channel(678423053306298389), {0:(time(hour=4), "Ongoing"),3:(time(hour=4), "Ongoing"),5:(time(hour=4), "Ongoing"),7:(time(hour=4), "Ongoing")})
 		self.countdown.start()
 
 	@group(invoke_without_command=True, hidden=True)
