@@ -1,4 +1,4 @@
-from discord.ext.commands import command, Cog, check, has_permissions, group, errors
+from discord.ext.commands import command, Cog, check, has_permissions, group, errors, PartialEmojiConverter, MessageConverter
 from .._utils import (
 	FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, getenv, bold, dsafe
 )
@@ -432,8 +432,12 @@ class Commands(Cog):
 			await ctx.message.add_reaction("👎")
 
 	@command(brief="Who asked?")
-	async def wa(self, ctx):
+	async def wa(self, ctx, msg: MessageConverter = None):
 		await ctx.message.delete()
+		if msg:
+			for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", "<:FukaWhy:677955897200476180>":
+				await msg.add_reaction(i)
+			return
 		async for msg in ctx.history(limit=3):
 			if not msg.author.bot:
 				for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", "<:FukaWhy:677955897200476180>":
