@@ -204,9 +204,7 @@ class Commands(Cog):
 	@command(brief="<user> | DM the user to make him come")
 	async def call(self, ctx, target: FindMember):
 		if target:
-			# 	if target.dm_channel is None:
-			# 		await target.create_dm()
-			await target.dm_channel.send(f"{ctx.author.display_name} wants you to show up in {bold(ctx.guild.name)}.")
+			await target.send(f"{ctx.author.display_name} wants you to show up in {bold(ctx.guild.name)}.")
 			await ctx.send(f"Notified {target.mention}")
 		else:
 			await ctx.send("User not found")
@@ -306,8 +304,6 @@ class Commands(Cog):
 				"num": 1
 				}
 			) as response:
-				print(response.url)
-				print(response.real_url)
 				try:
 					await ctx.send((await response.json())["items"][0]["link"])
 				except KeyError:
