@@ -64,9 +64,9 @@ class HI3Timers(Cog):
 		#})
 		self.timers["qs"] = Timer(self.bot.get_channel(752382371596206141), {
 			0: [(time(hour=14), "Preparing")],
-			2: [(time(hour=23), "Ongoing"), (time(hour=23, minute=30), "Finalizing")],
+			2: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
 			4: [(time(hour=14), "Preparing")],
-			6: [(time(hour=23), "Ongoing"), (time(hour=23, minute=30), "Finalizing")],
+			6: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
 		})
 		self.countdown.start()
 
@@ -79,7 +79,7 @@ class HI3Timers(Cog):
 
 	@timer.command()
 	async def next(self, ctx, t):
-		await ctx.send(self.timers[t].get_next_phase().strftime("%Y.%m.%d, %H:%M:%S") if self.timers.get(t) else f"Timer {t} not found")
+		await ctx.send(f"Next phase is on {self.timers[t].get_next_phase().strftime('%A, %H:%M')} server time" if self.timers.get(t) else f"Timer **{t}** not found")
 
 	def cog_unload(self):
 		self.countdown.cancel()

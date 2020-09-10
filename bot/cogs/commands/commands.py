@@ -408,22 +408,33 @@ class Commands(Cog):
 					embed.description = wa["tips"]["text"]
 			await ctx.send(embed=embed)
 
-	@command(brief="<emoji> | Replace emoji on server")
+	@command(brief="<emoji> | Suggest new server emoji")
 	async def chemoji(self, ctx, em_before: FindEmoji, em_after=None):
 		if not em_before in ctx.guild.emojis:
-			await ctx.send("Choose a valid server emoji to replace, boi")
+			await ctx.send("Choose a valid server emoji to replace")
 		elif em_after and ctx.message.attachments:
-			await ctx.send("You can only have one suggestion type in submission, boi")
-		elif not em_after and not ctx.message.attachments:
-			await ctx.send("You must include one suggestion type, boi")
-		elif em_after and (
-			not match(r"<:\w{2,32}:\d{18,22}>", em_after) or await FindEmoji().convert(ctx, em_after) in ctx.guild.emojis
-		):
-			await ctx.send(f"Choose a valid emoji to replace {em_before} with, boi")
+			await ctx.send("You can only have one suggestion type in submission")
+		elif not (em_after or ctx.message.attachments):
+			await ctx.send("You must include one emoji suggestion")
 		else:
-			em_after = (await PartialEmojiConverter().convert(ctx, em_after)) if em_after else ctx.message.attachments[0]
-			embed = discord.Embed().set_thumbnail(url=em_before.url).set_image(
-				url=em_after.url
+			if ctx.message.attachments:
+				em_after = ctx.message.attachments[0].url
+			if match(r"(https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", em_after):
+				async with WebSession() as session:
+					async with session.get(em_after) as resp:
+						if resp.status != 200 or not resp.content_type.startswith("image/"):
+							await ctx.send(f"Link a valid image to replace {em_before} with")
+							return
+			elif match(r"<a?:\w{2,32}:\d{18,22}>$", em_after):
+				if await FindEmoji().convert(ctx, em_after) in ctx.guild.emojis:
+					await ctx.send(f"We already have {em_after}")
+					return
+				em_after = (await PartialEmojiConverter().convert(ctx, em_after)).url
+			else:
+				await ctx.send(f"Choose a valid emoji to replace {em_before} with")
+				return
+			embed = discord.Embed(title="wants to change this →", description="to that ↓").set_thumbnail(url=em_before.url)	.set_image(
+				url=em_after
 			).set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
 			message = await ctx.send(embed=embed)
 			await ctx.message.delete()
