@@ -229,10 +229,13 @@ class Commands(Cog):
 				"searchType": "image"
 				}
 			) as response:
-				try:
-					await ctx.send((await response.json())["items"][0]["link"])
-				except KeyError:
-					await ctx.send("No images found")
+				if response.status == 429:
+					await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+				else:
+					try:
+						await ctx.send((await response.json())["items"][0]["link"])
+					except KeyError:
+						await ctx.send("No images found")
 
 	@command(aliases=["g"], brief="<query> | Top Google Search result") #Top 3 Google Search results
 	async def google(self, ctx, *, query):
@@ -246,24 +249,27 @@ class Commands(Cog):
 				"num": 1 #3
 				}
 			) as response:
-				#embed = discord.Embed(
-				#	title="Google search results",
-				#	description="Showing top 3 search results",
-				#	url="https://google.com/search?q=" + safe(query)
-				#)
-				#try:
-				#	for result in (await response.json())["items"]:
-				#		embed.add_field(
-				#			name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
-				#		)
-				#except KeyError:
-				#	await ctx.send("No results found")
-				#else:
-				#	await ctx.send(embed=embed)
-				try:
-					await ctx.send((await response.json())["items"][0]["link"])
-				except KeyError:
-					await ctx.send("No results found")
+				if response.status == 429:
+					await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+				else:
+					#embed = discord.Embed(
+					#	title="Google search results",
+					#	description="Showing top 3 search results",
+					#	url="https://google.com/search?q=" + safe(query)
+					#)
+					#try:
+					#	for result in (await response.json())["items"]:
+					#		embed.add_field(
+					#			name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
+					#		)
+					#except KeyError:
+					#	await ctx.send("No results found")
+					#else:
+					#	await ctx.send(embed=embed)
+					try:
+						await ctx.send((await response.json())["items"][0]["link"])
+					except KeyError:
+						await ctx.send("No results found")
 
 	@command(aliases=["yt3"], brief="<query> | Top 3 search results from YouTube")
 	async def youtube3(self, ctx, *, query): #TODO: Use YouTube API
@@ -277,20 +283,23 @@ class Commands(Cog):
 				"num": 3
 				}
 			) as response:
-				embed = discord.Embed(
-					title="YouTube search results",
-					description="Showing top 3 search results",
-					url=f"https://google.com/search?q={query} site:youtube.com/watch"
-				)
-				try:
-					for result in (await response.json())["items"]:
-						embed.add_field(
-							name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
-						)
-				except KeyError:
-					await ctx.send("No videos found")
+				if response.status == 429:
+					await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
 				else:
-					await ctx.send(embed=embed)
+					embed = discord.Embed(
+						title="YouTube search results",
+						description="Showing top 3 search results",
+						url=f"https://google.com/search?q={query} site:youtube.com/watch"
+					)
+					try:
+						for result in (await response.json())["items"]:
+							embed.add_field(
+								name=result["link"], value=f"{bold(result['title'])}\n{result['snippet']}", inline=False
+							)
+					except KeyError:
+						await ctx.send("No videos found")
+					else:
+						await ctx.send(embed=embed)
 
 	@command(aliases=["yt"], brief="<query> | Top search result from YouTube")
 	async def youtube(self, ctx, *, query): #TODO: Use YouTube API
@@ -304,10 +313,13 @@ class Commands(Cog):
 				"num": 1
 				}
 			) as response:
-				try:
-					await ctx.send((await response.json())["items"][0]["link"])
-				except KeyError:
-					await ctx.send("No videos found")
+				if response.status == 429:
+					await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+				else:
+					try:
+						await ctx.send((await response.json())["items"][0]["link"])
+					except KeyError:
+						await ctx.send("No videos found")
 
 	@command(brief="<nickname> | View player's FACEIT profile")
 	async def faceit(self, ctx, nickname):
