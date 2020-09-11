@@ -180,26 +180,11 @@ class Commands(Cog):
 
 	@command(aliases=["emote", "e"], brief="<emoji...> | Show full-sized versions of emoji(s)")
 	async def emoji(self, ctx, *emojis: FindEmoji):
-		files = []
-		async with ctx.typing():
-			async with WebSession() as session:
-				for emoji in emojis:
-					if isinstance(emoji, discord.Emoji):
-						files.append(
-							discord.File(BytesIO(await emoji.url.read()),
-							str(emoji.url).split("/")[-1].partition("?")[0])
-						)
-					elif isinstance(emoji, str):
-						async with session.get(emoji) as img:
-							if img.status == 200:
-								files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
-			if files:
-				if len(files) <= 10:
-					await ctx.send(files=files)
-				else:
-					await ctx.send("Too many emojis passed, sending first 10", files=files[:10])
-			else:
-				await ctx.send("No emojis found")
+		files = {str(emoji.url) if isinstance(emoji, (discord.Emoji, discord.PartialEmoji)) else emoji for emoji in emojis if emoji is not None}
+		#discord.File(BytesIO(await emoji.url.read()),
+		#str(emoji.url).split("/")[-1].partition("?")[0])
+		#files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
+		await ctx.send("\n".join(files) if files else "No emojis found")
 
 	@command(brief="<user> | DM the user to make him come")
 	async def call(self, ctx, target: FindMember):

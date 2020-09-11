@@ -460,7 +460,7 @@
 		}
 	},
 	"hor": {
-		"available": true,
+		"available": false,
 		"name": "Herrscher of Reason",
 		"rates": {
 			"ValkS+": 0.015,
@@ -496,6 +496,63 @@
 				"Arctic Kriegsmesser",
 				"Phantom Iron",
 				"Sakuno Rondo"
+			],
+			"SklMats": [
+				"Advanced Skill Material"
+			],
+			"EqMats": [
+				"Phase Shifter",
+				"Microreactor"
+			],
+			"ChrExp": [
+				"Super EXP Chip",
+				"ADV EXP Chip"
+			],
+			"Coins": [
+				"Mithril",
+				"HOMI Chest",
+				"HOMEI Chest",
+				"HOLI Chest"
+			]
+		}
+	},
+	"ae": {
+		"available": true,
+		"name": "Azure Empyrea",
+		"rates": {
+			"ValkS+": 0.015,
+			"ValkA+": 0.045,
+			"ValkA": 0.09,
+			"FragS+": 0.0225,
+			"FragA+": 0.15,
+			"FragA": 0.09,
+			"SklMats": 0.1,
+			"EqMats": 0.2641,
+			"ChrExp": 0.1117,
+			"Coins": 0.1117
+		},
+		"pool": {
+			"ValkS+": [
+				"Azure Empyrea"
+			],
+			"ValkA+": [
+				"Yamabuki Armor"
+			],
+			"ValkA": [
+				"Night Squire",
+				"Snowy Sniper",
+				"Umbral Rose"
+			],
+			"FragS+": [
+				"Azure Empyrea"
+			],
+			"FragA+": [
+				"Yamabuki Armor"
+			],
+			"FragA": [
+				"Night Squire",
+				"Snowy Sniper",
+				"Umbral Rose"
 			],
 			"SklMats": [
 				"Advanced Skill Material"

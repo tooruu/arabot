@@ -1,5 +1,5 @@
 from discord.ext.commands import (
-	Converter, MemberConverter, EmojiConverter, TextChannelConverter, VoiceChannelConverter, RoleConverter
+	Converter, MemberConverter, EmojiConverter, PartialEmojiConverter, TextChannelConverter, VoiceChannelConverter, RoleConverter
 )
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
@@ -9,7 +9,7 @@ from os import environ
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";"
-BOT_VERSION = "1.6.10" #TODO: UPDATE!
+BOT_VERSION = "1.6.11" #TODO: UPDATE!
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
@@ -31,11 +31,12 @@ class Finder(Converter):
 	Abstract class to convert *argument* to desired class.
 	1.	Try to convert via subclass's parents'
 		`convert` methods (implemented in discord.py)
-	2. Try to find via subclass's method `find`
+	2. Try to convert via subclass's method `find`
 
 	# Example usage:
 	class FindObject(Finder, AConverter, BConverter):
-		def find(self, ctx, argument):
+		@staticmethod
+		def find(ctx, argument):
 			return utils.find(lambda obj: obj.att == argument, ctx.obj_list)
 	"""
 	def __init__(self):
@@ -53,17 +54,20 @@ class Finder(Converter):
 				pass
 		return self.find(ctx, argument)
 
-	def find(self, ctx, argument):
+	@staticmethod
+	def find(ctx, argument):
 		raise NotImplementedError("Derived classes need to implement this.")
 
 class FindMember(Finder, MemberConverter):
-	def find(self, ctx, argument):
+	@staticmethod
+	def find(ctx, argument):
 		return find(
 			lambda member: not member.bot and member.display_name.lower().startswith(argument.lower()), ctx.guild.members
 		)
 
-class FindEmoji(Finder, EmojiConverter):
-	def find(self, ctx, argument):
+class FindEmoji(Finder, EmojiConverter, PartialEmojiConverter):
+	@staticmethod
+	def find(ctx, argument):
 		ctx.bot.guilds.insert(0, ctx.bot.guilds.pop(ctx.bot.guilds.index(ctx.guild)))
 		for guild in ctx.bot.guilds:
 			if emote := find(
@@ -75,21 +79,25 @@ class FindEmoji(Finder, EmojiConverter):
 		) == 1 else None
 
 class FindTxChl(Finder, TextChannelConverter):
-	def find(self, ctx, argument):
+	@staticmethod
+	def find(ctx, argument):
 		return find(lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.text_channels)
 
 class FindVcChl(Finder, VoiceChannelConverter):
-	def find(self, ctx, argument):
+	@staticmethod
+	def find(ctx, argument):
 		return find(lambda chan: chan.name.lower().startswith(argument.lower()), ctx.guild.voice_channels)
 
 class FindChl(Finder, TextChannelConverter, VoiceChannelConverter):
-	def find(self, ctx, argument):
+	@staticmethod
+	def find(ctx, argument):
 		return find(
 			lambda chl: chl.name.lower().startswith(argument.lower()), ctx.guild.text_channels + ctx.guild.voice_channels
 		)
 
 class FindRole(Finder, RoleConverter):
-	def find(self, ctx, argument):
+	@staticmethod
+	def find(ctx, argument):
 		return lambda role: role.name.lower().startswith(argument.lower()), ctx.guild.roles
 
 class Queue:

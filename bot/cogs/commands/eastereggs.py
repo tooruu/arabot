@@ -86,7 +86,7 @@ class EasterEggs(Cog):
 					temp_perms = msg.channel.overwrites_for(msg.author)
 					temp_perms.send_messages = False
 					await msg.channel.set_permissions(msg.author, overwrite=temp_perms)
-					await asyncio.sleep(60)
+					await asyncio.sleep(20)
 					await msg.channel.set_permissions(msg.author, overwrite=old_perms)
 					break
 
@@ -98,13 +98,13 @@ class EasterEggs(Cog):
 	@Cog.listener("on_message")
 	async def urban_listener(self, msg):
 		if regex := search(r"((?:wh?[ao]t|nani)'?\s?i?s\s)(.[^?]+)", msg.content.lower()):
-			if not (search(f"{regex.group(1)}(?:up|good|with|it|this|that|so)", msg.content.lower()) or msg.content.startswith('>')):
+			if not (search(f"{regex.group(1)}(up|good|with|it|this|that|so)\\b", msg.content.lower()) or msg.content.startswith('>')):
 				await self.bot.get_command("urban")(await self.bot.get_context(msg), term=regex.group(2))
 
 	@Cog.listener("on_message")
 	async def who_listener(self, msg):
-		if "who" in msg.content.lower() and not msg.content.startswith('>'):
-			await msg.channel.send("ur mom <:TeriGurn:677955897716375600>")
+		if search(r"\bwho\b", msg.content.lower()) and not msg.content.startswith('>'):
+			await msg.channel.send("ur mom")
 
 def setup(client):
 	client.add_cog(EasterEggs(client))
