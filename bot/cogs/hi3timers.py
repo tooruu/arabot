@@ -63,9 +63,9 @@ class HI3Timers(Cog):
 		#	1: [(time(hour=4), "Calculating")],
 		#})
 		self.timers["qs"] = Timer(self.bot.get_channel(752382371596206141), {
-			0: [(time(hour=14), "Preparing")],
+			0: [(time(hour=15), "Preparing")],
 			2: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
-			4: [(time(hour=14), "Preparing")],
+			4: [(time(hour=15), "Preparing")],
 			6: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
 		})
 		self.countdown.start()
