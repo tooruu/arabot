@@ -12,7 +12,7 @@ class Timer:
 
 	def get_next_phase(self): # TODO: TZ-aware timestamps
 		cur_time = now()
-		cur_wkday = cur_time.weekday()
+		cur_wkday = cur_time.isoweekday()
 		today = cur_time.date()
 		wkdays = list(self.sch.keys())
 		times = list(self.sch.values())
@@ -20,6 +20,8 @@ class Timer:
 			for tup in self.sch[cur_wkday]:
 				if cur_time.time() < tup[0]:
 					return datetime.combine(today, tup[0])
+			firstWkday_date = today + timedelta(days=(wkdays[0] - cur_wkday) % 7)
+			return datetime.combine(firstWkday_date, times[0][0][0])
 		for w in wkdays:
 			if cur_wkday < w:
 				next_wkday_date = today + timedelta(days=w - cur_wkday)
@@ -33,7 +35,7 @@ class Timer:
 
 	def get_status(self):
 		next_phase = self.get_next_phase()
-		for tup in self.sch[next_phase.weekday()]:
+		for tup in self.sch[next_phase.isoweekday()]:
 			if tup[0] == next_phase.time():
 				return tup[1]
 
@@ -54,19 +56,19 @@ class HI3Timers(Cog):
 	@Cog.listener()
 	async def on_ready(self):
 		self.timers["ow"] = Timer(self.bot.get_channel(678423053306298389), {
-			0: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
-			3: [(time(hour=4), "Ongoing")],
-			5: [(time(hour=4), "Ongoing")],
+			1: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
+			4: [(time(hour=4), "Ongoing")],
+			6: [(time(hour=4), "Ongoing")],
 		})
 		#self.timers["ma"] = Timer(self.bot.get_channel(752382371596206141), {
-		#	0: [(time(hour=4), "Ongoing")],
-		#	1: [(time(hour=4), "Calculating")],
+		#	1: [(time(hour=4), "Ongoing")],
+		#	2: [(time(hour=4), "Calculating")],
 		#})
 		self.timers["qs"] = Timer(self.bot.get_channel(752382371596206141), {
-			0: [(time(hour=15), "Preparing")],
-			2: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
-			4: [(time(hour=15), "Preparing")],
-			6: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
+			1: [(time(hour=15), "Preparing")],
+			3: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
+			5: [(time(hour=15), "Preparing")],
+			7: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
 		})
 		self.countdown.start()
 
