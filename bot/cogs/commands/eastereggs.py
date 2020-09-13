@@ -103,7 +103,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def who_listener(self, msg):
-		if search(r"\bwho\b", msg.content.lower()) and not msg.content.startswith('>'):
+		if msg.content.startswith("who"):
 			await msg.channel.send("ur mom")
 
 def setup(client):
