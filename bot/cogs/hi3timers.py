@@ -20,12 +20,12 @@ class Timer:
 			for tup in self.sch[cur_wkday]:
 				if cur_time.time() < tup[0]:
 					return datetime.combine(today, tup[0])
-			firstWkday_date = today + timedelta(days=(wkdays[0] - cur_wkday) % 7)
-			return datetime.combine(firstWkday_date, times[0][0][0])
 		for w in wkdays:
 			if cur_wkday < w:
 				next_wkday_date = today + timedelta(days=w - cur_wkday)
 				return datetime.combine(next_wkday_date, self.sch[w][0][0])
+		firstWkday_date = today + timedelta(days=(wkdays[0] - cur_wkday) % 7)
+		return datetime.combine(firstWkday_date, times[0][0][0])
 
 	def till_next_phase(self):
 		totalSeconds = (self.get_next_phase() - now()).total_seconds()
