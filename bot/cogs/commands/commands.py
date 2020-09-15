@@ -357,7 +357,7 @@ class Commands(Cog):
 			await ctx.send(f"Definition for {bold(term)} not found")
 
 	@command(hidden=True)
-	@has_permissions(manage_guild=True)
+	@has_permissions(manage_messages=True)
 	async def say(self, ctx, *, msg):
 		await ctx.message.delete()
 		await ctx.send(msg)
