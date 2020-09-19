@@ -57,8 +57,8 @@ class HI3Timers(Cog):
 	async def on_ready(self):
 		self.timers["ow"] = Timer(self.bot.get_channel(678423053306298389), {
 			1: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
-			4: [(time(hour=4), "Ongoing")],
-			6: [(time(hour=4), "Ongoing")],
+			4: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
+			6: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
 		})
 		#self.timers["ma"] = Timer(self.bot.get_channel(752382371596206141), {
 		#	1: [(time(hour=4), "Ongoing")],
