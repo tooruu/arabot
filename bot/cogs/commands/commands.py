@@ -106,6 +106,7 @@ class Commands(Cog):
 		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs))
 
 	@cog.command(aliases=["add"])
+	@check(isDev)
 	async def load(self, ctx, *cogs):
 		loaded = []
 		for i in cogs:
@@ -121,6 +122,7 @@ class Commands(Cog):
 		await ctx.send("Loaded " + (", ".join(loaded) or "nothing"))
 
 	@cog.command(aliases=["remove"])
+	@check(isDev)
 	async def unload(self, ctx, *cogs):
 		unloaded = []
 		for i in cogs:
@@ -132,6 +134,7 @@ class Commands(Cog):
 		await ctx.send("Unloaded " + (", ".join(unloaded) or "nothing"))
 
 	@cog.command()
+	@check(isDev)
 	async def reload(self, ctx, *cogs):
 		reloaded = []
 		for i in cogs:
@@ -434,7 +437,8 @@ class Commands(Cog):
 				url=em_after
 			).set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
 			message = await ctx.send(embed=embed)
-			await ctx.message.delete()
+			if not ctx.message.attachments:
+				await ctx.message.delete()
 			await message.add_reaction("👍")
 			await message.add_reaction("👎")
 
@@ -454,4 +458,4 @@ class Commands(Cog):
 def setup(client):
 	client.add_cog(Commands(client))
 
-# Track GAPI usage in presence
+# TODO: Track GAPI usage in presence
