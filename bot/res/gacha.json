@@ -344,19 +344,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Iris of the Dreams"
+				"MagStorm"
 			],
 			"Weap4": [
-				"Thunder Kikaku", "Raikiri", "Star Shatterer: Vikrant", "Swan Lake", "11th Sacred Relic", "Eos Gloria"
+				"Blooded Saints", "Fairy Sword Silven", "Star Destroyer 19C", "Sleeping Beauty", "Undine's Tale"
 			],
 			"Weap3": [
-				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell's Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
+				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Irene Adler"
+				"Ishikawa Goemon"
 			],
 			"Stig4": [
-				"Tesla Band", "Thales", "Dirac", "Jin Shengtan"
+				"Sin Mal", "Jin Shengtan", "Nobel", "Dirac"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -392,19 +392,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Star Shatterer: Vikrant"
+				"Eos Gloria"
 			],
 			"Weap4": [
-				"Mjolnir", "Fairy Sword Silven", "Sleeping Beauty", "Blood Embrace", "Skoll and Hati", "Path to Acheron"
+				"ARC Serratus", "Dawn Breaker: Talwar", "Blood Dance", "Hekate's Gloom", "Nuada's grief", "Aphrodite"
 			],
 			"Weap3": [
-				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell's Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
+				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Gustav Klimt"
+				"Thales"
 			],
 			"Stig4": [
-				"Allan Poe", "Tesla Band", "Dirac", "Nobel"
+				"Gustav Klimt", "Sirin: Ascendant", "Kafka", "Monet"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
