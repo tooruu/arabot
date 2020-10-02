@@ -9,7 +9,7 @@ from os import environ
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
-BOT_VERSION = "1.6.20" #TODO: UPDATE!
+BOT_VERSION = "1.6.21" #TODO: UPDATE!
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
@@ -18,7 +18,7 @@ def isDev(ctx):
 
 def isValid(client, msg, invocator):
 	return not msg.content.startswith(client.command_prefix
-													) and msg.author != client.user and invocator.lower() in msg.content.lower()
+													) and msg.author != client.user and not msg.author.bot and invocator.lower() in msg.content.lower()
 
 async def setPresence(client, _type: int, name: str, _status: Status = None):
 	if isinstance(_status, Status):
