@@ -104,7 +104,7 @@
 				"Oath of Judah",
 				"Blood Embrace",
 				"Hand of Tyr",
-				"Nuada's grief",
+				"Nuada's Grief",
 				"Skoll and Hati",
 				"Keys of the Void",
 				"Mjolnir",
@@ -344,19 +344,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"MagStorm"
+				"Hekate's Gloom"
 			],
 			"Weap4": [
-				"Blooded Saints", "Fairy Sword Silven", "Star Destroyer 19C", "Sleeping Beauty", "Undine's Tale"
+				"Tranquil Arias", "MagStorm", "Blood Dance", "11th Sacred Relic", "Nuada's Grief"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Ishikawa Goemon"
+				"Beethoven"
 			],
 			"Stig4": [
-				"Sin Mal", "Jin Shengtan", "Nobel", "Dirac"
+				"Planck", "Isaac Newton", "Gustav Klimt", "Ishikawa Goemon"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -392,19 +392,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Eos Gloria"
+				"Nuada's Grief"
 			],
 			"Weap4": [
-				"ARC Serratus", "Dawn Breaker: Talwar", "Blood Dance", "Hekate's Gloom", "Nuada's grief", "Aphrodite"
+				"Mjolnir", "Void Blade", "Briareus PRI", "Oath of Judah", "Skoll and Hati", "Undine's Tale"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Thales"
+				"Monet"
 			],
 			"Stig4": [
-				"Gustav Klimt", "Sirin: Ascendant", "Kafka", "Monet"
+				"Michelangelo", "Wilde", "Sirin: Ascendant", "Ekaterina"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -441,26 +441,26 @@
 		},
 		"pool": {
 			"ValkS+": [
-				"Fallen Rosemary"
+				"Vermillion Knight: Eclipse"
 			],
 			"ValkA+": [
-				"Shadow Dash"
+				"Flame Sakitama"
 			],
 			"ValkA": [
-				"Night Squire",
-				"Divine Prayer",
-				"Swallowtail Phantasm"
+				"Valkyrie Gloria",
+				"Sündenjäger",
+				"Umral Rose"
 			],
 			"FragS+": [
-				"Fallen Rosemary"
+				"Vermillion Knight: Eclipse"
 			],
 			"FragA+": [
-				"Shadow Dash"
+				"Flame Sakitama"
 			],
 			"FragA": [
-				"Night Squire",
-				"Divine Prayer",
-				"Swallowtail Phantasm"
+				"Valkyrie Gloria",
+				"Sündenjäger",
+				"Umral Rose"
 			],
 			"SklMats": [
 				"Advanced Skill Material"
