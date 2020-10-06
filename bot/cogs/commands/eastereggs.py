@@ -3,7 +3,7 @@ from .._utils import isValid
 import discord
 import asyncio
 from sys import _getframe
-from re import search
+from re import search, match
 
 class EasterEggs(Cog):
 	def __init__(self, client):
@@ -102,7 +102,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def who_listener(self, msg):
-		if msg.content.lower().startswith("who"):
+		if match(r"who\b", msg.content.lower())
 			await msg.channel.send("ur mom")
 
 def setup(client):
