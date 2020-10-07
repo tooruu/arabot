@@ -151,7 +151,7 @@ class Commands(Cog):
 				async with session.get(url := (await url.read()).decode()) as img:
 					await ctx.send(file=discord.File(BytesIO(await img.read()), url.split("/")[-1]))
 
-	@command(aliases=["i", "img"], brief="<query> | Top 3 search results from Google Images")
+	@command(aliases=["i", "img"], brief="<query> | Top search result from Google Images")
 	async def image(self, ctx, *, query):
 		async with WebSession() as session:
 			async with session.get(
@@ -160,17 +160,19 @@ class Commands(Cog):
 				"key": self.g_isearch_key,
 				"cx": self.g_cse,
 				"q": safe(query),
-				"num": 1,
+				"num": 5,
 				"searchType": "image"
 				}
 			) as response:
 				if response.status == 429:
 					await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
 				else:
-					try:
-						await ctx.send((await response.json())["items"][0]["link"])
-					except KeyError:
-						await ctx.send("No images found")
+					for i in (await response.json())["items"]:
+						async with session.get(i["link"]) as s:
+							if s.status == 200:
+								await ctx.send(i["link"])
+								return
+					await ctx.send("No images found")
 
 	@command(aliases=["g"], brief="<query> | Top Google Search result") #Top 3 Google Search results
 	async def google(self, ctx, *, query):
