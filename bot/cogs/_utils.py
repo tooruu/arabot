@@ -1,5 +1,6 @@
 from discord.ext.commands import (
-	Converter, MemberConverter, EmojiConverter, PartialEmojiConverter, TextChannelConverter, VoiceChannelConverter, RoleConverter
+	Converter, MemberConverter, EmojiConverter, PartialEmojiConverter, TextChannelConverter, VoiceChannelConverter,
+	RoleConverter
 )
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
@@ -9,7 +10,7 @@ from os import environ
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
-BOT_VERSION = "1.7.4" #TODO: UPDATE!
+BOT_VERSION = "1.7.5" #TODO: UPDATE!
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
@@ -17,8 +18,9 @@ def isDev(ctx):
 	return ctx.author.id in (337343326095409152, 447138372121788417)
 
 def isValid(client, msg, invocator):
-	return not msg.content.startswith(client.command_prefix
-													) and msg.author != client.user and not msg.author.bot and invocator.lower() in msg.content.lower()
+	return not msg.content.startswith(
+		client.command_prefix
+	) and msg.author != client.user and not msg.author.bot and invocator.lower() in msg.content.lower()
 
 async def setPresence(client, _type: int, name: str, _status: Status = None):
 	if isinstance(_status, Status):

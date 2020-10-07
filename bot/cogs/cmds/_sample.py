@@ -1,4 +1,4 @@
-import discord
+from discord.ext.commands import command, Cog
 
 class Commands(Cog):
 	def __init__(self, client):
