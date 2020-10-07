@@ -8,10 +8,9 @@ from matplotlib import use
 use("AGG") #pylint: disable=wrong-import-position
 from matplotlib import pyplot as plt
 
-class Ping(Cog):
-	def __init__(self, client, old_ping):
+class Commands(Cog):
+	def __init__(self, client):
 		self.bot = client
-		self.old = old_ping
 		self.log = Queue(60)
 		self.store.start()
 
@@ -23,7 +22,7 @@ class Ping(Cog):
 	async def wait(self):
 		await self.bot.wait_until_ready()
 
-	@command()
+	@command(brief="| View Discord's server's connectivity")
 	async def ping(self, ctx):
 		# Plot graph
 		x, y = range(self.log.size), self.log
@@ -49,8 +48,6 @@ class Ping(Cog):
 
 	def cog_unload(self):
 		self.store.cancel()
-		self.bot.remove_command("ping")
-		self.bot.add_command(self.old)
 
 def setup(client):
-	client.add_cog(Ping(client, client.remove_command("ping")))
+	client.add_cog(Commands(client))

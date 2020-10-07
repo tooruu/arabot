@@ -2,5 +2,3 @@ discord.py[voice] # Discord API wrapper + voice support
 aiohttp           # asynchronous web requests
 jikanpy           # MyAnimeList API wrapper
 matplotlib        # ping graph
-#bs4               # web parser
-#selenium          # web browser driver

@@ -2,7 +2,7 @@ from random import choice, choices
 from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCooldown, MissingRequiredArgument, BadArgument
 from json import load
 
-class Gacha(Cog):
+class Commands(Cog):
 	def __init__(self, client):
 		self.bot = client
 		self.gacha.cooldown_after_parsing = True
@@ -17,7 +17,7 @@ class Gacha(Cog):
 					]
 
 	@cooldown(1, 60, BucketType.user)
-	@command(aliases=["pull"])
+	@command(aliases=["pull"], brief="<supply> [amount] | Try out your HI3 luck for free")
 	async def gacha(self, ctx, supply, pulls: int = 10):
 		if not self.pool.get(supply := supply.lower()) or not self.pool[supply]["available"]:
 			await ctx.send("Invalid supply")
@@ -77,4 +77,4 @@ class Gacha(Cog):
 	)
 
 def setup(client):
-	client.add_cog(Gacha(client))
+	client.add_cog(Commands(client))

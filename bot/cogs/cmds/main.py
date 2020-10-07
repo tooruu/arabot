@@ -18,10 +18,6 @@ class Commands(Cog):
 	async def version(self, ctx):
 		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
-	@command()
-	async def ping(self, ctx):
-		await ctx.send(f":ping_pong: Pong after {self.bot.latency*1000:.0f}ms!")
-
 	@command(brief="<user> | Tell chat you love someone")
 	async def love(self, ctx, partner: FindMember):
 		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
@@ -50,55 +46,6 @@ class Commands(Cog):
 	@command(name="177013")
 	async def _177013(self, ctx):
 		await setPresence(self.bot, 3, "177013 with yo mama")
-
-	@command(aliases=["source"], brief="<link|attachment> | Find anime source for an image")
-	async def sauce(self, ctx, image_url=None):
-		if image_url := ctx.message.attachments[0].url if ctx.message.attachments else image_url if image_url.startswith(
-			"http"
-		) else None:
-			async with ctx.typing():
-				async with WebSession() as session:
-					async with session.get("https://trace.moe/api/search?url=" + quote(image_url)) as tmoe_resp:
-						try:
-							mal_resp = (
-								await
-								AioJikan(session=session).anime((tmoe_resp := (await tmoe_resp.json())["docs"][0])["mal_id"])
-							)
-						except ContentTypeError:
-							await ctx.send(
-								"Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find the sauce manually at\nhttps://trace.moe/?url="
-								+ safe(image_url)
-							)
-						else:
-							async with session.get(
-								"https://trace.moe/preview.php",
-								params={
-								"anilist_id": tmoe_resp["anilist_id"],
-								"file": quote(tmoe_resp["filename"]),
-								"t": str(tmoe_resp["at"]),
-								"token": tmoe_resp["tokenthumb"]
-								}
-							) as preview:
-								preview = await preview.read()
-							#pylint: disable=used-before-assignment
-							await ctx.send(
-								f"Episode {tmoe_resp['episode']} ({int(tmoe_resp['at']/60)}:{int(tmoe_resp['at']%60):02d})"
-								if tmoe_resp["episode"] else None,
-								file=discord.File(BytesIO(preview), tmoe_resp["filename"]),
-								embed=discord.Embed(
-								color=32767,
-								description=
-								f"Similarity: {tmoe_resp['similarity']:.1%} | Score: {mal_resp['score']} | {mal_resp['status']}"
-								).set_author(name=mal_resp["title"],
-								url=mal_resp["url"]).set_thumbnail(url=mal_resp["image_url"]).add_field(
-								name="Synopsis",
-								value=s if len(s := mal_resp["synopsis"].partition(" [")[0]) <=
-								(maxlength := 600) else ".".join(s[:maxlength].split(".")[0:-1]) + "..."
-								).set_footer(
-								text=f"Requested by {ctx.author.display_name} | Powered by trace.moe",
-								icon_url=ctx.author.avatar_url
-								)
-							)
 
 	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
 	@check(isDev)
@@ -343,7 +290,7 @@ class Commands(Cog):
 	async def urban(self, ctx, *, term):
 		if "tooru" in term:
 			await ctx.send(
-				embed=discord.Embed(description="An awesome guy").set_author(name="tooru", url="https://tooru.wtf")
+				embed=discord.Embed(description="An awesome guy").set_author(name="tooru", url="https://discord.gg/YdEXsZN")
 			)
 			return
 		async with WebSession() as session:
@@ -352,8 +299,9 @@ class Commands(Cog):
 		if ud := ud.get("list"):
 			await ctx.send(
 				embed=discord.Embed(
-				description="\n---------------------------------\n".
-				join([result["definition"].replace("[", "").replace("]", "") for result in ud[:3]])
+				description=dsafe(s if len(s := "\n---------------------------------\n".
+				join([result["definition"].replace("[", "").replace("]", "") for result in ud[:3]])) <=
+								(maxlength := 2000) else '.'.join(s[:maxlength].split('.')[0:-1]) + '...')
 				).set_author(name=term, url="https://www.urbandictionary.com/define.php?term=" + safe(term))
 			)
 		else:
@@ -407,40 +355,6 @@ class Commands(Cog):
 				if wa.get("tips"):
 					embed.description = wa["tips"]["text"]
 			await ctx.send(embed=embed)
-
-	@command(brief="<emoji> | Suggest new server emoji")
-	async def chemoji(self, ctx, em_before: FindEmoji, em_after=None):
-		if not em_before in ctx.guild.emojis:
-			await ctx.send("Choose a valid server emoji to replace")
-		elif em_after and ctx.message.attachments:
-			await ctx.send("You can only have one suggestion type in submission")
-		elif not (em_after or ctx.message.attachments):
-			await ctx.send("You must include one emoji suggestion")
-		else:
-			if ctx.message.attachments:
-				em_after = ctx.message.attachments[0].url
-			if match(r"(https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", em_after):
-				async with WebSession() as session:
-					async with session.get(em_after) as resp:
-						if resp.status != 200 or not resp.content_type.startswith("image/"):
-							await ctx.send(f"Link a valid image to replace {em_before} with")
-							return
-			elif match(r"<a?:\w{2,32}:\d{18,22}>$", em_after):
-				if await FindEmoji().convert(ctx, em_after) in ctx.guild.emojis:
-					await ctx.send(f"We already have {em_after}")
-					return
-				em_after = (await PartialEmojiConverter().convert(ctx, em_after)).url
-			else:
-				await ctx.send(f"Choose a valid emoji to replace {em_before} with")
-				return
-			embed = discord.Embed(title="wants to change this →", description="to that ↓").set_thumbnail(url=em_before.url)	.set_image(
-				url=em_after
-			).set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
-			message = await ctx.send(embed=embed)
-			if not ctx.message.attachments:
-				await ctx.message.delete()
-			await message.add_reaction("👍")
-			await message.add_reaction("👎")
 
 	@command(brief="Who asked?")
 	async def wa(self, ctx, msg: MessageConverter = None):

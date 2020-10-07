@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog #, command
+from discord.ext.commands import Cog
 from .._utils import isValid
 import discord
 import asyncio
@@ -8,18 +8,6 @@ from re import search, match
 class EasterEggs(Cog):
 	def __init__(self, client):
 		self.bot = client
-
-	async def VoiceReaction(self, msg, vorbis, trigger=None):
-		if isValid(self.bot, msg,
-			_getframe(1).f_code.co_name.replace("_", " ")
-			if trigger is None else trigger) and (await self.bot.get_context(msg)).voice_client is None:
-			for channel in msg.guild.voice_channels:
-				if channel.members:
-					(channel := await channel.connect()).play(
-						await discord.FFmpegOpusAudio.from_probe(f"./bot/res/{vorbis}.ogg"),
-						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
-					)
-					break
 
 	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
@@ -38,24 +26,6 @@ class EasterEggs(Cog):
 			await asyncio.sleep(1)
 			await msg.channel.purge(limit=7)
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
-
-	@Cog.listener("on_message")
-	async def lewd(self, msg):
-		await self.VoiceReaction(msg, "aroro")
-
-	@Cog.listener("on_message")
-	async def tuna(self, msg):
-		await self.VoiceReaction(msg, "nekocharm")
-
-	@Cog.listener("on_message")
-	async def teri(self, msg):
-		await self.VoiceReaction(msg, "teri")
-
-	# TODO: toggleable per-server
-	#@Cog.listener("on_message")
-	#async def everyone(self, msg):
-	#	if msg.mention_everyone:
-	#		await msg.delete()
 
 	@Cog.listener("on_message")
 	async def gaygames(self, msg):
@@ -95,14 +65,8 @@ class EasterEggs(Cog):
 			await msg.channel.send("no u")
 
 	@Cog.listener("on_message")
-	async def urban_listener(self, msg):
-		if regex := search(r"((?:wh?[ao]t|nani)'?\s?i?s\s)(.[^?]+)", msg.content.lower()):
-			if not (search(f"{regex.group(1)}(up|good|with|it|this|that|so)\\b", msg.content.lower()) or msg.content.startswith('>')):
-				await self.bot.get_command("urban")(await self.bot.get_context(msg), term=regex.group(2))
-
-	@Cog.listener("on_message")
 	async def who_listener(self, msg):
-		if match(r"who\b", msg.content.lower())
+		if match(r"who\b", msg.content.lower()):
 			await msg.channel.send("ur mom")
 
 def setup(client):
