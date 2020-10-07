@@ -69,5 +69,10 @@ class EasterEggs(Cog):
 		if match(r"who\b", msg.content.lower()):
 			await msg.channel.send("ur mom")
 
+	@Cog.listener("on_message")
+	async def im_hi_listener(self, msg):
+		if not msg.content.startswith('>') and regex := match(r"i(?:'?m|\sam)\s(.+)", msg.content.lower()):
+			await msg.channel.send(f"hi {regex.group(1)}\nim AraBot")
+
 def setup(client):
 	client.add_cog(EasterEggs(client))
