@@ -1,4 +1,5 @@
-from discord.ext.commands import Bot, Intents
+from discord.ext.commands import Bot
+from discord import Intents
 from os import walk
 from os.path import basename
 from cogs._utils import getenv, BOT_PREFIX
