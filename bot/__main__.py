@@ -14,11 +14,10 @@ def load_ext(client):
 					print(f"Loaded {path}{cog[:-3]}")
 
 def get_intents():
-	return Intents.default(
-		members=True,
-		typing=False,
-		presences=False
-	)
+	intents = Intents.default()
+	intents.members = True
+	intents.typing = False
+	return intents
 
 if __name__ == "__main__":
 	bot = Bot(command_prefix=BOT_PREFIX, case_insensitive=True, intents=get_intents())
