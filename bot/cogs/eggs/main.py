@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog
-from .._utils import isValid
+from .._utils import isValid, BOT_NAME
 import discord
 import asyncio
 from sys import _getframe
@@ -72,7 +72,7 @@ class EasterEggs(Cog):
 	@Cog.listener("on_message")
 	async def im_hi_listener(self, msg):
 		if not msg.content.startswith('>') and (regex := match(r"i(?:'?m|\sam)\s(.+)", msg.content.lower())):
-			await msg.channel.send(f"hi {regex.group(1)}\nim AraBot")
+			await msg.channel.send(f"hi {regex.group(1)}\nim {BOT_NAME}")
 
 def setup(client):
 	client.add_cog(EasterEggs(client))
