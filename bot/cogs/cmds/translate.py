@@ -2,6 +2,7 @@ from discord.ext.commands import command, Cog
 from .._utils import getenv, dsafe
 from aiohttp import ClientSession as WebSession
 from discord import Embed
+from html import unescape
 
 class Commands(Cog):
 	def __init__(self, client):
@@ -28,7 +29,7 @@ class Commands(Cog):
 				trans = (await trans.json())["data"]["translations"][0]
 		embed = Embed()
 		embed.add_field(name=trans["detectedSourceLanguage"].upper(), value=dsafe(text)[:1024])
-		embed.add_field(name=lang_to.upper(), value=dsafe(trans["translatedText"])[:1024], inline=False)
+		embed.add_field(name=lang_to.upper(), value=dsafe(unescape(trans["translatedText"]))[:1024], inline=False)
 		await ctx.send(embed=embed)
 
 def setup(client):
