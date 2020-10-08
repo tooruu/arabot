@@ -13,6 +13,9 @@ class Commands(Cog):
 		if not text:
 			await ctx.send("I need text to translate")
 			return
+		if len(text) > 1024:
+			await ctx.send("Your text is too long,\ntrimming it to the first 1024 characters")
+			text = text[:1024]
 		async with WebSession() as session:
 			async with session.get("https://translation.googleapis.com/language/translate/v2", params={
 				"key": self.key,
@@ -24,8 +27,8 @@ class Commands(Cog):
 					return
 				trans = (await trans.json())["data"]["translations"][0]
 		embed = Embed()
-		embed.add_field(name=trans["detectedSourceLanguage"], value=dsafe(text))
-		embed.add_field(name=lang_to, value=dsafe(trans["translatedText"]), inline=False)
+		embed.add_field(name=trans["detectedSourceLanguage"].upper(), value=dsafe(text)[:1024])
+		embed.add_field(name=lang_to.upper(), value=dsafe(trans["translatedText"])[:1024], inline=False)
 		await ctx.send(embed=embed)
 
 def setup(client):
