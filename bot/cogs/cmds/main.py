@@ -1,7 +1,7 @@
-from discord.ext.commands import command, Cog, check, has_permissions, group, errors, MessageConverter
+from discord.ext.commands import (command, Cog, check, has_permissions, group, errors, MessageConverter, cooldown, BucketType, CommandOnCooldown)
 from .._utils import (FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, bold)
 import discord
-from io import BytesIO
+from io import BytesIOvcooldown, BucketType, CommandOnCooldown
 
 class Commands(Cog):
 	def __init__(self, client):
@@ -150,6 +150,7 @@ class Commands(Cog):
 		await ctx.message.delete()
 		await ctx.send(msg)
 
+	@cooldown(1, 10, BucketType.user)
 	@command(brief="Who asked?")
 	async def wa(self, ctx, msg: MessageConverter = None):
 		await ctx.message.delete()
@@ -162,6 +163,13 @@ class Commands(Cog):
 				for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", "<:FukaWhy:677955897200476180>":
 					await msg.add_reaction(i)
 				break
+
+	@wa.error
+	async def wa_ratelimit(self, ctx, error):
+		if isinstance(error, CommandOnCooldown):
+			await ctx.message.delete()
+			return
+		raise error
 
 def setup(client):
 	client.add_cog(Commands(client))
