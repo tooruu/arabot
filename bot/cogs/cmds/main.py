@@ -1,7 +1,7 @@
 from discord.ext.commands import (command, Cog, check, has_permissions, group, errors, MessageConverter, cooldown, BucketType, CommandOnCooldown)
 from .._utils import (FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, bold)
 import discord
-from io import BytesIOvcooldown, BucketType, CommandOnCooldown
+from io import BytesIO
 
 class Commands(Cog):
 	def __init__(self, client):
