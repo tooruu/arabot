@@ -17,16 +17,15 @@ class Commands(Cog):
 		if len(text) > 1024:
 			await ctx.send("Your text is too long,\ntrimming it to the first 1024 characters")
 			text = text[:1024]
-		async with WebSession() as session:
-			async with session.get("https://translation.googleapis.com/language/translate/v2", params={
-				"key": self.key,
-				"target": lang_to,
-				"q": text
-			}) as trans:
-				if trans.status != 200:
-					await ctx.send("Invalid argument")
-					return
-				trans = (await trans.json())["data"]["translations"][0]
+		async with self.bot.ses.get("https://translation.googleapis.com/language/translate/v2", params={
+			"key": self.key,
+			"target": lang_to,
+			"q": text
+		}) as trans:
+			if trans.status != 200:
+				await ctx.send("Invalid argument")
+				return
+			trans = (await trans.json())["data"]["translations"][0]
 		embed = Embed()
 		embed.add_field(name=trans["detectedSourceLanguage"].upper(), value=dsafe(text)[:1024])
 		embed.add_field(name=lang_to.upper(), value=dsafe(unescape(trans["translatedText"]))[:1024], inline=False)

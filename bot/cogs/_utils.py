@@ -5,12 +5,13 @@ from discord.ext.commands import (
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
 from discord import Status, Activity
-from os import environ
+from os import environ, walk
+from os.path import basename
 
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
-BOT_VERSION = "1.7.9" #TODO: UPDATE!
+BOT_VERSION = "2.0.0"
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
@@ -76,7 +77,7 @@ class FindEmoji(Finder, EmojiConverter, PartialEmojiConverter):
 				lambda emoji: argument.lower() in emoji.name.lower() or argument.lower() == str(emoji.id), guild.emojis
 			):
 				return emote
-		return f"https://raw.githubusercontent.com/astronautlevel2/twemoji/gh-pages/128x128/{format(ord(argument), 'x')}.png" if len(
+		return f"https://raw.githubusercontent.com/astronautlevel2/twemoji/gh-pages/128x128/{ord(argument):x}.png" if len(
 			argument
 		) == 1 else None
 
@@ -144,3 +145,12 @@ def getenv(*keys):
 bold = lambda s: "**{}**".format(s.replace('*', '\\*'))
 
 dsafe = lambda s: s.replace('*', '\\*').replace('_', '\\_').replace('~', '\\~').replace('|', '\\|').replace('`', '\\`')
+
+def load_ext(client):
+	for path, _, files in walk("bot/cogs"):
+		if basename(path := path[4:])[0] != "_":
+			path = path.replace("/", ".").replace("\\", ".") + "."
+			for cog in sorted(files):
+				if cog[0] != "_" and cog.endswith(".py"):
+					client.load_extension(path + cog[:-3])
+					print(f"Loaded {path}{cog[:-3]}")

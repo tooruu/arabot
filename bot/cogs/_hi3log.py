@@ -1,6 +1,5 @@
 from discord.ext.commands import Cog
 from discord.ext.tasks import loop
-from aiohttp import ClientSession as WebSession
 from re import match
 
 class HI3Log(Cog):
@@ -11,21 +10,17 @@ class HI3Log(Cog):
 
 	@loop(hours=3)
 	async def check(self):
-		async with WebSession() as session:
-			async with session.get(
-				"https://honkaiimpact3.gamepedia.com/api.php",
-				params={
+		async with self.bot.ses.get(
+			"https://honkaiimpact3.gamepedia.com/api.php",
+			params={
 				"action": "parse",
 				"page": "Update_Log",
 				"section": 1,
 				"format": "json",
 				"prop": "wikitext"
-				}
-			) as response:
-				try:
-					self.new = (await response.json())["parse"]["wikitext"]["*"]
-				except Exception as e:
-					print(e)
+			}
+		) as resp:
+			self.new = (await resp.json())["parse"]["wikitext"]["*"]
 		if self.new != self.old:
 			await self.channel.send(
 				"Hey, Captain, {} patch is out!\nCheck out the changelog at <https://honkaiimpact3.gamepedia.com/Update_Log>"

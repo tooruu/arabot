@@ -1,7 +1,6 @@
 from discord.ext.commands import command, Cog, PartialEmojiConverter
 from .._utils import FindEmoji
 import discord
-from aiohttp import ClientSession as WebSession
 from re import match
 
 class Commands(Cog):
@@ -20,11 +19,10 @@ class Commands(Cog):
 			if ctx.message.attachments:
 				em_after = ctx.message.attachments[0].url
 			if match(r"(https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", em_after):
-				async with WebSession() as session:
-					async with session.get(em_after) as resp:
-						if resp.status != 200 or not resp.content_type.startswith("image/"):
-							await ctx.send(f"Link a valid image to replace {em_before} with")
-							return
+				async with self.bot.ses.get(em_after) as resp:
+					if resp.status != 200 or not resp.content_type.startswith("image/"):
+						await ctx.send(f"Link a valid image to replace {em_before} with")
+						return
 			elif match(r"<a?:\w{2,32}:\d{18,22}>$", em_after):
 				if await FindEmoji().convert(ctx, em_after) in ctx.guild.emojis:
 					await ctx.send(f"We already have {em_after}")

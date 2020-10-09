@@ -1,25 +1,26 @@
 from discord.ext.commands import Bot
 from discord import Intents
-from os import walk
-from os.path import basename
-from cogs._utils import getenv, BOT_PREFIX
+from cogs._utils import getenv, BOT_PREFIX, load_ext
+from aiohttp import ClientSession as WebSession
 
-def load_ext(client):
-	for path, _, files in walk("bot/cogs"):
-		if basename(path := path[4:])[0] != "_":
-			path = path.replace("/", ".").replace("\\", ".") + "."
-			for cog in sorted(files):
-				if cog[0] != "_" and cog.endswith(".py"):
-					client.load_extension(path + cog[:-3])
-					print(f"Loaded {path}{cog[:-3]}")
+get_intents = lambda: Intents(
+	guilds=True,
+	members=True,
+	emojis=True,
+	voice_states=True,
+	guild_messages=True
+)
 
-def get_intents():
-	intents = Intents.default()
-	intents.members = True
-	intents.typing = False
-	return intents
+class TheBot(Bot):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.ses = WebSession()
+
+	async def close(self):
+		await self.ses.close()
+		await super().close()
 
 if __name__ == "__main__":
-	bot = Bot(command_prefix=BOT_PREFIX, case_insensitive=True, intents=get_intents())
+	bot = TheBot(command_prefix=BOT_PREFIX, case_insensitive=True, intents=get_intents())
 	load_ext(bot)
 	bot.run(getenv("token"))
