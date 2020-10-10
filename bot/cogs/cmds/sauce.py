@@ -25,8 +25,7 @@ class Commands(Cog):
 						)
 					except ContentTypeError:
 						await ctx.send(
-							"Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find thesauce manually at\nhttps://trace.moe/?url="
-							+ safe(image_url)
+							f"Unfortunately, the image was rejected by our sauce provider.\nHowever, you can still find thesauce manually at\n<https://trace.moe/?url={safe(image_url)}>"
 						)
 					else:
 						async with self.bot.ses.get(
