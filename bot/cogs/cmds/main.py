@@ -130,11 +130,18 @@ class Commands(Cog):
 		#files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
 		await ctx.send("\n".join(files) if files else "No emojis found")
 
-	@command(brief="<user> | DM the user to make him come")
-	async def call(self, ctx, target: FindMember):
+	@command(brief="<user> | DM user to summon them")
+	async def summon(self, ctx, target: FindMember):
 		if target:
-			await target.send(f"{ctx.author.display_name} wants you to show up in {bold(ctx.guild.name)}.")
-			await ctx.send(f"Notified {target.mention}")
+			invite = discord.Embed.Empty
+			for invite in await ctx.guild.invites():
+				if invite.max_uses == 0:
+					invite = invite.url
+					break
+			await target.send(
+				embed=discord.Embed(description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}").set_author(name=ctx.guild.name, url=invite, icon_url=str(ctx.guild.icon_url_as(static_format="png")) or discord.Embed.Empty)
+			)
+			await ctx.send(f"Summoning {target.mention}")
 		else:
 			await ctx.send("User not found")
 
