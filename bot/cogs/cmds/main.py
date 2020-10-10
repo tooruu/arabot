@@ -1,3 +1,4 @@
+from glob import glob
 from discord.ext.commands import (command, Cog, check, has_permissions, group, errors, MessageConverter, cooldown, BucketType, CommandOnCooldown)
 from .._utils import (FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, bold)
 import discord
@@ -150,8 +151,8 @@ class Commands(Cog):
 		await ctx.message.delete()
 		await ctx.send(msg)
 
-	@cooldown(1, 10, BucketType.user)
-	@command(brief="Who asked?")
+	@cooldown(1, 10, BucketType.channel)
+	@command(brief="Who asked?", hidden=True)
 	async def wa(self, ctx, msg: MessageConverter = None):
 		await ctx.message.delete()
 		if msg:
@@ -170,6 +171,15 @@ class Commands(Cog):
 			await ctx.message.delete()
 			return
 		raise error
+
+	@command(hidden=True)
+	async def lines(self, ctx):
+		count = 0
+		for g in glob("./bot/**/[!_]*.py", recursive=True) + ["./bot/cogs/_utils.py"]:
+			with open(g, encoding="utf8") as f:
+				count += len(f.readlines())
+		await ctx.send(f"{BOT_NAME} consists of **{count}** lines of code")
+
 
 def setup(client):
 	client.add_cog(Commands(client))
