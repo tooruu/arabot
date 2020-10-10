@@ -17,7 +17,8 @@ class Listeners(Cog):
 	@Cog.listener()
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, CommandOnCooldown):
-			await ctx.send(f"Cooldown expires in {error.retry_after:.0f} seconds")
+			if not ctx.command.hidden:
+				await ctx.send(f"Cooldown expires in {error.retry_after:.0f} seconds")
 			return
 		if isinstance(error, MissingPermissions):
 			if not ctx.command.hidden:
