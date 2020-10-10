@@ -11,10 +11,13 @@ get_intents = lambda: Intents(
 	guild_messages=True
 )
 
+async def sessionify(client):
+	client.ses = WebSession()
+
 class TheBot(Bot):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.ses = WebSession()
+		self.loop.create_task(sessionify(self))
 
 	async def close(self):
 		await self.ses.close()
