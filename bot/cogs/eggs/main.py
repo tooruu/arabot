@@ -64,7 +64,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def im_hi_listener(self, msg):
-		if len(msg.content) < 30 and (regex := match(r"(?:i(?:'?m|\sam)\s)+(.+)", msg.content.lower())):
+		if len(msg.content) < 30 and (regex := match(r"(?:i(?:['’]?m|\sam)\s)+(.+)", msg.content.lower())):
 			await msg.channel.send(f"hi {regex.group(1)}\nim {BOT_NAME}")
 
 def setup(client):
