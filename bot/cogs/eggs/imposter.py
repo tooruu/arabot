@@ -9,7 +9,7 @@ class EasterEggs(Cog):
 	@Cog.listener("on_message")
 	async def imposter(self, msg):
 		if not msg.author.bot and msg.author.voice and (chl:=msg.author.voice.channel) and (word:=search("\\b(impost[eo]r)\\b", msg.content.lower())):
-			TIMEOUT = 20
+			TIMEOUT = 30
 			word = word.group(1)
 			await msg.channel.send("<:KonoDioDa:676949860502732803>")
 			await msg.channel.send(f"You have {TIMEOUT} seconds to find the {word}!\nPing the person you think is the {word} to vote")
