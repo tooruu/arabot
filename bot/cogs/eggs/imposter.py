@@ -14,7 +14,7 @@ class EasterEggs(Cog):
 			await msg.channel.send("<:KonoDioDa:676949860502732803>")
 			await msg.channel.send(f"You have {TIMEOUT} seconds to find the {word}!\nPing the person you think is the {word} to vote")
 			voted, votes = [], {}
-			check = lambda vote: vote.author not in voted and vote.mentions and search("^<@!?\d{15,21}>$", vote.content) and vote.channel == msg.channel and vote.author.voice and vote.author.voice.channel == chl and vote.mentions[0] != vote.author
+			check = lambda vote: vote.author not in voted and vote.mentions and search("^<@!?\d{15,21}>$", vote.content) and vote.channel == msg.channel and vote.author.voice and vote.author.voice.channel == chl and vote.mentions[0].voice and vote.mentions[0].voice.channel == chl and vote.mentions[0] != vote.author
 			async def ensure():
 				while True:
 					vote = await self.bot.wait_for("message", check=check)
