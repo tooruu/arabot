@@ -46,7 +46,7 @@ class Commands(Cog):
 	async def cog(self, ctx):
 		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs))
 
-	@cog.command(aliases=["add"])
+	@cog.command(aliases=["enable"])
 	@check(isDev)
 	async def load(self, ctx, *cogs):
 		loaded = []
@@ -62,7 +62,7 @@ class Commands(Cog):
 				await ctx.send(bold(i) + " is an invalid extension")
 		await ctx.send("Loaded " + (", ".join(loaded) or "nothing"))
 
-	@cog.command(aliases=["remove"])
+	@cog.command(aliases=["disable"])
 	@check(isDev)
 	async def unload(self, ctx, *cogs):
 		unloaded = []
