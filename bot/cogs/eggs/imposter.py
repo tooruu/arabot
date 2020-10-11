@@ -9,19 +9,20 @@ class EasterEggs(Cog):
 	@Cog.listener("on_message")
 	async def imposter(self, msg):
 		if not msg.author.bot and msg.author.voice and (chl:=msg.author.voice.channel) and (word:=search("\\b(impost[eo]r)\\b", msg.content.lower())):
+			TIMEOUT = 20
 			word = word.group(1)
 			await msg.channel.send("<:KonoDioDa:676949860502732803>")
-			await msg.channel.send(f"You have 15 seconds to find the {word}!\nPing the person you think is the {word} to vote")
+			await msg.channel.send(f"You have {TIMEOUT} seconds to find the {word}!\nPing the person you think is the {word} to vote")
 			voted, votes = [], {}
 			check = lambda vote: vote.author not in voted and vote.mentions and search("^<@!?\d{15,21}>$", vote.content) and vote.channel == msg.channel and vote.author.voice and vote.author.voice.channel == chl and vote.mentions[0] != vote.author
 			async def ensure():
 				while True:
 					vote = await self.bot.wait_for("message", check=check)
 					await vote.delete()
-					voted.append(vote.mentions[0])
+					voted.append(vote.author)
 					votes[vote.mentions[0]] = votes.get(vote.mentions[0], 0) + 1
 			try:
-				await wait_for(ensure(), timeout=15)
+				await wait_for(ensure(), timeout=TIMEOUT)
 			except TimeoutError:
 				pass
 			if len(voted) > 1:
