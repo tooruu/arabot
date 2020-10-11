@@ -9,7 +9,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def imposter(self, msg):
-		if not self.running not msg.author.bot and msg.author.voice and (chl:=msg.author.voice.channel) and (word:=search("\\b(impost[eo]r)\\b", msg.content.lower())):
+		if not self.running and not msg.author.bot and msg.author.voice and (chl:=msg.author.voice.channel) and (word:=search("\\b(impost[eo]r)\\b", msg.content.lower())):
 			self.running = True
 			TIMEOUT = 30
 			word = word.group(1)
