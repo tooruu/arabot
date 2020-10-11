@@ -8,7 +8,7 @@ from discord import Status, Activity
 from os import environ, walk
 from os.path import basename
 
-BOT_DEBUG = True
+BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
 BOT_VERSION = "2.3.0"
