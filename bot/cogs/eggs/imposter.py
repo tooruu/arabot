@@ -24,8 +24,7 @@ class EasterEggs(Cog):
 				await wait_for(ensure(), timeout=15)
 			except TimeoutError:
 				pass
-			values = sorted(votes.values(), reverse=True)
-			if len(votes) > 1 and values[0] != values[1]:
+			if len(voted) > 1:
 				imposter = max(votes, key=lambda m: votes[m])
 				await msg.channel.send(f"{imposter.mention} was the {word}.")
 				await imposter.move_to(None, reason="The " + word)
