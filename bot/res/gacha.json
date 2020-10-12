@@ -344,19 +344,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Hekate's Gloom"
+				"Skadi Ondurgud"
 			],
 			"Weap4": [
-				"Tranquil Arias", "MagStorm", "Blood Dance", "11th Sacred Relic", "Nuada's Grief"
+				"Tranquil Arias", "Ice Epiphyllum", "Briaerus PRI", "Hrungnir", "Super-☆ Sonata", "Hekate's Gloom"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Beethoven"
+				"Robert Peary"
 			],
 			"Stig4": [
-				"Planck", "Isaac Newton", "Gustav Klimt", "Ishikawa Goemon"
+				"Kallen - Hymn", "Zorro", "Ishikawa Goemon", "Beethoven"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -392,19 +392,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Nuada's Grief"
+				"Ice Epiphyllum"
 			],
 			"Weap4": [
-				"Mjolnir", "Void Blade", "Briareus PRI", "Oath of Judah", "Skoll and Hati", "Undine's Tale"
+				"Mjolnir", "Thunder Kikaku", "Dawn Breaker: Talwar", "Star Destroyer 19C", "Sleeping Beauty", "Genome Reaper"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Monet"
+				"Jin Shengtan"
 			],
 			"Stig4": [
-				"Michelangelo", "Wilde", "Sirin: Ascendant", "Ekaterina"
+				"Schordinger Band", "Michelangelo", "Ekaterina", "Caravaggio"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -441,26 +441,26 @@
 		},
 		"pool": {
 			"ValkS+": [
-				"Vermillion Knight: Eclipse"
+				"Argent Knight: Artemis"
 			],
 			"ValkA+": [
-				"Flame Sakitama"
+				"Arctic Kriegsmesser"
 			],
 			"ValkA": [
-				"Valkyrie Gloria",
-				"Sündenjäger",
-				"Umbral Rose"
+				"Scarlet Fusion",
+				"Snowy Sniper",
+				"Valkyrie Pledge"
 			],
 			"FragS+": [
-				"Vermillion Knight: Eclipse"
+				"Argent Knight: Artemis"
 			],
 			"FragA+": [
-				"Flame Sakitama"
+				"Arctic Kriegsmesser"
 			],
 			"FragA": [
-				"Valkyrie Gloria",
-				"Sündenjäger",
-				"Umbral Rose"
+				"Scarlet Fusion",
+				"Snowy Sniper",
+				"Valkyrie Pledge"
 			],
 			"SklMats": [
 				"Advanced Skill Material"
@@ -482,7 +482,7 @@
 		}
 	},
 	"exeq": {
-		"available": true,
+		"available": false,
 		"name": "Expansion Equipment",
 		"rates": {
 			"Weap4+": 0.01831,
