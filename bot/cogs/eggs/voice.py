@@ -4,7 +4,7 @@ import discord
 import asyncio
 from sys import _getframe
 
-class EasterEggs(Cog):
+class Voice(Cog, name="Eggs"):
 	def __init__(self, client):
 		self.bot = client
 
@@ -34,4 +34,4 @@ class EasterEggs(Cog):
 
 
 def setup(client):
-	client.add_cog(EasterEggs(client))
+	client.add_cog(Voice(client))

@@ -4,7 +4,7 @@ from aiohttp import ClientSession as WebSession
 from discord import Embed
 from html import unescape
 
-class Commands(Cog):
+class Trans(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 		self.key = getenv("g_trans_key")
@@ -32,4 +32,4 @@ class Commands(Cog):
 		await ctx.send(embed=embed)
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Trans(client))

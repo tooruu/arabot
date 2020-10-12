@@ -7,7 +7,7 @@ from urllib.parse import quote_plus as safe, quote
 from io import BytesIO
 from re import match
 
-class Commands(Cog):
+class Sauce(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 
@@ -65,4 +65,4 @@ class Commands(Cog):
 						)
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Sauce(client))

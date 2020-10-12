@@ -3,7 +3,7 @@ from discord import Embed
 from .._utils import getenv, bold
 from urllib.parse import quote_plus as safe
 
-class Commands(Cog):
+class Google(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 		(self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key) = getenv("g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
@@ -104,4 +104,4 @@ class Commands(Cog):
 			await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>" if resp.status == 429 else '\n'.join(["https://youtu.be/" + hit["id"]["videoId"] for hit in resp["items"]]) if (resp:=await resp.json())["items"] else "No videos found")
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Google(client))

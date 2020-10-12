@@ -2,7 +2,7 @@ from random import choice, choices
 from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCooldown, MissingRequiredArgument, BadArgument
 from json import load
 
-class Commands(Cog):
+class Gacha(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 		self.gacha.cooldown_after_parsing = True
@@ -77,4 +77,4 @@ awk = (
 )
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Gacha(client))

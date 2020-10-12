@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog
 
-class EasterEggs(Cog):
+class Sample(Cog, name="Eggs"):
 	def __init__(self, client):
 		self.bot = client
 
@@ -9,4 +9,4 @@ class EasterEggs(Cog):
 		print("I'm a sample listener")
 
 def setup(client):
-	client.add_cog(EasterEggs(client))
+	client.add_cog(Sample(client))

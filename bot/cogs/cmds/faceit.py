@@ -3,7 +3,7 @@ from aiohttp import ClientSession as WebSession
 import discord
 from .._utils import getenv
 
-class Commands(Cog):
+class Faceit(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 		self.faceit_key = getenv("faceit_key")
@@ -39,4 +39,4 @@ class Commands(Cog):
 		await ctx.send(embed=embed)
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Faceit(client))

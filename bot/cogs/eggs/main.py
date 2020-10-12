@@ -3,27 +3,9 @@ from .._utils import isValid, BOT_NAME
 import asyncio
 from re import search, match
 
-class EasterEggs(Cog):
+class General(Cog, name="Eggs"):
 	def __init__(self, client):
 		self.bot = client
-
-	@Cog.listener("on_message")
-	async def za_warudo(self, msg):
-		if isValid(self.bot, msg, "za warudo") and self.bot.user:
-			old_perms = msg.channel.overwrites_for(msg.guild.default_role)
-			temp_perms = msg.channel.overwrites_for(msg.guild.default_role)
-			temp_perms.send_messages = False
-			await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
-			await msg.channel.send("<:KonoDioDa:676949860502732803>")
-			await msg.channel.send("***Toki yo tomare!***")
-			for i in "Ichi", "Ni", "San", "Yon", "Go": # Ichi Ni San Yon Go Roku Nana Hachi Kyu
-				await asyncio.sleep(2)
-				await msg.channel.send(content=f"*{i} byou keika*")
-			await asyncio.sleep(1)
-			await msg.channel.send("Toki wa ugoki dasu")
-			await asyncio.sleep(1)
-			await msg.channel.purge(limit=7)
-			await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
 
 	@Cog.listener("on_message")
 	async def gaygames(self, msg):
@@ -59,7 +41,7 @@ class EasterEggs(Cog):
 
 	@Cog.listener("on_message")
 	async def who_listener(self, msg):
-		if len(msg.content) < 20 and match(r"who\b", msg.content.lower()):
+		if len(msg.content) < 20 and match("who\\b", msg.content.lower()):
 			await msg.channel.send("ur mom")
 
 	@Cog.listener("on_message")
@@ -68,4 +50,4 @@ class EasterEggs(Cog):
 			await msg.channel.send(f"hi {regex.group(1)}\nim {BOT_NAME}")
 
 def setup(client):
-	client.add_cog(EasterEggs(client))
+	client.add_cog(General(client))

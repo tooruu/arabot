@@ -8,7 +8,7 @@ from matplotlib import use
 use("AGG") #pylint: disable=wrong-import-position
 from matplotlib import pyplot as plt
 
-class Commands(Cog):
+class Ping(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 		self.log = Queue(60)
@@ -50,4 +50,4 @@ class Commands(Cog):
 		self.store.cancel()
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Ping(client))

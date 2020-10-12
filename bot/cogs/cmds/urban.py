@@ -3,7 +3,7 @@ from urllib.parse import quote_plus as safe
 from .._utils import bold, dsafe
 from discord import Embed
 
-class Commands(Cog):
+class Urban(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 
@@ -33,4 +33,4 @@ class Commands(Cog):
 			await ctx.send(f"Definition for {bold(term)} not found")
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Urban(client))

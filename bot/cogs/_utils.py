@@ -11,12 +11,11 @@ from os.path import basename
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
-BOT_VERSION = "2.3.6"
+BOT_VERSION = "2.4.0"
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
-def isDev(ctx):
-	return ctx.author.id in (337343326095409152, 447138372121788417)
+isDev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417, 401490060156862466)
 
 def isValid(client, msg, invocator):
 	return not msg.content.startswith(

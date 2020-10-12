@@ -1,7 +1,7 @@
 from discord.ext.commands import Cog
 from re import search
 
-class EasterEggs(Cog):
+class Urban(Cog, name="Eggs"):
 	def __init__(self, client):
 		self.bot = client
 
@@ -12,4 +12,4 @@ class EasterEggs(Cog):
 				await self.bot.get_command("urban")(await self.bot.get_context(msg), term=regex.group(2))
 
 def setup(client):
-	client.add_cog(EasterEggs(client))
+	client.add_cog(Urban(client))

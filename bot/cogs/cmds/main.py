@@ -4,13 +4,9 @@ from .._utils import (FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPres
 import discord
 from io import BytesIO
 
-class Commands(Cog):
+class General(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
-
-	@command(aliases=["ver", "v"], brief="| Show currently running bot's version")
-	async def version(self, ctx):
-		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
 	@command(brief="<user> | Tell chat you love someone")
 	async def love(self, ctx, partner: FindMember):
@@ -23,13 +19,6 @@ class Commands(Cog):
 		print("Stopping!")
 		await self.bot.close()
 
-	@command(aliases=["cren"], hidden=True)
-	@has_permissions(manage_guild=True)
-	async def crename(self, ctx, chan: FindChl, *, name):
-		oldName = chan.name
-		await chan.edit(name=name)
-		await ctx.send(f"Renamed {bold(oldName)} to {bold(chan.name)}")
-
 	@command(hidden=True)
 	@check(isDev)
 	async def status(self, ctx, _type: int, *, name):
@@ -40,56 +29,6 @@ class Commands(Cog):
 	@command(name="177013")
 	async def _177013(self, ctx):
 		await setPresence(self.bot, 3, "177013 with yo mama")
-
-	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
-	@check(isDev)
-	async def cog(self, ctx):
-		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs))
-
-	@cog.command(aliases=["enable"])
-	@check(isDev)
-	async def load(self, ctx, *cogs):
-		loaded = []
-		for i in cogs:
-			try:
-				self.bot.load_extension(f"cogs.{i}")
-				loaded.append(bold(i))
-			except errors.ExtensionNotFound:
-				await ctx.send(bold(i) + " was not found")
-			except errors.ExtensionAlreadyLoaded:
-				await ctx.send(bold(i) + " is already loaded")
-			except (errors.ExtensionFailed, errors.NoEntryPointError):
-				await ctx.send(bold(i) + " is an invalid extension")
-		await ctx.send("Loaded " + (", ".join(loaded) or "nothing"))
-
-	@cog.command(aliases=["disable"])
-	@check(isDev)
-	async def unload(self, ctx, *cogs):
-		unloaded = []
-		for i in cogs:
-			try:
-				self.bot.unload_extension(f"cogs.{i}")
-				unloaded.append(bold(i))
-			except errors.ExtensionNotLoaded:
-				pass
-		await ctx.send("Unloaded " + (", ".join(unloaded) or "nothing"))
-
-	@cog.command()
-	@check(isDev)
-	async def reload(self, ctx, *cogs):
-		reloaded = []
-		for i in cogs:
-			try:
-				self.bot.reload_extension(f"cogs.{i}")
-				reloaded.append(bold(i))
-			except errors.ExtensionNotFound:
-				await ctx.send(bold(i) + " was not found")
-			except errors.ExtensionNotLoaded:
-				self.bot.load_extension(f"cogs.{i}")
-				reloaded.append(bold(i))
-			except (errors.ExtensionFailed, errors.NoEntryPointError):
-				await ctx.send(bold(i) + " is an invalid extension")
-		await ctx.send("Reloaded " + (", ".join(reloaded) or "nothing"))
 
 	@command(aliases=["purge", "prune", "d"], hidden=True)
 	@has_permissions(manage_messages=True)
@@ -189,4 +128,4 @@ class Commands(Cog):
 
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(General(client))

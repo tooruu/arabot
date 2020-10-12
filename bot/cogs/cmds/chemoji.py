@@ -3,7 +3,7 @@ from .._utils import FindEmoji
 import discord
 from re import match
 
-class Commands(Cog):
+class Chemoji(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 
@@ -41,4 +41,4 @@ class Commands(Cog):
 			await message.add_reaction("👎")
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Chemoji(client))

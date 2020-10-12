@@ -4,7 +4,7 @@ from urllib.parse import quote
 from discord import Embed
 from json import loads
 
-class Commands(Cog):
+class Wolfram(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 		self.wolfram_id = getenv("wolfram_id")
@@ -52,4 +52,4 @@ class Commands(Cog):
 			await ctx.send(embed=embed)
 
 def setup(client):
-	client.add_cog(Commands(client))
+	client.add_cog(Wolfram(client))
