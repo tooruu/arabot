@@ -1,5 +1,5 @@
-from discord.ext.commands import command, Cog, check, group
-from .._utils import isDev, bold
+from discord.ext.commands import command, Cog, check, group, errors
+from .._utils import isDev, bold, BOT_NAME, BOT_VERSION
 
 class General(Cog, name="Admin"):
 	def __init__(self, client):

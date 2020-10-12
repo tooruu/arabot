@@ -1,6 +1,6 @@
 from glob import glob
-from discord.ext.commands import (command, Cog, check, has_permissions, group, errors, MessageConverter, cooldown, BucketType, CommandOnCooldown)
-from .._utils import (FindMember, isDev, FindChl, BOT_NAME, BOT_VERSION, setPresence, FindEmoji, bold)
+from discord.ext.commands import (command, Cog, check, has_permissions, MessageConverter, cooldown, BucketType, CommandOnCooldown)
+from .._utils import FindMember, isDev, BOT_NAME, setPresence, FindEmoji
 import discord
 from io import BytesIO
 
