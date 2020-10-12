@@ -16,7 +16,7 @@ class JoJoReference(Cog, name="Eggs"):
 			temp_perms.send_messages = False
 			msgs = []
 			await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
-			msgs.append(await msg.channel.send("<:KonoDioDa:676949860502732803>"))
+			await msg.channel.send("<:KonoDioDa:676949860502732803>")
 			msgs.append(await msg.channel.send("***Toki yo tomare!***"))
 			for i in "Ichi", "Ni", "San", "Yon", "Go": # Ichi Ni San Yon Go Roku Nana Hachi Kyu
 				await sleep(2)
