@@ -2,6 +2,7 @@ from discord.ext.commands import command, Cog
 from discord import Embed
 from .._utils import getenv, bold
 from urllib.parse import quote_plus as safe
+from aiohttp.client_exceptions import ClientConnectorError
 
 class Google(Cog, name="Commands"):
 	def __init__(self, client):
@@ -10,30 +11,33 @@ class Google(Cog, name="Commands"):
 
 	@command(aliases=["i", "img"], brief="<query> | Top search result from Google Images")
 	async def image(self, ctx, *, query):
-		try:
-			async with self.bot.ses.get(
-				"https://www.googleapis.com/customsearch/v1",
-				params={
-					"key": self.g_isearch_key,
-					"cx": self.g_cse,
-					"q": safe(query),
-					"num": 3,
-					"searchType": "image"
-				}
-			) as resp:
-				if resp.status == 429:
-					await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
-				elif "items" in (resp := await resp.json()):
-					for i in resp["items"]:
-						async with self.bot.ses.get(i["link"]) as s:
-							if s.status == 200:
-								await ctx.send(i["link"])
-								return
-					await ctx.send("First 3 links are dead, and I don't want to eat up the quota by requesting more images, so try something else. :slight_smile:")
-				else:
-					await ctx.send("No images found")
-		except Exception:
-			await ctx.send("An error occured")
+		NUM = 3
+		async with self.bot.ses.get(
+			"https://www.googleapis.com/customsearch/v1",
+			params={
+				"key": self.g_isearch_key,
+				"cx": self.g_cse,
+				"q": safe(query),
+				"num": NUM,
+				"searchType": "image"
+			}
+		) as resp:
+			if resp.status == 429:
+				await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+			elif "items" in (resp := await resp.json()):
+				blacklist =("lookaside.fbsbx.com",)
+				for i in resp["items"]:
+					if i["link"].split('/')[2] not in blacklist:
+						try:
+							async with self.bot.ses.get(i["link"]) as s:
+								if s.status == 200:
+									await ctx.send(i["link"])
+									return
+						except ClientConnectorError:
+							pass
+				await ctx.send(f"First {NUM} links are dead, and I don't want to eat up the quota by requesting more images, so try something else. :slight_smile:")
+			else:
+				await ctx.send("No images found")
 
 	@command(aliases=["g"], brief="<query> | Top Google Search result")
 	async def google(self, ctx, *, query):
