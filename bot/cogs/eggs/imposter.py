@@ -10,8 +10,8 @@ class Imposter(Cog, name="Eggs"):
 	@Cog.listener("on_message")
 	async def imposter(self, msg):
 		if not self.running and not msg.author.bot and msg.author.voice and (chl :=
-			msg.author.voice.channel) and len(chl.members) > 2 and [m.bot
-			for m in chl.members].count(False) > 2 and (word := search("\\b(impost[eo]r)\\b", msg.content.lower())):
+			msg.author.voice.channel) and [not m.bot
+			for m in chl.members].count(True) > 2 and (word := search("\\b(impost[eo]r)\\b", msg.content.lower())):
 			# Initializing
 			self.running = True
 			TIMEOUT = 30
