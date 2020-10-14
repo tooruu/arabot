@@ -23,7 +23,7 @@ class Trans(Cog, name="Commands"):
 			"q": text
 		}) as trans:
 			if trans.status != 200:
-				await ctx.send("Invalid argument")
+				await ctx.send("An error occured")
 				return
 			trans = (await trans.json())["data"]["translations"][0]
 		embed = Embed()
