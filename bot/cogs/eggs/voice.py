@@ -14,9 +14,9 @@ class Voice(Cog, name="Eggs"):
 			if trigger is None else trigger) and (await self.bot.get_context(msg)).voice_client is None:
 			for channel in msg.guild.voice_channels:
 				if channel.members:
-					(channel := await channel.connect()).play(
-						await discord.FFmpegOpusAudio.from_probe(f"./bot/res/{vorbis}.ogg"),
-						after=lambda e: asyncio.run_coroutine_threadsafe(channel.disconnect(), self.bot.loop).result()
+					(vc := await channel.connect()).play(
+						await discord.FFmpegOpusAudio.from_probe(f"./bot/res/ogg/{vorbis}.ogg"),
+						after=lambda e: vc.loop.create_task(vc.disconnect())
 					)
 					break
 
@@ -29,9 +29,16 @@ class Voice(Cog, name="Eggs"):
 		await self.VoiceReaction(msg, "nekocharm")
 
 	@Cog.listener("on_message")
+	async def gnome(self, msg):
+		await self.VoiceReaction(msg, "gnome")
+
+	@Cog.listener("on_message")
 	async def teri(self, msg):
 		await self.VoiceReaction(msg, "teri")
 
+	def cog_unload(self):
+		for c in self.bot.voice_clients:
+			c.loop.create_task(c.disconnect())
 
 def setup(client):
 	client.add_cog(Voice(client))

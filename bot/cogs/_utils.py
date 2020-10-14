@@ -11,7 +11,7 @@ from os.path import basename
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
-BOT_VERSION = "2.4.4"
+BOT_VERSION = "2.4.5"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
@@ -152,7 +152,7 @@ def load_ext(client):
 	for path, _, files in walk("bot/cogs"):
 		if basename(path := path[4:])[0] != "_":
 			path = path.replace("/", ".").replace("\\", ".") + "."
-			for cog in sorted(files):
+			for cog in files:
 				if cog[0] != "_" and cog.endswith(".py"):
 					client.load_extension(path + cog[:-3])
 					print(f"Loaded {path}{cog[:-3]}")
