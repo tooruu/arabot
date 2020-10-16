@@ -344,19 +344,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Skadi Ondurgud"
+				"Path to Acheron"
 			],
 			"Weap4": [
-				"Tranquil Arias", "Ice Epiphyllum", "Briareus PRI", "Hrungnir", "Super-☆ Sonata", "Hekate's Gloom"
+				"Hyper Railguns", "ARC Serratus", "Dawn Breaker: Talwar", "Hand of Tyr", "Blood Dance", "Cinder Hawk"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Robert Peary"
+				"Allan Poe"
 			],
 			"Stig4": [
-				"Kallen - Hymn", "Zorro", "Ishikawa Goemon", "Beethoven"
+				"Sirin: Ascendant", "Jin Shengtan", "Zorro", "Gustav Klimt"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -441,26 +441,26 @@
 		},
 		"pool": {
 			"ValkS+": [
-				"Argent Knight: Artemis"
+				"Stygian Nymph"
 			],
 			"ValkA+": [
-				"Arctic Kriegsmesser"
+				"Stalker: Phantom Iron"
 			],
 			"ValkA": [
-				"Scarlet Fusion",
-				"Snowy Sniper",
-				"Valkyrie Pledge"
+				"Yamabuki Armor",
+				"Luna Kindred",
+				"Blueberry Blitz"
 			],
 			"FragS+": [
-				"Argent Knight: Artemis"
+				"Stygian Nymph"
 			],
 			"FragA+": [
-				"Arctic Kriegsmesser"
+				"Stalker: Phantom Iron"
 			],
 			"FragA": [
-				"Scarlet Fusion",
-				"Snowy Sniper",
-				"Valkyrie Pledge"
+				"Yamabuki Armor",
+				"Luna Kindred",
+				"Blueberry Blitz"
 			],
 			"SklMats": [
 				"Advanced Skill Material"
