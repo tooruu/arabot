@@ -338,9 +338,7 @@
 			"Stig4+": 0.0372,
 			"Stig4": 0.0372,
 			"Stig3": 0.3370,
-			"UpMats": 0.1707,
-			"EqExp": 0.17072,
-			"Coins": 0.08535
+			"Mats": 0.4268
 		},
 		"pool": {
 			"Weap4+": [
@@ -361,15 +359,11 @@
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
 			],
-			"UpMats": [
+			"Mats": [
 				"Phase Shifter",
-				"Microreactor"
-			],
-			"EqExp": [
+				"Microreactor",
 				"Soul Crystal",
-				"Twin Soul Crystal"
-			],
-			"Coins": [
+				"Twin Soul Crystal",
 				"HOMI Chest",
 				"HOMEI Chest",
 				"HOLI Chest"
@@ -386,9 +380,7 @@
 			"Stig4+": 0.0372,
 			"Stig4": 0.0372,
 			"Stig3": 0.3370,
-			"UpMats": 0.1707,
-			"EqExp": 0.17072,
-			"Coins": 0.08535
+			"Mats": 0.4268
 		},
 		"pool": {
 			"Weap4+": [
@@ -409,15 +401,11 @@
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
 			],
-			"UpMats": [
+			"Mats": [
 				"Phase Shifter",
-				"Microreactor"
-			],
-			"EqExp": [
+				"Microreactor",
 				"Soul Crystal",
-				"Twin Soul Crystal"
-			],
-			"Coins": [
+				"Twin Soul Crystal",
 				"HOMI Chest",
 				"HOMEI Chest",
 				"HOLI Chest"
