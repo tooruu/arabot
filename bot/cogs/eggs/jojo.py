@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog
 from asyncio import sleep
-from .._utils import isValid
+from .._utils import is_valid
 
 class JoJoReference(Cog, name="Eggs"):
 	def __init__(self, client):
@@ -9,7 +9,7 @@ class JoJoReference(Cog, name="Eggs"):
 
 	@Cog.listener("on_message")
 	async def za_warudo(self, msg):
-		if not self.running and isValid(self.bot, msg, "za warudo"):
+		if not self.running and is_valid(self.bot, msg, "za warudo"):
 			self.running = True
 			old_perms = msg.channel.overwrites_for(msg.guild.default_role)
 			temp_perms = msg.channel.overwrites_for(msg.guild.default_role)

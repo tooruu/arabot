@@ -1,5 +1,5 @@
 from discord.ext.commands import command, Cog, check, group, errors
-from .._utils import isDev, bold, BOT_NAME, BOT_VERSION
+from .._utils import is_dev, bold, BOT_NAME, BOT_VERSION
 
 class General(Cog, name="Admin"):
 	def __init__(self, client):
@@ -9,12 +9,12 @@ class General(Cog, name="Admin"):
 	async def version(self, ctx):
 		await ctx.send(f"{BOT_NAME} v{BOT_VERSION}")
 
-	@check(isDev)
+	@check(is_dev)
 	@group(aliases=["cogs"], invoke_without_command=True, hidden=True)
 	async def cog(self, ctx):
 		await ctx.send("Loaded cogs: " + ", ".join(bold(c) for c in self.bot.cogs))
 
-	@check(isDev)
+	@check(is_dev)
 	@cog.command(aliases=["enable"])
 	async def load(self, ctx, *cogs):
 		loaded = []
@@ -30,7 +30,7 @@ class General(Cog, name="Admin"):
 				await ctx.send(bold(i) + " is an invalid extension")
 		await ctx.send("Loaded " + (", ".join(loaded) or "nothing"))
 
-	@check(isDev)
+	@check(is_dev)
 	@cog.command(aliases=["disable"])
 	async def unload(self, ctx, *cogs):
 		unloaded = []
@@ -42,7 +42,7 @@ class General(Cog, name="Admin"):
 				pass
 		await ctx.send("Unloaded " + (", ".join(unloaded) or "nothing"))
 
-	@check(isDev)
+	@check(is_dev)
 	@cog.command()
 	async def reload(self, ctx, *cogs):
 		reloaded = []

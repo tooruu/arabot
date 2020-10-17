@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog
-from .._utils import isValid
+from .._utils import is_valid
 import discord
 import asyncio
 from sys import _getframe
@@ -8,8 +8,8 @@ class Voice(Cog, name="Eggs"):
 	def __init__(self, client):
 		self.bot = client
 
-	async def VoiceReaction(self, msg, vorbis, trigger=None):
-		if isValid(self.bot, msg,
+	async def voice_reaction(self, msg, vorbis, trigger=None):
+		if is_valid(self.bot, msg,
 			_getframe(1).f_code.co_name.replace("_", " ")
 			if trigger is None else trigger) and (await self.bot.get_context(msg)).voice_client is None:
 			for channel in msg.guild.voice_channels:
@@ -22,19 +22,23 @@ class Voice(Cog, name="Eggs"):
 
 	@Cog.listener("on_message")
 	async def lewd(self, msg):
-		await self.VoiceReaction(msg, "aroro")
+		await self.voice_reaction(msg, "aroro")
 
 	@Cog.listener("on_message")
 	async def tuna(self, msg):
-		await self.VoiceReaction(msg, "nekocharm")
+		await self.voice_reaction(msg, "nekocharm")
 
 	@Cog.listener("on_message")
 	async def gnome(self, msg):
-		await self.VoiceReaction(msg, "gnome")
+		await self.voice_reaction(msg, "gnome")
 
 	@Cog.listener("on_message")
 	async def teri(self, msg):
-		await self.VoiceReaction(msg, "teri")
+		await self.voice_reaction(msg, "teri")
+
+	@Cog.listener("on_message")
+	async def boo(self, msg):
+		await self.voice_reaction(msg, "bababooey")
 
 	def cog_unload(self):
 		for c in self.bot.voice_clients:

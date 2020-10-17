@@ -1,6 +1,6 @@
 from glob import glob
 from discord.ext.commands import (command, Cog, check, has_permissions, MessageConverter, cooldown, BucketType, CommandOnCooldown)
-from .._utils import FindMember, isDev, BOT_NAME, setPresence, FindEmoji
+from .._utils import FindMember, is_dev, BOT_NAME, set_presence, FindEmoji
 import discord
 from io import BytesIO
 
@@ -13,22 +13,22 @@ class General(Cog, name="Commands"):
 		await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
 
 	@command(aliases=["exit", "quit", "kill", "shine", "shineo", "die", "kys", "begone", "fuck"], hidden=True)
-	@check(isDev)
+	@check(is_dev)
 	async def stop(self, ctx):
 		await ctx.send("I'm dying, master :cold_face:")
 		print("Stopping!")
 		await self.bot.close()
 
 	@command(hidden=True)
-	@check(isDev)
+	@check(is_dev)
 	async def status(self, ctx, _type: int, *, name):
 		if _type not in (0, 1, 2, 3):
 			return
-		await setPresence(self.bot, _type, name)
+		await set_presence(self.bot, _type, name)
 
 	@command(name="177013")
 	async def _177013(self, ctx):
-		await setPresence(self.bot, 3, "177013 with yo mama")
+		await set_presence(self.bot, 3, "177013 with yo mama")
 
 	@command(aliases=["purge", "prune", "d"], hidden=True)
 	@has_permissions(manage_messages=True)

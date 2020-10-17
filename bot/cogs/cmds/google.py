@@ -50,7 +50,7 @@ class Google(Cog, name="Commands"):
 				"num": 1
 			}
 			) as resp:
-				await ctx.send("Sorry, I've hit today's 100 queries/day limit :MeiStare:" if resp.status == 429 else resp["items"][0]["link"] if (resp:=await resp.json())["items"] else "No results found")
+				await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>" if resp.status == 429 else resp["items"][0]["link"] if (resp:=await resp.json())["items"] else "No results found")
 
 	@command(aliases=["g3"], brief="<query> | Top 3 Google Search results")
 	async def google3(self, ctx, *, query):

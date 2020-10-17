@@ -7,25 +7,23 @@ from discord.utils import find
 from discord import Status, Activity
 from os import environ, walk
 from os.path import basename
+from re import search
 
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
-BOT_PREFIX = "-" if BOT_DEBUG else ";", "ara "
-BOT_VERSION = "2.4.5"
+BOT_PREFIX = ("-",) if BOT_DEBUG else (";", "ara ")
+BOT_VERSION = "2.5.0"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
 if BOT_DEBUG:
 	BOT_VERSION += " (DEBUG MODE)"
 
-isDev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417, 401490060156862466)
+is_dev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417, 401490060156862466)
 
-def isValid(client, msg, invocator):
-	return not msg.content.startswith(
-		client.command_prefix
-	) and msg.author != client.user and not msg.author.bot and invocator.lower() in msg.content.lower()
+is_valid = lambda client, msg, expr="": [msg.content.startswith(pfx) for pfx in client.command_prefix].count(True) == 0 and msg.author != client.user and not msg.author.bot and search(expr, msg.content.lower())
 
-async def setPresence(client, _type: int, name: str, _status: Status = None):
+async def set_presence(client, _type: int, name: str, _status: Status = None):
 	if isinstance(_status, Status):
 		await client.change_presence(status=_status, activity=Activity(name=name, type=_type))
 	else:

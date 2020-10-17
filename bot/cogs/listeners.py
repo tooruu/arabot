@@ -3,7 +3,7 @@ from discord.ext.commands import Cog
 from discord.ext.commands.errors import (
 	CommandOnCooldown, MissingPermissions, CheckFailure, BadArgument, MissingRequiredArgument, ExpectedClosingQuoteError
 )
-from ._utils import setPresence
+from ._utils import set_presence
 
 class Listeners(Cog):
 	def __init__(self, client):
@@ -11,7 +11,7 @@ class Listeners(Cog):
 
 	@Cog.listener()
 	async def on_ready(self):
-		await setPresence(self.bot, 3, "#lewd")
+		await set_presence(self.bot, 3, "#lewd")
 		print("Ready!")
 
 	@Cog.listener()
