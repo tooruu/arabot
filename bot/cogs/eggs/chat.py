@@ -16,5 +16,11 @@ class Chat(Cog, name="Eggs"):
 		if len(msg.content) < 30 and (regex := match(r"(?:i(?:['’]?m|\sam)\s)+(.+)", msg.content.lower())):
 			await msg.channel.send(f"hi {regex.group(1)}\nim {BOT_NAME}")
 
+	@Cog.listener("on_message")
+	async def im_hi_listener(self, msg):
+		if is_valid(self.bot, msg, "\\brac(?:e|ing)\\b"):
+			await msg.channel.send("***RACING TIME***")
+			await msg.channel.send("🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽")
+
 def setup(client):
 	client.add_cog(Chat(client))
