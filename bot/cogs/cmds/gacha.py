@@ -52,10 +52,12 @@ class Gacha(Cog, name="Commands"):
 				)
 			)
 			return
-		self.gacha.reset_cooldown(ctx)
 		if isinstance(error, BadArgument):
-			await ctx.send("Invalid amount") # assuming this exception can only happen with pull amount
-			return
+			if repr(error) == "BadArgument('Converting to \"int\" failed for parameter \"pulls\".')":
+				# im tired let me sleep
+				await ctx.send("Invalid amount")
+				return
+		self.gacha.reset_cooldown(ctx)
 		raise error
 
 awk = (
