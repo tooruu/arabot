@@ -23,7 +23,7 @@ class Chemoji(Cog, name="Commands"):
 					if resp.status != 200 or not resp.content_type.startswith("image/"):
 						await ctx.send(f"Link a valid image to replace {em_before} with")
 						return
-			elif match(r"<a?:\w{2,32}:\d{18,22}>$", em_after):
+			elif match(r"<a?:[a-zA-Z0-9_]{2,32}:[0-9]{18,22}>$", em_after):
 				if await FindEmoji().convert(ctx, em_after) in ctx.guild.emojis:
 					await ctx.send(f"We already have {em_after}")
 					return
