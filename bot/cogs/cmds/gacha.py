@@ -55,7 +55,8 @@ class Gacha(Cog, name="Commands"):
 		if isinstance(error, BadArgument):
 			if repr(error) == "BadArgument('Converting to \"int\" failed for parameter \"pulls\".')":
 				# im tired let me sleep
-				await ctx.send("Invalid amount")
+				await ctx.send(f"Cooldown expires in {self.gacha.get_cooldown_retry_after(ctx):.0f} seconds"
+				if self.gacha.is_on_cooldown(ctx) else "Invalid amount")
 				return
 		self.gacha.reset_cooldown(ctx)
 		raise error
