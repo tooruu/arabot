@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog
-from .._utils import is_valid
+from .._utils import is_valid, BOT_NAME
 from re import match
 
 class Chat(Cog, name="Eggs"):
