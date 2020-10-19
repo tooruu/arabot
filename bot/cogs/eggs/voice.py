@@ -10,7 +10,7 @@ class Voice(Cog, name="Eggs"):
 
 	async def voice_reaction(self, msg, vorbis, trigger=None):
 		if is_valid(self.bot, msg, trigger
-		if trigger else _getframe(1).f_code.co_name.replace("_", " ")
+		if trigger else "\\b{}\\b".format(_getframe(1).f_code.co_name.replace("_", " "))
 		) and (await self.bot.get_context(msg)).voice_client is None:
 			for channel in msg.guild.voice_channels:
 				if channel.members:
