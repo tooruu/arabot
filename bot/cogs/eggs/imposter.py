@@ -42,7 +42,7 @@ class Imposter(Cog, name="Eggs"):
 			if len(voted) > 1 and list(votes.values()).count(
 				votes[(imposter := max(votes, key=lambda m: votes[m]))]
 			) == 1 and imposter.voice and imposter.voice.channel == chl:
-				await msg.channel.send(f"{imposter.mention} was the {word}.")
+				await msg.channel.send(f"{imposter.mention} was ejected.")
 				await imposter.move_to(None, reason="The " + word)
 			else:
 				await msg.channel.send("No one was ejected.")
