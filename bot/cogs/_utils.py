@@ -12,7 +12,7 @@ from re import search
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = ("-",) if BOT_DEBUG else (";", "ara ")
-BOT_VERSION = "2.5.1"
+BOT_VERSION = "2.5.2"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
@@ -21,7 +21,7 @@ if BOT_DEBUG:
 
 is_dev = lambda ctx: ctx.author.id in (337343326095409152, 447138372121788417, 401490060156862466)
 
-is_valid = lambda client, msg, expr="": [msg.content.startswith(pfx) for pfx in client.command_prefix].count(True) == 0 and msg.author != client.user and not msg.author.bot and search(expr, msg.content.lower())
+is_valid = lambda client, msg, expr="": not any(msg.content.startswith(pfx) for pfx in ('>', *client.command_prefix)) and not msg.author.bot and search(expr, msg.content.lower())
 
 async def set_presence(client, _type: int, name: str, _status: Status = None):
 	await client.change_presence(status=_status if isinstance(_status, Status) else None, activity=Activity(name=name, type=_type))
