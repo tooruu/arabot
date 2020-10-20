@@ -1,8 +1,9 @@
 from glob import glob
-from discord.ext.commands import (command, Cog, check, has_permissions, MessageConverter, cooldown, BucketType, CommandOnCooldown)
-from .._utils import FindMember, is_dev, BOT_NAME, set_presence, FindEmoji
+from discord.ext.commands import (
+	command, Cog, check, has_permissions, MessageConverter, cooldown, BucketType, CommandOnCooldown
+)
+from .._utils import FindMember, is_dev, BOT_NAME, set_presence, FindEmoji, bold
 import discord
-from io import BytesIO
 
 class General(Cog, name="Commands"):
 	def __init__(self, client):
@@ -63,24 +64,36 @@ class General(Cog, name="Commands"):
 
 	@command(aliases=["emote", "e"], brief="<emoji...> | Show full-sized versions of emoji(s)")
 	async def emoji(self, ctx, *emojis: FindEmoji):
-		files = {str(emoji.url) if isinstance(emoji, (discord.Emoji, discord.PartialEmoji)) else emoji for emoji in emojis if emoji is not None}
+		files = {
+			str(emoji.url) if isinstance(emoji, (discord.Emoji, discord.PartialEmoji)) else emoji
+			for emoji in emojis if emoji is not None
+		}
 		#discord.File(BytesIO(await emoji.url.read()),
 		#str(emoji.url).split("/")[-1].partition("?")[0])
 		#files.append(discord.File(BytesIO(await img.read()), emoji.split("/")[-1]))
 		await ctx.send("\n".join(files) if files else "No emojis found")
 
 	@command(brief="<user> | DM user to summon them")
-	async def summon(self, ctx, target: FindMember):
+	async def summon(self, ctx, target: FindMember, *, msg=None):
 		if target:
 			invite = discord.Embed.Empty
-			for invite in await ctx.guild.invites():
-				if invite.max_uses == 0:
-					invite = invite.url
+			for i in await ctx.guild.invites():
+				if i.max_uses == 0:
+					invite = i.url
 					break
-			await target.send(
-				embed=discord.Embed(description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}").set_author(name=ctx.guild.name, url=invite, icon_url=str(ctx.guild.icon_url_as(static_format="png")) or discord.Embed.Empty)
+			embed = discord.Embed(
+				description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}" +
+				(f"\n\n{bold(msg)}\n[Jump to message]({ctx.message.jump_url})" if msg else "")
+			).set_author(
+				name=ctx.guild.name,
+				url=invite,
+				icon_url=str(ctx.guild.icon_url_as(static_format="png")) or discord.Embed.Empty
 			)
-			await ctx.send(f"Summoning {target.mention}")
+			try:
+				await target.send(embed=embed)
+				await ctx.send(f"Summoning {target.mention}")
+			except:
+				await ctx.send("An error occurred")
 		else:
 			await ctx.send("User not found")
 
@@ -125,7 +138,6 @@ class General(Cog, name="Commands"):
 			with open(g, encoding="utf8") as f:
 				count += len(f.readlines())
 		await ctx.send(f"{BOT_NAME} consists of **{count}** lines of code")
-
 
 def setup(client):
 	client.add_cog(General(client))

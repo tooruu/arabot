@@ -1,6 +1,6 @@
 from discord.ext.commands import command, Cog
 from urllib.parse import quote_plus as safe
-from .._utils import bold, dsafe
+from .._utils import bold, dsafe, BOT_NAME
 from discord import Embed
 
 class Urban(Cog, name="Commands"):
@@ -14,9 +14,9 @@ class Urban(Cog, name="Commands"):
 				embed=Embed(description="An awesome guy").set_author(name="tooru", url="https://discord.gg/YdEXsZN")
 			)
 			return
-		if "arabot" in term.lower():
+		if BOT_NAME.lower() in term.lower():
 			await ctx.send(
-				embed=Embed(description="An awesome bot written by an awesome guy").set_author(name="AraBot", url="https://discord.gg/YdEXsZN")
+				embed=Embed(description="An awesome bot written by an awesome guy").set_author(name=BOT_NAME, url="https://discord.gg/YdEXsZN")
 			)
 			return
 		async with self.bot.ses.get("https://api.urbandictionary.com/v0/define?term="+ safe(term)) as ud:
