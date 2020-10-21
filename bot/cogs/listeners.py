@@ -1,5 +1,4 @@
-from discord.ext import commands
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, CommandNotFound
 from discord.ext.commands.errors import (
 	CommandOnCooldown, MissingPermissions, CheckFailure, BadArgument, MissingRequiredArgument, ExpectedClosingQuoteError
 )
@@ -27,7 +26,7 @@ class Listeners(Cog):
 		if hasattr(ctx.command, "on_error") or isinstance(
 			error,
 			( # Ignore following errors
-			commands.CommandNotFound,
+			CommandNotFound,
 			CheckFailure,
 			BadArgument,
 			MissingRequiredArgument,

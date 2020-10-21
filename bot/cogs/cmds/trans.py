@@ -1,6 +1,5 @@
 from discord.ext.commands import command, Cog
 from .._utils import getenv, dsafe
-from aiohttp import ClientSession as WebSession
 from discord import Embed
 from html import unescape
 

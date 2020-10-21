@@ -1,7 +1,6 @@
 from discord.ext.commands import Cog
-from .._utils import is_valid, BOT_NAME
+from .._utils import is_valid
 import asyncio
-from re import search, match
 
 class General(Cog, name="Eggs"):
 	def __init__(self, client):
@@ -9,7 +8,7 @@ class General(Cog, name="Eggs"):
 
 	@Cog.listener("on_message")
 	async def gaygames(self, msg):
-		if is_valid(self.bot, msg) and msg.guild.id == 433298614564159488:
+		if msg.guild.id == 433298614564159488:
 			for gaygame in (
 				"кс",
 				"cs",
@@ -27,7 +26,7 @@ class General(Cog, name="Eggs"):
 				"дестини",
 				"дестени",
 			):
-				if search(f"\\b{gaygame}\\b", msg.content.lower()):
+				if is_valid(self.bot, msg, "\\b{gaygame}\\b"):
 					await msg.channel.send(f"{gaygame}? Ебать ты гей 🤡, иди в мут нахуй")
 					old_perms = msg.channel.overwrites_for(msg.author)
 					temp_perms = msg.channel.overwrites_for(msg.author)
@@ -35,7 +34,7 @@ class General(Cog, name="Eggs"):
 					await msg.channel.set_permissions(msg.author, overwrite=temp_perms)
 					await asyncio.sleep(20)
 					await msg.channel.set_permissions(msg.author, overwrite=old_perms)
-					break
+					return
 
 def setup(client):
 	client.add_cog(General(client))

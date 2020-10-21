@@ -1,7 +1,7 @@
 from discord.ext.commands import command, Cog
 from .._utils import dsafe
 import discord
-from aiohttp import ClientSession as WebSession, ContentTypeError
+from aiohttp import ContentTypeError
 from jikanpy import AioJikan
 from urllib.parse import quote_plus as safe, quote
 from io import BytesIO
