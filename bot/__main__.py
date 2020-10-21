@@ -24,6 +24,10 @@ class TheBot(Bot):
 		await super().close()
 
 if __name__ == "__main__":
-	bot = TheBot(command_prefix=BOT_PREFIX, case_insensitive=True, intents=get_intents())
+	bot = TheBot(
+		command_prefix=BOT_PREFIX,
+		case_insensitive=True,
+		intents=get_intents()
+	)
 	load_ext(bot)
 	bot.run(getenv("token"))
