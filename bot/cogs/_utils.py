@@ -12,7 +12,7 @@ from re import search
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = ("-", ) if BOT_DEBUG else (";", "ara ")
-BOT_VERSION = "2.6.2"
+BOT_VERSION = "2.6.3"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes

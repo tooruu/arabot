@@ -44,6 +44,10 @@ class Voice(Cog, name="Eggs"):
 	async def paimon(self, msg):
 		await self.voice_reaction(msg, "ehe")
 
+	@Cog.listener("on_message")
+	async def jugemu(self, msg):
+		await self.voice_reaction(msg, "jugemu")
+
 	def cog_unload(self):
 		for c in self.bot.voice_clients:
 			c.loop.create_task(c.disconnect())
