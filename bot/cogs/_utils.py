@@ -64,8 +64,11 @@ class Finder(Converter):
 class FindMember(Finder, MemberConverter):
 	@staticmethod
 	async def find(ctx, argument):
-		return find(
-			lambda member: not member.bot and member.display_name.lower().startswith(argument.lower()), ctx.guild.members
+		result = find(
+			lambda member: not member.bot and argument.lower() in member.display_name.lower(), ctx.guild.members
+		)
+		return result or find(
+			lambda member: not member.bot and argument.lower() in member.name.lower(), ctx.guild.members
 		)
 
 class FindEmoji(Finder, EmojiConverter, PartialEmojiConverter):
@@ -168,7 +171,8 @@ class text_reaction:
 
 		@Cog.listener("on_message")
 		async def event(itself, msg):
-			if (datetime.now() - self._last_call).seconds > self._cd and is_valid(itself.bot, msg, self.expr) and (self.check is None or self.check(msg)):
+			if (datetime.now() - self._last_call).seconds > self._cd and is_valid(itself.bot, msg,
+				self.expr) and (self.check is None or self.check(msg)):
 				if self.send:
 					resp = func(msg)
 					if isinstance(resp, (list, tuple)):
