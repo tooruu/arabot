@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, time
 from discord.ext.commands import Cog, group, has_permissions
 from discord.ext.tasks import loop
 from ._utils import FindChl
-now = datetime.now
 
 class Timer:
 	def __init__(self, channel, schedule):
@@ -11,7 +10,7 @@ class Timer:
 		self.channel = channel
 
 	def get_next_phase(self): # TODO: TZ-aware timestamps
-		cur_time = now()
+		cur_time = datetime.now()
 		cur_wkday = cur_time.isoweekday()
 		today = cur_time.date()
 		wkdays = list(self.sch.keys())
@@ -28,7 +27,7 @@ class Timer:
 		return datetime.combine(firstWkday_date, times[0][0][0])
 
 	def till_next_phase(self):
-		totalSeconds = (self.get_next_phase() - now()).total_seconds()
+		totalSeconds = (self.get_next_phase() - datetime.now()).total_seconds()
 		hours = int(totalSeconds / 3600)
 		minutes = int(totalSeconds % 3600 / 60)
 		return hours, minutes
