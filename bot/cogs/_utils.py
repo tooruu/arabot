@@ -1,6 +1,6 @@
 from discord.ext.commands import (
 	Converter, MemberConverter, EmojiConverter, PartialEmojiConverter, TextChannelConverter, VoiceChannelConverter,
-	RoleConverter
+	RoleConverter, Cog
 )
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
@@ -8,11 +8,12 @@ from discord import Status, Activity
 from os import environ, walk
 from os.path import basename
 from re import search
+from datetime import datetime
 
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = ("-", ) if BOT_DEBUG else (";", "ara ")
-BOT_VERSION = "2.6.3"
+BOT_VERSION = "2.7.0"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
@@ -153,3 +154,31 @@ def load_ext(client):
 				if cog[0] != "_" and cog.endswith(".py"):
 					client.load_extension(path + cog[:-3])
 					print(f"Loaded {path}{cog[:-3]}")
+
+class text_reaction:
+	def __init__(self, *, cd=0, regex=None, check=None, send=True):
+		self.expr = regex
+		self.check = check
+		self.send = send
+		self._cd = cd if cd > 0 else -1
+		self._last_call = datetime(1970, 1, 1)
+
+	def __call__(self, func):
+		self.expr = self.expr or "\\b{}\\b".format(func.__name__.replace('_', '\\s'))
+
+		@Cog.listener("on_message")
+		async def event(itself, msg):
+			if (datetime.now() - self._last_call).seconds > self._cd and is_valid(itself.bot, msg, self.expr) and (self.check is None or self.check(msg)):
+				if self.send:
+					resp = func(msg)
+					if isinstance(resp, (list, tuple)):
+						for i in resp:
+							await msg.channel.send(i)
+					else:
+						await msg.channel.send(str(resp))
+				else:
+					await func(itself, msg)
+				self._last_call = datetime.now()
+
+		event.__name__ = func.__name__
+		return event
