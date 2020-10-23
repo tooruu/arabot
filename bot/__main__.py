@@ -3,12 +3,13 @@ from discord import Intents
 from cogs._utils import getenv, BOT_PREFIX, load_ext
 from aiohttp import ClientSession as WebSession
 
-get_intents = lambda: Intents(
+intents = Intents(
 	guilds=True,
 	members=True,
 	emojis=True,
 	voice_states=True,
-	guild_messages=True
+	guild_messages=True,
+	guild_reactions=True,
 )
 
 async def sessionify(client):
@@ -27,7 +28,7 @@ if __name__ == "__main__":
 	bot = TheBot(
 		command_prefix=BOT_PREFIX,
 		case_insensitive=True,
-		intents=get_intents()
+		intents=intents
 	)
 	load_ext(bot)
 	bot.run(getenv("token"))
