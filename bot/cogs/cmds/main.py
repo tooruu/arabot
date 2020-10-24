@@ -44,11 +44,10 @@ class General(Cog, name="Commands"):
 		if target is None:
 			await ctx.send("User not found")
 		else:
-			if target is False:
-				target = ctx.author
+			target = target or ctx.author
 			await ctx.send(
 				embed=discord.Embed().set_image(url=str(target.avatar_url_as(static_format="png"))
-															).set_footer(text=(target.display_name) + "'s avatar")
+															).set_footer(text=target.display_name + "'s avatar")
 			)
 
 	@command(aliases=["r"], brief="<emoji> | Show your big reaction to everyone")

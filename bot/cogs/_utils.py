@@ -13,7 +13,7 @@ from datetime import datetime
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = ("-", ) if BOT_DEBUG else (";", "ara ")
-BOT_VERSION = "2.8.1"
+BOT_VERSION = "2.8.2"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
@@ -65,10 +65,10 @@ class FindMember(Finder, MemberConverter):
 	@staticmethod
 	async def find(ctx, argument):
 		result = find(
-			lambda member: not member.bot and argument.lower() in member.display_name.lower(), ctx.guild.members
+			lambda member: argument.lower() in member.display_name.lower(), ctx.guild.members
 		)
 		return result or find(
-			lambda member: not member.bot and argument.lower() in member.name.lower(), ctx.guild.members
+			lambda member: argument.lower() in member.name.lower(), ctx.guild.members
 		)
 
 class FindEmoji(Finder, EmojiConverter, PartialEmojiConverter):
