@@ -138,5 +138,26 @@ class General(Cog, name="Commands"):
 				count += len(f.readlines())
 		await ctx.send(f"{BOT_NAME} consists of **{count}** lines of code")
 
+	@cooldown(1, 10, BucketType.channel)
+	@command(brief="Who cares?", hidden=True)
+	async def wc(self, ctx, msg: MessageConverter = None):
+		await ctx.message.delete()
+		if msg:
+			for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", "<:TooruWeary:685461000891531282>":
+				await msg.add_reaction(i)
+			return
+		async for msg in ctx.history(limit=3):
+			if not msg.author.bot:
+				for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", "<:TooruWeary:685461000891531282>":
+					await msg.add_reaction(i)
+				break
+
+	@wc.error
+	async def wc_ratelimit(self, ctx, error):
+		if isinstance(error, CommandOnCooldown):
+			await ctx.message.delete()
+			return
+		raise error
+
 def setup(client):
 	client.add_cog(General(client))
