@@ -78,13 +78,13 @@ class Trello(Cog, name="Commands"):
 			for r in ('☑️', '➡️', '❌'):
 				await wiz.remove_reaction(r, self.bot.user)
 			await edit("Unreact when you're done uploading all files")
-			try: # Add files support
+			try: # TODO: Add files support
 				await self.bot.wait_for("reaction_remove", timeout=60, check=lambda r, u: u == ctx.author and r.message == wiz and r.emoji == '☑️')
 			except TimeoutError:
+				await wiz.clear_reactions()
 				await edit("Command timed out")
 				return
-			finally:
-				await wiz.clear_reactions()
+		await wiz.clear_reactions()
 
 		async with self.bot.ses as session:
 			async with session.post(self.CARDS_URL, params=params) as resp:
