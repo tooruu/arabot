@@ -1,12 +1,14 @@
 from argparse import ArgumentParser
 from json import dump, load
+from math import isclose
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 TABLE_ITEMS = "items"
 TABLE_POOLS = "pools"
+DROP_RATE_TOLERANCE = 1e-5
 
 class GachaEditor:
-	def __init__(self: GachaEditor):
+	def __init__(self):
 		with open(DATABASE_FILE_PATH) as database:
 			self._database = load(database)
 			self._operations = {
@@ -24,31 +26,57 @@ class GachaEditor:
 				"removepoolitem": self.__removepoolitem
 			}
 
-	def __save_database(self: GachaEditor):
+	def __save_database(self):
 		with open(DATABASE_FILE_PATH, "w+") as database:
 			dump(self._database, database)
 		print("The database has been saved successfully.")
 
-	def __get_or_initialize_table(self: GachaEditor, table_name: str) -> dict:
+	def __get_or_initialize_value(self, dictionary: dict, key: str, default_value: object) -> object:
+		value = dictionary.get(key)
+		if value is not None:
+			return value
+		dictionary[key] = value = default_value
+		return value
+
+	# TODO Refactor to use __get_or_initialize_value, or remove entirely.
+	def __get_or_initialize_table(self, table_name: str) -> dict:
 		table = self._database.get(table_name)
 		if table is not None:
 			return table
 		table = self._database[table_name] = {}
 		return table
 
-	def __find_ids_by_field(self: GachaEditor, table_name: str, field_name: str, field_value: str):
+	def __find_ids_by_field(self, table_name: str, field_name: str, field_value: str):
 		for key, item in self.__get_or_initialize_table(table_name).items():
 			if item.get(field_name, "") == field_value:
 				yield key
 
+	def __get_pool_total_rate(self, pool_code: str) -> float:
+		table = self.__get_or_initialize_table(TABLE_POOLS)
+		pool = table.get(pool_code)
+		if pool is None:
+			return 0.0
+		loot_table = pool.get("loot_table", [])
+		if len(loot_table) == 0:
+			return 0.0
+		total_rate = 0.0
+		for _, descriptor in enumerate(loot_table):
+			total_rate += descriptor.get("rate", 0.0) * len(descriptor.get("items", []))
+		return total_rate
+
+	def __validate_pool_total_rate(self, pool_code: str):
+		total_rate = self.__get_pool_total_rate(pool_code)
+		if not isclose(total_rate, 0.0, rel_tol=DROP_RATE_TOLERANCE) and not isclose(total_rate, 1.0, rel_tol=DROP_RATE_TOLERANCE):
+			print(f"Warning! Pool '{pool_code}' has a total drop rate of {total_rate}.")
+
 	# TODO Make the argument parser more obvious, because specifying the "names" argument here makes no sense.
 	# python .\bot\tools\database_editor.py listtables all
-	def __list_tables(self: GachaEditor, options):
+	def __list_tables(self, options):
 		for table_id in self._database.keys():
 			print(table_id)
 
 	# database_editor.py --type 2 --rank 3 additem "name 1" "name 2"
-	def __additem(self: GachaEditor, options):
+	def __additem(self, options):
 		if not options.type:
 			raise ValueError("The item type must be specified.")
 		if not options.rank:
@@ -66,7 +94,7 @@ class GachaEditor:
 		self.__save_database()
 
 	# database_editor.py --field name finditem "name 1" "name 2"
-	def __finditem(self: GachaEditor, options):
+	def __finditem(self, options):
 		if not options.field:
 			raise ValueError("The field name must be specified.")
 		table = self.__get_or_initialize_table(TABLE_ITEMS)
@@ -76,7 +104,7 @@ class GachaEditor:
 
 	# database_editor.py deleteitem "id 1" "id 2"
 	# database_editor.py --field name deleteitem "name 1" "name 2"
-	def __deleteitem(self: GachaEditor, options):
+	def __deleteitem(self, options):
 		table = self.__get_or_initialize_table(TABLE_ITEMS)
 		has_changed = False
 		for _, name in enumerate(options.names):
@@ -95,7 +123,7 @@ class GachaEditor:
 
 	# database_editor.py addpool <code> <name>
 	# database_editor.py addpool ex "Expansion Battlesuit"
-	def __addpool(self: GachaEditor, options):
+	def __addpool(self, options):
 		if len(options.names) < 2:
 			raise ValueError("The code and the name must be specified. Eg. gacha_editor.py addpool ex \"Expansion Battlesuit\"")
 		table = self.__get_or_initialize_table(TABLE_POOLS)
@@ -110,12 +138,12 @@ class GachaEditor:
 
 	# database_editor.py removepool <code> <code> <code>
 	# database_editor.py removepool ex foca focb
-	def __removepool(self: GachaEditor, options):
+	def __removepool(self, options):
 		table = self.__get_or_initialize_table(TABLE_POOLS)
 		has_changed = False
 		for _, name in enumerate(options.names):
 			if table.get(name) is None:
-				print(f"The pool '{name}' does not exist.")
+				print(f"The pool '{name}' doesn't exist.")
 				continue
 			table.pop(name)
 			has_changed = True
@@ -123,16 +151,56 @@ class GachaEditor:
 		if has_changed:
 			self.__save_database()
 
-	# database_editor.py addpoolitem --pool <code> --rate <drop rate> names [names]
-	# database_editor.py addpoolitem -pool ex --rate 0.015 "ARC Serratus" "Blaze Destroyer"
-	def __addpoolitem(self: GachaEditor, options):
+	# database_editor.py -pool <code> --rate <drop rate> addpoolitem names [names]
+	# database_editor.py --pool ex --rate 0.015 addpoolitem "ARC Serratus" "Blaze Destroyer"
+	def __addpoolitem(self, options):
+		rate = float(options.rate)
+		if rate < 0.0 or rate > 1.0:
+			raise ValueError("The drop rate must be between 0.0, inclusive and 1.0, inclusive.")
 		table = self.__get_or_initialize_table(TABLE_POOLS)
+		pool = table.get(options.pool)
+		if pool is None:
+			raise ValueError("The specified pool doesn't exist.")
+		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
+		matching_descriptor = None
+		for descriptor in loot_table:
+			# Since it's impossible to precisely compare two floating-point numbers,
+			# we use a relative tolerance to check for equality.
+			if not isclose(descriptor.get("rate", 0.0), rate, rel_tol=DROP_RATE_TOLERANCE):
+				continue
+			matching_descriptor = descriptor
+			break
+		has_changed = False
+		if matching_descriptor is None:
+			matching_descriptor = {
+				"rate": rate,
+				"items": []
+			}
+			loot_table.append(matching_descriptor)
+			has_changed = True
+		item_list = matching_descriptor.get("items")
+		if item_list is None:
+			matching_descriptor["items"] = item_list = []
+		for _, name in enumerate(options.names):
+			item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", name), -1)
+			if item_id == -1:
+				print(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
+				continue
+			if item_id in item_list:
+				print(f"Item '{name}' is already added to the pool, hence it won't be added again.")
+				continue
+			item_list.append(item_id)
+			has_changed = True
+			print(f"Added item '{name}' to the pool.")
+		print(f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}.")
+		self.__validate_pool_total_rate(options.pool)
+		if has_changed and len(item_list) > 0:
+			self.__save_database()
+
+	def __removepoolitem(self, options):
 		print("Not implemented yet.")
 
-	def __removepoolitem(self: GachaEditor, options):
-		print("Not implemented yet.")
-
-	def execute(self: GachaEditor, options):
+	def execute(self, options):
 		operation = self._operations.get(options.operation)
 		if operation is not None:
 			operation(options)
