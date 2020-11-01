@@ -187,16 +187,26 @@ class GachaEditor:
 				print(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
 				continue
 			if item_id in item_list:
-				print(f"Item '{name}' is already added to the pool, hence it won't be added again.")
+				print(f"Item '{name}' is already added to the pool with the same rate, hence it won't be added again.")
 				continue
+			for descriptor_index, descriptor in enumerate(loot_table):
+				other_item_list = descriptor.get("items", [])
+				if item_id in other_item_list:
+					other_item_list.remove(item_id)
+					print(f"Item '{name}' has been removed with drop rate {descriptor.get('rate', 0.0)}.")
+					if len(other_item_list) == 0:
+						loot_table.pop(descriptor_index)
+					break
 			item_list.append(item_id)
 			has_changed = True
-			print(f"Added item '{name}' to the pool.")
+			print(f"Added item '{name}' to the pool with drop rate {rate}.")
 		print(f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}.")
 		self.__validate_pool_total_rate(options.pool)
 		if has_changed and len(item_list) > 0:
 			self.__save_database()
 
+	# database_editor.py --pool <code> removepoolitem names [names]
+	# database_editor.py --pool ex removepoolitem "ARC Serratus" "Blaze Destroyer"
 	def __removepoolitem(self, options):
 		print("Not implemented yet.")
 
