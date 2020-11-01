@@ -2,6 +2,7 @@
 	"python.linting.pylintArgs": [
 		"--disable=missing-docstring,mixed-indentation,bad-continuation,invalid-name,inconsistent-return-statements,missing-final-newline,line-too-long,wrong-import-order,cell-var-from-loop,wildcard-import,unused-wildcard-import,no-member",
 		"--max-line-length=120",
-		"--ignored-argument-names=ctx"
+		"--ignored-argument-names=ctx",
+		"--indent-string=\"\t\""
 	]
 }
