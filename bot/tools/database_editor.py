@@ -38,21 +38,13 @@ class GachaEditor:
 		dictionary[key] = value = default_value
 		return value
 
-	# TODO Refactor to use __get_or_initialize_value, or remove entirely.
-	def __get_or_initialize_table(self, table_name: str) -> dict:
-		table = self._database.get(table_name)
-		if table is not None:
-			return table
-		table = self._database[table_name] = {}
-		return table
-
 	def __find_ids_by_field(self, table_name: str, field_name: str, field_value: str):
-		for key, item in self.__get_or_initialize_table(table_name).items():
+		for key, item in self.__get_or_initialize_value(self._database, table_name, {}).items():
 			if item.get(field_name, "") == field_value:
 				yield key
 
 	def __get_pool_total_rate(self, pool_code: str) -> float:
-		table = self.__get_or_initialize_table(TABLE_POOLS)
+		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		pool = table.get(pool_code)
 		if pool is None:
 			return 0.0
@@ -81,7 +73,7 @@ class GachaEditor:
 			raise ValueError("The item type must be specified.")
 		if not options.rank:
 			raise ValueError("The item rank must be specified.")
-		table = self.__get_or_initialize_table(TABLE_ITEMS)
+		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
 		next_key = max((int(key) for key in table.keys()), default=0) + 1
 		for item_index, item_name in enumerate(options.names):
 			item_id = str(next_key + item_index)
@@ -97,7 +89,7 @@ class GachaEditor:
 	def __finditem(self, options):
 		if not options.field:
 			raise ValueError("The field name must be specified.")
-		table = self.__get_or_initialize_table(TABLE_ITEMS)
+		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
 		for name in options.names:
 			for item_id in self.__find_ids_by_field(TABLE_ITEMS, options.field, name):
 				print(f"ID: {item_id}\nData: {table[item_id]}")
@@ -105,7 +97,7 @@ class GachaEditor:
 	# database_editor.py deleteitem "id 1" "id 2"
 	# database_editor.py --field name deleteitem "name 1" "name 2"
 	def __deleteitem(self, options):
-		table = self.__get_or_initialize_table(TABLE_ITEMS)
+		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
 		has_changed = False
 		for _, name in enumerate(options.names):
 			if not options.field and table.pop(name, None):
@@ -126,7 +118,7 @@ class GachaEditor:
 	def __addpool(self, options):
 		if len(options.names) < 2:
 			raise ValueError("The code and the name must be specified. Eg. gacha_editor.py addpool ex \"Expansion Battlesuit\"")
-		table = self.__get_or_initialize_table(TABLE_POOLS)
+		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		if table.get(options.names[0]) is not None:
 			raise ValueError("The specified pool already exists.")
 		table[options.names[0]] = {
@@ -139,7 +131,7 @@ class GachaEditor:
 	# database_editor.py removepool <code> <code> <code>
 	# database_editor.py removepool ex foca focb
 	def __removepool(self, options):
-		table = self.__get_or_initialize_table(TABLE_POOLS)
+		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		has_changed = False
 		for _, name in enumerate(options.names):
 			if table.get(name) is None:
@@ -157,7 +149,7 @@ class GachaEditor:
 		rate = float(options.rate)
 		if rate < 0.0 or rate > 1.0:
 			raise ValueError("The drop rate must be between 0.0, inclusive and 1.0, inclusive.")
-		table = self.__get_or_initialize_table(TABLE_POOLS)
+		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		pool = table.get(options.pool)
 		if pool is None:
 			raise ValueError("The specified pool doesn't exist.")
