@@ -1,10 +1,10 @@
 from discord.ext.commands import (
 	Converter, MemberConverter, EmojiConverter, PartialEmojiConverter, TextChannelConverter, VoiceChannelConverter,
-	RoleConverter, Cog
+	RoleConverter, Cog, MinimalHelpCommand
 )
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
-from discord import Status, Activity
+from discord import Status, Activity, Embed
 from os import environ, walk
 from os.path import basename
 from re import search
@@ -198,3 +198,18 @@ class Blacklist(Converter):
 		if arg in self.BLACKLIST:
 			raise BlacklistMatch(arg)
 		return arg
+
+class Help(MinimalHelpCommand):
+	#def get_command_signature(self, command):
+	#	return "{0.clean_prefix}{1.qualified_name} {1.signature}".format(self, command)
+
+	async def send_bot_help(self, mapping):
+		help = Embed()
+		help.set_author(name=BOT_NAME, icon_url=str(self.context.bot.user.avatar_url_as(static_format="png")))
+		for cog in mapping:
+			if cog and mapping[cog]:
+				help.add_field(
+					name=bold(cog.qualified_name),
+					value='\n'.join(f"`{cmd.name}`" for cmd in mapping[cog])
+				)
+		await self.get_destination().send(embed=help)

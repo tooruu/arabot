@@ -1,6 +1,6 @@
 from discord.ext.commands import Bot
 from discord import Intents
-from cogs._utils import getenv, BOT_PREFIX, load_ext
+from cogs._utils import getenv, BOT_PREFIX, load_ext, Help
 from aiohttp import ClientSession as WebSession
 
 intents = Intents(
@@ -28,7 +28,8 @@ if __name__ == "__main__":
 	bot = TheBot(
 		command_prefix=BOT_PREFIX,
 		case_insensitive=True,
-		intents=intents
+		intents=intents,
+		#help_command=Help(),
 	)
 	load_ext(bot)
 	bot.run(getenv("token"))
