@@ -25,14 +25,14 @@ class Imposter(Cog, name="Eggs"):
 			check = lambda vote: vote.author not in voted and vote.mentions and search("^<@!?\d{15,21}>$", vote.
 				content) and vote.channel == msg.channel and vote.author.voice and vote.author.voice.channel == chl and (
 				target := vote.mentions[0]
-				).voice and target.voice.channel == chl and target != vote.author and not target.bot
+				).voice and target.voice.channel == chl and not target.bot
 
 			async def ensure():
 				while True:
 					vote = await self.bot.wait_for("message", check=check)
 					await vote.delete()
 					voted.append(vote.author)
-					votes[vote.mentions[0]] = votes.get(vote.mentions[0], 0) + 1
+					votes[vote.author if vote.mentions[0].voice.self_stream else vote.mentions[0]] = votes.get(vote.mentions[0], 0) + 1
 
 			try:
 				await wait_for(ensure(), timeout=TIMEOUT)
