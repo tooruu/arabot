@@ -342,19 +342,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Path to Acheron"
+				"Key of Castigation"
 			],
 			"Weap4": [
-				"Hyper Railguns", "ARC Serratus", "Dawn Breaker: Talwar", "Hand of Tyr", "Blood Dance", "Cinder Hawk"
+				"ARC Serratus", "MagStorm", "Sleeping Beauty", "Hekate's Gloom", "Skoll and Hati", "Aphrodite"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Allan Poe"
+				"Benares: Awakening"
 			],
 			"Stig4": [
-				"Sirin: Ascendant", "Jin Shengtan", "Zorro", "Gustav Klimt"
+				"Beethoven", "Dirac", "Nobel", "Ishikawa Goemon"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -384,19 +384,19 @@
 		},
 		"pool": {
 			"Weap4+": [
-				"Ice Epiphyllum"
+				"Nue of the Shadow"
 			],
 			"Weap4": [
-				"Mjolnir", "Thunder Kikaku", "Dawn Breaker: Talwar", "Star Destroyer 19C", "Sleeping Beauty", "Genome Reaper"
+				"Keys of the Void", "Key of Castigation", "Star Destroyer 19C", "Oath of Judah", "Skadi Ondurgud", "Undine's Tale"
 			],
 			"Weap3": [
 				"Water Spirit Type-I", "Water Spirit Type-II", "Fire Spirit Type-I", "Fire Spirit Type-II", "Lightning Soul", "Hell Thunder", "Pulse Katana Type-17", "Pulse Katana Type-19", "Vanguard", "Ion Resonance", "Nitro Crystal", "King Cobra", "Lightning Angel", "The Dark Crusher", "Fire Angel", "CAS-X Saints", "White Star Banishers", "Obisidian Reaper", "Plasma Lance"
 			],
 			"Stig4+": [
-				"Jin Shengtan"
+				"Kafka"
 			],
 			"Stig4": [
-				"Schrodinger Band", "Michelangelo", "Ekaterina", "Caravaggio"
+				"Benares: Awakening", "Robert Peary", "Dirac", "Sirin: Ascendant"
 			],
 			"Stig3": [
 				"Wang Zhaojun", "Attila", "Sakamoto Ryouma", "Ogier", "Charlemagne", "Nikola Tesla", "Elizabeth Bathory", "Rinaldo", "Shigure Kira", "Galileo", "Ryunosuke Akutagawa", "Roald Amundsen"
@@ -429,26 +429,26 @@
 		},
 		"pool": {
 			"ValkS+": [
-				"Stygian Nymph"
+				"Herrscher of Thunder"
 			],
 			"ValkA+": [
-				"Phantom Iron"
+				"Swallowtail Phantasm"
 			],
 			"ValkA": [
-				"Yamabuki Armor",
 				"Luna Kindred",
-				"Blueberry Blitz"
+				"Phantom Iron",
+				"Yamabuki Armor"
 			],
 			"FragS+": [
-				"Stygian Nymph"
+				"Herrscher of Thunder"
 			],
 			"FragA+": [
-				"Phantom Iron"
+				"Swallowtail Phantasm"
 			],
 			"FragA": [
-				"Yamabuki Armor",
 				"Luna Kindred",
-				"Blueberry Blitz"
+				"Phantom Iron",
+				"Yamabuki Armor"
 			],
 			"SklMats": [
 				"Advanced Skill Material"
