@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, command
 from .._utils import BOT_NAME, text_reaction
 from re import match
 
@@ -18,6 +18,11 @@ class Chat(Cog, name="Eggs"):
 	@text_reaction(regex="\\brac(?:e|ing)\\b", cd=15)
 	def racing(msg):
 		return "***RACING TIME***", "🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽"
+
+	@command(name="-;", hidden=True)
+	async def cry(self, ctx):
+		if ctx.prefix == ';':
+			await ctx.send(ctx.author.mention + " don't cry <:KannaPat:762774093723860993>")
 
 def setup(client):
 	client.add_cog(Chat(client))
