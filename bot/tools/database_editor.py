@@ -12,6 +12,7 @@ class GachaEditor:
 		with open(DATABASE_FILE_PATH) as database:
 			self._database = load(database)
 			self._operations = {
+				# generic
 				"listtables": self.__list_tables,
 
 				# items
@@ -23,7 +24,8 @@ class GachaEditor:
 				"addpool": self.__addpool,
 				"removepool": self.__removepool,
 				"addpoolitem": self.__addpoolitem,
-				"removepoolitem": self.__removepoolitem
+				"removepoolitem": self.__removepoolitem,
+				"replacepoolitem": self.__replacepoolitem
 			}
 
 	def __save_database(self):
@@ -77,11 +79,13 @@ class GachaEditor:
 		next_key = max((int(key) for key in table.keys()), default=0) + 1
 		for item_index, item_name in enumerate(options.names):
 			item_id = str(next_key + item_index)
-			table[item_id] = {
+			table[item_id] = item = {
 				"name": item_name,
 				"type": options.type,
 				"rank": options.rank
 			}
+			if options.single:
+				item["is_single_stigmata"] = True
 			print(f"Added item '{item_name}' with identifier '{item_id}'.")
 		self.__save_database()
 
@@ -200,7 +204,61 @@ class GachaEditor:
 	# database_editor.py --pool <code> removepoolitem names [names]
 	# database_editor.py --pool ex removepoolitem "ARC Serratus" "Blaze Destroyer"
 	def __removepoolitem(self, options):
-		print("Not implemented yet.")
+		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
+		pool = table.get(options.pool)
+		if pool is None:
+			raise ValueError("The specified pool doesn't exist.")
+		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
+		has_changed = False
+		for _, name in enumerate(options.names):
+			item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", name), -1)
+			if item_id == -1:
+				print(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
+				continue
+			is_found = False
+			for descriptor_index, descriptor in enumerate(loot_table):
+				item_list = descriptor.get("items", [])
+				if item_id in item_list:
+					item_list.remove(item_id)
+					print(f"Item '{name}' has been removed.")
+					if len(item_list) == 0:
+						loot_table.pop(descriptor_index)
+					is_found = True
+					has_changed = True
+					break
+			if not is_found:
+				print(f"Item '{name}' isn't in the pool, hence it won't be removed.")
+		self.__validate_pool_total_rate(options.pool)
+		if has_changed:
+			self.__save_database()
+
+	# database_editor.py --pool <code> replacepoolitem <name 1> <name 2>
+	# database_editor.py --pool ex replacepoolitem "Stygian Nymph" "Bright Knight: Excelsis"
+	def __replacepoolitem(self, options):
+		if len(options.names) < 2:
+			raise ValueError("Both the name of the item to be replaced and the item replacing it must be specified.")
+		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
+		pool = table.get(options.pool)
+		if pool is None:
+			raise ValueError("The specified pool doesn't exist.")
+		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
+		old_item_name = options.names[0]
+		new_item_name = options.names[1]
+		old_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", old_item_name), None)
+		new_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", new_item_name), None)
+		if old_item_id is None:
+			raise ValueError(f"The item '{old_item_name}' doesn't exist.")
+		if new_item_id is None:
+			raise ValueError(f"The item '{new_item_name}' doesn't exist.")
+		for _, descriptor in enumerate(loot_table):
+			item_list = descriptor.get("items", [])
+			if old_item_id in item_list:
+				item_list.remove(old_item_id)
+				item_list.append(new_item_id)
+				print(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
+				self.__save_database()
+				return
+		print(f"The item '{old_item_name}' cannot be found in the pool.")
 
 	def execute(self, options):
 		operation = self._operations.get(options.operation)
@@ -209,11 +267,10 @@ class GachaEditor:
 		else:
 			print("Invalid operation.")
 
-# python .\bot\tools\database_editor.py --operation find --table items --field name "ARC Serratus" "Valkyrie Bladestrike"
-# python .\bot\tools\database_editor.py --operation add --table items --type 1 --rank 3 "ARC Serratus" "Blaze Destroyer" "Blooded Saints" "Dominators" "Energy Leapers" "Fafnir Flame" "Hallowed Saints" "Hurricanes" "Hyper Railguns" "Jingwei's Wings" "Judgement of Shamash" "Keys of the Void" "Light and Shadow" "Mjolnir" "PSY - Bows of Hel" "Proto Alberich's Bows" "Ranger's Pistol" "Shennong's Guardians" "Spirit Guns - Yae" "Thunder Kikaku" "Tranquil Arias" "Twins of Eden"
 parser = ArgumentParser()
 parser.add_argument("--type", dest="type", action="store", default="0")
 parser.add_argument("--rank", dest="rank", action="store", default="0")
+parser.add_argument("--single", dest="single", action="store", default=False)
 parser.add_argument("--field", dest="field", action="store", default=None)
 parser.add_argument("--pool", dest="pool", action="store", default=None)
 parser.add_argument("--rate", dest="rate", action="store", default=None)
