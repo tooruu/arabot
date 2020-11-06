@@ -268,12 +268,12 @@ class GachaEditor:
 			print("Invalid operation.")
 
 parser = ArgumentParser()
-parser.add_argument("--type", dest="type", action="store", default="0")
-parser.add_argument("--rank", dest="rank", action="store", default="0")
-parser.add_argument("--single", dest="single", action="store", default=False)
-parser.add_argument("--field", dest="field", action="store", default=None)
-parser.add_argument("--pool", dest="pool", action="store", default=None)
-parser.add_argument("--rate", dest="rate", action="store", default=None)
-parser.add_argument("operation", action="store")
+parser.add_argument("--type", dest="type", action="store", default="0") # Item type
+parser.add_argument("--rank", dest="rank", action="store", default="0") # Item rank
+parser.add_argument("--single", dest="single", action="store", default=False) # Is single (non-set) stigmata?
+parser.add_argument("--field", dest="field", action="store", default=None) # Field name
+parser.add_argument("--pool", dest="pool", action="store", default=None) # Pool ID
+parser.add_argument("--rate", dest="rate", action="store", default=None) # Drop rate
+parser.add_argument("operation", action="store") # Operation to perform
 parser.add_argument("names", nargs="+", action="store")
 GachaEditor().execute(parser.parse_args())

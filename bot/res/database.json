@@ -62,18 +62,6 @@
 		}
 	},
 	"items": {
-		"0": {
-			"name": "",
-			"type": "0"
-		},
-		"1": {
-			"name": "",
-			"type": "0"
-		},
-		"2": {
-			"name": "",
-			"type": "2"
-		},
 		"3": {
 			"name": "Advanced Skill Material",
 			"type": "6"
@@ -106,45 +94,9 @@
 			"name": "HOLI Chest",
 			"type": "5"
 		},
-		"11": {
-			"name": "",
-			"type": "0"
-		},
-		"12": {
-			"name": "",
-			"type": "0"
-		},
-		"13": {
-			"name": "",
-			"type": "0"
-		},
-		"14": {
-			"name": "",
-			"type": "2"
-		},
-		"15": {
-			"name": "",
-			"type": "2"
-		},
-		"16": {
-			"name": "",
-			"type": "2"
-		},
-		"17": {
-			"name": "",
-			"type": "2"
-		},
 		"18": {
 			"name": "Microreactor",
 			"type": "3"
-		},
-		"19": {
-			"name": "",
-			"type": "0"
-		},
-		"20": {
-			"name": "",
-			"type": "2"
 		},
 		"21": {
 			"name": "White Comet",
@@ -547,11 +499,11 @@
 			"type": "2"
 		},
 		"121": {
-			"name": "Bright Knight",
+			"name": "Bright Knight: Excelsis",
 			"type": "0"
 		},
 		"122": {
-			"name": "Bright Knight Soul",
+			"name": "Bright Knight: Excelsis Soul",
 			"type": "2"
 		},
 		"123": {
