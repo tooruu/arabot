@@ -1,4 +1,4 @@
-from discord.ext.commands import command, Cog, check
+from discord.ext.commands import command, Cog, check, BucketType, cooldown
 from asyncio import wait_for, TimeoutError, sleep
 from random import randint
 
@@ -6,6 +6,7 @@ class Guess(Cog, name="Commands"):
 	def __init__(self, client):
 		self.bot = client
 
+	@cooldown(1, 120, BucketType.guild)
 	@command(hidden=True)
 	@check(lambda ctx: ctx.guild.id == 676889696302792774)
 	async def guess(self, ctx, MAX: int=20):
