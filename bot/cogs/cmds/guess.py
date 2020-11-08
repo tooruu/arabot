@@ -11,6 +11,7 @@ class Guess(Cog, name="Commands"):
 	@check(lambda ctx: ctx.guild.id == 676889696302792774)
 	async def guess(self, ctx, MAX: int=20):
 		# Initializing
+		MAX = abs(MAX)
 		TIMEOUT = 20
 		MUTED_ROLE = ctx.guild.get_role(751868258130329732)
 		NUMBER = randint(1, MAX)
@@ -31,6 +32,8 @@ class Guess(Cog, name="Commands"):
 				vote = await self.bot.wait_for("message", check=check)
 				await vote.add_reaction('✅')
 				guesses[vote.author] = int(vote.content)
+				if int(vote.content) == NUMBER:
+					return
 
 		try:
 			await wait_for(ensure(), timeout=TIMEOUT)
