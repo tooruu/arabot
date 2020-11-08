@@ -9,9 +9,6 @@ DROP_RATE_TOLERANCE = 1e-5
 
 # TODO LIST
 # - fix the logic in gacha_teest.py and port it to gacha.py
-# - additemset
-#   a command used to add an entire item set to the database
-#   typically useful when a new valkyrie and her set is introduced
 # - smarter replacepoolitem
 #   when you want to change a pool (typically due to banner updates)
 #   you want to replace item sets, not just single items
@@ -34,8 +31,9 @@ class GachaEditor:
 
 				# items
 				"additem": self.__additem,
-				"deleteitem": self.__deleteitem,
 				"finditem": self.__finditem,
+				"deleteitem": self.__deleteitem,
+				"additemset": self.__additemset,
 
 				# pools
 				"addpool": self.__addpool,
@@ -87,23 +85,26 @@ class GachaEditor:
 		for table_id in self._database.keys():
 			print(table_id)
 
+	def __add_item_internal(self, item_name: str, item_type: str, item_rank: str = None, is_single_stigmata: bool = False) -> str:
+		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
+		next_key = max((int(key) for key in table.keys()), default=0) + 1
+		table[next_key] = item = {
+			"name": item_name,
+			"type": item_type
+		}
+		if item_rank is not None:
+			item["rank"] = item_rank
+		if is_single_stigmata:
+			item["is_single_stigmata"] = True
+		return next_key
+
+	# database_editor.py --type <type> [--rank <rank>] additem "name 1" "name 2"
 	# database_editor.py --type 2 --rank 3 additem "name 1" "name 2"
 	def __additem(self, options):
 		if not options.type:
 			raise ValueError("The item type must be specified.")
-		if not options.rank:
-			raise ValueError("The item rank must be specified.")
-		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
-		next_key = max((int(key) for key in table.keys()), default=0) + 1
-		for item_index, item_name in enumerate(options.names):
-			item_id = str(next_key + item_index)
-			table[item_id] = item = {
-				"name": item_name,
-				"type": options.type,
-				"rank": options.rank
-			}
-			if options.single:
-				item["is_single_stigmata"] = True
+		for _, item_name in enumerate(options.names):
+			item_id = self.__add_item_internal(item_name, options.type, options.rank, options.single)
 			print(f"Added item '{item_name}' with identifier '{item_id}'.")
 		self.__save_database()
 
@@ -134,6 +135,22 @@ class GachaEditor:
 					print(f"Deleted item '{item_id}'.")
 		if has_changed:
 			self.__save_database()
+
+	# database_editor.py [--awakened] [--rank <rank>] additemset "Valkyrie" "Weapon" "Stigmata set"
+	def __additemset(self, options):
+		if len(options.names) != 3:
+			raise ValueError("You must specify a valid itemset: valkyrie, weapon, stigmata.")
+		def add_item(name, item_type, item_rank=None):
+			item_id = self.__add_item_internal(name, item_type, item_rank)
+			print(f"Added item '{name}' with identifier '{item_id}'.")
+		add_item(options.names[0], "0", options.rank if options.rank is not None else "2")
+		if options.awakened:
+			add_item(f"{options.names[0]} soul", "2")
+		else:
+			add_item(f"{options.names[0]} fragment", "7")
+		add_item(options.names[1], "1", "3")
+		add_item(options.names[2], "8")
+		self.__save_database()
 
 	# database_editor.py addpool <code> <name>
 	# database_editor.py addpool ex "Expansion Battlesuit"
@@ -281,14 +298,17 @@ class GachaEditor:
 	def execute(self, options):
 		operation = self._operations.get(options.operation)
 		if operation is not None:
+			print(f"Invoking operation '{options.operation}'...")
 			operation(options)
+			print(f"Operation '{options.operation}' finished.")
 		else:
-			print("Invalid operation.")
+			print(f"Invalid operation '{options.operation}'.")
 
 parser = ArgumentParser()
 parser.add_argument("--type", dest="type", action="store", default="0") # Item type
-parser.add_argument("--rank", dest="rank", action="store", default="0") # Item rank
-parser.add_argument("--single", dest="single", action="store", default=False) # Is single (non-set) stigmata?
+parser.add_argument("--rank", dest="rank", action="store", default=None) # Item rank
+parser.add_argument("--single", dest="single", action="store_const", const=True) # Is single (non-set) stigmata?
+parser.add_argument("--awakened", dest="awakened", action="store_const", const=True) # Is awakened valkyrie?
 parser.add_argument("--field", dest="field", action="store", default=None) # Field name
 parser.add_argument("--pool", dest="pool", action="store", default=None) # Pool ID
 parser.add_argument("--rate", dest="rate", action="store", default=None) # Drop rate
