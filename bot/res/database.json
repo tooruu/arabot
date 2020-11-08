@@ -59,6 +59,10 @@
 			"is_multi": true,
 			"multi_min": 4,
 			"multi_max": 6
+		},
+		"8": {
+			"name": "Stigmata",
+			"is_special": true
 		}
 	},
 	"items": {
@@ -1695,6 +1699,576 @@
 			"name": "Lucia",
 			"type": "1",
 			"rank": "3"
+		},
+		"362": {
+			"name": "Allan Poe",
+			"type": "8",
+			"rank": "3"
+		},
+		"363": {
+			"name": "Ana Schariac",
+			"type": "8",
+			"rank": "3"
+		},
+		"364": {
+			"name": "Anniversary Ball",
+			"type": "8",
+			"rank": "3"
+		},
+		"365": {
+			"name": "Anniversary Festival",
+			"type": "8",
+			"rank": "3"
+		},
+		"366": {
+			"name": "Beach Party",
+			"type": "8",
+			"rank": "3"
+		},
+		"367": {
+			"name": "Beethoven",
+			"type": "8",
+			"rank": "3"
+		},
+		"368": {
+			"name": "Benares - Awakening",
+			"type": "8",
+			"rank": "3"
+		},
+		"369": {
+			"name": "Bronya - Shadow",
+			"type": "8",
+			"rank": "3"
+		},
+		"370": {
+			"name": "Caravaggio",
+			"type": "8",
+			"rank": "3"
+		},
+		"371": {
+			"name": "Cecilia Schariac",
+			"type": "8",
+			"rank": "3"
+		},
+		"372": {
+			"name": "Cleopatra",
+			"type": "8",
+			"rank": "3"
+		},
+		"373": {
+			"name": "Cocolia",
+			"type": "8",
+			"rank": "3"
+		},
+		"374": {
+			"name": "Dante",
+			"type": "8",
+			"rank": "3"
+		},
+		"375": {
+			"name": "Dark Jixuanyuan",
+			"type": "8",
+			"rank": "3"
+		},
+		"376": {
+			"name": "Darwin",
+			"type": "8",
+			"rank": "3"
+		},
+		"377": {
+			"name": "Dirac",
+			"type": "8",
+			"rank": "3"
+		},
+		"378": {
+			"name": "Dracula",
+			"type": "8",
+			"rank": "3"
+		},
+		"379": {
+			"name": "Edwin Hubble",
+			"type": "8",
+			"rank": "3"
+		},
+		"380": {
+			"name": "Einstein",
+			"type": "8",
+			"rank": "3"
+		},
+		"381": {
+			"name": "Einstein - Band",
+			"type": "8",
+			"rank": "3"
+		},
+		"382": {
+			"name": "Ekaterina",
+			"type": "8",
+			"rank": "3"
+		},
+		"383": {
+			"name": "Fu Hua - Margrave",
+			"type": "8",
+			"rank": "3"
+		},
+		"384": {
+			"name": "Fu Hua Musician",
+			"type": "8",
+			"rank": "3"
+		},
+		"385": {
+			"name": "Fuxi",
+			"type": "8",
+			"rank": "3"
+		},
+		"386": {
+			"name": "Gustav Klimt",
+			"type": "8",
+			"rank": "3"
+		},
+		"387": {
+			"name": "Hanabi Fireworks",
+			"type": "8",
+			"rank": "3"
+		},
+		"388": {
+			"name": "Heartfelt Memories",
+			"type": "8",
+			"rank": "3"
+		},
+		"389": {
+			"name": "Higokumaru",
+			"type": "8",
+			"rank": "3"
+		},
+		"390": {
+			"name": "Homecoming Theater",
+			"type": "8",
+			"rank": "3"
+		},
+		"391": {
+			"name": "Irene Adler",
+			"type": "8",
+			"rank": "3"
+		},
+		"392": {
+			"name": "Isaac Newton",
+			"type": "8",
+			"rank": "3"
+		},
+		"393": {
+			"name": "Ishikawa Goemon",
+			"type": "8",
+			"rank": "3"
+		},
+		"394": {
+			"name": "Jin Shengtan",
+			"type": "8",
+			"rank": "3"
+		},
+		"395": {
+			"name": "Jingwei",
+			"type": "8",
+			"rank": "3"
+		},
+		"396": {
+			"name": "Jixuanyuan",
+			"type": "8",
+			"rank": "3"
+		},
+		"397": {
+			"name": "Kafka",
+			"type": "8",
+			"rank": "3"
+		},
+		"398": {
+			"name": "Kallen - Hymn",
+			"type": "8",
+			"rank": "3"
+		},
+		"399": {
+			"name": "Kallen Pledge",
+			"type": "8",
+			"rank": "3"
+		},
+		"400": {
+			"name": "Kepler",
+			"type": "8",
+			"rank": "3"
+		},
+		"401": {
+			"name": "Leeuwenhoek",
+			"type": "8",
+			"rank": "3"
+		},
+		"402": {
+			"name": "Lier",
+			"type": "8",
+			"rank": "3"
+		},
+		"403": {
+			"name": "Lier Scarlet",
+			"type": "8",
+			"rank": "3"
+		},
+		"404": {
+			"name": "Marco Polo",
+			"type": "8",
+			"rank": "3"
+		},
+		"405": {
+			"name": "Mary Shelley",
+			"type": "8",
+			"rank": "3"
+		},
+		"406": {
+			"name": "Mendeleev",
+			"type": "8",
+			"rank": "3"
+		},
+		"407": {
+			"name": "Michelangelo",
+			"type": "8",
+			"rank": "3"
+		},
+		"408": {
+			"name": "Monet",
+			"type": "8",
+			"rank": "3"
+		},
+		"409": {
+			"name": "Nagamitsu",
+			"type": "8",
+			"rank": "3"
+		},
+		"410": {
+			"name": "New Year",
+			"type": "8",
+			"rank": "3"
+		},
+		"411": {
+			"name": "Nobel",
+			"type": "8",
+			"rank": "3"
+		},
+		"412": {
+			"name": "Nohime",
+			"type": "8",
+			"rank": "3"
+		},
+		"413": {
+			"name": "Nuwa",
+			"type": "8",
+			"rank": "3"
+		},
+		"414": {
+			"name": "Nuewa Figurine Master",
+			"type": "8",
+			"rank": "3"
+		},
+		"415": {
+			"name": "Otto Apocalypse",
+			"type": "8",
+			"rank": "3"
+		},
+		"416": {
+			"name": "Picasso",
+			"type": "8",
+			"rank": "3"
+		},
+		"417": {
+			"name": "Planck",
+			"type": "8",
+			"rank": "3"
+		},
+		"418": {
+			"name": "Rasputin",
+			"type": "8",
+			"rank": "3"
+		},
+		"419": {
+			"name": "Rebel's Blades",
+			"type": "8",
+			"rank": "3"
+		},
+		"420": {
+			"name": "Robert Peary",
+			"type": "8",
+			"rank": "3"
+		},
+		"421": {
+			"name": "Sanada Yukimura",
+			"type": "8",
+			"rank": "3"
+		},
+		"422": {
+			"name": "Schrodinger",
+			"type": "8",
+			"rank": "3"
+		},
+		"423": {
+			"name": "Schrodinger Band",
+			"type": "8",
+			"rank": "3"
+		},
+		"424": {
+			"name": "Seele Vollerei",
+			"type": "8",
+			"rank": "3"
+		},
+		"425": {
+			"name": "Shakespeare",
+			"type": "8",
+			"rank": "3"
+		},
+		"426": {
+			"name": "Shennong",
+			"type": "8",
+			"rank": "3"
+		},
+		"427": {
+			"name": "Shuijing",
+			"type": "8",
+			"rank": "3"
+		},
+		"428": {
+			"name": "Siegfried Kaslana",
+			"type": "8",
+			"rank": "3"
+		},
+		"429": {
+			"name": "Sin Mal",
+			"type": "8",
+			"rank": "3"
+		},
+		"430": {
+			"name": "Sirin",
+			"type": "8",
+			"rank": "3"
+		},
+		"431": {
+			"name": "Sirin - Ascendant",
+			"type": "8",
+			"rank": "3"
+		},
+		"432": {
+			"name": "Summer Day",
+			"type": "8",
+			"rank": "3"
+		},
+		"433": {
+			"name": "Tesla Band",
+			"type": "8",
+			"rank": "3"
+		},
+		"434": {
+			"name": "Thales",
+			"type": "8",
+			"rank": "3"
+		},
+		"435": {
+			"name": "Welt Yang",
+			"type": "8",
+			"rank": "3"
+		},
+		"436": {
+			"name": "Wilde",
+			"type": "8",
+			"rank": "3"
+		},
+		"437": {
+			"name": "Yae Sakura",
+			"type": "8",
+			"rank": "3"
+		},
+		"438": {
+			"name": "Zhangheng",
+			"type": "8",
+			"rank": "3"
+		},
+		"439": {
+			"name": "Zhuge Kongming",
+			"type": "8",
+			"rank": "3"
+		},
+		"440": {
+			"name": "Zorro",
+			"type": "8",
+			"rank": "3"
+		},
+		"441": {
+			"name": "Anti-Entropy XMas",
+			"type": "8",
+			"rank": "2"
+		},
+		"442": {
+			"name": "Attila",
+			"type": "8",
+			"rank": "2"
+		},
+		"443": {
+			"name": "Beach Angels",
+			"type": "8",
+			"rank": "2"
+		},
+		"444": {
+			"name": "Charlemagne",
+			"type": "8",
+			"rank": "2"
+		},
+		"445": {
+			"name": "Dragon Boat",
+			"type": "8",
+			"rank": "2"
+		},
+		"446": {
+			"name": "Edison",
+			"type": "8",
+			"rank": "2"
+		},
+		"447": {
+			"name": "Elizabeth Bathory",
+			"type": "8",
+			"rank": "2"
+		},
+		"448": {
+			"name": "Galileo",
+			"type": "8",
+			"rank": "2"
+		},
+		"449": {
+			"name": "HOMU",
+			"type": "8",
+			"rank": "2"
+		},
+		"450": {
+			"name": "Himeko - Christmas",
+			"type": "8",
+			"rank": "2"
+		},
+		"451": {
+			"name": "Jixuanyuan Aqua",
+			"type": "8",
+			"rank": "2"
+		},
+		"452": {
+			"name": "Kitten Fun",
+			"type": "8",
+			"rank": "2"
+		},
+		"453": {
+			"name": "Naoe Kanetsugu",
+			"type": "8",
+			"rank": "2"
+		},
+		"454": {
+			"name": "Nikola Tesla",
+			"type": "8",
+			"rank": "2"
+		},
+		"455": {
+			"name": "Ogier",
+			"type": "8",
+			"rank": "2"
+		},
+		"456": {
+			"name": "Rinaldo",
+			"type": "8",
+			"rank": "2"
+		},
+		"457": {
+			"name": "Roald Amundsen",
+			"type": "8",
+			"rank": "2"
+		},
+		"458": {
+			"name": "Rowland",
+			"type": "8",
+			"rank": "2"
+		},
+		"459": {
+			"name": "Ryunosuke Akutagawa",
+			"type": "8",
+			"rank": "2"
+		},
+		"460": {
+			"name": "Sakamoto Ryoma",
+			"type": "8",
+			"rank": "2"
+		},
+		"461": {
+			"name": "Schrodinger - Tour",
+			"type": "8",
+			"rank": "2"
+		},
+		"462": {
+			"name": "Scott",
+			"type": "8",
+			"rank": "2"
+		},
+		"463": {
+			"name": "Shigure Kira",
+			"type": "8",
+			"rank": "2"
+		},
+		"464": {
+			"name": "Summer Surf",
+			"type": "8",
+			"rank": "2"
+		},
+		"465": {
+			"name": "Tchaikovsky",
+			"type": "8",
+			"rank": "2"
+		},
+		"466": {
+			"name": "Theresa - Origins",
+			"type": "8",
+			"rank": "2"
+		},
+		"467": {
+			"name": "Wang Zhaojun",
+			"type": "8",
+			"rank": "2"
+		},
+		"468": {
+			"name": "Yodo Dono",
+			"type": "8",
+			"rank": "2"
+		},
+		"469": {
+			"name": "Hannah",
+			"type": "8",
+			"rank": "1"
+		},
+		"470": {
+			"name": "Lucia",
+			"type": "8",
+			"rank": "1"
+		},
+		"471": {
+			"name": "Octavia",
+			"type": "8",
+			"rank": "1"
+		},
+		"472": {
+			"name": "Victoria",
+			"type": "8",
+			"rank": "1"
+		},
+		"473": {
+			"name": "Viola",
+			"type": "8",
+			"rank": "1"
+		},
+		"474": {
+			"name": "Charlotte",
+			"type": "8",
+			"rank": "0"
+		},
+		"475": {
+			"name": "Selena",
+			"type": "8",
+			"rank": "0"
 		}
 	},
 	"pools": {
