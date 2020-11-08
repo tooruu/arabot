@@ -1,10 +1,10 @@
 from discord.ext.commands import (
 	Converter, MemberConverter, EmojiConverter, PartialEmojiConverter, TextChannelConverter, VoiceChannelConverter,
-	RoleConverter, Cog
+	RoleConverter, Cog, MinimalHelpCommand
 )
 from discord.ext.commands.errors import BadArgument
 from discord.utils import find
-from discord import Status, Activity
+from discord import Status, Activity, Embed
 from os import environ, walk
 from os.path import basename
 from re import search
@@ -13,7 +13,7 @@ from datetime import datetime
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = ("-", ) if BOT_DEBUG else (";", "ara ")
-BOT_VERSION = "2.9.0"
+BOT_VERSION = "2.11.1"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
@@ -186,3 +186,30 @@ class text_reaction:
 
 		event.__name__ = func.__name__
 		return event
+
+class BlacklistMatch(Exception):
+	def __init__(self, hit):
+		self.hit = hit
+
+class Blacklist(Converter):
+	BLACKLIST = "ight imma head out",
+
+	async def convert(self, ctx, arg):
+		if arg in self.BLACKLIST:
+			raise BlacklistMatch(arg)
+		return arg
+
+class Help(MinimalHelpCommand):
+	#def get_command_signature(self, command):
+	#	return "{0.clean_prefix}{1.qualified_name} {1.signature}".format(self, command)
+
+	async def send_bot_help(self, mapping):
+		help = Embed()
+		help.set_author(name=BOT_NAME, icon_url=str(self.context.bot.user.avatar_url_as(static_format="png")))
+		for cog in mapping:
+			if cog and mapping[cog]:
+				help.add_field(
+					name=bold(cog.qualified_name),
+					value='\n'.join(f"`{cmd.name}`" for cmd in mapping[cog])
+				)
+		await self.get_destination().send(embed=help)

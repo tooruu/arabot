@@ -1,6 +1,6 @@
-from discord.ext.commands import command, Cog
+from discord.ext.commands import command, Cog, Converter, ConversionError
 from discord import Embed
-from .._utils import getenv, bold
+from .._utils import getenv, bold, Blacklist, BlacklistMatch
 from urllib.parse import quote_plus as safe
 from aiohttp.client_exceptions import ClientConnectorError
 
@@ -10,7 +10,7 @@ class Google(Cog, name="Commands"):
 		(self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key) = getenv("g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
 
 	@command(aliases=["i", "img"], brief="<query> | Top search result from Google Images")
-	async def image(self, ctx, *, query):
+	async def image(self, ctx, *, query: Blacklist):
 		NUM = 3
 		async with self.bot.ses.get(
 			"https://www.googleapis.com/customsearch/v1",
@@ -25,9 +25,9 @@ class Google(Cog, name="Commands"):
 			if resp.status == 429:
 				await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
 			elif "items" in (resp := await resp.json()):
-				blacklist =("lookaside.fbsbx.com",)
+				BLACKLIST = "lookaside.fbsbx.com",
 				for i in resp["items"]:
-					if i["link"].split('/')[2] not in blacklist:
+					if i["link"].split('/')[2] not in BLACKLIST:
 						try:
 							async with self.bot.ses.get(i["link"]) as s:
 								if s.status == 200:
@@ -38,6 +38,14 @@ class Google(Cog, name="Commands"):
 				await ctx.send(f"First {NUM} links are dead, and I don't want to eat up the quota by requesting more images, so try something else. :slight_smile:")
 			else:
 				await ctx.send("No images found")
+
+	@image.error
+	async def use_tags(self, ctx, error):
+		if isinstance(error, ConversionError) and isinstance(error.original, BlacklistMatch):
+			if error.original.hit == "ight imma head out":
+				await ctx.send(f"Please use `?tag iiho` instead of `{ctx.prefix}{ctx.invoked_with}`")
+				return
+		raise error
 
 	@command(aliases=["g"], brief="<query> | Top Google Search result")
 	async def google(self, ctx, *, query):
