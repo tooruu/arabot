@@ -2269,6 +2269,261 @@
 			"name": "Selena",
 			"type": "8",
 			"rank": "0"
+		},
+		"476": {
+			"name": "Darkbolt Jonin fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"477": {
+			"name": "Starlit Astrologos fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"478": {
+			"name": "Valkyrie Accipiter fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"479": {
+			"name": "Violet Executer fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"480": {
+			"name": "Valkyrie Gloria fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"481": {
+			"name": "Fallen Rosemary fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"482": {
+			"name": "Valyrie Ranger fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"483": {
+			"name": "Night Squire fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"484": {
+			"name": "Shadow Dash fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"485": {
+			"name": "Valkyrie Bladestrike fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"486": {
+			"name": "Valkyrie Chariot fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"487": {
+			"name": "Snowy Sniper fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"488": {
+			"name": "Valkyrie Triumph fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"489": {
+			"name": "Scarlet Fusion fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"490": {
+			"name": "Blood Rose fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"491": {
+			"name": "Blueberry Blitz fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"492": {
+			"name": "Sakuno Rondo fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"493": {
+			"name": "Shadow Knight fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"494": {
+			"name": "Phoenix fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"495": {
+			"name": "Umbral Rose fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"496": {
+			"name": "Swallowtail Phantasm fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"497": {
+			"name": "White Comet fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"498": {
+			"name": "Knight Moonbeam fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"499": {
+			"name": "Divine Prayer fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"500": {
+			"name": "Crimson Impulse fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"501": {
+			"name": "Lightning Empress fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"502": {
+			"name": "Yamabuki Armor fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"503": {
+			"name": "Battle Storm fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"504": {
+			"name": "Molotov Cherry fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"505": {
+			"name": "Valkyrie Pledge fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"506": {
+			"name": "Celestial Hymn fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"507": {
+			"name": "Phantom Iron fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"508": {
+			"name": "Bright Knight: Excelsis fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"509": {
+			"name": "Dimension Breaker fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"510": {
+			"name": "Argent Knight: Artemis fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"511": {
+			"name": "Stygian Nymph fragment",
+			"type": "7",
+			"rank": "0"
+		},
+		"512": {
+			"name": "Herrscher of Thunder soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"513": {
+			"name": "Goushinnso Memento soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"514": {
+			"name": "Azure Empyrea soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"515": {
+			"name": "S\u00fcndenj\u00e4ger soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"516": {
+			"name": "Ritual Imayoh soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"517": {
+			"name": "Flame Sakitama soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"518": {
+			"name": "Gyakushinn Miko soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"519": {
+			"name": "Black Nucleus soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"520": {
+			"name": "Vermilion Knight: Eclipse soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"521": {
+			"name": "Arctic Kriegsmesser soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"522": {
+			"name": "Herrscher of the Void soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"523": {
+			"name": "Sixth Serenade soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"524": {
+			"name": "Wolf's Dawn soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"525": {
+			"name": "Luna Kindred soul",
+			"type": "2",
+			"rank": "0"
+		},
+		"526": {
+			"name": "Herrscher of Reason soul",
+			"type": "2",
+			"rank": "0"
 		}
 	},
 	"pools": {

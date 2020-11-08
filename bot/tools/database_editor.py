@@ -8,7 +8,6 @@ TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
 
 # TODO LIST
-# - add the valkyrie fragments/souls to the database
 # - fix the logic in gacha_teest.py and port it to gacha.py
 # - additemset
 #   a command used to add an entire item set to the database
