@@ -16,8 +16,6 @@ DROP_RATE_TOLERANCE = 1e-5
 #   like: "this" "to this" "this" "to this" "this" "to this"
 # - togglepool
 #   a command used to change the availability of a pool
-# - showpool
-#   a command used to print the items in a specific pool
 # - smarter argparse
 #   it sucks when you have to type unnecessary parameters
 #   such as the listtables command
@@ -40,7 +38,8 @@ class GachaEditor:
 				"removepool": self.__removepool,
 				"addpoolitem": self.__addpoolitem,
 				"removepoolitem": self.__removepoolitem,
-				"replacepoolitem": self.__replacepoolitem
+				"replacepoolitem": self.__replacepoolitem,
+				"showpool": self.__showpool
 			}
 
 	def __save_database(self):
@@ -82,6 +81,7 @@ class GachaEditor:
 	# TODO Make the argument parser more obvious, because specifying the "names" argument here makes no sense.
 	# python .\bot\tools\database_editor.py listtables all
 	def __list_tables(self, options):
+		"""Lists the names of the tables available in the database."""
 		for table_id in self._database.keys():
 			print(table_id)
 
@@ -101,6 +101,7 @@ class GachaEditor:
 	# database_editor.py --type <type> [--rank <rank>] additem "name 1" "name 2"
 	# database_editor.py --type 2 --rank 3 additem "name 1" "name 2"
 	def __additem(self, options):
+		"""Adds a new item described by the specified options to the database."""
 		if not options.type:
 			raise ValueError("The item type must be specified.")
 		for _, item_name in enumerate(options.names):
@@ -295,6 +296,23 @@ class GachaEditor:
 				return
 		print(f"The item '{old_item_name}' cannot be found in the pool.")
 
+	# database_editor.py showpool <code>
+	# database_editor.py showpool ex
+	def __showpool(self, options):
+		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
+		pool = pools.get(options.names[0], None)
+		if pool is None:
+			raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
+		items = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
+		loot_table = pool.get("loot_table", [])
+		for descriptor in loot_table:
+			rate = descriptor.get("rate", 0)
+			item_ids = descriptor.get("items", [])
+			item_names = []
+			for item_id in item_ids:
+				item_names.append(items.get(item_id, {}).get("name", "Unknown item"))
+			print("Rate '{}': {}".format(rate, ", ".join(item_names)))
+
 	def execute(self, options):
 		operation = self._operations.get(options.operation)
 		if operation is not None:
@@ -305,13 +323,13 @@ class GachaEditor:
 			print(f"Invalid operation '{options.operation}'.")
 
 parser = ArgumentParser()
-parser.add_argument("--type", dest="type", action="store", default="0") # Item type
-parser.add_argument("--rank", dest="rank", action="store", default=None) # Item rank
-parser.add_argument("--single", dest="single", action="store_const", const=True) # Is single (non-set) stigmata?
-parser.add_argument("--awakened", dest="awakened", action="store_const", const=True) # Is awakened valkyrie?
-parser.add_argument("--field", dest="field", action="store", default=None) # Field name
-parser.add_argument("--pool", dest="pool", action="store", default=None) # Pool ID
-parser.add_argument("--rate", dest="rate", action="store", default=None) # Drop rate
-parser.add_argument("operation", action="store") # Operation to perform
-parser.add_argument("names", nargs="+", action="store")
+parser.add_argument("--type", default="0") # Item type
+parser.add_argument("--rank", default=None) # Item rank
+parser.add_argument("--single", action="store_const", const=True) # Is single (non-set) stigmata?
+parser.add_argument("--awakened", action="store_const", const=True) # Is awakened valkyrie?
+parser.add_argument("--field", default=None) # Field name
+parser.add_argument("--pool", default=None) # Pool ID
+parser.add_argument("--rate",  default=None) # Drop rate
+parser.add_argument("operation") # Operation to perform
+parser.add_argument("names", nargs="+")
 GachaEditor().execute(parser.parse_args())
