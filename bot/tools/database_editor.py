@@ -7,6 +7,24 @@ TABLE_ITEMS = "items"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
 
+# TODO LIST
+# - add the valkyrie fragments/souls to the database
+# - fix the logic in gacha_teest.py and port it to gacha.py
+# - additemset
+#   a command used to add an entire item set to the database
+#   typically useful when a new valkyrie and her set is introduced
+# - smarter replacepoolitem
+#   when you want to change a pool (typically due to banner updates)
+#   you want to replace item sets, not just single items
+#   so this command should take multiple item pairs as its arguments
+#   like: "this" "to this" "this" "to this" "this" "to this"
+# - togglepool
+#   a command used to change the availability of a pool
+# - showpool
+#   a command used to print the items in a specific pool
+# - smarter argparse
+#   it sucks when you have to type unnecessary parameters
+#   such as the listtables command
 class GachaEditor:
 	def __init__(self):
 		with open(DATABASE_FILE_PATH) as database:
