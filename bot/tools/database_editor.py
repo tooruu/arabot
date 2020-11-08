@@ -40,9 +40,10 @@ class GachaEditor:
 		dictionary[key] = value = default_value
 		return value
 
-	def __find_ids_by_field(self, table_name: str, field_name: str, field_value: str):
+	def __find_ids_by_field(self, table_name: str, field_name: str, field_value: str, is_exact: bool = True):
+		predicate = (lambda text: text == field_value) if is_exact else (lambda text: field_value.lower() in text.lower())
 		for key, item in self.__get_or_initialize_value(self._database, table_name, {}).items():
-			if item.get(field_name, "") == field_value:
+			if predicate(item.get(field_name, "")):
 				yield key
 
 	def __get_pool_total_rate(self, pool_code: str) -> float:
@@ -95,7 +96,7 @@ class GachaEditor:
 			raise ValueError("The field name must be specified.")
 		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
 		for name in options.names:
-			for item_id in self.__find_ids_by_field(TABLE_ITEMS, options.field, name):
+			for item_id in self.__find_ids_by_field(TABLE_ITEMS, options.field, name, False):
 				print(f"ID: {item_id}\nData: {table[item_id]}")
 
 	# database_editor.py deleteitem "id 1" "id 2"
