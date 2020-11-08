@@ -14,8 +14,6 @@ DROP_RATE_TOLERANCE = 1e-5
 #   you want to replace item sets, not just single items
 #   so this command should take multiple item pairs as its arguments
 #   like: "this" "to this" "this" "to this" "this" "to this"
-# - togglepool
-#   a command used to change the availability of a pool
 # - smarter argparse
 #   it sucks when you have to type unnecessary parameters
 #   such as the listtables command
@@ -39,7 +37,8 @@ class GachaEditor:
 				"addpoolitem": self.__addpoolitem,
 				"removepoolitem": self.__removepoolitem,
 				"replacepoolitem": self.__replacepoolitem,
-				"showpool": self.__showpool
+				"showpool": self.__showpool,
+				"togglepool": self.__togglepool
 			}
 
 	def __save_database(self):
@@ -312,6 +311,17 @@ class GachaEditor:
 			for item_id in item_ids:
 				item_names.append(items.get(item_id, {}).get("name", "Unknown item"))
 			print("Rate '{}': {}".format(rate, ", ".join(item_names)))
+
+	# database_editor.py togglepool <code>
+	# database_editor.py togglepool ex
+	def __togglepool(self, options):
+		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
+		pool = pools.get(options.names[0], None)
+		if pool is None:
+			raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
+		pool["available"] = new_status = not pool.get("available", False)
+		self.__save_database()
+		print(f"Pool '{options.names[0]}' is now {'' if new_status else 'un'}available.")
 
 	def execute(self, options):
 		operation = self._operations.get(options.operation)
