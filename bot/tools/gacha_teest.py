@@ -14,9 +14,9 @@ class Gacha:
 	def __init__(self, database_file_path):
 		with open(database_file_path) as database:
 			self._database = load(database)
-		self._pools = self.__load_pool()
+		self._pools = self.__load_pools()
 
-	def __load_pool(self):
+	def __load_pools(self):
 		pools = {}
 		item_configs = self._database.get(TABLE_ITEMS, {})
 		item_type_configs = self._database.get(TABLE_ITEM_TYPES, {})
@@ -53,16 +53,25 @@ class Gacha:
 		return pools
 
 	def __get_item(self, item_id: str) -> dict:
-		return self._database["items"].get(item_id)
+		return self._database[TABLE_ITEMS].get(item_id)
 
 	def __get_item_type(self, type_id: str) -> dict:
-		return self._database["item_types"].get(type_id)
+		return self._database[TABLE_ITEM_TYPES].get(type_id)
 
 	def __pull_items(self, supply_type: str, pull_count: int) -> Sequence[object]:
 		supply = self._pools[supply_type]
 		available_items = [item for item in supply]
 		drop_rates = [item["rate"] for item in supply]
 		return choices(available_items, drop_rates, k = pull_count)
+
+	def __get_available_pools(self) -> Sequence[tuple]:
+		for pool_id in self._pools.keys():
+			pool_config = self._database.get(TABLE_POOLS, {}).get(pool_id, {})
+			if pool_config.get("available", False):
+				yield (pool_id, pool_config)
+
+	def pools(self):
+		return self.__get_available_pools()
 
 	def bigpull(self, supply_type: str, pull_count: int):
 		return self.__pull_items(supply_type, pull_count)
@@ -90,11 +99,13 @@ class Gacha:
 		print("__**{}** supply drops:__\n{}".format(supply["name"], "\n".join(pulled_item_names)))
 
 gacha = Gacha(DATABASE_FILE_PATH)
-all_pulls = {}
-for pull_index in range(100):
-	items = gacha.bigpull("focb", 10)
-	for item in items:
-		if all_pulls.get(item["name"]) is None:
-			all_pulls[item["name"]] = 0
-		all_pulls[item["name"]] += 1
-print(*["{}: {}".format(pull, all_pulls[pull]) for pull in sorted(all_pulls.keys())], sep="\n")
+print(*[pool[0] for pool in gacha.pools()])
+gacha.gacha("focb")
+# all_pulls = {}
+# for pull_index in range(100):
+# 	items = gacha.bigpull("focb", 10)
+# 	for item in items:
+# 		if all_pulls.get(item["name"]) is None:
+# 			all_pulls[item["name"]] = 0
+# 		all_pulls[item["name"]] += 1
+# print(*["{}: {}".format(pull, all_pulls[pull]) for pull in sorted(all_pulls.keys())], sep="\n")
