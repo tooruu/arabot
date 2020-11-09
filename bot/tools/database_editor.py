@@ -4,16 +4,17 @@ from math import isclose
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 TABLE_ITEMS = "items"
+TABLE_ITEM_TYPES = "item_types"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
 
 # TODO LIST
-# - fix the logic in gacha_teest.py and port it to gacha.py
-# - smarter replacepoolitem
-#   when you want to change a pool (typically due to banner updates)
-#   you want to replace item sets, not just single items
-#   so this command should take multiple item pairs as its arguments
-#   like: "this" "to this" "this" "to this" "this" "to this"
+# - changerate command
+#   change the rate of a specific item set
+#   e.g. --pool ex changerate 0.15 0.07
+#   note: it should merge equal sets
+# - clonepool command
+#   e.g. --pool ex clonepool new_ex
 # - smarter argparse
 #   it sucks when you have to type unnecessary parameters
 #   such as the listtables command
@@ -67,9 +68,24 @@ class GachaEditor:
 		loot_table = pool.get("loot_table", [])
 		if len(loot_table) == 0:
 			return 0.0
+		items = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
+		item_types = self.__get_or_initialize_value(self._database, TABLE_ITEM_TYPES, {})
 		total_rate = 0.0
 		for _, descriptor in enumerate(loot_table):
-			total_rate += descriptor.get("rate", 0.0) * len(descriptor.get("items", []))
+			for item_id in descriptor.get("items", []):
+				item = items.get(item_id, None)
+				if item is None:
+					print(f"Warning! The item identified by '{item_id}' doesn't exist.")
+					continue
+				item_type_id = item.get("type", None)
+				if item_type_id is None:
+					print(f"Warning! The type of the item '{item_id}' isn't specified.")
+					continue
+				item_type = item_types.get(item_type_id, None)
+				if item_type is None:
+					print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
+					continue
+				total_rate += descriptor.get("rate", 0.0) * item_type.get("item_count", 1)
 		return total_rate
 
 	def __validate_pool_total_rate(self, pool_code: str):
@@ -178,7 +194,7 @@ class GachaEditor:
 				continue
 			table.pop(name)
 			has_changed = True
-			print(f"The pool '{name}' has been removed.'")
+			print(f"The pool '{name}' has been removed.")
 		if has_changed:
 			self.__save_database()
 
@@ -267,33 +283,35 @@ class GachaEditor:
 		if has_changed:
 			self.__save_database()
 
-	# database_editor.py --pool <code> replacepoolitem <name 1> <name 2>
+	# database_editor.py --pool <code> replacepoolitem <name 1> <name 2> [<name 1> <name 2> ...]
 	# database_editor.py --pool ex replacepoolitem "Stygian Nymph" "Bright Knight: Excelsis"
 	def __replacepoolitem(self, options):
-		if len(options.names) < 2:
-			raise ValueError("Both the name of the item to be replaced and the item replacing it must be specified.")
+		if len(options.names) % 2 != 0:
+			raise ValueError("You must specify name pairs.")
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		pool = table.get(options.pool)
 		if pool is None:
 			raise ValueError("The specified pool doesn't exist.")
 		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
-		old_item_name = options.names[0]
-		new_item_name = options.names[1]
-		old_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", old_item_name), None)
-		new_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", new_item_name), None)
-		if old_item_id is None:
-			raise ValueError(f"The item '{old_item_name}' doesn't exist.")
-		if new_item_id is None:
-			raise ValueError(f"The item '{new_item_name}' doesn't exist.")
-		for _, descriptor in enumerate(loot_table):
-			item_list = descriptor.get("items", [])
-			if old_item_id in item_list:
-				item_list.remove(old_item_id)
-				item_list.append(new_item_id)
-				print(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
-				self.__save_database()
-				return
-		print(f"The item '{old_item_name}' cannot be found in the pool.")
+		for old_item_name, new_item_name in zip(options.names[0::2], options.names[1::2]):
+			old_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", old_item_name), None)
+			new_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", new_item_name), None)
+			if old_item_id is None:
+				raise ValueError(f"The item '{old_item_name}' doesn't exist.")
+			if new_item_id is None:
+				raise ValueError(f"The item '{new_item_name}' doesn't exist.")
+			has_changed = False
+			for _, descriptor in enumerate(loot_table):
+				item_list = descriptor.get("items", [])
+				if old_item_id in item_list:
+					item_list.remove(old_item_id)
+					item_list.append(new_item_id)
+					print(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
+					self.__save_database()
+					has_changed = True
+					break
+			if not has_changed:
+				print(f"The item '{old_item_name}' cannot be found in the pool.")
 
 	# database_editor.py showpool <code>
 	# database_editor.py showpool ex
@@ -303,14 +321,14 @@ class GachaEditor:
 		if pool is None:
 			raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
 		items = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
-		loot_table = pool.get("loot_table", [])
-		for descriptor in loot_table:
-			rate = descriptor.get("rate", 0)
-			item_ids = descriptor.get("items", [])
+		for descriptor in pool.get("loot_table", []):
+			rate = descriptor.get("rate", 0.0)
 			item_names = []
-			for item_id in item_ids:
-				item_names.append(items.get(item_id, {}).get("name", "Unknown item"))
+			for item_id in descriptor.get("items", []):
+				item = items.get(item_id, {})
+				item_names.append(item.get("name", "Unknown item"))
 			print("Rate '{}': {}".format(rate, ", ".join(item_names)))
+		print(f"Total drop rate is '{self.__get_pool_total_rate(options.names[0])}'.")
 
 	# database_editor.py togglepool <code>
 	# database_editor.py togglepool ex

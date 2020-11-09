@@ -1,4 +1,172 @@
 {
+	"pools": {
+		"ex": {
+			"name": "Expansion Battlesuit",
+			"available": true,
+			"loot_table": [
+				{
+					"rate": 0.015,
+					"items": [
+						"39"
+					]
+				},
+				{
+					"rate": 0.045,
+					"items": [
+						"115"
+					]
+				},
+				{
+					"rate": 0.03,
+					"items": [
+						"79",
+						"105",
+						"45",
+						"525",
+						"507",
+						"502"
+					]
+				},
+				{
+					"rate": 0.0225,
+					"items": [
+						"512"
+					]
+				},
+				{
+					"rate": 0.15,
+					"items": [
+						"496"
+					]
+				},
+				{
+					"rate": 0.1,
+					"items": [
+						"3"
+					]
+				},
+				{
+					"rate": 0.13205,
+					"items": [
+						"4",
+						"18"
+					]
+				},
+				{
+					"rate": 0.05585,
+					"items": [
+						"5",
+						"6"
+					]
+				},
+				{
+					"rate": 0.027925,
+					"items": [
+						"1",
+						"8",
+						"9",
+						"10"
+					]
+				}
+			]
+		},
+		"focb": {
+			"name": "Focused Supply B",
+			"available": true,
+			"loot_table": [
+				{
+					"rate": 0.0248,
+					"items": [
+						"527"
+					]
+				},
+				{
+					"rate": 0.0124,
+					"items": [
+						"397"
+					]
+				},
+				{
+					"rate": 0.0041,
+					"items": [
+						"138",
+						"204",
+						"259",
+						"279",
+						"354",
+						"355"
+					]
+				},
+				{
+					"rate": 0.0031,
+					"items": [
+						"420",
+						"377",
+						"368",
+						"431"
+					]
+				},
+				{
+					"rate": 0.05335,
+					"items": [
+						"528",
+						"529",
+						"4",
+						"18",
+						"8",
+						"9",
+						"10",
+						"1"
+					]
+				},
+				{
+					"rate": 0.0048826,
+					"items": [
+						"162",
+						"163",
+						"155",
+						"156",
+						"186",
+						"185",
+						"189",
+						"190",
+						"236",
+						"237",
+						"231",
+						"232",
+						"303",
+						"300",
+						"302",
+						"301",
+						"273",
+						"274",
+						"271",
+						"330",
+						"332",
+						"347",
+						"358"
+					]
+				},
+				{
+					"rate": 0.0093583,
+					"items": [
+						"467",
+						"442",
+						"460",
+						"455",
+						"444",
+						"454",
+						"447",
+						"456",
+						"463",
+						"448",
+						"459",
+						"457"
+					]
+				}
+			]
+		}
+	},
 	"valkyrie_ranks": {
 		"0": {
 			"name": "B"
@@ -62,10 +230,18 @@
 		},
 		"8": {
 			"name": "Stigmata",
-			"is_special": true
+			"is_special": true,
+			"item_count": 3
+		},
+		"9": {
+			"name": "Item exp"
 		}
 	},
 	"items": {
+		"1": {
+			"name": "Mithril",
+			"type": "5"
+		},
 		"3": {
 			"name": "Advanced Skill Material",
 			"type": "6"
@@ -601,7 +777,7 @@
 			"rank": "3"
 		},
 		"141": {
-			"name": "PSY - Bows of Hel",
+			"name": "PSY: Bows of Hel",
 			"type": "1",
 			"rank": "3"
 		},
@@ -621,7 +797,7 @@
 			"rank": "3"
 		},
 		"145": {
-			"name": "Spirit Guns - Yae",
+			"name": "Spirit Guns: Yae",
 			"type": "1",
 			"rank": "3"
 		},
@@ -676,7 +852,7 @@
 			"rank": "2"
 		},
 		"157": {
-			"name": "Holy Guns - Kallen",
+			"name": "Holy Guns: Kallen",
 			"type": "1",
 			"rank": "2"
 		},
@@ -816,7 +992,7 @@
 			"rank": "2"
 		},
 		"185": {
-			"name": "Hell Thunder",
+			"name": "Hell's Thunder",
 			"type": "1",
 			"rank": "2"
 		},
@@ -876,12 +1052,12 @@
 			"rank": "3"
 		},
 		"197": {
-			"name": "Dawn Breaker - Talwar",
+			"name": "Dawn Breaker: Talwar",
 			"type": "1",
 			"rank": "3"
 		},
 		"198": {
-			"name": "Demonblade - Florid Sakura",
+			"name": "Demonblade: Florid Sakura",
 			"type": "1",
 			"rank": "3"
 		},
@@ -1071,12 +1247,12 @@
 			"rank": "2"
 		},
 		"236": {
-			"name": "Markov Type A",
+			"name": "Markov Type-A",
 			"type": "1",
 			"rank": "2"
 		},
 		"237": {
-			"name": "Markov Type C",
+			"name": "Markov Type-C",
 			"type": "1",
 			"rank": "2"
 		},
@@ -1191,7 +1367,7 @@
 			"rank": "3"
 		},
 		"260": {
-			"name": "Star Shatterer - Vikrant",
+			"name": "Star Shatterer: Vikrant",
 			"type": "1",
 			"rank": "3"
 		},
@@ -1451,7 +1627,7 @@
 			"rank": "3"
 		},
 		"312": {
-			"name": "Godslayer - Surtr",
+			"name": "Godslayer: Surtr",
 			"type": "1",
 			"rank": "3"
 		},
@@ -1731,12 +1907,12 @@
 			"rank": "3"
 		},
 		"368": {
-			"name": "Benares - Awakening",
+			"name": "Benares: Awakening",
 			"type": "8",
 			"rank": "3"
 		},
 		"369": {
-			"name": "Bronya - Shadow",
+			"name": "Bronya: Shadow",
 			"type": "8",
 			"rank": "3"
 		},
@@ -1796,7 +1972,7 @@
 			"rank": "3"
 		},
 		"381": {
-			"name": "Einstein - Band",
+			"name": "Einstein:Band",
 			"type": "8",
 			"rank": "3"
 		},
@@ -1806,7 +1982,7 @@
 			"rank": "3"
 		},
 		"383": {
-			"name": "Fu Hua - Margrave",
+			"name": "Fu Hua: Margrave",
 			"type": "8",
 			"rank": "3"
 		},
@@ -1881,7 +2057,7 @@
 			"rank": "3"
 		},
 		"398": {
-			"name": "Kallen - Hymn",
+			"name": "Kallen: Hymn",
 			"type": "8",
 			"rank": "3"
 		},
@@ -2046,7 +2222,7 @@
 			"rank": "3"
 		},
 		"431": {
-			"name": "Sirin - Ascendant",
+			"name": "Sirin: Ascendant",
 			"type": "8",
 			"rank": "3"
 		},
@@ -2141,7 +2317,7 @@
 			"rank": "2"
 		},
 		"450": {
-			"name": "Himeko - Christmas",
+			"name": "Himeko: Christmas",
 			"type": "8",
 			"rank": "2"
 		},
@@ -2196,7 +2372,7 @@
 			"rank": "2"
 		},
 		"461": {
-			"name": "Schrodinger - Tour",
+			"name": "Schrodinger: Tour",
 			"type": "8",
 			"rank": "2"
 		},
@@ -2221,7 +2397,7 @@
 			"rank": "2"
 		},
 		"466": {
-			"name": "Theresa - Origins",
+			"name": "Theresa: Origins",
 			"type": "8",
 			"rank": "2"
 		},
@@ -2524,158 +2700,19 @@
 			"name": "Herrscher of Reason soul",
 			"type": "2",
 			"rank": "0"
-		}
-	},
-	"pools": {
-		"ex": {
-			"available": true,
-			"name": "Expansion Battlesuit",
-			"loot_table": [
-				{
-					"rate": 0.045,
-					"items": [
-						"105"
-					]
-				},
-				{
-					"rate": 0.03,
-					"items": [
-						"45",
-						"79",
-						"111"
-					]
-				},
-				{
-					"rate": 0.0225,
-					"items": [
-						"118"
-					]
-				},
-				{
-					"rate": 0.15,
-					"items": [
-						"106"
-					]
-				},
-				{
-					"rate": 0.03,
-					"items": [
-						"46",
-						"80",
-						"112"
-					]
-				},
-				{
-					"rate": 0.1,
-					"items": [
-						"3"
-					]
-				},
-				{
-					"rate": 0.13205,
-					"items": [
-						"4",
-						"18"
-					]
-				},
-				{
-					"rate": 0.05585,
-					"items": [
-						"5",
-						"6"
-					]
-				},
-				{
-					"rate": 0.027925,
-					"items": [
-						"7",
-						"8",
-						"9",
-						"10"
-					]
-				},
-				{
-					"rate": 0.015,
-					"items": [
-						"117"
-					]
-				}
-			]
 		},
-		"foca": {
-			"available": true,
-			"name": "Focused Supply A",
-			"loot_table": [
-				{
-					"rate": 0.015,
-					"items": [
-						"117"
-					]
-				},
-				{
-					"rate": 0.045,
-					"items": [
-						"105"
-					]
-				},
-				{
-					"rate": 0.03,
-					"items": [
-						"45",
-						"79",
-						"111"
-					]
-				},
-				{
-					"rate": 0.0225,
-					"items": [
-						"118"
-					]
-				},
-				{
-					"rate": 0.15,
-					"items": [
-						"106"
-					]
-				},
-				{
-					"rate": 0.03,
-					"items": [
-						"55",
-						"66",
-						"77"
-					]
-				},
-				{
-					"rate": 0.1,
-					"items": [
-						"3"
-					]
-				},
-				{
-					"rate": 0.13205,
-					"items": [
-						"4",
-						"32"
-					]
-				},
-				{
-					"rate": 0.05585,
-					"items": [
-						"5",
-						"6"
-					]
-				},
-				{
-					"rate": 0.027925,
-					"items": [
-						"7",
-						"8",
-						"9",
-						"88"
-					]
-				}
-			]
+		"527": {
+			"name": "Nue of the Shadow",
+			"type": "1",
+			"rank": "3"
+		},
+		"528": {
+			"name": "Soul Crystal",
+			"type": "9"
+		},
+		"529": {
+			"name": "Twin Soul Crystal",
+			"type": "9"
 		}
 	}
 }

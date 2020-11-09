@@ -1,25 +1,56 @@
 from random import choice, choices
 from json import load
 from typing import Sequence
+from math import isclose
+
+DATABASE_FILE_PATH = "./bot/res/database.json"
+TABLE_ITEMS = "items"
+TABLE_ITEM_TYPES = "item_types"
+TABLE_POOLS = "pools"
+DROP_RATE_TOLERANCE = 1e-5
 
 # This file has a stupid name, because a certain someone .gitignored *test*
 class Gacha:
-	def __init__(self):
-		with open("./bot/res/database.json") as database:
+	def __init__(self, database_file_path):
+		with open(database_file_path) as database:
 			self._database = load(database)
-		self._pools = {}
-		for supply_type, supply in self._database.get("pools", {}).items():
-			self._pools[supply_type] = pool = []
-			pool_total_rate = 0
-			for loot_definition in supply.get("loot_table", []):
-				for loot_item in loot_definition.get("items", []):
-					pool.append({
-						"id": loot_item,
-						"rate": loot_definition.get("rate", 0)
-					})
-					pool_total_rate += loot_definition.get("rate", 0)
-			print(f"Pool '{supply_type}' has {len(pool)} items and the total drop rate is {pool_total_rate}.")
-		print(f"Total pool count is {len(self._pools)}.")
+		self._pools = self.__load_pool()
+
+	def __load_pool(self):
+		pools = {}
+		item_configs = self._database.get(TABLE_ITEMS, {})
+		item_type_configs = self._database.get(TABLE_ITEM_TYPES, {})
+		for pool_type, pool_config in self._database.get(TABLE_POOLS, {}).items():
+			pools[pool_type] = pool = []
+			for loot_config in pool_config.get("loot_table", []):
+				rate = loot_config.get("rate", 0.0)
+				if isclose(rate, 0.0, rel_tol=DROP_RATE_TOLERANCE):
+					print("Ignored loot table with 0.0 rate.")
+					continue
+				for item_id in loot_config.get("items", []):
+					item_config = item_configs.get(item_id, None)
+					if item_config is None:
+						print(f"Warning! The item identified by '{item_id}' doesn't exist.")
+						continue
+					item_type_id = item_config.get("type", None)
+					if item_type_id is None:
+						print(f"Warning! The type of the item '{item_id}' isn't specified.")
+						continue
+					item_type_config = item_type_configs.get(item_type_id, None)
+					if item_type_config is None:
+						print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
+						continue
+					item_name = item_config.get("name", "Unknown")
+					if item_type_config.get("name", None) == "Stigmata":
+						items_to_add = [f"{item_name} ({part})" for part in ["T", "M", "B"]]
+					else:
+						items_to_add = [item_name]
+					pool.extend({
+						"id": item_id,
+						"name": item_to_add,
+						"rate": rate
+					} for item_to_add in items_to_add)
+		return pools
 
 	def __get_item(self, item_id: str) -> dict:
 		return self._database["items"].get(item_id)
@@ -27,9 +58,9 @@ class Gacha:
 	def __get_item_type(self, type_id: str) -> dict:
 		return self._database["item_types"].get(type_id)
 
-	def __pull_items(self, supply_type: str, pull_count: int) -> Sequence[str]:
+	def __pull_items(self, supply_type: str, pull_count: int) -> Sequence[object]:
 		supply = self._pools[supply_type]
-		available_items = [item["id"] for item in supply]
+		available_items = [item for item in supply]
 		drop_rates = [item["rate"] for item in supply]
 		return choices(available_items, drop_rates, k = pull_count)
 
@@ -43,10 +74,10 @@ class Gacha:
 			print("The supply type you specified doesn't exist.")
 			return
 		pull_count = max(1, min(pull_count, 10))
-		pulled_item_ids = self.__pull_items(supply_type, pull_count)
+		pulled_items = self.__pull_items(supply_type, pull_count)
 		pulled_item_names = []
-		for pulled_item_id in pulled_item_ids:
-			item = self.__get_item(pulled_item_id)
+		for pulled_item in pulled_items:
+			item = self.__get_item(pulled_item["id"])
 			item_name = item["name"] if item is not None else "Unknown item"
 			item_type = self.__get_item_type(item.get("type", "0") if item is not None else 0)
 			if item_type is not None and item_type.get("is_multi", False):
@@ -58,12 +89,12 @@ class Gacha:
 			pulled_item_names.append(item_name)
 		print("__**{}** supply drops:__\n{}".format(supply["name"], "\n".join(pulled_item_names)))
 
-gacha = Gacha()
+gacha = Gacha(DATABASE_FILE_PATH)
 all_pulls = {}
-for pull_index in range(1):
-	items = gacha.bigpull("ex", 10)
+for pull_index in range(100):
+	items = gacha.bigpull("focb", 10)
 	for item in items:
-		if all_pulls.get(item) is None:
-			all_pulls[item] = 0
-		all_pulls[item] += 1
-print(*["{}: {}".format(gacha._database["items"][pull[0]]["name"], pull[1]) for pull in all_pulls.items()], sep="\n")
+		if all_pulls.get(item["name"]) is None:
+			all_pulls[item["name"]] = 0
+		all_pulls[item["name"]] += 1
+print(*["{}: {}".format(pull, all_pulls[pull]) for pull in sorted(all_pulls.keys())], sep="\n")
