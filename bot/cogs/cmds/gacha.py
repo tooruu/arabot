@@ -7,6 +7,7 @@ from math import isclose
 DATABASE_FILE_PATH = "./bot/res/database.json"
 TABLE_ITEMS = "items"
 TABLE_ITEM_TYPES = "item_types"
+TABLE_ITEM_RANKS = "item_ranks"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
 
@@ -32,13 +33,17 @@ class Gacha(Cog, name="Commands"):
 		pulled_item_names = []
 		for pulled_item in pulled_items:
 			item = self.__get_item(pulled_item["id"])
-			item_name = item["name"] if item is not None else "Unknown item"
-			item_type = self.__get_item_type(item.get("type", "0") if item is not None else 0)
-			if item_type is not None and item_type.get("is_multi", False):
+			if item is None:
+				pulled_item_names.append("Unknown item")
+				continue
+			item_name = item["name"]
+			item_type = self._database.get(TABLE_ITEM_TYPES, {}).get(item.get("type", "0"))
+			item_rank = self._database.get(TABLE_ITEM_RANKS, {}).get(item.get("rank", "0"))
+			if item_type.get("is_multi", False):
 				count_min = item_type.get("multi_min", 1)
 				count_max = item_type.get("multi_max", 1)
 				item_name = f"{item_name} x{choice(range(count_min, count_max))}"
-			elif item_type is not None and item_type.get("is_special", False):
+			elif item_rank.get("is_special", False):
 				item_name = f"**{item_name}**"
 			pulled_item_names.append(item_name)
 		await ctx.send("__**{}** supply drops:__\n{}".format(supply["name"], "\n".join(pulled_item_names)))
@@ -65,9 +70,6 @@ class Gacha(Cog, name="Commands"):
 
 	def __get_item(self, item_id: str) -> dict:
 		return self._database[TABLE_ITEMS].get(item_id)
-
-	def __get_item_type(self, type_id: str) -> dict:
-		return self._database[TABLE_ITEM_TYPES].get(type_id)
 
 	def __pull_items(self, supply_type: str, pull_count: int) -> Sequence[object]:
 		supply = self._pools[supply_type]

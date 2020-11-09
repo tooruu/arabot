@@ -7,21 +7,21 @@
 				{
 					"rate": 0.015,
 					"items": [
-						"39"
+						"539"
 					]
 				},
 				{
 					"rate": 0.045,
 					"items": [
-						"115"
+						"577"
 					]
 				},
 				{
 					"rate": 0.03,
 					"items": [
-						"79",
-						"105",
-						"45",
+						"559",
+						"572",
+						"542",
 						"525",
 						"507",
 						"502"
@@ -100,23 +100,10 @@
 				{
 					"rate": 0.0031,
 					"items": [
+						"368",
 						"420",
 						"377",
-						"368",
 						"431"
-					]
-				},
-				{
-					"rate": 0.05335,
-					"items": [
-						"528",
-						"529",
-						"4",
-						"18",
-						"8",
-						"9",
-						"10",
-						"1"
 					]
 				},
 				{
@@ -163,46 +150,48 @@
 						"459",
 						"457"
 					]
+				},
+				{
+					"rate": 0.05335,
+					"items": [
+						"528",
+						"529",
+						"4",
+						"18",
+						"8",
+						"9",
+						"10",
+						"1"
+					]
 				}
 			]
 		}
 	},
-	"valkyrie_ranks": {
-		"0": {
-			"name": "B"
-		},
-		"1": {
-			"name": "A"
-		},
-		"2": {
-			"name": "S"
-		}
-	},
 	"item_ranks": {
 		"0": {
-			"name": "2*"
+			"name": "Junk"
 		},
 		"1": {
-			"name": "3*"
+			"name": "Common"
 		},
 		"2": {
-			"name": "4*"
+			"name": "Uncommon"
 		},
 		"3": {
-			"name": "5*"
+			"name": "Rare",
+			"is_special": true
 		},
 		"4": {
-			"name": "6*"
+			"name": "Epic",
+			"is_special": true
 		}
 	},
 	"item_types": {
 		"0": {
-			"name": "Valkyrie",
-			"is_special": true
+			"name": "Valkyrie"
 		},
 		"1": {
-			"name": "Equipment",
-			"is_special": true
+			"name": "Equipment"
 		},
 		"2": {
 			"name": "Soul",
@@ -230,7 +219,6 @@
 		},
 		"8": {
 			"name": "Stigmata",
-			"is_special": true,
 			"item_count": 3
 		},
 		"9": {
@@ -277,414 +265,6 @@
 		"18": {
 			"name": "Microreactor",
 			"type": "3"
-		},
-		"21": {
-			"name": "White Comet",
-			"type": "0"
-		},
-		"22": {
-			"name": "White Comet Soul",
-			"type": "2"
-		},
-		"23": {
-			"name": "Valkyrie Ranger",
-			"type": "0"
-		},
-		"24": {
-			"name": "Valkyrie Ranger Soul",
-			"type": "2"
-		},
-		"25": {
-			"name": "Divine Prayer",
-			"type": "0"
-		},
-		"26": {
-			"name": "Divine Prayer Soul",
-			"type": "2"
-		},
-		"27": {
-			"name": "Knight Moonbeam",
-			"type": "0"
-		},
-		"28": {
-			"name": "Knight Moonbeam Soul",
-			"type": "2"
-		},
-		"29": {
-			"name": "Herrscher of the Void",
-			"type": "0"
-		},
-		"30": {
-			"name": "Herrscher of the Void Soul",
-			"type": "2"
-		},
-		"31": {
-			"name": "Crimson Impulse",
-			"type": "0"
-		},
-		"32": {
-			"name": "Crimson Impulse",
-			"type": "2"
-		},
-		"33": {
-			"name": "Valkyrie Bladestrike",
-			"type": "0"
-		},
-		"34": {
-			"name": "Valkyrie Bladestrike Soul",
-			"type": "2"
-		},
-		"35": {
-			"name": "Shadow Dash",
-			"type": "0"
-		},
-		"36": {
-			"name": "Shadow Dash Soul",
-			"type": "2"
-		},
-		"37": {
-			"name": "Lightning Empress",
-			"type": "0"
-		},
-		"38": {
-			"name": "Lightning Empress Soul",
-			"type": "2"
-		},
-		"39": {
-			"name": "Herrscher of Thunder",
-			"type": "0"
-		},
-		"40": {
-			"name": "Herrscher of Thunder Soul",
-			"type": "2"
-		},
-		"41": {
-			"name": "Valkyrie Chariot",
-			"type": "0"
-		},
-		"42": {
-			"name": "Valkyrie Chariot",
-			"type": "2"
-		},
-		"43": {
-			"name": "Snowy Sniper",
-			"type": "0"
-		},
-		"44": {
-			"name": "Snowy Sniper Soul",
-			"type": "2"
-		},
-		"45": {
-			"name": "Yamabuki Armor",
-			"type": "0"
-		},
-		"46": {
-			"name": "Yamabuki Armor Soul",
-			"type": "2"
-		},
-		"47": {
-			"name": "Wolf's Dawn",
-			"type": "0"
-		},
-		"48": {
-			"name": "Wolf's Dawn Soul",
-			"type": "2"
-		},
-		"49": {
-			"name": "Dimension Breaker",
-			"type": "0"
-		},
-		"50": {
-			"name": "Dimension Breaker Soul",
-			"type": "2"
-		},
-		"51": {
-			"name": "Black Nucleus",
-			"type": "0"
-		},
-		"52": {
-			"name": "Black Nucleus Soul",
-			"type": "2"
-		},
-		"53": {
-			"name": "Herrscher of Reason",
-			"type": "0"
-		},
-		"54": {
-			"name": "Herrscher of Reason Soul",
-			"type": "2"
-		},
-		"55": {
-			"name": "Battle Storm",
-			"type": "0"
-		},
-		"56": {
-			"name": "Battle Storm Soul",
-			"type": "2"
-		},
-		"57": {
-			"name": "Valkyrie Triumph",
-			"type": "0"
-		},
-		"58": {
-			"name": "Valkyrie Triumph Soul",
-			"type": "2"
-		},
-		"59": {
-			"name": "Scarlet Fusion",
-			"type": "0"
-		},
-		"60": {
-			"name": "Scarlet Fusion Soul",
-			"type": "2"
-		},
-		"61": {
-			"name": "Blood Rose",
-			"type": "0"
-		},
-		"62": {
-			"name": "Blood Rose Soul",
-			"type": "2"
-		},
-		"63": {
-			"name": "Arctic Kriegsmesser",
-			"type": "0"
-		},
-		"64": {
-			"name": "Arctic Kriegsmesser Soul",
-			"type": "2"
-		},
-		"65": {
-			"name": "Vermilion Knights",
-			"type": "0"
-		},
-		"66": {
-			"name": "Vermilion Knights Soul",
-			"type": "2"
-		},
-		"67": {
-			"name": "Gyakusninn Miko",
-			"type": "0"
-		},
-		"68": {
-			"name": "Gyakushinn Miko Soul",
-			"type": "2"
-		},
-		"69": {
-			"name": "Flame Sakitama",
-			"type": "0"
-		},
-		"70": {
-			"name": "Flame Sakitama Soul",
-			"type": "2"
-		},
-		"71": {
-			"name": "Goushinnso Memento",
-			"type": "0"
-		},
-		"72": {
-			"name": "Goushinnso Memento Soul",
-			"type": "2"
-		},
-		"73": {
-			"name": "Darkbolt Jonin",
-			"type": "0"
-		},
-		"74": {
-			"name": "Darkbolt Jonin Soul",
-			"type": "2"
-		},
-		"75": {
-			"name": "Valkyrie Pledge",
-			"type": "0"
-		},
-		"76": {
-			"name": "Valkyrie Pledge Soul",
-			"type": "2"
-		},
-		"77": {
-			"name": "Sakuno Rondo",
-			"type": "0"
-		},
-		"78": {
-			"name": "Sakuno Rondo Soul",
-			"type": "2"
-		},
-		"79": {
-			"name": "Luna Kindred",
-			"type": "0"
-		},
-		"80": {
-			"name": "Luna Kindred Soul",
-			"type": "2"
-		},
-		"81": {
-			"name": "Violet Executer",
-			"type": "0"
-		},
-		"82": {
-			"name": "Violet Executer Soul",
-			"type": "2"
-		},
-		"83": {
-			"name": "Celestial Hymn",
-			"type": "0"
-		},
-		"84": {
-			"name": "Celestial Hymn Soul",
-			"type": "2"
-		},
-		"85": {
-			"name": "Starlit Astrologos",
-			"type": "0"
-		},
-		"86": {
-			"name": "Starlit Astrologos Soul",
-			"type": "2"
-		},
-		"87": {
-			"name": "Valkyrie Accipiter",
-			"type": "0"
-		},
-		"88": {
-			"name": "Valkyrie Accipiter Soul",
-			"type": "2"
-		},
-		"89": {
-			"name": "Night Squire",
-			"type": "0"
-		},
-		"90": {
-			"name": "Night Squire Soul",
-			"type": "2"
-		},
-		"91": {
-			"name": "Phoenix",
-			"type": "0"
-		},
-		"92": {
-			"name": "Phoenix Soul",
-			"type": "2"
-		},
-		"93": {
-			"name": "Shadow Knight",
-			"type": "0"
-		},
-		"94": {
-			"name": "Shadow Knight Soul",
-			"type": "2"
-		},
-		"95": {
-			"name": "Azure Empyrea",
-			"type": "0"
-		},
-		"96": {
-			"name": "Azure Empyrea Soul",
-			"type": "2"
-		},
-		"97": {
-			"name": "Imayoh Ritual",
-			"type": "0"
-		},
-		"98": {
-			"name": "Imayoh Ritual Soul",
-			"type": "2"
-		},
-		"99": {
-			"name": "S\u0102\u013dndenj\u0102\u00a4ger",
-			"type": "0"
-		},
-		"100": {
-			"name": "S\u0102\u013dndenj\u0102\u00a4ger Soul",
-			"type": "2"
-		},
-		"101": {
-			"name": "Sixth Serenade",
-			"type": "0"
-		},
-		"102": {
-			"name": "Sixth Serenade Soul",
-			"type": "2"
-		},
-		"103": {
-			"name": "Umbral Rose",
-			"type": "0"
-		},
-		"104": {
-			"name": "Umbral Rose Soul",
-			"type": "2"
-		},
-		"105": {
-			"name": "Phantom Iron",
-			"type": "0"
-		},
-		"106": {
-			"name": "Phantom Iron Soul",
-			"type": "2"
-		},
-		"107": {
-			"name": "Argent Knight: Artemis",
-			"type": "0"
-		},
-		"108": {
-			"name": "Argent Knight: Artemis Soul",
-			"type": "2"
-		},
-		"109": {
-			"name": "Fallen Rosemary",
-			"type": "0"
-		},
-		"110": {
-			"name": "Fallen Rosemary Soul",
-			"type": "2"
-		},
-		"111": {
-			"name": "Blueberry Blitz",
-			"type": "0"
-		},
-		"112": {
-			"name": "Blueberry Blitz Soul",
-			"type": "2"
-		},
-		"113": {
-			"name": "Molotov Cherry",
-			"type": "0"
-		},
-		"114": {
-			"name": "Molotov Cherry Soul",
-			"type": "2"
-		},
-		"115": {
-			"name": "Swallowtail Phantasm",
-			"type": "0"
-		},
-		"116": {
-			"name": "Swallowtail Phantasm Soul",
-			"type": "2"
-		},
-		"117": {
-			"name": "Stygian Nymph",
-			"type": "0"
-		},
-		"118": {
-			"name": "Stygian Nymph Soul",
-			"type": "2"
-		},
-		"119": {
-			"name": "Valkyrie Gloria",
-			"type": "0"
-		},
-		"120": {
-			"name": "Valkyrie Gloria Soul",
-			"type": "2"
-		},
-		"121": {
-			"name": "Bright Knight: Excelsis",
-			"type": "0"
-		},
-		"122": {
-			"name": "Bright Knight: Excelsis Soul",
-			"type": "2"
 		},
 		"123": {
 			"name": "Domain of the Void",
@@ -2713,6 +2293,261 @@
 		"529": {
 			"name": "Twin Soul Crystal",
 			"type": "9"
+		},
+		"530": {
+			"name": "White Comet",
+			"type": "0",
+			"rank": "1"
+		},
+		"531": {
+			"name": "Valkyrie Ranger",
+			"type": "0",
+			"rank": "2"
+		},
+		"532": {
+			"name": "Divine Prayer",
+			"type": "0",
+			"rank": "2"
+		},
+		"533": {
+			"name": "Knight Moonbeam",
+			"type": "0",
+			"rank": "3"
+		},
+		"534": {
+			"name": "Herrscher of the Void",
+			"type": "0",
+			"rank": "3"
+		},
+		"535": {
+			"name": "Crimson Impulse",
+			"type": "0",
+			"rank": "1"
+		},
+		"536": {
+			"name": "Valkyrie Bladestrike",
+			"type": "0",
+			"rank": "2"
+		},
+		"537": {
+			"name": "Shadow Dash",
+			"type": "0",
+			"rank": "2"
+		},
+		"538": {
+			"name": "Lightning Empress",
+			"type": "0",
+			"rank": "3"
+		},
+		"539": {
+			"name": "Herrscher of Thunder",
+			"type": "0",
+			"rank": "3"
+		},
+		"540": {
+			"name": "Valkyrie Chariot",
+			"type": "0",
+			"rank": "1"
+		},
+		"541": {
+			"name": "Snowy Sniper",
+			"type": "0",
+			"rank": "2"
+		},
+		"542": {
+			"name": "Yamabuki Armor",
+			"type": "0",
+			"rank": "2"
+		},
+		"543": {
+			"name": "Wolf's Dawn",
+			"type": "0",
+			"rank": "2"
+		},
+		"544": {
+			"name": "Dimension Breaker",
+			"type": "0",
+			"rank": "3"
+		},
+		"545": {
+			"name": "Black Nucleus",
+			"type": "0",
+			"rank": "3"
+		},
+		"546": {
+			"name": "Herrscher of Reason",
+			"type": "0",
+			"rank": "3"
+		},
+		"547": {
+			"name": "Battle Storm",
+			"type": "0",
+			"rank": "1"
+		},
+		"548": {
+			"name": "Valkyrie Triumph",
+			"type": "0",
+			"rank": "2"
+		},
+		"549": {
+			"name": "Scarlet Fusion",
+			"type": "0",
+			"rank": "2"
+		},
+		"550": {
+			"name": "Kriegsmesser",
+			"type": "0",
+			"rank": "2"
+		},
+		"551": {
+			"name": "Blood Rose",
+			"type": "0",
+			"rank": "3"
+		},
+		"552": {
+			"name": "Vermilion Knight: Eclipse",
+			"type": "0",
+			"rank": "3"
+		},
+		"553": {
+			"name": "Gyakushinn Miko",
+			"type": "0",
+			"rank": "2"
+		},
+		"554": {
+			"name": "Flame Sakitama",
+			"type": "0",
+			"rank": "2"
+		},
+		"555": {
+			"name": "Darkbolt Jonin",
+			"type": "0",
+			"rank": "2"
+		},
+		"556": {
+			"name": "Goushinnso Memento",
+			"type": "0",
+			"rank": "3"
+		},
+		"557": {
+			"name": "Valkyrie Pledge",
+			"type": "0",
+			"rank": "2"
+		},
+		"558": {
+			"name": "Sakuno Rondo",
+			"type": "0",
+			"rank": "2"
+		},
+		"559": {
+			"name": "Luna Kindred",
+			"type": "0",
+			"rank": "2"
+		},
+		"560": {
+			"name": "Starlit Astrologos",
+			"type": "0",
+			"rank": "2"
+		},
+		"561": {
+			"name": "Violet Executer",
+			"type": "0",
+			"rank": "3"
+		},
+		"562": {
+			"name": "Celestial Hymn",
+			"type": "0",
+			"rank": "3"
+		},
+		"563": {
+			"name": "Valkyrie Accipiter",
+			"type": "0",
+			"rank": "2"
+		},
+		"564": {
+			"name": "Night Squire",
+			"type": "0",
+			"rank": "2"
+		},
+		"565": {
+			"name": "Phoenix",
+			"type": "0",
+			"rank": "3"
+		},
+		"566": {
+			"name": "Shadow Knight",
+			"type": "0",
+			"rank": "3"
+		},
+		"567": {
+			"name": "Azure Empyrea",
+			"type": "0",
+			"rank": "3"
+		},
+		"568": {
+			"name": "Imayoh Ritual",
+			"type": "0",
+			"rank": "2"
+		},
+		"569": {
+			"name": "S\u00fcndenj\u00e4ger",
+			"type": "0",
+			"rank": "2"
+		},
+		"570": {
+			"name": "Sixth Serenade",
+			"type": "0",
+			"rank": "3"
+		},
+		"571": {
+			"name": "Umbral Rose",
+			"type": "0",
+			"rank": "2"
+		},
+		"572": {
+			"name": "Phantom Iron",
+			"type": "0",
+			"rank": "2"
+		},
+		"573": {
+			"name": "Argent Knight: Artemis",
+			"type": "0",
+			"rank": "3"
+		},
+		"574": {
+			"name": "Fallen Rosemary",
+			"type": "0",
+			"rank": "3"
+		},
+		"575": {
+			"name": "Blueberry Blitz",
+			"type": "0",
+			"rank": "2"
+		},
+		"576": {
+			"name": "Molotov Cherry",
+			"type": "0",
+			"rank": "3"
+		},
+		"577": {
+			"name": "Swallowtail Phantasm",
+			"type": "0",
+			"rank": "2"
+		},
+		"578": {
+			"name": "Stygian Nymph",
+			"type": "0",
+			"rank": "3"
+		},
+		"579": {
+			"name": "Valkyrie Gloria",
+			"type": "0",
+			"rank": "2"
+		},
+		"580": {
+			"name": "Bight Knight: Excelsis",
+			"type": "0",
+			"rank": "3"
 		}
 	}
 }
