@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from copy import deepcopy
 from json import dump, load
 from math import isclose
 
@@ -13,8 +14,6 @@ DROP_RATE_TOLERANCE = 1e-5
 #   change the rate of a specific item set
 #   e.g. --pool ex changerate 0.15 0.07
 #   note: it should merge equal sets
-# - clonepool command
-#   e.g. --pool ex clonepool new_ex
 # - smarter argparse
 #   it sucks when you have to type unnecessary parameters
 #   such as the listtables command
@@ -39,7 +38,8 @@ class GachaEditor:
 				"removepoolitem": self.__removepoolitem,
 				"replacepoolitem": self.__replacepoolitem,
 				"showpool": self.__showpool,
-				"togglepool": self.__togglepool
+				"togglepool": self.__togglepool,
+				"clonepool": self.__clonepool
 			}
 
 	def __save_database(self):
@@ -340,6 +340,19 @@ class GachaEditor:
 		pool["available"] = new_status = not pool.get("available", False)
 		self.__save_database()
 		print(f"Pool '{options.names[0]}' is now {'' if new_status else 'un'}available.")
+
+	# database_editor.py clonepool foca focb "Focused Supply B"
+	def __clonepool(self, options):
+		if len(options.names) != 3:
+			raise ValueError("You must specify the source and the target pool identifiers, and the target pool name.")
+		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
+		pool = pools.get(options.names[0])
+		if pool is None:
+			raise ValueError("The pool with the specified identifier doesn't exist.")
+		new_pool = deepcopy(pool)
+		new_pool["name"] = options.names[2]
+		self._database[TABLE_POOLS][options.names[1]] = new_pool
+		self.__save_database()
 
 	def execute(self, options):
 		operation = self._operations.get(options.operation)
