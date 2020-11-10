@@ -1,7 +1,7 @@
-from random import choice, choices
 from json import load
-from typing import Sequence
 from math import isclose
+from random import choice, choices
+from typing import Sequence
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 TABLE_ITEMS = "items"
@@ -9,6 +9,7 @@ TABLE_ITEM_TYPES = "item_types"
 TABLE_ITEM_RANKS = "item_ranks"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
+STIGMATA_PARTS = ("T", "M", "B")
 
 # This file has a stupid name, because a certain someone .gitignored *test*
 class Gacha:
@@ -42,8 +43,8 @@ class Gacha:
 						print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
 						continue
 					item_name = item_config.get("name", "Unknown")
-					if item_type_config.get("name", None) == "Stigmata":
-						items_to_add = [f"{item_name} ({part})" for part in ["T", "M", "B"]]
+					if item_type_config.get("name", None) == "Stigmata" and not item_name.endswith(STIGMATA_PARTS):
+						items_to_add = [f"{item_name} ({part})" for part in STIGMATA_PARTS]
 					else:
 						items_to_add = [item_name]
 					pool.extend({
@@ -88,7 +89,7 @@ class Gacha:
 			if item is None:
 				pulled_item_names.append("Unknown item")
 				continue
-			item_name = item["name"]
+			item_name = pulled_item["name"]
 			item_type = self._database.get(TABLE_ITEM_TYPES, {}).get(item.get("type", "0"))
 			item_rank = self._database.get(TABLE_ITEM_RANKS, {}).get(item.get("rank", "0"))
 			if item_type.get("is_multi", False):
@@ -102,7 +103,7 @@ class Gacha:
 
 gacha = Gacha(DATABASE_FILE_PATH)
 print(*[pool[0] for pool in gacha.pools()])
-gacha.gacha("ex")
+gacha.gacha("dorm")
 # all_pulls = {}
 # for pull_index in range(100):
 # 	items = gacha.bigpull("focb", 10)

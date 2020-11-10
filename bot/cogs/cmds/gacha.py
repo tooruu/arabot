@@ -10,6 +10,7 @@ TABLE_ITEM_TYPES = "item_types"
 TABLE_ITEM_RANKS = "item_ranks"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
+STIGMATA_PARTS = ("T", "M", "B")
 
 class Gacha(Cog, name="Commands"):
 	def __init__(self, client, database_file_path):
@@ -36,7 +37,7 @@ class Gacha(Cog, name="Commands"):
 			if item is None:
 				pulled_item_names.append("Unknown item")
 				continue
-			item_name = item["name"]
+			item_name = pulled_item["name"]
 			item_type = self._database.get(TABLE_ITEM_TYPES, {}).get(item.get("type", "0"))
 			item_rank = self._database.get(TABLE_ITEM_RANKS, {}).get(item.get("rank", "0"))
 			if item_type.get("is_multi", False):
@@ -108,8 +109,8 @@ class Gacha(Cog, name="Commands"):
 						print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
 						continue
 					item_name = item_config.get("name", "Unknown")
-					if item_type_config.get("name", None) == "Stigmata":
-						items_to_add = [f"{item_name} ({part})" for part in ["T", "M", "B"]]
+					if item_type_config.get("name", None) == "Stigmata" and not item_name.endswith(STIGMATA_PARTS):
+						items_to_add = [f"{item_name} ({part})" for part in STIGMATA_PARTS]
 					else:
 						items_to_add = [item_name]
 					pool.extend({
