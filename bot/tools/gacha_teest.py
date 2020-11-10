@@ -10,6 +10,7 @@ TABLE_ITEM_RANKS = "item_ranks"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
 STIGMATA_PARTS = ("T", "M", "B")
+STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
 
 # This file has a stupid name, because a certain someone .gitignored *test*
 class Gacha:
@@ -43,7 +44,7 @@ class Gacha:
 						print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
 						continue
 					item_name = item_config.get("name", "Unknown")
-					if item_type_config.get("name", None) == "Stigmata" and not item_name.endswith(STIGMATA_PARTS):
+					if item_type_config.get("name", None) == "Stigmata" and not item_name.endswith(STIGMATA_PARTS_FULL):
 						items_to_add = [f"{item_name} ({part})" for part in STIGMATA_PARTS]
 					else:
 						items_to_add = [item_name]

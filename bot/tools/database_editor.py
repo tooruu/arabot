@@ -8,8 +8,13 @@ TABLE_ITEMS = "items"
 TABLE_ITEM_TYPES = "item_types"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
+STIGMATA_PARTS = ("T", "M", "B")
+STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
 
 # TODO LIST
+# - --auto-adjust flag for addpoolitem command
+#   it's a pain in the ass to re-calculate all the drop rates
+#   for the item count, so why not let the program do it?
 # - changerate command
 #   change the rate of a specific item set
 #   e.g. --pool ex changerate 0.15 0.07
@@ -85,7 +90,12 @@ class GachaEditor:
 				if item_type is None:
 					print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
 					continue
-				total_rate += descriptor.get("rate", 0.0) * item_type.get("item_count", 1)
+				rate = descriptor.get("rate", 0.0)
+				item_name = item.get("name", "Unknown")
+				if item_type.get("name") == "Stigmata" and not item_name.endswith(STIGMATA_PARTS_FULL):
+					total_rate += rate * len(STIGMATA_PARTS)
+				else:
+					total_rate += rate
 		return total_rate
 
 	def __validate_pool_total_rate(self, pool_code: str):
