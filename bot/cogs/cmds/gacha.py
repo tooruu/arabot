@@ -3,6 +3,7 @@ from discord.ext.commands import command, Cog, cooldown, BucketType, CommandOnCo
 from json import load
 from typing import Sequence
 from math import isclose
+from .._utils import bold
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 TABLE_ITEMS = "items"
@@ -46,7 +47,7 @@ class Gacha(Cog, name="Commands"):
 				count_max = item_type.get("multi_max", 1)
 				item_name = f"{item_name} x{choice(range(count_min, count_max))}"
 			elif item_rank is not None and item_rank.get("is_special", False):
-				item_name = f"**{item_name}**"
+				item_name = bold(item_name)
 			pulled_item_names.append(item_name)
 		await ctx.send("__**{}** supply drops:__\n{}".format(supply["name"], "\n".join(pulled_item_names)))
 
