@@ -39,13 +39,13 @@ class Gacha(Cog, name="Commands"):
 				pulled_item_names.append("Unknown item")
 				continue
 			item_name = pulled_item["name"]
-			item_type = self._database.get(TABLE_ITEM_TYPES, {}).get(item.get("type", "0"))
-			item_rank = self._database.get(TABLE_ITEM_RANKS, {}).get(item.get("rank", "0"))
-			if item_type.get("is_multi", False):
+			item_type = self._database.get(TABLE_ITEM_TYPES, {}).get(item.get("type", None))
+			item_rank = self._database.get(TABLE_ITEM_RANKS, {}).get(item.get("rank", None))
+			if item_type is not None and item_type.get("is_multi", False):
 				count_min = item_type.get("multi_min", 1)
 				count_max = item_type.get("multi_max", 1)
 				item_name = f"{item_name} x{choice(range(count_min, count_max))}"
-			elif item_rank.get("is_special", False):
+			elif item_rank is not None and item_rank.get("is_special", False):
 				item_name = f"**{item_name}**"
 			pulled_item_names.append(item_name)
 		await ctx.send("__**{}** supply drops:__\n{}".format(supply["name"], "\n".join(pulled_item_names)))

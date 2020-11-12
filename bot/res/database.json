@@ -666,8 +666,7 @@
 			"multi_max": 6
 		},
 		"8": {
-			"name": "Stigmata",
-			"item_count": 3
+			"name": "Stigmata"
 		},
 		"9": {
 			"name": "Item exp"

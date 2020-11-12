@@ -12,9 +12,9 @@ STIGMATA_PARTS = ("T", "M", "B")
 STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
 
 # TODO LIST
-# - --auto-adjust flag for addpoolitem command
-#   it's a pain in the ass to re-calculate all the drop rates
-#   for the item count, so why not let the program do it?
+# - for the rates, use the ones from the game and let
+#   the database editor/gacha script figure out the
+#   real drop rates (rate / 100 / item count -> stigmas are special)
 # - changerate command
 #   change the rate of a specific item set
 #   e.g. --pool ex changerate 0.15 0.07
