@@ -50,6 +50,7 @@ class GachaEditor:
 	def __save_database(self):
 		with open(DATABASE_FILE_PATH, "w+") as database:
 			dump(self._database, database)
+			dump(self._database, database, indent="\t")
 		print("The database has been saved successfully.")
 
 	def __get_or_initialize_value(self, dictionary: dict, key: str, default_value: object) -> object:
