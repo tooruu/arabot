@@ -19,6 +19,11 @@ STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
 #   change the rate of a specific item set
 #   e.g. --pool ex changerate 0.15 0.07
 #   note: it should merge equal sets
+# - interactive pool updates
+#   it would be nice if the user didn't have to type the whole name of items
+#   but could instead use regex matching (eg. "Star Shatterer: Vikrant" -> "vikrant")
+#   and in case the input is ambiguous the script should let the user choose one
+#   from the list of matching options
 # - smarter argparse
 #   it sucks when you have to type unnecessary parameters
 #   such as the listtables command
@@ -48,11 +53,16 @@ class GachaEditor:
 			}
 
 	def __save_database(self):
+		'''Saves the database associated to the editor instance.'''
 		with open(DATABASE_FILE_PATH, "w+") as database:
-			dump(self._database, database)
+			dump(self._database, database, indent="\t")
 		print("The database has been saved successfully.")
 
 	def __get_or_initialize_value(self, dictionary: dict, key: str, default_value: object) -> object:
+		'''
+		Gets the value associated to the specified ``key`` from the specified ``dictionary``.
+		If the key isn't present in the dictionary, it is initialized with the specified ``default_value``.
+		'''
 		value = dictionary.get(key)
 		if value is not None:
 			return value
@@ -60,12 +70,24 @@ class GachaEditor:
 		return value
 
 	def __find_ids_by_field(self, table_name: str, field_name: str, field_value: str, is_exact: bool = True):
+		'''
+		Finds all the identifiers in the table with the specified ``table_name``
+		whose fields identified by the specified ``field_name``
+		match the specified ``field_value``.
+		If ``is_exact`` is set to ``True``, only exact matches are returned.
+		'''
 		predicate = (lambda text: text == field_value) if is_exact else (lambda text: field_value.lower() in text.lower())
 		for key, item in self.__get_or_initialize_value(self._database, table_name, {}).items():
 			if predicate(item.get(field_name, "")):
 				yield key
 
 	def __get_pool_total_rate(self, pool_code: str) -> float:
+		'''
+		Calculates the total drop rate for the items in the loot table
+		of the pool identified by the specified ``pool_code``.
+
+		This function accounts for stigmatas, too.
+		'''
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		pool = table.get(pool_code)
 		if pool is None:
@@ -99,14 +121,26 @@ class GachaEditor:
 		return total_rate
 
 	def __validate_pool_total_rate(self, pool_code: str):
+		'''
+		Validates the total drop rate of the pool identified by the specified ``pool_code``.
+		'''
 		total_rate = self.__get_pool_total_rate(pool_code)
 		if not isclose(total_rate, 0.0, rel_tol=DROP_RATE_TOLERANCE) and not isclose(total_rate, 1.0, rel_tol=DROP_RATE_TOLERANCE):
 			print(f"Warning! Pool '{pool_code}' has a total drop rate of {total_rate}.")
 
+	def __find_item_id(self, item_name: str) -> str:
+		'''Finds the unique identifier of the item with the specified name.'''
+		return next(self.__find_ids_by_field(TABLE_ITEMS, "name", item_name), None)
+
+	def __find_valkyrie_fragment_id(self, valkyrie_name: str) -> str:
+		'''Finds the unique identifier of fragment/soul that belongs to the Valkyrie with the specified name.'''
+		# TODO Mark valkyries with "is_awakened": True so it's easier to find the matching frag/soul.
+		return self.__find_item_id(f"{valkyrie_name} fragment") or self.__find_item_id(f"{valkyrie_name} soul")
+
 	# TODO Make the argument parser more obvious, because specifying the "names" argument here makes no sense.
 	# python .\bot\tools\database_editor.py listtables all
 	def __list_tables(self, options):
-		"""Lists the names of the tables available in the database."""
+		'''Lists the names of the tables available in the database.'''
 		for table_id in self._database.keys():
 			print(table_id)
 
@@ -239,8 +273,8 @@ class GachaEditor:
 		if item_list is None:
 			matching_descriptor["items"] = item_list = []
 		for _, name in enumerate(options.names):
-			item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", name), -1)
-			if item_id == -1:
+			item_id = self.__find_item_id(name)
+			if item_id is None:
 				print(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
 				continue
 			if item_id in item_list:
@@ -272,8 +306,8 @@ class GachaEditor:
 		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
 		has_changed = False
 		for _, name in enumerate(options.names):
-			item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", name), -1)
-			if item_id == -1:
+			item_id = self.__find_item_id(name)
+			if item_id is None:
 				print(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
 				continue
 			is_found = False
@@ -293,35 +327,65 @@ class GachaEditor:
 		if has_changed:
 			self.__save_database()
 
-	# database_editor.py --pool <code> replacepoolitem <name 1> <name 2> [<name 1> <name 2> ...]
+	# database_editor.py --pool <code> [--fragments] replacepoolitem <name 1> <name 2> [<name 1> <name 2> ...]
 	# database_editor.py --pool ex replacepoolitem "Stygian Nymph" "Bright Knight: Excelsis"
 	def __replacepoolitem(self, options):
 		if len(options.names) % 2 != 0:
 			raise ValueError("You must specify name pairs.")
-		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = table.get(options.pool)
+		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
+		pool = pools.get(options.pool)
 		if pool is None:
 			raise ValueError("The specified pool doesn't exist.")
 		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
+		has_changed = False
 		for old_item_name, new_item_name in zip(options.names[0::2], options.names[1::2]):
-			old_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", old_item_name), None)
-			new_item_id = next(self.__find_ids_by_field(TABLE_ITEMS, "name", new_item_name), None)
+			if not self.__replace_pool_item(loot_table, old_item_name, new_item_name):
+				continue
+			has_changed = True
+			if options.fragments:
+				self.__replace_pool_valkyrie_fragment(loot_table, old_item_name, new_item_name)
+		if has_changed:
+			self.__save_database()
+
+	def __replace_pool_item(self, loot_table, old_item_name: str, new_item_name: str) -> bool:
+			old_item_id = self.__find_item_id(old_item_name)
 			if old_item_id is None:
-				raise ValueError(f"The item '{old_item_name}' doesn't exist.")
+				print(f"The item '{old_item_name}' doesn't exist, hence it won't be replaced.")
+				return False
+			new_item_id = self.__find_item_id(new_item_name)
 			if new_item_id is None:
-				raise ValueError(f"The item '{new_item_name}' doesn't exist.")
-			has_changed = False
-			for _, descriptor in enumerate(loot_table):
-				item_list = descriptor.get("items", [])
-				if old_item_id in item_list:
-					item_list.remove(old_item_id)
-					item_list.append(new_item_id)
-					print(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
-					self.__save_database()
-					has_changed = True
-					break
-			if not has_changed:
-				print(f"The item '{old_item_name}' cannot be found in the pool.")
+				print(f"The item '{new_item_name}' doesn't exist, hence it won't replace the item '{old_item_name}'.")
+				return False
+			if self.__replace_pool_item_internal(loot_table, old_item_id, new_item_id):
+				print(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
+				return True
+			print(f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced.")
+			return False
+
+	def __replace_pool_valkyrie_fragment(self, loot_table, old_valkyrie_name: str, new_valkyrie_name: str) -> bool:
+		old_item_id = self.__find_valkyrie_fragment_id(old_valkyrie_name)
+		if old_item_id is None:
+			print(f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced.")
+			return False
+		new_item_id = self.__find_valkyrie_fragment_id(new_valkyrie_name)
+		if old_item_id is None:
+			print(f"The fragment for item '{new_valkyrie_name}' doesn't exist, hence it won't replace any other fragments.")
+			return False
+		if self.__replace_pool_item_internal(loot_table, old_item_id, new_item_id):
+			print(f"The fragment of valkyrie '{old_valkyrie_name}' has been replaced by the fragment of valkyrie '{new_valkyrie_name}'.")
+			return True
+		print(f"The fragment of valkyrie '{old_valkyrie_name}' cannot be found in the pool, hence it won't be replaced.")
+		return False
+
+	def __replace_pool_item_internal(self, loot_table, old_item_id: str, new_item_id: str) -> bool:
+		for _, descriptor in enumerate(loot_table):
+			item_list = descriptor.get("items", [])
+			if not old_item_id in item_list:
+				continue
+			item_list.remove(old_item_id)
+			item_list.append(new_item_id)
+			return True
+		return False
 
 	# database_editor.py showpool <code>
 	# database_editor.py showpool ex
@@ -381,6 +445,7 @@ parser.add_argument("--awakened", action="store_const", const=True) # Is awakene
 parser.add_argument("--field", default=None) # Field name
 parser.add_argument("--pool", default=None) # Pool ID
 parser.add_argument("--rate",  default=None) # Drop rate
+parser.add_argument("--fragments", action="store_const", const=True) # Automatically handles valkyrie fragments/souls during item operations
 parser.add_argument("operation") # Operation to perform
 parser.add_argument("names", nargs="+")
 GachaEditor().execute(parser.parse_args())
