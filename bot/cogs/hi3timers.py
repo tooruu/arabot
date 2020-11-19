@@ -46,11 +46,13 @@ class HI3Timers(Cog):
 	@loop(minutes=5) # rate limit: 2 updates per 10 mins
 	async def countdown(self):
 		ow = self.timers["ow"]
-		#ma = self.timers["ma"]
+		ma = self.timers["ma"]
 		qs = self.timers["qs"]
+		waifus = self.timers["waifus"]
 		await ow.channel.edit(name="🌍{} {}h {}m".format(ow.get_status(), *ow.till_next_phase()))
-		#await ma.channel.edit(name="👹{} {}h {}m".format(ma.get_status(), *ma.till_next_phase()))
+		await ma.channel.edit(name="👹{} {}h {}m".format(ma.get_status(), *ma.till_next_phase()))
 		await qs.channel.edit(name="🔥{} {}h {}m".format(qs.get_status(), *qs.till_next_phase()))
+		await waifus.channel.edit(name="💖Waifus in {}m".format(*waifus.till_next_phase()))
 
 	@Cog.listener()
 	async def on_ready(self):
@@ -59,15 +61,18 @@ class HI3Timers(Cog):
 			4: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
 			6: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
 		})
-		#self.timers["ma"] = Timer(self.bot.get_channel(752382371596206141), {
-		#	1: [(time(hour=4), "Ongoing")],
-		#	2: [(time(hour=4), "Calculating")],
-		#})
+		self.timers["ma"] = Timer(self.bot.get_channel(779022842372685854), {
+			1: [(time(hour=4), "Ongoing")],
+			2: [(time(hour=4), "Calculating")],
+		})
 		self.timers["qs"] = Timer(self.bot.get_channel(752382371596206141), {
 			1: [(time(hour=15), "Preparing")],
 			3: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
 			5: [(time(hour=15), "Preparing")],
 			7: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
+		})
+		self.timers["waifus"] = Timer(self.bot.get_channel(779019769755861004), {
+			w: [(time(hour=h, minute=39), None) for h in range(23)] for w in range(1,8)
 		})
 		self.countdown.start()
 
