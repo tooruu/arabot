@@ -52,7 +52,7 @@ class HI3Timers(Cog):
 		await ow.channel.edit(name="🌍{} {}h {}m".format(ow.get_status(), *ow.till_next_phase()))
 		await ma.channel.edit(name="👹{} {}h {}m".format(ma.get_status(), *ma.till_next_phase()))
 		await qs.channel.edit(name="🔥{} {}h {}m".format(qs.get_status(), *qs.till_next_phase()))
-		await waifus.channel.edit(name="💖Waifus in {}m".format(*waifus.till_next_phase()))
+		await waifus.channel.edit(name="💖Waifus in {}m".format(waifus.till_next_phase()[1]))
 
 	@Cog.listener()
 	async def on_ready(self):
