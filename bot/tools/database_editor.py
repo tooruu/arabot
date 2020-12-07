@@ -368,7 +368,7 @@ class GachaEditor:
 			print(f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced.")
 			return False
 		new_item_id = self.__find_valkyrie_fragment_id(new_valkyrie_name)
-		if old_item_id is None:
+		if new_item_id is None:
 			print(f"The fragment for item '{new_valkyrie_name}' doesn't exist, hence it won't replace any other fragments.")
 			return False
 		if self.__replace_pool_item_internal(loot_table, old_item_id, new_item_id):
