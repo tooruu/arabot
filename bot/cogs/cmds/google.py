@@ -1,13 +1,14 @@
 from discord.ext.commands import command, Cog, Converter, ConversionError
 from discord import Embed
-from .._utils import getenv, bold, Blacklist, BlacklistMatch
+from .._utils import bold, Blacklist, BlacklistMatch
 from urllib.parse import quote_plus as safe
 from aiohttp.client_exceptions import ClientConnectorError
+from auth.credman import req_auth
 
 class Google(Cog, name="Commands"):
-	def __init__(self, client):
+	def __init__(self, client, keys):
 		self.bot = client
-		(self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key) = getenv("g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
+		(self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key) = keys
 
 	@command(aliases=["i", "img"], brief="<query> | Top search result from Google Images")
 	async def image(self, ctx, *, query: Blacklist):
@@ -115,5 +116,6 @@ class Google(Cog, name="Commands"):
 		) as resp:
 			await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>" if resp.status == 429 else '\n'.join(["https://youtu.be/" + hit["id"]["videoId"] for hit in resp["items"]]) if (resp:=await resp.json())["items"] else "No videos found")
 
-def setup(client):
-	client.add_cog(Google(client))
+@req_auth("g_search_key", "g_isearch_key", "g_cse", "g_yt_key")
+def setup(client, keys):
+	client.add_cog(Google(client, keys))

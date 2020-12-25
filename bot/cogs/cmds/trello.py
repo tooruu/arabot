@@ -1,12 +1,13 @@
 from discord.ext.commands import Cog, group, check
-from .._utils import getenv, is_dev, bold
+from .._utils import is_dev, bold
 from discord import Embed
 from asyncio import TimeoutError
+from auth.credman import req_auth
 
 class Trello(Cog, name="Commands"):
-	def __init__(self, client):
+	def __init__(self, client, keys):
 		self.bot = client
-		self.key, self.token = getenv("trello_key", "trello_token")
+		self.key, self.token = keys
 		self.TODO_ID = "5f83b280d843221ed1677555"
 		self.CARDS_URL = "https://api.trello.com/1/cards"
 
@@ -96,5 +97,6 @@ class Trello(Cog, name="Commands"):
 	async def view(self, ctx):
 		...
 
-def setup(client):
-	client.add_cog(Trello(client))
+@req_auth("trello_key", "trello_token")
+def setup(client, keys):
+	client.add_cog(Trello(client, keys))

@@ -13,7 +13,7 @@ from datetime import datetime
 BOT_DEBUG = False
 BOT_NAME = "AraBot"
 BOT_PREFIX = ("-", ) if BOT_DEBUG else (";", "ara ")
-BOT_VERSION = "2.15.3"
+BOT_VERSION = "2.16.0"
 # 1.0.0 major changes
 # 0.1.0 new features
 # 0.0.1 minor improvements & bugfixes
@@ -133,17 +133,6 @@ class Queue:
 
 	def items(self):
 		return self._items
-
-def getenv(*keys):
-	if environ.get("token"):
-		if len(keys) == 1:
-			return environ[keys[0]]
-		return (environ[k] for k in keys)
-	with open("./.env") as s:
-		secret = {line.partition("=")[0]: line.partition("=")[-1] for line in s.read().splitlines()}
-	if len(keys) == 1:
-		return secret[keys[0]]
-	return (secret[k] for k in keys)
 
 bold = lambda s: "**{}**".format(s.replace('*', '\\*'))
 

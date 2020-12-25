@@ -1,12 +1,13 @@
 from discord.ext.commands import command, Cog
-from .._utils import getenv, dsafe
+from .._utils import dsafe
 from discord import Embed
 from html import unescape
+from auth.credman import req_auth
 
 class Trans(Cog, name="Commands"):
-	def __init__(self, client):
+	def __init__(self, client, key):
 		self.bot = client
-		self.key = getenv("g_trans_key")
+		self.key = key
 
 	@command(aliases=["trans", "tr"], brief="<target_lang> <text> | Translates text to target language")
 	async def translate(self, ctx, lang_to, *, text=None):
@@ -33,5 +34,6 @@ class Trans(Cog, name="Commands"):
 		embed.add_field(name=lang_to.upper(), value=dsafe(unescape(trans["translatedText"]))[:1024], inline=False)
 		await ctx.send(embed=embed)
 
-def setup(client):
-	client.add_cog(Trans(client))
+@req_auth("g_trans_key")
+def setup(client, key):
+	client.add_cog(Trans(client, key))

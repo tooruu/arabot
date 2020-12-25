@@ -1,12 +1,12 @@
 from discord.ext.commands import command, Cog
 from aiohttp import ClientSession as WebSession
 import discord
-from .._utils import getenv
+from auth.credman import req_auth
 
 class Faceit(Cog, name="Commands"):
-	def __init__(self, client):
+	def __init__(self, client, key):
 		self.bot = client
-		self.faceit_key = getenv("faceit_key")
+		self.faceit_key = key
 
 	@command(brief="<nickname> | View player's FACEIT profile")
 	async def faceit(self, ctx, nickname):
@@ -38,5 +38,6 @@ class Faceit(Cog, name="Commands"):
 			)
 		await ctx.send(embed=embed)
 
-def setup(client):
-	client.add_cog(Faceit(client))
+@req_auth("faceit_key")
+def setup(client, key):
+	client.add_cog(Faceit(client, key))

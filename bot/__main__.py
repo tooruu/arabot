@@ -1,7 +1,8 @@
 from discord.ext.commands import Bot
 from discord import Intents
-from cogs._utils import getenv, BOT_PREFIX, load_ext, Help
+from cogs._utils import BOT_PREFIX, load_ext, Help
 from aiohttp import ClientSession as WebSession
+from auth.credman import getenv
 
 intents = Intents(
 	guilds=True,

@@ -1,13 +1,14 @@
 from discord.ext.commands import command, Cog
-from .._utils import dsafe, getenv
+from .._utils import dsafe
 from urllib.parse import quote
 from discord import Embed
 from json import loads
+from auth.credman import req_auth
 
 class Wolfram(Cog, name="Commands"):
-	def __init__(self, client):
+	def __init__(self, client, key):
 		self.bot = client
-		self.wolfram_id = getenv("wolfram_id")
+		self.wolfram_id = key
 
 	@command(brief="<query> | Answer a question?")
 	async def calc(self, ctx, *, query):
@@ -51,5 +52,6 @@ class Wolfram(Cog, name="Commands"):
 					embed.description = wa["tips"]["text"]
 			await ctx.send(embed=embed)
 
-def setup(client):
-	client.add_cog(Wolfram(client))
+@req_auth("wolfram_id")
+def setup(client, key):
+	client.add_cog(Wolfram(client, key))
