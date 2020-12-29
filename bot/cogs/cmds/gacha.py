@@ -6,7 +6,7 @@ from gacha.models.pulls import Pull
 from gacha.persistence.json import JsonEntityProvider
 from gacha.persistence.json.converters import ItemConverter, ItemRankConverter, ItemTypeConverter, PoolConverter
 from gacha.providers import SimplePullProvider
-from typing import Generator, List
+from typing import Generator
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 LOG_LEVEL = LogLevel.WARNING
@@ -59,7 +59,7 @@ class Gacha(Cog, name="Commands"):
 		return SimplePullProvider(entity_provider, item_resolver, log)
 
 	@staticmethod
-	def _format_pulls(pulls: Generator[Pull, None, None]) -> List[str]:
+	def _format_pulls(pulls: Generator[Pull, None, None]) -> Generator[str, None, None]:
 		for pull in pulls:
 			formatted_pull = pull.name
 			if pull.count > 1:
