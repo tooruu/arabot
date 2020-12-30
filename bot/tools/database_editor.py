@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from copy import deepcopy
 from json import dump, load
 from math import isclose
+from typing import Callable, Iterable, TypeVar
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 TABLE_ITEMS = "items"
@@ -10,6 +11,9 @@ TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
 STIGMATA_PARTS = ("T", "M", "B")
 STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
+
+_T = TypeVar("_T")
+_T2 = TypeVar("_T2")
 
 # TODO LIST
 # - for the rates, use the ones from the game and let
@@ -52,6 +56,13 @@ class GachaEditor:
 				"clonepool": self.__clonepool
 			}
 
+	@staticmethod
+	def _aggregate(source: Iterable[_T], seed: _T2, func: Callable[[_T2, _T], _T2]) -> _T2:
+		current_value = seed
+		for item in source:
+			current_value = func(current_value, item)
+		return current_value
+
 	def __save_database(self):
 		'''Saves the database associated to the editor instance.'''
 		with open(DATABASE_FILE_PATH, "w+") as database:
@@ -63,7 +74,7 @@ class GachaEditor:
 		Gets the value associated to the specified ``key`` from the specified ``dictionary``.
 		If the key isn't present in the dictionary, it is initialized with the specified ``default_value``.
 		'''
-		value = dictionary.get(key)
+		value = dictionary.get(key, None)
 		if value is not None:
 			return value
 		dictionary[key] = value = default_value
@@ -81,6 +92,9 @@ class GachaEditor:
 			if predicate(item.get(field_name, "")):
 				yield key
 
+	def _find_id_by_field(self, table_name: str, field_name: str, field_value: str, is_exact: bool = True, default_value = None):
+		return next(self.__find_ids_by_field(table_name, field_name, field_value, is_exact), default_value)
+
 	def __get_pool_total_rate(self, pool_code: str) -> float:
 		'''
 		Calculates the total drop rate for the items in the loot table
@@ -89,36 +103,14 @@ class GachaEditor:
 		This function accounts for stigmatas, too.
 		'''
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = table.get(pool_code)
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", pool_code)
+		pool = table.get(pool_id)
 		if pool is None:
 			return 0.0
 		loot_table = pool.get("loot_table", [])
 		if len(loot_table) == 0:
 			return 0.0
-		items = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
-		item_types = self.__get_or_initialize_value(self._database, TABLE_ITEM_TYPES, {})
-		total_rate = 0.0
-		for _, descriptor in enumerate(loot_table):
-			for item_id in descriptor.get("items", []):
-				item = items.get(item_id, None)
-				if item is None:
-					print(f"Warning! The item identified by '{item_id}' doesn't exist.")
-					continue
-				item_type_id = item.get("type", None)
-				if item_type_id is None:
-					print(f"Warning! The type of the item '{item_id}' isn't specified.")
-					continue
-				item_type = item_types.get(item_type_id, None)
-				if item_type is None:
-					print(f"Warning! The item type identified by '{item_type_id}' doesn't exist.")
-					continue
-				rate = descriptor.get("rate", 0.0)
-				item_name = item.get("name", "Unknown")
-				if item_type.get("name") == "Stigmata" and not item_name.endswith(STIGMATA_PARTS_FULL):
-					total_rate += rate * len(STIGMATA_PARTS)
-				else:
-					total_rate += rate
-		return total_rate
+		return GachaEditor._aggregate(loot_table, 0.0, lambda c, i: c + i.get("rate", 0.0))
 
 	def __validate_pool_total_rate(self, pool_code: str):
 		'''
@@ -137,6 +129,12 @@ class GachaEditor:
 		# TODO Mark valkyries with "is_awakened": True so it's easier to find the matching frag/soul.
 		return self.__find_item_id(f"{valkyrie_name} fragment") or self.__find_item_id(f"{valkyrie_name} soul")
 
+	def _get_next_id(self, table_name: str) -> int:
+		table = self._database.get(table_name, None)
+		if table is None:
+			return 1
+		return max((int(key) for key in table.keys()), default=0) + 1
+
 	# TODO Make the argument parser more obvious, because specifying the "names" argument here makes no sense.
 	# python .\bot\tools\database_editor.py listtables all
 	def __list_tables(self, options):
@@ -146,7 +144,7 @@ class GachaEditor:
 
 	def __add_item_internal(self, item_name: str, item_type: str, item_rank: str = None, is_single_stigmata: bool = False) -> str:
 		table = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
-		next_key = max((int(key) for key in table.keys()), default=0) + 1
+		next_key = self._get_next_id(TABLE_ITEMS)
 		table[next_key] = item = {
 			"name": item_name,
 			"type": item_type
@@ -209,7 +207,7 @@ class GachaEditor:
 		else:
 			add_item(f"{options.names[0]} fragment", "7")
 		add_item(options.names[1], "1", "3")
-		add_item(options.names[2], "8")
+		add_item(options.names[2], "8", options.rank if options.rank is not None else "2")
 		self.__save_database()
 
 	# database_editor.py addpool <code> <name>
@@ -220,8 +218,9 @@ class GachaEditor:
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		if table.get(options.names[0]) is not None:
 			raise ValueError("The specified pool already exists.")
-		table[options.names[0]] = {
+		table[self._get_next_id(TABLE_POOLS)] = {
 			"name": options.names[1],
+			"code": options.names[0],
 			"available": True,
 			"loot_table": []
 		}
@@ -233,10 +232,11 @@ class GachaEditor:
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
 		has_changed = False
 		for _, name in enumerate(options.names):
-			if table.get(name) is None:
+			pool_id = self._find_id_by_field(TABLE_POOLS, "code", name)
+			if pool_id is None:
 				print(f"The pool '{name}' doesn't exist.")
 				continue
-			table.pop(name)
+			table.pop(pool_id)
 			has_changed = True
 			print(f"The pool '{name}' has been removed.")
 		if has_changed:
@@ -249,7 +249,8 @@ class GachaEditor:
 		if rate < 0.0 or rate > 1.0:
 			raise ValueError("The drop rate must be between 0.0, inclusive and 1.0, inclusive.")
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = table.get(options.pool)
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
+		pool = table.get(pool_id)
 		if pool is None:
 			raise ValueError("The specified pool doesn't exist.")
 		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
@@ -300,7 +301,8 @@ class GachaEditor:
 	# database_editor.py --pool ex removepoolitem "ARC Serratus" "Blaze Destroyer"
 	def __removepoolitem(self, options):
 		table = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = table.get(options.pool)
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
+		pool = table.get(pool_id)
 		if pool is None:
 			raise ValueError("The specified pool doesn't exist.")
 		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
@@ -333,7 +335,8 @@ class GachaEditor:
 		if len(options.names) % 2 != 0:
 			raise ValueError("You must specify name pairs.")
 		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = pools.get(options.pool)
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
+		pool = pools.get(pool_id)
 		if pool is None:
 			raise ValueError("The specified pool doesn't exist.")
 		loot_table = self.__get_or_initialize_value(pool, "loot_table", [])
@@ -391,7 +394,8 @@ class GachaEditor:
 	# database_editor.py showpool ex
 	def __showpool(self, options):
 		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = pools.get(options.names[0], None)
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
+		pool = pools.get(pool_id, None)
 		if pool is None:
 			raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
 		items = self.__get_or_initialize_value(self._database, TABLE_ITEMS, {})
@@ -408,7 +412,8 @@ class GachaEditor:
 	# database_editor.py togglepool ex
 	def __togglepool(self, options):
 		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = pools.get(options.names[0], None)
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
+		pool = pools.get(pool_id, None)
 		if pool is None:
 			raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
 		pool["available"] = new_status = not pool.get("available", False)
@@ -420,13 +425,17 @@ class GachaEditor:
 		if len(options.names) != 3:
 			raise ValueError("You must specify the source and the target pool identifiers, and the target pool name.")
 		pools = self.__get_or_initialize_value(self._database, TABLE_POOLS, {})
-		pool = pools.get(options.names[0])
+		pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
+		pool = pools.get(pool_id)
 		if pool is None:
 			raise ValueError("The pool with the specified identifier doesn't exist.")
 		new_pool = deepcopy(pool)
 		new_pool["name"] = options.names[2]
-		self._database[TABLE_POOLS][options.names[1]] = new_pool
+		new_pool["code"] = options.names[1]
+		new_pool_id = self._get_next_id(TABLE_POOLS)
+		self._database[TABLE_POOLS][new_pool_id] = new_pool
 		self.__save_database()
+		print(f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'.")
 
 	def execute(self, options):
 		operation = self._operations.get(options.operation)
