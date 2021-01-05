@@ -1,3 +1,4 @@
-discord.py[voice]      # Discord API wrapper + voice support
-jikanpy                # MyAnimeList API wrapper
-matplotlib             # ping graph
+discord.py[voice]                                         # Discord API wrapper + voice support
+jikanpy                                                   # MyAnimeList API wrapper
+matplotlib                                                # ping graph
+git+https://github.com/rexor12/gacha.py.git@develop/1.0   # Generic Gacha System
