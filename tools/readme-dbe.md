@@ -183,7 +183,7 @@ This command is typically useful when a new item is introduced to the game or th
 
 Example for creating a pool and adding items to it:
 
-> database_editor.py addpool focb "Focused Supply B"  
+> database_editor.py addpool focb "Focused Supply B"
 > database_editor.py --rate 0.0248 --pool focb addpoolitem "Nue of the Shadow"
 
 This is useful when a new supply needs to be created from scratch or items have to be added to an existing pool. Don't forget to adjust the rates in case it's needed!
@@ -212,18 +212,18 @@ Just invoke the script with the ID of the pool you'd like to pull as follows:
 
 You should see an output similar to the following:
 
-> Available pools:  
-> ex focb foca dorm dormeq  
-> ***Expansion Battlesuit** supply drops:*  
-> Swallowtail Phantasm fragment x4  
-> Phase Shifter  
-> **Herrscher of Thunder**  
-> Phase Shifter  
-> Phantom Iron  
-> ADV EXP Chip  
-> Swallowtail Phantasm fragment x5  
-> Luna Kindred  
-> HOLI Chest  
+> Available pools:
+> ex focb foca dorm dormeq
+> ***Expansion Battlesuit** supply drops:*
+> Swallowtail Phantasm fragment x4
+> Phase Shifter
+> **Herrscher of Thunder**
+> Phase Shifter
+> Phantom Iron
+> ADV EXP Chip
+> Swallowtail Phantasm fragment x5
+> Luna Kindred
+> HOLI Chest
 > Luna Kindred soul x6
 
 # Quick tutorial on updating the gacha
@@ -242,16 +242,16 @@ Since you most likely want to replace the valkyrie fragments/souls, too, specify
 
 The above should give you an output similar to this (unless one or more of the items cannot be found):
 
-> The item 'Herrscher of Thunder' has been replaced by the item 'Azure Empyrea'.  
-> The fragment of valkyrie 'Herrscher of Thunder' has been replaced by the fragment of valkyrie 'Azure Empyrea'.  
-> The item 'Swallowtail Phantasm' has been replaced by the item 'Wolf's Dawn'.  
-> The fragment of valkyrie 'Swallowtail Phantasm' has been replaced by the fragment of valkyrie 'Wolf's Dawn'.  
-> The item 'Luna Kindred' has been replaced by the item 'Blueberry Blitz'.  
-> The fragment of valkyrie 'Luna Kindred' has been replaced by the fragment of valkyrie 'Blueberry Blitz'.  
-> The item 'Phantom Iron' has been replaced by the item 'Arctic Kriegsmesser'.  
-> The fragment of valkyrie 'Phantom Iron' has been replaced by the fragment of valkyrie 'Arctic Kriegsmesser'.  
-> The item 'Yamabuki Armor' has been replaced by the item 'Shadow Dash'.  
-> The fragment of valkyrie 'Yamabuki Armor' has been replaced by the fragment of valkyrie 'Shadow Dash'.  
+> The item 'Herrscher of Thunder' has been replaced by the item 'Azure Empyrea'.
+> The fragment of valkyrie 'Herrscher of Thunder' has been replaced by the fragment of valkyrie 'Azure Empyrea'.
+> The item 'Swallowtail Phantasm' has been replaced by the item 'Wolf's Dawn'.
+> The fragment of valkyrie 'Swallowtail Phantasm' has been replaced by the fragment of valkyrie 'Wolf's Dawn'.
+> The item 'Luna Kindred' has been replaced by the item 'Blueberry Blitz'.
+> The fragment of valkyrie 'Luna Kindred' has been replaced by the fragment of valkyrie 'Blueberry Blitz'.
+> The item 'Phantom Iron' has been replaced by the item 'Arctic Kriegsmesser'.
+> The fragment of valkyrie 'Phantom Iron' has been replaced by the fragment of valkyrie 'Arctic Kriegsmesser'.
+> The item 'Yamabuki Armor' has been replaced by the item 'Shadow Dash'.
+> The fragment of valkyrie 'Yamabuki Armor' has been replaced by the fragment of valkyrie 'Shadow Dash'.
 > The database has been saved successfully.
 
 To update a Focused Supply, you issue the same command but typically, you don't need the *--fragments* flag, because these supplies have no valkyries:
@@ -260,18 +260,18 @@ To update a Focused Supply, you issue the same command but typically, you don't 
 
 Similar to the above, you get an output similar to the following:
 
-> The item 'Swan Lake' has been replaced by the item 'Nebulous Duality'.  
-> The item 'Hyper Railguns' has been replaced by the item 'ARC Serratus'.  
-> The item 'Void Blade' has been replaced by the item 'Ice Epiphyllum'.  
-> The item 'Briareus PRI' has been replaced by the item 'Raikiri'.  
-> The item 'Sleeping Beauty' has been replaced by the item 'Star Shatterer: Vikrant'.  
-> The item 'Cinder Hawk' has been replaced by the item '11th Sacred Relic'.  
-> The item 'Genome Reaper' has been replaced by the item 'Aphrodite'.  
-> The item 'Beethoven' has been replaced by the item 'Fu Hua: Margrave'.  
-> The item 'Caravaggio' has been replaced by the item 'Welt Yang'.  
-> The item 'Michelangelo' has been replaced by the item 'Wilde'.  
-> The item 'Nobel' has been replaced by the item 'Gustav Klimt'.  
-> The item 'Isaac Newton' has been replaced by the item 'Kallen - Hymn'.  
+> The item 'Swan Lake' has been replaced by the item 'Nebulous Duality'.
+> The item 'Hyper Railguns' has been replaced by the item 'ARC Serratus'.
+> The item 'Void Blade' has been replaced by the item 'Ice Epiphyllum'.
+> The item 'Briareus PRI' has been replaced by the item 'Raikiri'.
+> The item 'Sleeping Beauty' has been replaced by the item 'Star Shatterer: Vikrant'.
+> The item 'Cinder Hawk' has been replaced by the item '11th Sacred Relic'.
+> The item 'Genome Reaper' has been replaced by the item 'Aphrodite'.
+> The item 'Beethoven' has been replaced by the item 'Fu Hua: Margrave'.
+> The item 'Caravaggio' has been replaced by the item 'Welt Yang'.
+> The item 'Michelangelo' has been replaced by the item 'Wilde'.
+> The item 'Nobel' has been replaced by the item 'Gustav Klimt'.
+> The item 'Isaac Newton' has been replaced by the item 'Kallen - Hymn'.
 > The database has been saved successfully.
 
 Once you've finished updating the pools, you can give gacha a few tries as described in the section [gacha_simulator.py](#gacha_simulatorpy).

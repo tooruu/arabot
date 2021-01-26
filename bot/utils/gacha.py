@@ -1,12 +1,13 @@
+from typing import Generator
 from gacha.logging import LogBase
 from gacha.models import VirtualItem
 from gacha.providers import EntityProviderInterface
 from gacha.resolvers import ItemResolverInterface
 from gacha.utils.entity_provider_utils import get_item, get_item_rank, get_item_type
-from typing import Generator
 
 STIGMATA_PARTS = ("T", "M", "B")
 STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
+
 
 class ItemResolver(ItemResolverInterface):
     def __init__(self, entity_provider: EntityProviderInterface, log: LogBase):
