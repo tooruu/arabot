@@ -23,7 +23,7 @@ class Snipe(Cog, name="Commands"):
 
     @Cog.listener()
     async def on_message_delete(self, msg):
-        if not msg.author.bot:
+        if not msg.author.bot and msg.content:
             self.log.setdefault(msg.channel, []).append(RawDeletedMessage(msg))
 
     @loop(minutes=1)
@@ -58,12 +58,14 @@ class Snipe(Cog, name="Commands"):
                         last_sender = msg.author
                         group_start = msg.created_at
                     group_tail = msg.created_at
-                    msg_group.append(msg.content)
                 title = f"{last_sender.display_name}, {(now - group_start).seconds // 60}m ago:"
                 embed.add_field(name=title, value="\n".join(msg_group)[-1024:], inline=False)
                 while len(embed) > 6000:
                     del embed.fields[0]
-                await ctx.send(embed=embed)
+                try:
+                    await ctx.send(embed=embed)
+                except Exception:
+                    await ctx.send("I was coded by a retard so there you have an ~~unhandled exception~~ error")
                 return
 
         await ctx.send("Nothing to snipe here :eyes:")
