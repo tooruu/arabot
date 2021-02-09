@@ -40,8 +40,9 @@ class Snipe(Cog, name="Commands"):
             msg_pool = sorted(self.log[ctx.channel], key=lambda message: message.created_at)
             if target:
                 msg_pool = [m for m in msg_pool if m.author == target]
+            msg_pool = msg_pool[:10]
             if msg_pool:
-                embed = Embed()
+                embed = Embed(color=0x87011D)
                 now = datetime.utcnow()
                 msg_group = []
                 last_sender = msg_pool[0].author
@@ -52,14 +53,16 @@ class Snipe(Cog, name="Commands"):
                 for msg in msg_pool:
                     if msg.author != last_sender or (msg.created_at - group_tail).seconds >= GROUP_AGE_THRESHOLD:
                         title = f"{last_sender.display_name}, {(now - group_start).seconds // 60}m ago:"
-                        embed.add_field(name=title, value="\n".join(msg_group), inline=False)
+                        embed.add_field(name=title, value="\n".join(msg_group)[-1024:], inline=False)
                         msg_group = []
                         last_sender = msg.author
                         group_start = msg.created_at
                     group_tail = msg.created_at
                     msg_group.append(msg.content)
                 title = f"{last_sender.display_name}, {(now - group_start).seconds // 60}m ago:"
-                embed.add_field(name=title, value="\n".join(msg_group), inline=False)
+                embed.add_field(name=title, value="\n".join(msg_group)[-1024:], inline=False)
+                while len(embed) > 6000:
+                    del embed.fields[0]
                 await ctx.send(embed=embed)
                 return
 
