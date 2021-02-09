@@ -47,7 +47,7 @@ class Snipe(Cog, name="Commands"):
                 last_sender = msg_pool[0].author
                 group_tail = msg_pool[0].created_at
                 group_start = msg_pool[0].created_at
-                GROUP_AGE_THRESHOLD = 20
+                GROUP_AGE_THRESHOLD = 300
 
                 for msg in msg_pool:
                     if msg.author != last_sender or (msg.created_at - group_tail).seconds >= GROUP_AGE_THRESHOLD:
