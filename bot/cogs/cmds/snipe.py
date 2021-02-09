@@ -1,8 +1,18 @@
-from discord.ext.commands import command, Cog
-from discord.ext.tasks import loop
 from datetime import datetime
 from discord import Embed
+from discord.ext.commands import command, Cog
+from discord.ext.tasks import loop
 from utils.converters import FindMember
+
+
+class RawDeletedMessage:
+    __slots__ = "content", "author", "created_at", "deleted_at"
+
+    def __init__(self, message):
+        self.content = message.content
+        self.author = message.author
+        self.created_at = message.created_at
+        self.deleted_at = datetime.utcnow()
 
 
 class Snipe(Cog, name="Commands"):
@@ -14,42 +24,45 @@ class Snipe(Cog, name="Commands"):
     @Cog.listener()
     async def on_message_delete(self, msg):
         if not msg.author.bot:
-            self.log.setdefault(msg.channel, {})[msg] = datetime.now()
+            self.log.setdefault(msg.channel, []).append(RawDeletedMessage(msg))
 
     @loop(minutes=1)
     async def purge(self):
-        now = datetime.now()
+        now = datetime.utcnow()
         for channel in self.log:
-            for message, deleted_at in self.log[channel].items():
-                if (now - deleted_at).seconds > 3600:
-                    del self.log[channel][message]
+            for message in self.log[channel]:
+                if (now - message.deleted_at).seconds > 3600:
+                    self.log[channel].remove(message)
 
     @command(brief="| View deleted messages within the last hour")
     async def snipe(self, ctx, target: FindMember = None):
         if self.log.get(ctx.channel):
-            embed = Embed()
-            now = datetime.now()
-            last_sender = None
-            msg_group = []
-            group_timestamp = None
-            msg_pool = sorted(self.log[ctx.channel].items(), key=lambda message: message[0].created_at)
+            msg_pool = sorted(self.log[ctx.channel], key=lambda message: message.created_at)
             if target:
-                msg_pool = [(m, t) for m, t in msg_pool if m.author == target]
-            for msg, timestamp in msg_pool:
-                if last_sender is None:
-                    last_sender = msg.author
-                    group_timestamp - msg.created_at
-                elif msg.author != last_sender:
-                    title = f"{last_sender.display_name}, {(now - msg.created_at).seconds//60}m ago:"
-                    embed.add_field(name=title, value="\n".join(msg_group), inline=False)
-                    last_sender = msg.author
-                    msg_group = []
-                msg_group.append(msg.content)
-            if msg_group:
-                title = f"{last_sender.display_name}, {(now - msg.created_at).seconds//60}m ago:"
+                msg_pool = [m for m in msg_pool if m.author == target]
+            if msg_pool:
+                embed = Embed()
+                now = datetime.utcnow()
+                msg_group = []
+                last_sender = msg_pool[0].author
+                group_tail = msg_pool[0].created_at
+                group_start = msg_pool[0].created_at
+                GROUP_AGE_THRESHOLD = 20
+
+                for msg in msg_pool:
+                    if msg.author != last_sender or (msg.created_at - group_tail).seconds >= GROUP_AGE_THRESHOLD:
+                        title = f"{last_sender.display_name}, {(now - group_start).seconds // 60}m ago:"
+                        embed.add_field(name=title, value="\n".join(msg_group), inline=False)
+                        msg_group = []
+                        last_sender = msg.author
+                        group_start = msg.created_at
+                    group_tail = msg.created_at
+                    msg_group.append(msg.content)
+                title = f"{last_sender.display_name}, {(now - group_start).seconds // 60}m ago:"
                 embed.add_field(name=title, value="\n".join(msg_group), inline=False)
                 await ctx.send(embed=embed)
                 return
+
         await ctx.send("Nothing to snipe here :eyes:")
 
     @purge.before_loop
