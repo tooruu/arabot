@@ -58,14 +58,16 @@ class Snipe(Cog, name="Commands"):
                         last_sender = msg.author
                         group_start = msg.created_at
                     group_tail = msg.created_at
+                    msg_group.append(msg.content)
                 title = f"{last_sender.display_name}, {(now - group_start).seconds // 60}m ago:"
                 embed.add_field(name=title, value="\n".join(msg_group)[-1024:], inline=False)
                 while len(embed) > 6000:
                     del embed.fields[0]
                 try:
                     await ctx.send(embed=embed)
-                except Exception:
-                    await ctx.send("I was coded by a retard so there you have an ~~unhandled exception~~ error")
+                except Exception as e:
+                    print(e)
+                    await ctx.send("An error occured ||because I was coded by a retard||")
                 return
 
         await ctx.send("Nothing to snipe here :eyes:")
