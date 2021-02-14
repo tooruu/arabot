@@ -1,4 +1,5 @@
 from glob import glob
+from random import choice
 from discord import Embed, Emoji, PartialEmoji
 from discord.ext.commands import (
     command,
@@ -223,6 +224,11 @@ class General(Cog, name="Commands"):
             await ctx.message.delete()
             return
         raise error
+
+    @command()
+    async def who(self, ctx):
+        member = choice(ctx.guild.members)
+        await ctx.reply(member.mention)
 
 
 def setup(client):
