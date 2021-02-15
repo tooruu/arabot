@@ -2,3 +2,4 @@ discord.py[voice]                                         # Discord API wrapper 
 jikanpy                                                   # MyAnimeList API wrapper
 matplotlib                                                # ping graph
 git+https://github.com/rexor12/gacha.py.git@develop/1.0   # Generic Gacha System
+pytz                                                      # time zones

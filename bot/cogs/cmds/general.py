@@ -225,7 +225,8 @@ class General(Cog, name="Commands"):
             return
         raise error
 
-    @command()
+    @cooldown(3, 10, BucketType.guild)
+    @command(brief="| Pings random person")
     async def who(self, ctx):
         member = choice(ctx.guild.members)
         await ctx.reply(member.mention)
