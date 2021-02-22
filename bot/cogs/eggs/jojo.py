@@ -33,6 +33,7 @@ class JoJoReference(Cog, name="Eggs"):
             await sleep(1)
             await msg.channel.delete_messages(msgs)
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
+            await sleep(20)
             self.running = False
 
 
