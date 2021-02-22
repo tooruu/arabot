@@ -40,7 +40,7 @@ class Snipe(Cog, name="Commands"):
             msg_pool = sorted(self.log[ctx.channel], key=lambda message: message.created_at)
             if target:
                 msg_pool = [m for m in msg_pool if m.author == target]
-            msg_pool = msg_pool[:10]
+            msg_pool = msg_pool[-10:]
             if msg_pool:
                 embed = Embed(color=0x87011D)
                 now = datetime.utcnow()
@@ -67,7 +67,7 @@ class Snipe(Cog, name="Commands"):
                     await ctx.send(embed=embed)
                 except Exception as e:
                     print(e)
-                    await ctx.send("An error occured ||because I was coded by a retard||")
+                    await ctx.send("An error occurred ||because I was coded by a retard||")
                 return
 
         await ctx.send("Nothing to snipe here :eyes:")
