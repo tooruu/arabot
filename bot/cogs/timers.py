@@ -10,7 +10,6 @@ class Timer:
             wkday: sorted(zip(map(tz.localize, (t[0] for t in times)), (t[1] for t in times)))
             for wkday, times in sorted(schedule.items())
         }
-        print(self.sched)
         self.tz = tz
 
     def get_next_phase(self):
@@ -92,7 +91,7 @@ class DiscordTimers(Cog):
                 ): (752382371596206141, "🔥{} {}h {}m"),
                 Timer({w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}): (
                     779019769755861004,
-                    "💖Waifus in {2}m",
+                    "💖Waifus {1}h {2}m",
                 ),
             }
         )
