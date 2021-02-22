@@ -1,5 +1,4 @@
 from urllib.parse import quote_plus as safe
-from aiohttp.client_exceptions import ClientConnectorError
 from discord import Embed
 from discord.ext.commands import command, Cog, ConversionError
 from utils.format_escape import bold
@@ -29,15 +28,14 @@ class Google(Cog, name="Commands"):
                 await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
             elif "items" in (resp := await resp.json()):
                 BLACKLIST = ("lookaside.fbsbx.com",)
-                for i in resp["items"]:
-                    if i["link"].split("/")[2] not in BLACKLIST:
-                        try:
-                            async with self.bot.ses.get(i["link"]) as s:
-                                if s.status == 200:
-                                    await ctx.send(i["link"])
-                                    return
-                        except ClientConnectorError:
-                            pass
+                for i in filter(lambda item: item["link"].split("/")[2] not in BLACKLIST, resp["items"]):
+                    try:
+                        async with self.bot.ses.get(i["link"]) as s:
+                            if s.status == 200:
+                                await ctx.send(i["link"])
+                                return
+                    except Exception:
+                        pass
                 await ctx.send(
                     f"First {NUM} links are dead, and I don't want to eat up the quota by requesting more images,"
                     "so try something else. :slight_smile:"

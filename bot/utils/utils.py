@@ -8,6 +8,10 @@ def is_dev(ctx) -> bool:
     return ctx.author.id in (337343326095409152, 447138372121788417, 401490060156862466)
 
 
+def is_root(ctx) -> bool:
+    return ctx.author.id == 447138372121788417
+
+
 def is_valid(client, msg, expr="") -> bool:
     return (
         not any(msg.content.startswith(pfx) for pfx in (">", *client.command_prefix))
