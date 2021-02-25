@@ -35,9 +35,7 @@ class DatabaseEditor:
         if len(options.names) == 0:
             return False
         for _, item_name in enumerate(options.names):
-            item_id = self._add_item_internal(
-                item_name, options.type, options.rank, options.single
-            )
+            item_id = self._add_item_internal(item_name, options.type, options.rank, options.single)
             self._log(f"Added item '{item_name}' with identifier '{item_id}'.")
         return True
 
@@ -45,11 +43,9 @@ class DatabaseEditor:
     def find_item(self, options) -> bool:
         if not options.field:
             raise ValueError("The field name must be specified.")
-        table = self._get_or_initialize_value(self._database, TABLE_ITEMS, {})
+        table = self._get_or_initialize_value(self.database, TABLE_ITEMS, {})
         for name in options.names:
-            for item_id in self._find_ids_by_field(
-                TABLE_ITEMS, options.field, name, False
-            ):
+            for item_id in self._find_ids_by_field(TABLE_ITEMS, options.field, name, False):
                 self._log(f"ID: {item_id}\nData: {table[item_id]}")
         return False
 
@@ -65,9 +61,7 @@ class DatabaseEditor:
             elif options.field is not None:
                 # Since we're using a generator function, we need to iterate through a list
                 # different from the original dictionary to avoid concurrent modification.
-                for item_id in list(
-                    self._find_ids_by_field(TABLE_ITEMS, options.field, name)
-                ):
+                for item_id in list(self._find_ids_by_field(TABLE_ITEMS, options.field, name)):
                     table.pop(item_id)
                     has_changed = True
                     self._log(f"Deleted item '{item_id}'.")
@@ -76,25 +70,19 @@ class DatabaseEditor:
     # database_editor.py [--awakened] [--rank <rank>] additemset "Valkyrie" "Weapon" "Stigmata set"
     def add_item_set(self, options) -> bool:
         if len(options.names) != 3:
-            raise ValueError(
-                "You must specify a valid itemset: valkyrie, weapon, stigmata."
-            )
+            raise ValueError("You must specify a valid itemset: valkyrie, weapon, stigmata.")
 
         def add_item(name, item_type, item_rank=None):
             item_id = self._add_item_internal(name, item_type, item_rank)
             self._log(f"Added item '{name}' with identifier '{item_id}'.")
 
-        add_item(
-            options.names[0], "0", options.rank if options.rank is not None else "2"
-        )
+        add_item(options.names[0], "0", options.rank if options.rank is not None else "2")
         if options.awakened:
             add_item(f"{options.names[0]} soul", "2")
         else:
             add_item(f"{options.names[0]} fragment", "7")
         add_item(options.names[1], "1", "3")
-        add_item(
-            options.names[2], "8", options.rank if options.rank is not None else "2"
-        )
+        add_item(options.names[2], "8", options.rank if options.rank is not None else "2")
         return True
 
     # database_editor.py addpool <code> <name>
@@ -135,9 +123,7 @@ class DatabaseEditor:
     def add_pool_item(self, options) -> bool:
         rate = float(options.rate)
         if rate < 0.0 or rate > 1.0:
-            raise ValueError(
-                "The drop rate must be between 0.0, inclusive and 1.0, inclusive."
-            )
+            raise ValueError("The drop rate must be between 0.0, inclusive and 1.0, inclusive.")
         table = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
         pool = table.get(pool_id)
@@ -148,9 +134,7 @@ class DatabaseEditor:
         for descriptor in loot_table:
             # Since it's impossible to precisely compare two floating-point numbers,
             # we use a relative tolerance to check for equality.
-            if not isclose(
-                descriptor.get("rate", 0.0), rate, rel_tol=DROP_RATE_TOLERANCE
-            ):
+            if not isclose(descriptor.get("rate", 0.0), rate, rel_tol=DROP_RATE_TOLERANCE):
                 continue
             matching_descriptor = descriptor
             break
@@ -165,9 +149,7 @@ class DatabaseEditor:
         for _, name in enumerate(options.names):
             item_id = self._find_item_id(name)
             if item_id is None:
-                self._log(
-                    f"Item '{name}' doesn't exist, hence it won't be added to the pool."
-                )
+                self._log(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
                 continue
             if item_id in item_list:
                 self._log(
@@ -178,18 +160,14 @@ class DatabaseEditor:
                 other_item_list = descriptor.get("items", [])
                 if item_id in other_item_list:
                     other_item_list.remove(item_id)
-                    self._log(
-                        f"Item '{name}' has been removed with drop rate {descriptor.get('rate', 0.0)}."
-                    )
+                    self._log(f"Item '{name}' has been removed with drop rate {descriptor.get('rate', 0.0)}.")
                     if len(other_item_list) == 0:
                         loot_table.pop(descriptor_index)
                     break
             item_list.append(item_id)
             has_changed = True
             self._log(f"Added item '{name}' to the pool with drop rate {rate}.")
-        self._log(
-            f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}."
-        )
+        self._log(f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}.")
         self._validate_pool_total_rate(options.pool)
         return has_changed and len(item_list) > 0
 
@@ -206,9 +184,7 @@ class DatabaseEditor:
         for _, name in enumerate(options.names):
             item_id = self._find_item_id(name)
             if item_id is None:
-                self._log(
-                    f"Item '{name}' doesn't exist, hence it won't be added to the pool."
-                )
+                self._log(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
                 continue
             is_found = False
             for descriptor_index, descriptor in enumerate(loot_table):
@@ -222,9 +198,7 @@ class DatabaseEditor:
                     has_changed = True
                     break
             if not is_found:
-                self._log(
-                    f"Item '{name}' isn't in the pool, hence it won't be removed."
-                )
+                self._log(f"Item '{name}' isn't in the pool, hence it won't be removed.")
         self._validate_pool_total_rate(options.pool)
         return has_changed
 
@@ -240,16 +214,12 @@ class DatabaseEditor:
             raise ValueError("The specified pool doesn't exist.")
         loot_table = self._get_or_initialize_value(pool, "loot_table", [])
         has_changed = False
-        for old_item_name, new_item_name in zip(
-            options.names[0::2], options.names[1::2]
-        ):
+        for old_item_name, new_item_name in zip(options.names[0::2], options.names[1::2]):
             if not self._replace_pool_item(loot_table, old_item_name, new_item_name):
                 continue
             has_changed = True
             if options.fragments:
-                self._replace_pool_valkyrie_fragment(
-                    loot_table, old_item_name, new_item_name
-                )
+                self._replace_pool_valkyrie_fragment(loot_table, old_item_name, new_item_name)
         return has_changed
 
     # database_editor.py showpool <code>
@@ -268,9 +238,7 @@ class DatabaseEditor:
                 item = items.get(item_id, {})
                 item_names.append(item.get("name", "Unknown item"))
             self._log("Rate '{}': {}".format(rate, ", ".join(item_names)))
-        self._log(
-            f"Total drop rate is '{self._get_pool_total_rate(options.names[0])}'."
-        )
+        self._log(f"Total drop rate is '{self._get_pool_total_rate(options.names[0])}'.")
         return False
 
     # database_editor.py togglepool <code>
@@ -282,17 +250,13 @@ class DatabaseEditor:
         if pool is None:
             raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
         pool["available"] = new_status = not pool.get("available", False)
-        self._log(
-            f"Pool '{options.names[0]}' is now {'' if new_status else 'un'}available."
-        )
+        self._log(f"Pool '{options.names[0]}' is now {'' if new_status else 'un'}available.")
         return True
 
     # database_editor.py clonepool foca focb "Focused Supply B"
     def clone_pool(self, options) -> bool:
         if len(options.names) != 3:
-            raise ValueError(
-                "You must specify the source and the target pool identifiers, and the target pool name."
-            )
+            raise ValueError("You must specify the source and the target pool identifiers, and the target pool name.")
         pools = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
         pool = pools.get(pool_id)
@@ -303,23 +267,17 @@ class DatabaseEditor:
         new_pool["code"] = options.names[1]
         new_pool_id = self._get_next_id(TABLE_POOLS)
         self.database[TABLE_POOLS][new_pool_id] = new_pool
-        self._log(
-            f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'."
-        )
+        self._log(f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'.")
         return True
 
     @staticmethod
-    def _aggregate(
-        source: Iterable[_T], seed: _T2, func: Callable[[_T2, _T], _T2]
-    ) -> _T2:
+    def _aggregate(source: Iterable[_T], seed: _T2, func: Callable[[_T2, _T], _T2]) -> _T2:
         current_value = seed
         for item in source:
             current_value = func(current_value, item)
         return current_value
 
-    def _get_or_initialize_value(
-        self, dictionary: dict, key: str, default_value: object
-    ) -> object:
+    def _get_or_initialize_value(self, dictionary: dict, key: str, default_value: object) -> object:
         """
         Gets the value associated to the specified ``key`` from the specified ``dictionary``.
         If the key isn't present in the dictionary, it is initialized with the specified ``default_value``.
@@ -351,13 +309,9 @@ class DatabaseEditor:
         loot_table = pool.get("loot_table", [])
         if len(loot_table) == 0:
             return 0.0
-        return DatabaseEditor._aggregate(
-            loot_table, 0.0, lambda c, i: c + i.get("rate", 0.0)
-        )
+        return DatabaseEditor._aggregate(loot_table, 0.0, lambda c, i: c + i.get("rate", 0.0))
 
-    def _find_ids_by_field(
-        self, table_name: str, field_name: str, field_value: str, is_exact: bool = True
-    ):
+    def _find_ids_by_field(self, table_name: str, field_name: str, field_value: str, is_exact: bool = True):
         """
         Finds all the identifiers in the table with the specified ``table_name``
         whose fields identified by the specified ``field_name``
@@ -365,13 +319,9 @@ class DatabaseEditor:
         If ``is_exact`` is set to ``True``, only exact matches are returned.
         """
         predicate = (
-            (lambda text: text == field_value)
-            if is_exact
-            else (lambda text: field_value.lower() in text.lower())
+            (lambda text: text == field_value) if is_exact else (lambda text: field_value.lower() in text.lower())
         )
-        for key, item in self._get_or_initialize_value(
-            self.database, table_name, {}
-        ).items():
+        for key, item in self._get_or_initialize_value(self.database, table_name, {}).items():
             if predicate(item.get(field_name, "")):
                 yield key
 
@@ -395,9 +345,7 @@ class DatabaseEditor:
     def _find_valkyrie_fragment_id(self, valkyrie_name: str) -> str:
         """Finds the unique identifier of fragment/soul that belongs to the Valkyrie with the specified name."""
         # TODO Mark valkyries with "is_awakened": True so it's easier to find the matching frag/soul.
-        return self._find_item_id(f"{valkyrie_name} fragment") or self._find_item_id(
-            f"{valkyrie_name} soul"
-        )
+        return self._find_item_id(f"{valkyrie_name} fragment") or self._find_item_id(f"{valkyrie_name} soul")
 
     def _validate_pool_total_rate(self, pool_code: str):
         """
@@ -407,9 +355,7 @@ class DatabaseEditor:
         if not isclose(total_rate, 0.0, rel_tol=DROP_RATE_TOLERANCE) and not isclose(
             total_rate, 1.0, rel_tol=DROP_RATE_TOLERANCE
         ):
-            self._log(
-                f"Warning! Pool '{pool_code}' has a total drop rate of {total_rate}."
-            )
+            self._log(f"Warning! Pool '{pool_code}' has a total drop rate of {total_rate}.")
 
     def _add_item_internal(
         self,
@@ -427,39 +373,25 @@ class DatabaseEditor:
             item["is_single_stigmata"] = True
         return next_key
 
-    def _replace_pool_item(
-        self, loot_table, old_item_name: str, new_item_name: str
-    ) -> bool:
+    def _replace_pool_item(self, loot_table, old_item_name: str, new_item_name: str) -> bool:
         old_item_id = self._find_item_id(old_item_name)
         if old_item_id is None:
-            self._log(
-                f"The item '{old_item_name}' doesn't exist, hence it won't be replaced."
-            )
+            self._log(f"The item '{old_item_name}' doesn't exist, hence it won't be replaced.")
             return False
         new_item_id = self._find_item_id(new_item_name)
         if new_item_id is None:
-            self._log(
-                f"The item '{new_item_name}' doesn't exist, hence it won't replace the item '{old_item_name}'."
-            )
+            self._log(f"The item '{new_item_name}' doesn't exist, hence it won't replace the item '{old_item_name}'.")
             return False
         if self._replace_pool_item_internal(loot_table, old_item_id, new_item_id):
-            self._log(
-                f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'."
-            )
+            self._log(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
             return True
-        self._log(
-            f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced."
-        )
+        self._log(f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced.")
         return False
 
-    def _replace_pool_valkyrie_fragment(
-        self, loot_table, old_valkyrie_name: str, new_valkyrie_name: str
-    ) -> bool:
+    def _replace_pool_valkyrie_fragment(self, loot_table, old_valkyrie_name: str, new_valkyrie_name: str) -> bool:
         old_item_id = self._find_valkyrie_fragment_id(old_valkyrie_name)
         if old_item_id is None:
-            self._log(
-                f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced."
-            )
+            self._log(f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced.")
             return False
         new_item_id = self._find_valkyrie_fragment_id(new_valkyrie_name)
         if new_item_id is None:
@@ -477,12 +409,10 @@ class DatabaseEditor:
         )
         return False
 
-    def _replace_pool_item_internal(
-        self, loot_table, old_item_id: str, new_item_id: str
-    ) -> bool:
+    def _replace_pool_item_internal(self, loot_table, old_item_id: str, new_item_id: str) -> bool:
         for _, descriptor in enumerate(loot_table):
             item_list = descriptor.get("items", [])
-            if not old_item_id in item_list:
+            if old_item_id not in item_list:
                 continue
             item_list.remove(old_item_id)
             item_list.append(new_item_id)

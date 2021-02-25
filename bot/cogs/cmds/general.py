@@ -11,10 +11,10 @@ from discord.ext.commands import (
     BucketType,
     CommandOnCooldown,
 )
-from utils.converters import FindMember, FindEmoji
-from utils.utils import is_dev, set_presence
-from utils.meta import BOT_NAME
-from utils.format_escape import bold
+from ...utils.converters import FindMember, FindEmoji
+from ...utils.utils import is_dev, set_presence
+from ...utils.meta import BOT_NAME
+from ...utils.format_escape import bold
 
 
 class General(Cog, name="Commands"):

@@ -7,7 +7,7 @@ from discord.ext.commands import (
     VoiceChannelConverter,
     RoleConverter,
 )
-from helpers.finder import Finder
+from ..helpers.finder import Finder
 
 
 class FindMember(Finder, MemberConverter):

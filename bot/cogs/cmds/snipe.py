@@ -2,7 +2,7 @@ from datetime import datetime
 from discord import Embed
 from discord.ext.commands import command, Cog
 from discord.ext.tasks import loop
-from utils.converters import FindMember
+from ...utils.converters import FindMember
 
 
 class RawDeletedMessage:

@@ -1,9 +1,9 @@
 from urllib.parse import quote_plus as safe
 from discord import Embed
 from discord.ext.commands import command, Cog, ConversionError
-from utils.format_escape import bold
-from utils.utils import Blacklist, BlacklistMatch
-from helpers.auth import req_auth
+from ...utils.format_escape import bold
+from ...utils.utils import Blacklist, BlacklistMatch
+from ...helpers.auth import req_auth
 
 
 class Google(Cog, name="Commands"):

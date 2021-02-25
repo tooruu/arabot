@@ -19,8 +19,8 @@ from gacha.persistence.json.converters import (
     ItemTypeConverter,
     PoolConverter,
 )
-from utils.gacha import ItemResolver
-from utils.format_escape import bold
+from ...utils.gacha import ItemResolver
+from ...utils.format_escape import bold
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
 LOG_LEVEL = LogLevel.WARNING

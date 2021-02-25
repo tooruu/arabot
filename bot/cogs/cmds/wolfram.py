@@ -2,8 +2,8 @@ from json import loads
 from urllib.parse import quote
 from discord import Embed
 from discord.ext.commands import command, Cog
-from utils.format_escape import dsafe
-from helpers.auth import req_auth
+from ...utils.format_escape import dsafe
+from ...helpers.auth import req_auth
 
 
 class Wolfram(Cog, name="Commands"):

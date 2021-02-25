@@ -1,9 +1,9 @@
 from asyncio import TimeoutError
 from discord import Embed
 from discord.ext.commands import Cog, group, check
-from utils.utils import is_dev
-from utils.format_escape import bold
-from helpers.auth import req_auth
+from ...utils.utils import is_dev
+from ...utils.format_escape import bold
+from ...helpers.auth import req_auth
 
 
 class Trello(Cog, name="Commands"):

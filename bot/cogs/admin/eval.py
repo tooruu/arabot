@@ -3,7 +3,7 @@ from textwrap import indent
 from traceback import format_exc
 from contextlib import redirect_stdout
 from discord.ext.commands import command, Cog, check
-from utils.utils import is_root
+from ...utils.utils import is_root
 
 
 class Sample(Cog, name="Admin"):

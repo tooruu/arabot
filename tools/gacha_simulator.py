@@ -115,6 +115,7 @@ class GachaSimulator:
             )
         )
 
+    @staticmethod
     def _consolidate(dictionary: Dict[str, Pull], pull: Pull) -> Dict[str, Pull]:
         key = f"{pull.id}/{pull.name}"
         value = dictionary.get(key, None)

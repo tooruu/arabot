@@ -1,7 +1,7 @@
 from aiohttp import ClientSession
 from discord import Embed
 from discord.ext.commands import command, Cog
-from helpers.auth import req_auth
+from ...helpers.auth import req_auth
 
 
 class Faceit(Cog, name="Commands"):

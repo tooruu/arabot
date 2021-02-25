@@ -1,6 +1,6 @@
 from re import match
 from discord.ext.commands import Cog
-from utils.utils import text_reaction
+from ...utils.utils import text_reaction
 
 
 class Chat(Cog, name="Eggs"):

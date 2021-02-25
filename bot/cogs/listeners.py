@@ -7,7 +7,7 @@ from discord.ext.commands.errors import (
     MissingRequiredArgument,
     ExpectedClosingQuoteError,
 )
-from utils.utils import set_presence
+from ..utils.utils import set_presence
 
 
 class Listeners(Cog):
