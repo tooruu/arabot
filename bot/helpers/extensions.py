@@ -4,7 +4,7 @@ from os.path import basename
 
 def load_ext(client):
     for path, _, files in walk("bot/cogs"):
-        path = path.split("/")
+        path = path.replace("\\", "/").split("/")
         if basename(path[-1])[0] != "_":
             for cog in files:
                 if cog[0] != "_" and cog.endswith(".py"):
