@@ -1,6 +1,5 @@
 __pycache__/
 *.pyc
-*test*
 .env
 
 # Visual Studio Code
