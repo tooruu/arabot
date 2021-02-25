@@ -7,11 +7,11 @@ def getenv(*keys):
             return environ.get(keys[0])
         key = [environ.get(k) for k in keys]
         return key if all(key) else None
-    with open("./.env") as s:
-        secret = {
-            line.partition("=")[0]: line.partition("=")[-1]
-            for line in s.read().splitlines()
-        }
+    try:
+        with open("./.env") as s:
+            secret = {line.partition("=")[0]: line.partition("=")[-1] for line in s.read().splitlines()}
+    except FileNotFoundError:
+        return None
     if len(keys) == 1:
         return secret.get(keys[0])
     key = [secret.get(k) for k in keys]
@@ -24,7 +24,7 @@ def req_auth(*api_keys):
             if key := getenv(*api_keys):
                 setup(client, key)
             else:
-                print(f"'{api_keys}' key doesn't exist in .env file")
+                print(f"{api_keys} key(s) not present on the system")
 
         return dpy_setup
 
