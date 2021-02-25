@@ -35,5 +35,6 @@ bot = TheBot(
 )
 
 if __name__ == "__main__":
+    assert (token := getenv("token"))
     load_ext(bot)
-    bot.run(getenv("token"))
+    bot.run(token)
