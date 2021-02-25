@@ -2,7 +2,7 @@ from urllib.parse import quote_plus as safe
 from discord import Embed
 from discord.ext.commands import command, Cog, ConversionError
 from ...utils.format_escape import bold
-from ...utils.utils import Blacklist, BlacklistMatch
+from ...utils.general import QueryFilter, BlacklistMatch
 from ...helpers.auth import req_auth
 
 
@@ -12,7 +12,7 @@ class Google(Cog, name="Commands"):
         (self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key) = keys
 
     @command(aliases=["i", "img"], brief="<query> | Top search result from Google Images")
-    async def image(self, ctx, *, query: Blacklist):
+    async def image(self, ctx, *, query: QueryFilter):
         NUM = 3
         async with self.bot.ses.get(
             "https://www.googleapis.com/customsearch/v1",
@@ -34,8 +34,8 @@ class Google(Cog, name="Commands"):
                             if s.status == 200:
                                 await ctx.send(i["link"])
                                 return
-                    except Exception:
-                        pass
+                    except:
+                        print("Failed image link: " + i["link"])
                 await ctx.send(
                     f"First {NUM} links are dead, and I don't want to eat up the quota by requesting more images,"
                     "so try something else. :slight_smile:"
@@ -46,9 +46,8 @@ class Google(Cog, name="Commands"):
     @image.error
     async def use_tags(self, ctx, error):
         if isinstance(error, ConversionError) and isinstance(error.original, BlacklistMatch):
-            if error.original.hit == "ight imma head out":
-                await ctx.send(f"Please use `?tag iiho` instead of `{ctx.prefix}{ctx.invoked_with}`")
-                return
+            await ctx.send(error.original.desc)
+            return
         raise error
 
     @command(aliases=["g"], brief="<query> | Top Google Search result")
