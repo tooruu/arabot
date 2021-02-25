@@ -13,7 +13,7 @@ def is_root(ctx) -> bool:
 
 
 def is_valid(client, msg, expr="") -> bool:
-    return bool(
+    return (
         not any(msg.content.startswith(pfx) for pfx in (">", *client.command_prefix))
         and not msg.author.bot
         and search(expr, msg.content.lower())
@@ -89,14 +89,17 @@ class text_reaction:
 
 
 class BlacklistMatch(Exception):
-    def __init__(self, hit):
+    def __init__(self, hit, desc):
         self.hit = hit
+        self.desc = desc
 
 
-class Blacklist(Converter):
-    BLACKLIST = ("ight imma head out",)
+class QueryFilter(Converter):
+    BLACKLIST = {
+        "ight imma head out": "Please use `.iiho` instead of `{ctx.prefix}{ctx.invoked_with}`",
+    }
 
     async def convert(self, ctx, arg):
-        if arg in self.BLACKLIST:
-            raise BlacklistMatch(arg)
+        if ctx.guild.id == 676889696302792774 and arg in self.BLACKLIST:
+            raise BlacklistMatch(arg, self.BLACKLIST[arg].format(ctx=ctx))
         return arg

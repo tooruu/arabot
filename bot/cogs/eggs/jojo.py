@@ -1,6 +1,6 @@
 from asyncio import sleep
 from discord.ext.commands import Cog
-from ...utils.utils import is_valid
+from ...utils.general import is_valid
 
 
 class JoJoReference(Cog, name="Eggs"):

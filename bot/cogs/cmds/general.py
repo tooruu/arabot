@@ -12,7 +12,7 @@ from discord.ext.commands import (
     CommandOnCooldown,
 )
 from ...utils.converters import FindMember, FindEmoji
-from ...utils.utils import is_dev, set_presence
+from ...utils.general import is_dev, set_presence
 from ...utils.meta import BOT_NAME
 from ...utils.format_escape import bold
 
@@ -182,7 +182,7 @@ class General(Cog, name="Commands"):
         for g in glob("./bot/**/[!_]*.py", recursive=True):
             with open(g, encoding="utf8") as f:
                 count += len(f.readlines())
-        await ctx.send(f"{BOT_NAME} consists of **{count}** lines of code")
+        await ctx.send(f"{BOT_NAME} consists of **{count}** lines of Python code")
 
     @cooldown(1, 10, BucketType.channel)
     @command(brief="Who cares?", hidden=True)

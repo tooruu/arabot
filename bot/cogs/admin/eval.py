@@ -3,7 +3,7 @@ from textwrap import indent
 from traceback import format_exc
 from contextlib import redirect_stdout
 from discord.ext.commands import command, Cog, check
-from ...utils.utils import is_root
+from ...utils.general import is_root
 
 
 class Sample(Cog, name="Admin"):
@@ -37,7 +37,7 @@ class Sample(Cog, name="Admin"):
         try:
             with redirect_stdout(stdout):
                 ret = await func()
-        except Exception:
+        except:
             value = stdout.getvalue()
             await ctx.send(f"```py\n{value}{format_exc()}\n```")
         else:
@@ -51,7 +51,7 @@ class Sample(Cog, name="Admin"):
                     self._last_result = ret
                     await ctx.send(f"```py\n{value}{ret}\n```")
                 await ctx.message.add_reaction("✅")
-            except Exception:
+            except:
                 await ctx.message.add_reaction("❌")
 
     @staticmethod

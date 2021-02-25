@@ -1,6 +1,6 @@
 import asyncio
 from discord.ext.commands import Cog
-from ...utils.utils import is_valid
+from ...utils.general import is_valid
 
 
 class General(Cog, name="Eggs"):
