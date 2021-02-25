@@ -13,7 +13,7 @@ def is_root(ctx) -> bool:
 
 
 def is_valid(client, msg, expr="") -> bool:
-    return (
+    return bool(
         not any(msg.content.startswith(pfx) for pfx in (">", *client.command_prefix))
         and not msg.author.bot
         and search(expr, msg.content.lower())

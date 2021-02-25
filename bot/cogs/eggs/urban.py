@@ -1,6 +1,6 @@
 from re import search
 from discord.ext.commands import Cog
-from utils.utils import text_reaction
+from ...utils.utils import text_reaction
 
 
 class Urban(Cog, name="Eggs"):

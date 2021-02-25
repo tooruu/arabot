@@ -1,8 +1,8 @@
 from urllib.parse import quote_plus as safe
 from discord import Embed
 from discord.ext.commands import command, Cog
-from utils.format_escape import bold, dsafe
-from utils.meta import BOT_NAME
+from ...utils.format_escape import bold, dsafe
+from ...utils.meta import BOT_NAME
 
 
 class Urban(Cog, name="Commands"):

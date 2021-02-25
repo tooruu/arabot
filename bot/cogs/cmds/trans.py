@@ -1,8 +1,8 @@
 from html import unescape
 from discord import Embed
 from discord.ext.commands import command, Cog
-from utils.format_escape import dsafe
-from helpers.auth import req_auth
+from ...utils.format_escape import dsafe
+from ...helpers.auth import req_auth
 
 
 class Trans(Cog, name="Commands"):

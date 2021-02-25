@@ -1,7 +1,7 @@
 from os import listdir
 import discord
 from discord.ext.commands import Cog
-from utils.utils import is_valid
+from ...utils.utils import is_valid
 
 
 class Voice(Cog, name="Eggs"):

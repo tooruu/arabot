@@ -7,7 +7,7 @@ from matplotlib.ticker import MaxNLocator
 from discord import File
 from discord.ext.tasks import loop
 from discord.ext.commands import command, Cog
-from utils.utils import Queue
+from ...utils.utils import Queue
 
 
 class Ping(Cog, name="Commands"):

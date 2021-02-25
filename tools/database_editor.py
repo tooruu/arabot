@@ -4,9 +4,7 @@ import sys
 import os
 
 PACKAGE_PARENT = ".."
-SCRIPT_DIR = os.path.dirname(
-    os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__)))
-)
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from tools.modules.database_editor import DatabaseEditor
@@ -14,6 +12,7 @@ from argparse import ArgumentParser
 from json import dump, load
 
 DATABASE_FILE_PATH = "./bot/res/database.json"
+
 
 # TODO LIST
 # - changerate command
@@ -74,12 +73,8 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--type", default="0")  # Item type
     parser.add_argument("--rank", default=None)  # Item rank
-    parser.add_argument(
-        "--single", action="store_const", const=True
-    )  # Is single (non-set) stigmata?
-    parser.add_argument(
-        "--awakened", action="store_const", const=True
-    )  # Is awakened valkyrie?
+    parser.add_argument("--single", action="store_const", const=True)  # Is single (non-set) stigmata?
+    parser.add_argument("--awakened", action="store_const", const=True)  # Is awakened valkyrie?
     parser.add_argument("--field", default=None)  # Field name
     parser.add_argument("--pool", default=None)  # Pool ID
     parser.add_argument("--rate", default=None)  # Drop rate

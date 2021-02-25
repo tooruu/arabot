@@ -1,7 +1,7 @@
 from discord import Embed
 from discord.ext.commands import MinimalHelpCommand
-from utils.meta import BOT_NAME
-from utils.format_escape import bold
+from ..utils.meta import BOT_NAME
+from ..utils.format_escape import bold
 
 
 class Help(MinimalHelpCommand):

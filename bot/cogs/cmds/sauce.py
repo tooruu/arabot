@@ -4,7 +4,7 @@ from aiohttp import ContentTypeError
 from discord import Embed
 from discord.ext.commands import command, Cog
 from jikanpy import AioJikan
-from utils.format_escape import dsafe
+from ...utils.format_escape import dsafe
 
 
 class Sauce(Cog, name="Commands"):

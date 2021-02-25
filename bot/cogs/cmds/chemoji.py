@@ -1,7 +1,7 @@
 from re import match
 import discord
 from discord.ext.commands import command, Cog, PartialEmojiConverter
-from utils.converters import FindEmoji
+from ...utils.converters import FindEmoji
 
 
 class Chemoji(Cog, name="Commands"):

@@ -1,7 +1,7 @@
 from discord.ext.commands import command, Cog, check, group, errors
-from utils.meta import BOT_NAME, BOT_VERSION
-from utils.utils import is_dev
-from utils.format_escape import bold
+from ...utils.meta import BOT_NAME, BOT_VERSION
+from ...utils.utils import is_dev
+from ...utils.format_escape import bold
 
 
 class General(Cog, name="Admin"):
