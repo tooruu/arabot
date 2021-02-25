@@ -3,7 +3,7 @@ from discord.ext.commands import Cog
 from ...utils.general import is_valid
 
 
-class JoJoReference(Cog, name="Eggs"):
+class ZaWarudo(Cog, name="Eggs"):
     def __init__(self, client):
         self.bot = client
         self.running = False
@@ -38,4 +38,4 @@ class JoJoReference(Cog, name="Eggs"):
 
 
 def setup(client):
-    client.add_cog(JoJoReference(client))
+    client.add_cog(ZaWarudo(client))
