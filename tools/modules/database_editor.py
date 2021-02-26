@@ -43,7 +43,7 @@ class DatabaseEditor:
     def find_item(self, options) -> bool:
         if not options.field:
             raise ValueError("The field name must be specified.")
-        table = self._get_or_initialize_value(self.database, TABLE_ITEMS, {})
+        table = self.database.setdefault(TABLE_ITEMS, {})
         for name in options.names:
             for item_id in self._find_ids_by_field(TABLE_ITEMS, options.field, name, False):
                 self._log(f"ID: {item_id}\nData: {table[item_id]}")
@@ -52,7 +52,7 @@ class DatabaseEditor:
     # database_editor.py deleteitem "id 1" "id 2"
     # database_editor.py --field name deleteitem "name 1" "name 2"
     def delete_item(self, options) -> bool:
-        table = self._get_or_initialize_value(self.database, TABLE_ITEMS, {})
+        table = self.database.setdefault(TABLE_ITEMS, {})
         has_changed = False
         for _, name in enumerate(options.names):
             if not options.field and table.pop(name, None):
@@ -92,7 +92,7 @@ class DatabaseEditor:
             raise ValueError(
                 'The code and the name must be specified. Eg. gacha_editor.py addpool ex "Expansion Battlesuit"'
             )
-        table = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        table = self.database.setdefault(TABLE_POOLS, {})
         if table.get(options.names[0]) is not None:
             raise ValueError("The specified pool already exists.")
         table[self._get_next_id(TABLE_POOLS)] = {
@@ -106,7 +106,7 @@ class DatabaseEditor:
     # database_editor.py removepool <code> <code> <code>
     # database_editor.py removepool ex foca focb
     def remove_pool(self, options) -> bool:
-        table = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        table = self.database.setdefault(TABLE_POOLS, {})
         has_changed = False
         for _, name in enumerate(options.names):
             pool_id = self._find_id_by_field(TABLE_POOLS, "code", name)
@@ -124,12 +124,12 @@ class DatabaseEditor:
         rate = float(options.rate)
         if rate < 0.0 or rate > 1.0:
             raise ValueError("The drop rate must be between 0.0, inclusive and 1.0, inclusive.")
-        table = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        table = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
         pool = table.get(pool_id)
         if pool is None:
             raise ValueError("The specified pool doesn't exist.")
-        loot_table = self._get_or_initialize_value(pool, "loot_table", [])
+        loot_table = pool.setdefault("loot_table", [])
         matching_descriptor = None
         for descriptor in loot_table:
             # Since it's impossible to precisely compare two floating-point numbers,
@@ -174,12 +174,12 @@ class DatabaseEditor:
     # database_editor.py --pool <code> removepoolitem names [names]
     # database_editor.py --pool ex removepoolitem "ARC Serratus" "Blaze Destroyer"
     def remove_pool_item(self, options) -> bool:
-        table = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        table = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
         pool = table.get(pool_id)
         if pool is None:
             raise ValueError("The specified pool doesn't exist.")
-        loot_table = self._get_or_initialize_value(pool, "loot_table", [])
+        loot_table = pool.setdefault("loot_table", [])
         has_changed = False
         for _, name in enumerate(options.names):
             item_id = self._find_item_id(name)
@@ -207,12 +207,12 @@ class DatabaseEditor:
     def replace_pool_item(self, options) -> bool:
         if len(options.names) % 2 != 0:
             raise ValueError("You must specify name pairs.")
-        pools = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        pools = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.pool)
         pool = pools.get(pool_id)
         if pool is None:
             raise ValueError("The specified pool doesn't exist.")
-        loot_table = self._get_or_initialize_value(pool, "loot_table", [])
+        loot_table = pool.setdefault("loot_table", [])
         has_changed = False
         for old_item_name, new_item_name in zip(options.names[0::2], options.names[1::2]):
             if not self._replace_pool_item(loot_table, old_item_name, new_item_name):
@@ -225,12 +225,12 @@ class DatabaseEditor:
     # database_editor.py showpool <code>
     # database_editor.py showpool ex
     def show_pool(self, options) -> bool:
-        pools = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        pools = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
         pool = pools.get(pool_id, None)
         if pool is None:
             raise ValueError(f"The pool '{options.names[0]}' doesn't exist.")
-        items = self._get_or_initialize_value(self.database, TABLE_ITEMS, {})
+        items = self.database.setdefault(TABLE_ITEMS, {})
         for descriptor in pool.get("loot_table", []):
             rate = descriptor.get("rate", 0.0)
             item_names = []
@@ -244,7 +244,7 @@ class DatabaseEditor:
     # database_editor.py togglepool <code>
     # database_editor.py togglepool ex
     def toggle_pool(self, options) -> bool:
-        pools = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        pools = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
         pool = pools.get(pool_id, None)
         if pool is None:
@@ -257,7 +257,7 @@ class DatabaseEditor:
     def clone_pool(self, options) -> bool:
         if len(options.names) != 3:
             raise ValueError("You must specify the source and the target pool identifiers, and the target pool name.")
-        pools = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        pools = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
         pool = pools.get(pool_id)
         if pool is None:
@@ -277,17 +277,6 @@ class DatabaseEditor:
             current_value = func(current_value, item)
         return current_value
 
-    def _get_or_initialize_value(self, dictionary: dict, key: str, default_value: object) -> object:
-        """
-        Gets the value associated to the specified ``key`` from the specified ``dictionary``.
-        If the key isn't present in the dictionary, it is initialized with the specified ``default_value``.
-        """
-        value = dictionary.get(key, None)
-        if value is not None:
-            return value
-        dictionary[key] = value = default_value
-        return value
-
     def _get_next_id(self, table_name: str) -> int:
         table = self.database.get(table_name, None)
         if table is None:
@@ -301,7 +290,7 @@ class DatabaseEditor:
 
         This function accounts for stigmatas, too.
         """
-        table = self._get_or_initialize_value(self.database, TABLE_POOLS, {})
+        table = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", pool_code)
         pool = table.get(pool_id)
         if pool is None:
@@ -321,7 +310,7 @@ class DatabaseEditor:
         predicate = (
             (lambda text: text == field_value) if is_exact else (lambda text: field_value.lower() in text.lower())
         )
-        for key, item in self._get_or_initialize_value(self.database, table_name, {}).items():
+        for key, item in self.database.setdefault(table_name, {}).items():
             if predicate(item.get(field_name, "")):
                 yield key
 
@@ -364,7 +353,7 @@ class DatabaseEditor:
         item_rank: str = None,
         is_single_stigmata: bool = False,
     ) -> str:
-        table = self._get_or_initialize_value(self.database, TABLE_ITEMS, {})
+        table = self.database.setdefault(TABLE_ITEMS, {})
         next_key = self._get_next_id(TABLE_ITEMS)
         table[next_key] = item = {"name": item_name, "type": item_type}
         if item_rank is not None:
@@ -410,7 +399,7 @@ class DatabaseEditor:
         return False
 
     def _replace_pool_item_internal(self, loot_table, old_item_id: str, new_item_id: str) -> bool:
-        for _, descriptor in enumerate(loot_table):
+        for descriptor in loot_table:
             item_list = descriptor.get("items", [])
             if old_item_id not in item_list:
                 continue

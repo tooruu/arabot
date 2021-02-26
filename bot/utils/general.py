@@ -1,6 +1,6 @@
 from re import search
 from datetime import datetime
-from discord import Status, Activity
+from discord import Status, Activity, Colour
 from discord.ext.commands import Converter, Cog
 
 
@@ -103,3 +103,9 @@ class QueryFilter(Converter):
         if ctx.guild.id == 676889696302792774 and arg in self.BLACKLIST:
             raise BlacklistMatch(arg, self.BLACKLIST[arg].format(ctx=ctx))
         return arg
+
+
+class Color:
+    red = Colour.from_rgb(218, 76, 82)
+    yellow = Colour.from_rgb(254, 163, 42)
+    green = Colour.from_rgb(39, 159, 109)

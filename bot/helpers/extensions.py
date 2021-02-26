@@ -10,4 +10,3 @@ def load_ext(client):
                 if cog[0] != "_" and cog.endswith(".py"):
                     module = f"{'.'.join(path)}.{cog[:-3]}"
                     client.load_extension(module)
-                    print("Loaded " + module)

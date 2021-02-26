@@ -14,7 +14,8 @@ class Urban(Cog, name="Eggs"):
     )
     async def urban_listener(self, msg):
         term = search(r"^(?:wh?[ao]t(?:['’]?s|\sis)\s)(.*?)\??$", msg.content.lower()).group(1)
-        await self.bot.get_command("urban")(await self.bot.get_context(msg), term=term)
+        if urban := self.bot.get_command("urban"):
+            await urban(await self.bot.get_context(msg), term=term)
 
 
 def setup(client):

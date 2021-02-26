@@ -118,11 +118,10 @@ class GachaSimulator:
     @staticmethod
     def _consolidate(dictionary: Dict[str, Pull], pull: Pull) -> Dict[str, Pull]:
         key = f"{pull.id}/{pull.name}"
-        value = dictionary.get(key, None)
-        if value is not None:
-            value.count += pull.count
-            return dictionary
-        dictionary[key] = value = Pull(pull.id, pull.name, pull.count, pull.is_rare)
+        try:
+            dictionary[key].value += pull.count
+        except KeyError:
+            dictionary[key] = Pull(pull.id, pull.name, pull.count, pull.is_rare)
         return dictionary
 
 
