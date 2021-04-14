@@ -56,10 +56,11 @@ class Queue:
 
 
 class text_reaction:
-    def __init__(self, *, cd=0, regex=None, check=None, string_send=True):
+    def __init__(self, *, cd=0, regex=None, check=None, string_send=True, reply=False):
         self.expr = regex
         self.check = check
         self.send = string_send
+        self.reply = reply
         self._cd = cd if cd > 0 else -1
         self._last_call = datetime(1970, 1, 1)
 
@@ -73,13 +74,15 @@ class text_reaction:
                 and is_valid(itself.bot, msg, self.expr)
                 and (self.check is None or self.check(msg))
             ):
+                method = msg.reply if self.reply else msg.channel.send
                 if self.send:
                     resp = func(msg)
                     if isinstance(resp, (list, tuple)):
-                        for i in resp:
-                            await msg.channel.send(i)
+                        await method(str(resp[0]))
+                        for i in resp[1:]:
+                            await msg.channel.send(str(i))
                     elif resp:
-                        await msg.channel.send(str(resp))
+                        await method(str(resp))
                 else:
                     await func(itself, msg)
                 self._last_call = datetime.now()
@@ -109,3 +112,9 @@ class Color:
     red = Colour.from_rgb(218, 76, 82)
     yellow = Colour.from_rgb(254, 163, 42)
     green = Colour.from_rgb(39, 159, 109)
+
+
+async def get_master_invite(guild):
+    for i in await guild.invites():
+        if i.max_uses == 0:
+            return i.url

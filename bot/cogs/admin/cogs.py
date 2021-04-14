@@ -1,10 +1,9 @@
 from discord import Embed
 from discord.ext.commands import Cog, check, group, errors
 from ...utils.general import is_dev, Color
-from ...utils.format_escape import bold
 
 
-class Sample(Cog, name="Admin"):
+class Cogs(Cog, name="Admin"):
     def __init__(self, client):
         self.bot = client
         self.root = "bot.cogs"
@@ -12,8 +11,7 @@ class Sample(Cog, name="Admin"):
     @check(is_dev)
     @group(aliases=["cogs"], invoke_without_command=True, hidden=True)
     async def cog(self, ctx):
-        cog_list = "\n".join(bold(c) for c in self.bot.cogs)
-        embed = Embed(color=Color.yellow).add_field(name="Loaded cogs", value=cog_list)
+        embed = Embed(color=Color.yellow).add_field(name="Loaded cogs", value="\n".join(self.bot.cogs))
         await ctx.send(embed=embed)
 
     @check(is_dev)
@@ -76,4 +74,4 @@ class Sample(Cog, name="Admin"):
 
 
 def setup(client):
-    client.add_cog(Sample(client))
+    client.add_cog(Cogs(client))
