@@ -12,7 +12,7 @@ from discord.ext.commands import (
     CommandOnCooldown,
 )
 from ...utils.converters import FindMember, FindEmoji
-from ...utils.general import is_dev, set_presence
+from ...utils.general import is_dev, set_presence, get_master_invite
 from ...utils.meta import BOT_NAME
 from ...utils.format_escape import bold
 
@@ -106,11 +106,7 @@ class General(Cog, name="Commands"):
     @command(brief="<user> | DM user to summon them")
     async def summon(self, ctx, target: FindMember, *, msg=None):
         if target:
-            invite = Embed.Empty
-            for i in await ctx.guild.invites():
-                if i.max_uses == 0:
-                    invite = i.url
-                    break
+            invite = await get_master_invite(ctx.guild) or Embed.Empty
             embed = Embed(
                 description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}"
                 "\n{}\n[Jump to message]({})".format(f"\n{bold(msg)}" if msg else "", ctx.message.jump_url)
@@ -139,35 +135,24 @@ class General(Cog, name="Commands"):
     @command(brief="Who asked?", hidden=True)
     async def wa(self, ctx, msg: MessageConverter = None):
         await ctx.message.delete()
-        if msg:
-            for i in (
-                "🇼",
-                "🇭",
-                "🇴",
-                "🇦",
-                "🇸",
-                "🇰",
-                "🇪",
-                "🇩",
-                "<:FukaWhy:677955897200476180>",
-            ):
-                await msg.add_reaction(i)
-            return
-        async for msg in ctx.history(limit=3):
-            if not msg.author.bot:
-                for i in (
-                    "🇼",
-                    "🇭",
-                    "🇴",
-                    "🇦",
-                    "🇸",
-                    "🇰",
-                    "🇪",
-                    "🇩",
-                    "<:FukaWhy:677955897200476180>",
-                ):
-                    await msg.add_reaction(i)
-                break
+        if not msg:
+            async for msg in ctx.history(limit=3):
+                if not msg.author.bot:
+                    break
+            else:
+                return
+        for i in (
+            "🇼",
+            "🇭",
+            "🇴",
+            "🇦",
+            "🇸",
+            "🇰",
+            "🇪",
+            "🇩",
+            "<:FukaWhy:677955897200476180>",
+        ):
+            await msg.add_reaction(i)
 
     @wa.error
     async def wa_ratelimit(self, ctx, error):
@@ -188,35 +173,24 @@ class General(Cog, name="Commands"):
     @command(brief="Who cares?", hidden=True)
     async def wc(self, ctx, msg: MessageConverter = None):
         await ctx.message.delete()
-        if msg:
-            for i in (
-                "🇼",
-                "🇭",
-                "🇴",
-                "🇨",
-                "🇦",
-                "🇷",
-                "🇪",
-                "🇸",
-                "<:TooruWeary:685461000891531282>",
-            ):
-                await msg.add_reaction(i)
-            return
-        async for msg in ctx.history(limit=3):
-            if not msg.author.bot:
-                for i in (
-                    "🇼",
-                    "🇭",
-                    "🇴",
-                    "🇨",
-                    "🇦",
-                    "🇷",
-                    "🇪",
-                    "🇸",
-                    "<:TooruWeary:685461000891531282>",
-                ):
-                    await msg.add_reaction(i)
-                break
+        if not msg:
+            async for msg in ctx.history(limit=3):
+                if not msg.author.bot:
+                    break
+            else:
+                return
+        for i in (
+            "🇼",
+            "🇭",
+            "🇴",
+            "🇨",
+            "🇦",
+            "🇷",
+            "🇪",
+            "🇸",
+            "<:TooruWeary:685461000891531282>",
+        ):
+            await msg.add_reaction(i)
 
     @wc.error
     async def wc_ratelimit(self, ctx, error):
@@ -226,7 +200,7 @@ class General(Cog, name="Commands"):
         raise error
 
     @cooldown(3, 10, BucketType.guild)
-    @command(brief="| Pings random person")
+    @command(aliases=["whom", "whose", "who's"], brief="| Pings random person")
     async def who(self, ctx):
         member = choice(ctx.guild.members)
         await ctx.reply(member.mention)
