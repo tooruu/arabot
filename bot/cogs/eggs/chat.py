@@ -12,18 +12,18 @@ class Chat(Cog, name="Eggs"):
         return "ur mom"
 
     @text_reaction(
-        regex=r"^(?:i(?:['’]?m|\sam)\s)+(?:(?:an?|the)\s)?\w$",
+        regex=r"^(?:[ıi](?:['’]?m|\sam)\s)+(?:(?:an?|the)\s)?\w+$",
         check=lambda msg: len(msg.content) < 20,
     )
     def im_hi(msg):
-        regex = match(r"(?:i(?:['’]?m|\sam)\s)+(?:(?:an?|the)\s)?(\w)", msg.content.lower())
+        regex = match(r"(?:[ıi](?:['’]?m|\sam)\s)+(?:(?:an?|the)\s)?(\w+)", msg.content.lower())
         return "hi " + regex.group(1)
 
     @text_reaction(regex="\\brac(?:e|ing)\\b", cd=15)
     def racing(msg):
         return "***RACING TIME***", "🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽🧑🏼‍🦽"
 
-    @text_reaction(regex=";-;")
+    @text_reaction(regex="\\b;-;\\b")
     def cry(msg):
         return msg.author.mention + " don't cry <:KannaPat:762774093723860993>"
 
