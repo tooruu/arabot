@@ -23,11 +23,11 @@ class Listeners(Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, CommandOnCooldown):
             if not ctx.command.hidden:
-                await ctx.send(f"Cooldown expires in {error.retry_after:.0f} seconds")
+                await ctx.reply(f"Cooldown expires in {error.retry_after:.0f} seconds")
             return
         if isinstance(error, MissingPermissions):
             if not ctx.command.hidden:
-                await ctx.send("Missing permissions")
+                await ctx.reply("Missing permissions")
             return
         if hasattr(ctx.command, "on_error") or isinstance(
             error,
