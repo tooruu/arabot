@@ -23,7 +23,7 @@ class General(Cog, name="Commands"):
 
     @command(brief="<user> | Tell chat you love someone")
     async def love(self, ctx, partner: FindMember):
-        await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
+        await ctx.send(f"{ctx.author.mention} loves {partner.mention} ❤️" if partner else "Love partner not found")
 
     @command(
         aliases=[
@@ -41,7 +41,7 @@ class General(Cog, name="Commands"):
     )
     @check(is_dev)
     async def stop(self, ctx):
-        await ctx.send("I'm dying, master :cold_face:")
+        await ctx.send("I'm dying, master 🥶")
         print("Stopping!")
         await self.bot.close()
 
