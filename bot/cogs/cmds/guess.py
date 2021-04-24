@@ -33,14 +33,14 @@ class Guess(Cog, name="Commands"):
                 await vote.add_reaction("✅")
                 guesses[vote.author] = int(vote.content)
                 if int(vote.content) == NUMBER:
-                    return
+                    return True
 
         try:
-            await wait_for(ensure(), timeout=TIMEOUT)
+            exact_guess = await wait_for(ensure(), timeout=TIMEOUT)
         except TimeoutError:
-            pass
+            exact_guess = False
         # Ejection phase
-        if len(guesses) > 1:
+        if exact_guess or len(guesses) > 1:
             winner = min(guesses, key=lambda m: abs(guesses[m] - NUMBER))
             await ctx.send(
                 winner.mention + f" {'guessed' if guesses[winner] == NUMBER else 'was the closest to'} "
