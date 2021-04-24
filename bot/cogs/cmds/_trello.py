@@ -112,9 +112,8 @@ class Trello(Cog, name="Commands"):
                 return
         await wiz.clear_reactions()
 
-        async with self.bot.ses as session:
-            async with session.post(self.CARDS_URL, params=params):
-                pass
+        async with self.bot.ses.post(self.CARDS_URL, params=params):
+            pass
         await edit("Created card " + bold(title))
 
     @check(is_dev)
