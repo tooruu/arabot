@@ -21,14 +21,10 @@ class Trans(Cog, name="Commands"):
         if len(text) > 1024:
             await ctx.send("Your text is too long,\ntrimming it to the first 1024 characters")
             text = text[:1024]
-        async with self.bot.ses.get(
+        trans = await self.bot.fetch_json(
             "https://translation.googleapis.com/language/translate/v2",
             params={"key": self.key, "target": lang_to, "q": text},
-        ) as trans:
-            if trans.status != 200:
-                await ctx.send("An error occurred")
-                return
-            trans = (await trans.json())["data"]["translations"][0]
+        )["data"]["translations"][0]
         embed = (
             Embed()
             .add_field(name=trans["detectedSourceLanguage"].upper(), value=dsafe(text)[:1024])

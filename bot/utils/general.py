@@ -1,6 +1,6 @@
 from re import search
 from datetime import datetime
-from discord import Status, Activity, Colour
+from discord import Colour
 from discord.ext.commands import Converter, Cog
 
 
@@ -17,12 +17,6 @@ def is_valid(client, msg, expr="") -> bool:
         not any(msg.content.startswith(pfx) for pfx in (">", *client.command_prefix))
         and not msg.author.bot
         and search(expr, msg.content.lower())
-    )
-
-
-async def set_presence(client, _type: int, name: str, _status: Status = None):
-    await client.change_presence(
-        status=_status if isinstance(_status, Status) else None, activity=Activity(name=name, type=_type)
     )
 
 

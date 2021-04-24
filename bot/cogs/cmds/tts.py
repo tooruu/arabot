@@ -18,35 +18,30 @@ class TTS(Cog, name="Commands"):
             await ctx.send("I need text to synthesize")
             return
         async with ctx.typing():
-            async with self.bot.ses.post(
-                "https://translation.googleapis.com/language/translate/v2/detect", params={"key": self.key, "q": text}
-            ) as lang:
-                if lang.status == 200:
-                    lang = (await lang.json())["data"]["detections"][0][0]["language"]
-                    if lang == "und":
-                        lang = "en"
-                else:
+            try:
+                lang = await self.bot.fetch_json(
+                    "https://translation.googleapis.com/language/translate/v2/detect",
+                    params={"key": self.key, "q": text},
+                )
+            except:
+                lang = "en"
+            else:
+                if lang["data"]["detections"][0][0]["language"] == "und":
                     lang = "en"
 
-            async with self.bot.ses.post(
+            tts = await self.bot.fetch_json(
                 "https://texttospeech.googleapis.com/v1beta1/text:synthesize",
-                params={
-                    "key": self.key,
-                },
+                method="post",
+                params={"key": self.key},
                 data=dumps(
                     {
                         "input": {"text": text},
                         "voice": {"languageCode": lang},
-                        "audioConfig": {
-                            "audioEncoding": "OGG_OPUS",
-                        },
+                        "audioConfig": {"audioEncoding": "OGG_OPUS"},
                     }
                 ),
-            ) as tts:
-                if tts.status != 200:
-                    await ctx.send("An error occurred")
-                    return
-                tts = b64decode((await tts.json())["audioContent"])
+            )
+            tts = b64decode(tts["audioContent"])
             await ctx.reply(file=File(BytesIO(tts), text + ".ogg"))
 
 
