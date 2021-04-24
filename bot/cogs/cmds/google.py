@@ -37,7 +37,7 @@ class Google(Cog, name="Commands"):
                     if image.ok and image.content_type.startswith("image/"):
                         filename = urlparse(i["link"])[2].split("/")[-1]
                         image = BytesIO(await image.read())
-                        await ctx.send(file=File(image, filename))
+                        await ctx.send(file=File(image, filename + ".jpg"))
                         return
             except Exception as e:
                 print(e, "\nFailed image link: ", i["link"])
