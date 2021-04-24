@@ -11,7 +11,7 @@ from discord.ext.commands import (
     BucketType,
     CommandOnCooldown,
 )
-from ...utils.converters import FindMember, FindEmoji
+from ...utils.converters import FindMember, FindEmoji, ChlMemberConverter
 from ...utils.general import is_dev, set_presence, get_master_invite
 from ...utils.meta import BOT_NAME
 from ...utils.format_escape import bold
@@ -104,8 +104,8 @@ class General(Cog, name="Commands"):
         await ctx.send("\n".join(files) if files else "No emojis found")
 
     @command(brief="<user> | DM user to summon them")
-    async def summon(self, ctx, target: FindMember, *, msg=None):
-        if target:
+    async def summon(self, ctx, target: ChlMemberConverter, *, msg=None):
+        if target and not target.bot:
             invite = await get_master_invite(ctx.guild) or Embed.Empty
             embed = Embed(
                 description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}"
@@ -117,8 +117,8 @@ class General(Cog, name="Commands"):
             )
             await target.send(embed=embed)
             await ctx.send(f"Summoning {target.mention}")
-        else:
-            await ctx.send("User not found")
+            return
+        await ctx.send("User not found")
 
     @command(brief="| Get a random inspirational quote")
     async def inspire(self, ctx):
