@@ -21,7 +21,7 @@ class Chemoji(Cog, name="Commands"):
                 em_after = ctx.message.attachments[0].url
             if match(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", em_after):
                 async with self.bot.ses.get(em_after) as resp:
-                    if resp.status != 200 or not resp.content_type.startswith("image/"):
+                    if not resp.ok or not resp.content_type.startswith("image/"):
                         await ctx.send(f"Link a valid image to replace {em_before} with")
                         return
             elif match(r"<a?:[a-zA-Z0-9_]{2,32}:[0-9]{18,22}>$", em_after):
