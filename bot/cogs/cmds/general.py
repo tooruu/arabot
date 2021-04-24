@@ -12,7 +12,7 @@ from discord.ext.commands import (
     CommandOnCooldown,
 )
 from ...utils.converters import FindMember, FindEmoji, ChlMemberConverter
-from ...utils.general import is_dev, set_presence, get_master_invite
+from ...utils.general import is_dev, get_master_invite
 from ...utils.meta import BOT_NAME
 from ...utils.format_escape import bold
 
@@ -47,14 +47,14 @@ class General(Cog, name="Commands"):
 
     @command(hidden=True)
     @check(is_dev)
-    async def status(self, ctx, _type: int, *, name):
-        if _type not in (0, 1, 2, 3):
+    async def status(self, ctx, presence_type: int, *, name):
+        if presence_type not in (0, 1, 2, 3):
             return
-        await set_presence(self.bot, _type, name)
+        await self.bot.set_presence(presence_type, name)
 
     @command(name="177013")
     async def _177013(self, ctx):
-        await set_presence(self.bot, 3, "177013 with yo mama")
+        await self.bot.set_presence(3, "177013 with yo mama")
 
     @command(aliases=["purge", "prune", "d"], hidden=True)
     @has_permissions(manage_messages=True)
