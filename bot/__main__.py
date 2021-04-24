@@ -1,5 +1,5 @@
 from aiohttp import ClientSession
-from discord import Intents
+from discord import Intents, Status, Activity
 from discord.ext.commands import Bot
 from .utils.meta import BOT_PREFIX
 from .helpers.auth import getenv
