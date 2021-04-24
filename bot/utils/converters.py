@@ -6,6 +6,7 @@ from discord.ext.commands import (
     TextChannelConverter,
     VoiceChannelConverter,
     RoleConverter,
+    Converter,
 )
 from ..helpers.finder import Finder
 
@@ -55,3 +56,9 @@ class FindRole(Finder, RoleConverter):
     @staticmethod
     async def find(ctx, argument):
         return lambda role: role.name.lower().startswith(argument.lower()), ctx.guild.roles
+
+
+class ChlMemberConverter(Converter):
+    async def convert(self, ctx, argument):
+        result = find(lambda member: argument.lower() in member.display_name.lower(), ctx.channel.members)
+        return result or find(lambda member: argument.lower() in member.name.lower(), ctx.channel.members)

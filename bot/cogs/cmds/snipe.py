@@ -63,14 +63,9 @@ class Snipe(Cog, name="Commands"):
                 embed.add_field(name=title, value="\n".join(msg_group)[-1024:], inline=False)
                 while len(embed) > 6000:
                     del embed.fields[0]
-                try:
-                    await ctx.send(embed=embed)
-                except Exception as e:
-                    print(e)
-                    await ctx.send("An error occurred ||because I was coded by a retard||")
+                await ctx.send(embed=embed)
                 return
-
-        await ctx.send("Nothing to snipe here :eyes:")
+        await ctx.send("Nothing to snipe here 👀")
 
     @purge.before_loop
     async def wait(self):

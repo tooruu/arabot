@@ -1,5 +1,5 @@
 from aiohttp import ClientSession
-from discord import Intents
+from discord import Intents, Status, Activity
 from discord.ext.commands import Bot
 from .utils.meta import BOT_PREFIX
 from .helpers.auth import getenv
@@ -26,6 +26,16 @@ class TheBot(Bot):
     async def close(self):
         await self.ses.close()
         await super().close()
+
+    async def fetch_json(self, url, method="get", **kwargs):
+        async with self.ses.request(method, url, **kwargs) as resp:
+            resp.raise_for_status()
+            return await resp.json()
+
+    async def set_presence(self, presence_type: int, name: str, status: Status = None):
+        await self.change_presence(
+            status=status if isinstance(status, Status) else None, activity=Activity(name=name, type=presence_type)
+        )
 
 
 bot = TheBot(

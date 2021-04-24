@@ -16,7 +16,7 @@ class Guess(Cog, name="Commands"):
         TIMEOUT = 20
         MUTED_ROLE = ctx.guild.get_role(751868258130329732)
         NUMBER = randint(1, MAX)
-        await ctx.send(f":game_die: You have {TIMEOUT} seconds to guess a number between 1-{MAX}.")
+        await ctx.send(f"🎲 Guess a number between 1-{MAX}")
         # Voting phase
         guesses = {}
 
@@ -43,9 +43,8 @@ class Guess(Cog, name="Commands"):
         if len(guesses) > 1:
             winner = min(guesses, key=lambda m: abs(guesses[m] - NUMBER))
             await ctx.send(
-                f"{winner.mention} Congrats, "
-                f"{'you guessed' if guesses[winner] == NUMBER else 'your guess was the closest one to'} "
-                f"the number {NUMBER} <:TeriCelebrate:676915184698130469>\nEnjoy your 1 minute mute!"
+                winner.mention + f" {'guessed' if guesses[winner] == NUMBER else 'was the closest to'} "
+                f"number {NUMBER}\nEnjoy your 1 minute mute! <:TeriCelebrate:676915184698130469>"
             )
             await winner.add_roles(MUTED_ROLE, reason="Guessed the number")
             await sleep(60)

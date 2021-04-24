@@ -11,7 +11,7 @@ class HI3Log(Cog):
 
     @loop(hours=3)
     async def check(self):
-        async with self.bot.ses.get(
+        self.new = await self.bot.fetch_json(
             "https://honkaiimpact3.gamepedia.com/api.php",
             params={
                 "action": "parse",
@@ -20,8 +20,7 @@ class HI3Log(Cog):
                 "format": "json",
                 "prop": "wikitext",
             },
-        ) as resp:
-            self.new = (await resp.json())["parse"]["wikitext"]["*"]
+        )["parse"]["wikitext"]["*"]
         if self.new != self.old:
             await self.channel.send(
                 "Hey, Captain, {} patch is out!\n"

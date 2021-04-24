@@ -45,7 +45,7 @@ class Ping(Cog, name="Commands"):
         plt.savefig(buf, dpi=180, format="png", transparent=False)
         buf.seek(0)
         await ctx.send(
-            f":ping_pong: Pong after {self.bot.latency * 1000:.0f}ms!",
+            f"🏓 Pong after {self.bot.latency * 1000:.0f}ms!",
             file=File(buf, "ping.png"),
         )
         plt.close()

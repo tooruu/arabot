@@ -11,8 +11,8 @@ from discord.ext.commands import (
     BucketType,
     CommandOnCooldown,
 )
-from ...utils.converters import FindMember, FindEmoji
-from ...utils.general import is_dev, set_presence, get_master_invite
+from ...utils.converters import FindMember, FindEmoji, ChlMemberConverter
+from ...utils.general import is_dev, get_master_invite
 from ...utils.meta import BOT_NAME
 from ...utils.format_escape import bold
 
@@ -23,7 +23,7 @@ class General(Cog, name="Commands"):
 
     @command(brief="<user> | Tell chat you love someone")
     async def love(self, ctx, partner: FindMember):
-        await ctx.send(f"{ctx.author.mention} loves {partner.mention} :heart:" if partner else "Love partner not found")
+        await ctx.send(f"{ctx.author.mention} loves {partner.mention} ❤️" if partner else "Love partner not found")
 
     @command(
         aliases=[
@@ -41,20 +41,20 @@ class General(Cog, name="Commands"):
     )
     @check(is_dev)
     async def stop(self, ctx):
-        await ctx.send("I'm dying, master :cold_face:")
+        await ctx.send("I'm dying, master 🥶")
         print("Stopping!")
         await self.bot.close()
 
     @command(hidden=True)
     @check(is_dev)
-    async def status(self, ctx, _type: int, *, name):
-        if _type not in (0, 1, 2, 3):
+    async def status(self, ctx, presence_type: int, *, name):
+        if presence_type not in (0, 1, 2, 3):
             return
-        await set_presence(self.bot, _type, name)
+        await self.bot.set_presence(presence_type, name)
 
     @command(name="177013")
     async def _177013(self, ctx):
-        await set_presence(self.bot, 3, "177013 with yo mama")
+        await self.bot.set_presence(3, "177013 with yo mama")
 
     @command(aliases=["purge", "prune", "d"], hidden=True)
     @has_permissions(manage_messages=True)
@@ -104,8 +104,8 @@ class General(Cog, name="Commands"):
         await ctx.send("\n".join(files) if files else "No emojis found")
 
     @command(brief="<user> | DM user to summon them")
-    async def summon(self, ctx, target: FindMember, *, msg=None):
-        if target:
+    async def summon(self, ctx, target: ChlMemberConverter, *, msg=None):
+        if target and not target.bot:
             invite = await get_master_invite(ctx.guild) or Embed.Empty
             embed = Embed(
                 description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}"
@@ -117,8 +117,8 @@ class General(Cog, name="Commands"):
             )
             await target.send(embed=embed)
             await ctx.send(f"Summoning {target.mention}")
-        else:
-            await ctx.send("User not found")
+            return
+        await ctx.send("User not found")
 
     @command(brief="| Get a random inspirational quote")
     async def inspire(self, ctx):

@@ -9,7 +9,7 @@ class Urban(Cog, name="Eggs"):
 
     @text_reaction(
         string_send=False,
-        regex=r"^(?:wh?[ao]t(?:['’]?s|\sis)\s)((?:(?!up|good|with|it|this|that|so|the|about|goin|happenin|wrong|your|ur).)*?)\??$",
+        regex=r"^(?:wh?[ao]t(?:['’]?s|\sis)\s)((?:(?!up|good|with|it|this|that|so|the|about|goin|happenin|wrong|your|ur|next|da|dis|dat).)*?)\??$",
         check=lambda msg: len(msg.content) < 25,
     )
     async def urban_listener(self, msg):

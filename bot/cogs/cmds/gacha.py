@@ -1,4 +1,5 @@
 from typing import Generator
+from discord.errors import DiscordException
 from discord.ext.commands import (
     Context,
     command,
@@ -41,7 +42,7 @@ class Gacha(Cog, name="Commands"):
             self.gacha.reset_cooldown(ctx)
             return
         pulls = self._pull_provider.pull(supply_type, pull_count)
-        formatted_pulls = Gacha._format_pulls(pulls)
+        formatted_pulls = self._format_pulls(pulls)
         await ctx.reply(
             "__{} supply drops:__\n{}".format(
                 bold(self._pull_provider.get_pool_name(supply_type)), "\n".join(formatted_pulls)
@@ -49,7 +50,7 @@ class Gacha(Cog, name="Commands"):
         )
 
     @gacha.error
-    async def on_error(self, ctx: Context, error):
+    async def on_error(self, ctx: Context, error: DiscordException):
         if isinstance(error, CommandOnCooldown):
             return
         if isinstance(error, MissingRequiredArgument):
@@ -59,13 +60,17 @@ class Gacha(Cog, name="Commands"):
             ]
             await ctx.send(f"{ctx.author.mention}, currently available supplies:\n" + "\n".join(pools))
             return
-        if isinstance(error, BadArgument):
-            if repr(error) == 'BadArgument(\'Converting to "int" failed for parameter "pulls".\')':
-                if self.gacha.is_on_cooldown(ctx):
-                    await ctx.reply(f"Cooldown expires in {self.gacha.get_cooldown_retry_after(ctx):.0f} seconds")
-                else:
-                    await ctx.reply("You specified an invalid amount")
-                return
+        last_param = ctx.command.clean_params.popitem(last=True)[1]
+        if (
+            isinstance(error, BadArgument)
+            and last_param.name in str(error)
+            and last_param.annotation.__name__ in str(error)
+        ):
+            if self.gacha.is_on_cooldown(ctx):
+                await ctx.reply(f"Cooldown expires in {self.gacha.get_cooldown_retry_after(ctx):.0f} seconds")
+            else:
+                await ctx.reply("You specified an invalid amount")
+            return
         self.gacha.reset_cooldown(ctx)
         raise error
 
