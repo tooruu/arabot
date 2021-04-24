@@ -7,7 +7,6 @@ from discord.ext.commands.errors import (
     MissingRequiredArgument,
     ExpectedClosingQuoteError,
 )
-from ..utils.general import set_presence
 
 
 class Listeners(Cog):
@@ -16,7 +15,7 @@ class Listeners(Cog):
 
     @Cog.listener()
     async def on_ready(self):
-        await set_presence(self.bot, 3, "#lewd")
+        await self.bot.set_presence(3, "#lewd")
         print("Ready!")
 
     @Cog.listener()
@@ -40,6 +39,7 @@ class Listeners(Cog):
             ),
         ):
             return
+        await ctx.send("An error occurred")
         raise error
 
 
