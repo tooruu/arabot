@@ -3,6 +3,7 @@ from discord import Embed
 from discord.ext.commands import command, Cog
 from ...utils.format_escape import bold, dsafe
 from ...utils.meta import BOT_NAME
+from ...utils.general import get_master_invite
 
 
 class Urban(Cog, name="Commands"):
@@ -11,20 +12,19 @@ class Urban(Cog, name="Commands"):
 
     @command(brief="<term> | Search term in Urban Dictionary", aliases=["ud"])
     async def urban(self, ctx, *, term):
-        if "tooru" in term.lower():
-            await ctx.send(
-                embed=Embed(description="An awesome guy").set_author(name="tooru", url="https://discord.gg/YdEXsZN")
-            )
+        if "tooru" == term.lower():
+            invite = await get_master_invite(self.bot.get_guild(676889696302792774)) or Embed.Empty
+            await ctx.send(embed=Embed(description="An awesome guy").set_author(name="tooru", url=invite))
             return
-        if BOT_NAME.lower() in term.lower():
+        if BOT_NAME.lower() == term.lower():
+            invite = await get_master_invite(self.bot.get_guild(676889696302792774)) or Embed.Empty
             await ctx.send(
                 embed=Embed(description="An awesome bot written by an awesome guy").set_author(
-                    name=BOT_NAME, url="https://discord.gg/YdEXsZN"
+                    name=BOT_NAME, url=invite
                 )
             )
             return
-        async with self.bot.ses.get("https://api.urbandictionary.com/v0/define?term=" + safe(term)) as ud:
-            ud = (await ud.json()).get("list")
+        ud = (await self.bot.fetch_json("https://api.urbandictionary.com/v0/define?term=" + safe(term))).get("list")
         if ud:
             desc = dsafe(
                 "\n---------------------------------\n".join(
