@@ -34,7 +34,7 @@ class Google(Cog, name="Commands"):
         for i in json.get("items", ()):
             try:
                 async with self.bot.ses.get(i["link"]) as image:
-                    if image.ok and image.content_type.startswith("image/"):
+                    if image.ok and image.content_type.startswith("image/") and "svg" not in image.content_type:
                         filename = urlparse(i["link"])[2].split("/")[-1]
                         image = BytesIO(await image.read())
                         await ctx.send(file=File(image, filename + ".jpg"))
