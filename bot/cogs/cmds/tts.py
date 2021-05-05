@@ -26,11 +26,12 @@ class TTS(Cog, name="Commands"):
             except:
                 lang = "en"
             else:
-                if lang["data"]["detections"][0][0]["language"] == "und":
+                lang = lang["data"]["detections"][0][0]["language"]
+                if lang == "und":
                     lang = "en"
 
             tts = await self.bot.fetch_json(
-                "https://texttospeech.googleapis.com/v1beta1/text:synthesize",
+                "https://texttospeech.googleapis.com/v1/text:synthesize",
                 method="post",
                 params={"key": self.key},
                 data=dumps(
