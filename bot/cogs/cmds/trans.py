@@ -21,9 +21,11 @@ class Trans(Cog, name="Commands"):
         if len(text) > 1024:
             await ctx.send("Your text is too long,\ntrimming it to the first 1024 characters")
             text = text[:1024]
-        trans = await self.bot.fetch_json(
-            "https://translation.googleapis.com/language/translate/v2",
-            params={"key": self.key, "target": lang_to, "q": text},
+        trans = (
+            await self.bot.fetch_json(
+                "https://translation.googleapis.com/language/translate/v2",
+                params={"key": self.key, "target": lang_to, "q": text},
+            )
         )["data"]["translations"][0]
         embed = (
             Embed()
