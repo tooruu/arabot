@@ -27,8 +27,8 @@ class TheBot(Bot):
         await self.ses.close()
         await super().close()
 
-    async def fetch_json(self, url, method="get", **kwargs):
-        async with self.ses.request(method, url, **kwargs) as resp:
+    async def fetch_json(self, url, *, method="get", session=None, **kwargs):
+        async with (session or self.ses).request(method, url, **kwargs) as resp:
             resp.raise_for_status()
             return await resp.json()
 

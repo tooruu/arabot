@@ -9,6 +9,8 @@ from ...helpers.auth import req_auth
 
 
 class Google(Cog, name="Commands"):
+    E429 = "Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>"
+
     def __init__(self, client, keys):
         self.bot = client
         (self.g_search_key, self.g_isearch_key, self.g_cse, self.g_yt_key) = keys
@@ -28,7 +30,7 @@ class Google(Cog, name="Commands"):
             )
         except ClientResponseError as e:
             if e.status == 429:
-                await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+                await ctx.send(self.E429)
                 return
             raise
         for i in json.get("items", ()):
@@ -59,7 +61,8 @@ class Google(Cog, name="Commands"):
             )
         except ClientResponseError as e:
             if e.status == 429:
-                await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+                await ctx.send(self.E429)
+                return
             raise
         await ctx.send(json["items"][0]["link"] if json["items"] else "No results found")
 
@@ -77,7 +80,7 @@ class Google(Cog, name="Commands"):
             )
         except ClientResponseError as e:
             if e.status == 429:
-                await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+                await ctx.send(self.E429)
                 return
             raise
         if json["items"]:
@@ -111,7 +114,8 @@ class Google(Cog, name="Commands"):
             )
         except ClientResponseError as e:
             if e.status == 429:
-                await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+                await ctx.send(self.E429)
+                return
             raise
         await ctx.send("https://youtu.be/" + json["items"][0]["id"]["videoId"] if json["items"] else "No videos found")
 
@@ -130,7 +134,8 @@ class Google(Cog, name="Commands"):
             )
         except ClientResponseError as e:
             if e.status == 429:
-                await ctx.send("Sorry, I've hit today's 100 queries/day limit <:MeiStare:697945045311160451>")
+                await ctx.send()
+                return
             raise
         await ctx.send(
             "\n".join(["https://youtu.be/" + hit["id"]["videoId"] for hit in json["items"]])
