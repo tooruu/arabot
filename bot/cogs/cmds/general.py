@@ -1,6 +1,6 @@
 from glob import glob
 from random import choice
-from discord import Embed, Emoji, PartialEmoji
+from discord import Embed, Emoji, PartialEmoji, Forbidden
 from discord.ext.commands import (
     command,
     Cog,
@@ -115,8 +115,12 @@ class General(Cog, name="Commands"):
                 url=invite,
                 icon_url=ctx.guild.icon_url_as(static_format="png") or Embed.Empty,
             )
-            await target.send(embed=embed)
-            await ctx.send(f"Summoning {target.mention}")
+            try:
+                await target.send(embed=embed)
+            except Forbidden:
+                await ctx.send(f"Cannot send messages to {target.mention}")
+            else:
+                await ctx.send(f"Summoning {target.mention}")
             return
         await ctx.send("User not found")
 
