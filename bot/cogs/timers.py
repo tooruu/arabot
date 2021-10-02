@@ -30,7 +30,7 @@ class Timer:
         return datetime.combine(first_wkday_date, times[0][0][0])
 
     def till_next_phase(self):
-        totalSeconds = (self.get_next_phase() - datetime.now(tz=self.tz)).seconds
+        totalSeconds = (self.get_next_phase() - datetime.now(tz=self.tz)).total_seconds()
         hours = int(totalSeconds / 3600)
         minutes = int(totalSeconds % 3600 / 60)
         return hours, minutes
