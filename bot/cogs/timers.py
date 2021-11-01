@@ -57,6 +57,7 @@ class DiscordTimers(Cog):
     @Cog.listener()
     async def on_ready(self):
         HI3TZ = timezone("Etc/GMT-1")
+        HYLTZ = timezone("Etc/GMT-8")
         self.timers.update(
             {
                 Timer(
@@ -89,9 +90,12 @@ class DiscordTimers(Cog):
                     },
                     HI3TZ,
                 ): (752382371596206141, "🔥{} {}h {}m"),
-                Timer({w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}): (
-                    779019769755861004,
-                    "💖Waifus {1}h {2}m",
+                Timer(
+                    {w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}
+                ): (779019769755861004, "💖Waifus {1}h {2}m"),
+                Timer({w: [(time(), None)] for w in range(1, 8)}, HYLTZ): (
+                    904642451887783956,
+                    "🌟HoYoLAB {1}h {2}m",
                 ),
             }
         )
