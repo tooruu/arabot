@@ -17,7 +17,7 @@ class ZaWarudo(Cog, name="Eggs"):
             temp_perms.send_messages = False
             msgs = []
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
-            await msg.channel.send("<:KonoDioDa:676949860502732803>")
+            await msg.channel.send("<:KonoDioDa:937687826693251102>")
             msgs.append(await msg.channel.send("***Toki yo tomare!***"))
             for i in (
                 "Ichi",
