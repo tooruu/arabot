@@ -51,12 +51,14 @@ class Chat(Cog):
     @pfxless()
     async def gaygames(self, msg: disnake.Message):
         shit = "|".join(
-            "кс|cs",
-            "мм|mm",
-            "ра[фс]т|r(af|us)t",
-            "фортнайт|fortnite",
-            "осу|osu",
-            "дест[еи]ни|destiny",
+            (
+                "кс|cs",
+                "мм|mm",
+                "ра[фс]т|r(af|us)t",
+                "фортнайт|fortnite",
+                "осу|osu",
+                "дест[еи]ни|destiny",
+            )
         )
         if not (res := re.search(rf"\b{shit}\b", msg)):
             return
