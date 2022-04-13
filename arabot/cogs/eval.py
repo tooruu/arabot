@@ -74,7 +74,7 @@ class RemoteEvalException(EvalException):
 
     def format(self, *, filename: str = Evaluator.TB_FILENAME) -> str:
         tb_formatted = re.sub(
-            r'(?<=^  File ")/piston/jobs/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/[^/]+?(?=")',
+            r'(?<=^ {2}File ")/piston/jobs/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/[^/]+?(?=")',
             filename,
             self.error,
             flags=re.MULTILINE,

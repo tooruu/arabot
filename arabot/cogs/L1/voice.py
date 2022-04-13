@@ -48,7 +48,7 @@ class Voice(Cog):
     async def play_ogg(channel: disnake.VoiceChannel, audio: disnake.FFmpegOpusAudio) -> None:
         try:
             vc = await channel.connect()
-        except:
+        except Exception:
             logging.warning(disnake.ClientException("Could not connect to voice channel"))
             return
 

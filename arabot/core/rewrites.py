@@ -28,8 +28,8 @@ class ContextMixin:
 
 
 class Cog(commands.Cog):
-    def __init_subclass__(cog, category: Category = None, keys: Iterable[str] = (), **kwargs):
-        cog.category = category
+    def __init_subclass__(cls, category: Category = None, keys: Iterable[str] = (), **kwargs):
+        cls.category = category
         for key_name, key in zip(keys, getkeys(*keys)):
-            setattr(cog, key_name, key)
+            setattr(cls, key_name, key)
         super().__init_subclass__(**kwargs)

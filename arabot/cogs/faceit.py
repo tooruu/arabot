@@ -33,9 +33,9 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
             last_infraction = datetime.strptime(
                 player["last_infraction_date"], "%a %b %d %H:%M:%S UTC %Y"
             )
-            last_infraction = last_infraction.strftime("%d %b %Y")
-            last_infraction = " | Last infraction: " + last_infraction
-        except:
+        except (KeyError, ValueError):
+            last_infraction = " | Last infraction: " + last_infraction.strftime("%d %b %Y")
+        else:
             last_infraction = ""
 
         embed = (

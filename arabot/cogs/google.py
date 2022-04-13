@@ -130,7 +130,7 @@ class Google(
                 "https://translation.googleapis.com/language/translate/v2/detect",
                 params={"key": self.g_tts_key, "q": text},
             )
-        except:
+        except ClientResponseError:
             lang = "en"
         else:
             lang = lang["data"]["detections"][0][0]["language"]
@@ -165,7 +165,8 @@ class Google(
                             f"{mono(ctx.invoked_with)} doesn't work without "
                             f"cloud-billing,\nask `{self.ara.owner}` to enable it."
                         )
-        raise
+            case _:
+                raise
 
 
 Detection = TypeVar("Detection", bound=dict[str, str | bool | float])

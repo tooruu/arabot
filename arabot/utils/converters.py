@@ -52,7 +52,10 @@ class Twemoji(commands.Converter):
         ensure_only: bool = False,
     ) -> bytes | bool:
         async with (session or ClientSession()).get(self.url) as resp:
-            return (True if ensure_only else await resp.read()) if resp.ok else False
+            if resp.ok:
+                return True if ensure_only else await resp.read()
+            else:
+                return False
 
 
 class CslsMember(commands.Converter):

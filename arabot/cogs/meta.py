@@ -15,7 +15,7 @@ class AraHelp(MinimalHelpCommand):
     async def send_bot_help(self, mapping):
         bot: Ara = self.context.bot
 
-        help = (
+        embed = (
             Embed(description=self.get_opening_note() or Embed.Empty)
             .set_author(
                 name=f"{bot.name} help",
@@ -41,9 +41,9 @@ class AraHelp(MinimalHelpCommand):
                     break
                 val += cell + " "
 
-            help.add_field(name=bold(category), value=val[:-1] or "No commands")
+            embed.add_field(name=bold(category), value=val[:-1] or "No commands")
 
-        await self.get_destination().send(embed=help)
+        await self.get_destination().send(embed=embed)
 
     def get_opening_note(self):
         command_name = self.invoked_with

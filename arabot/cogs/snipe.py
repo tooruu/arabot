@@ -18,6 +18,7 @@ class RawDeletedMessage:
 
 class Snipe(Cog, category=Category.FUN):
     GROUP_AGE_THRESHOLD = 300  # seconds since last message to end group
+    EMPTY_SNIPE_MSG = "Nothing to snipe here 👀"
 
     def __init__(self, ara: Ara):
         self.ara = ara
@@ -44,7 +45,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send("User not found")
             return
         if ctx.channel not in self.log:
-            await ctx.send("Nothing to snipe here 👀")
+            await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         msg_pool = filter(
             lambda m: m.author == target if target else True,
@@ -52,7 +53,7 @@ class Snipe(Cog, category=Category.FUN):
         )
         msg_pool = list(msg_pool)[-10:]
         if not msg_pool:
-            await ctx.send("Nothing to snipe here 👀")
+            await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
         now = utcnow()
@@ -89,7 +90,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send("User not found")
             return
         if ctx.channel not in self.log:
-            await ctx.send("Nothing to snipe here 👀")
+            await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         try:
             last_msg = next(
@@ -99,7 +100,7 @@ class Snipe(Cog, category=Category.FUN):
                 )
             )
         except StopIteration:
-            await ctx.send("Nothing to snipe here 👀")
+            await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
         minutes_passed = (utcnow() - last_msg.created_at).seconds // 60
