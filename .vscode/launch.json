@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug AraBot",
+            "type": "python",
+            "request": "launch",
+            "module": "arabot",
+            "justMyCode": true
+        }
+    ]
+}

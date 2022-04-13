@@ -1,17 +1,21 @@
 # Neat hack to make sure this script can import modules despite being invoked from within the same package.
 # See: https://stackoverflow.com/a/16985066
-import sys
+import logging
 import os
+import sys
 
 PACKAGE_PARENT = ".."
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+SCRIPT_DIR = os.path.dirname(
+    os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__)))
+)
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from tools.modules.database_editor import DatabaseEditor
 from argparse import ArgumentParser
 from json import dump, load
 
-DATABASE_FILE_PATH = "./bot/res/database.json"
+from tools.modules.database_editor import DatabaseEditor
+
+DATABASE_FILE_PATH = "resources/database.json"
 
 
 # TODO LIST
@@ -54,26 +58,28 @@ class Main:
     def execute(self, options):
         operation = self._operations.get(options.operation)
         if operation is not None:
-            print(f"Invoking operation '{options.operation}'...")
+            logging.info(f"Invoking operation '{options.operation}'...")
             has_database_changed = operation(options)
             if has_database_changed:
                 self._save_database()
-            print(f"Operation '{options.operation}' finished.")
+            logging.info(f"Operation '{options.operation}' finished.")
         else:
-            print(f"Invalid operation '{options.operation}'.")
+            logging.error(f"Invalid operation '{options.operation}'.")
 
     def _save_database(self):
         """Saves the database associated to the editor instance."""
         with open(self._database_file_path, "w+") as database_file:
             dump(self._editor.database, database_file, indent="\t")
-        print("The database has been saved successfully.")
+        logging.info("The database has been saved successfully.")
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--type", default="0")  # Item type
     parser.add_argument("--rank", default=None)  # Item rank
-    parser.add_argument("--single", action="store_const", const=True)  # Is single (non-set) stigmata?
+    parser.add_argument(
+        "--single", action="store_const", const=True
+    )  # Is single (non-set) stigmata?
     parser.add_argument("--awakened", action="store_const", const=True)  # Is awakened valkyrie?
     parser.add_argument("--field", default=None)  # Field name
     parser.add_argument("--pool", default=None)  # Pool ID

@@ -1,6 +1,9 @@
 __pycache__/
 *.pyc
 .env
+.venv/
+.pytest_cache
+resources/ogg/
 
 # Visual Studio Code
 .vscode/*
@@ -9,6 +12,9 @@ __pycache__/
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+# Pycharm
+.idea/
 
 # Local History for Visual Studio Code
 .history/

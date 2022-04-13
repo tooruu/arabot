@@ -1,4 +1,7 @@
+import logging
 from argparse import ArgumentParser
+from typing import Callable, Dict, Generator, Iterable, TypeVar
+
 from gacha.logging import ConsoleLog, LogBase, LogLevel
 from gacha.models import VirtualItem
 from gacha.models.pulls import Pull
@@ -12,7 +15,6 @@ from gacha.persistence.json.converters import (
 from gacha.providers import EntityProviderInterface, SimplePullProvider
 from gacha.resolvers import ItemResolverInterface
 from gacha.utils.entity_provider_utils import get_item, get_item_rank, get_item_type
-from typing import Callable, Dict, Generator, Iterable, TypeVar
 
 # ::: Usage examples :::
 # Pull 10 items from the "foca" supply:
@@ -20,7 +22,7 @@ from typing import Callable, Dict, Generator, Iterable, TypeVar
 # Pull 100 items from the "foca" supply, consolidate and sort them:
 # python .\bot\tools\gacha_simulator.py -c -s foca 100
 
-DATABASE_FILE_PATH = "./bot/res/database.json"
+DATABASE_FILE_PATH = "resources/database.json"
 LOG_LEVEL = LogLevel.INFORMATION
 STIGMATA_PARTS = ("T", "M", "B")
 STIGMATA_PARTS_FULL = tuple(f"({part})" for part in STIGMATA_PARTS)
@@ -41,11 +43,15 @@ class ItemResolver(ItemResolverInterface):
             return
         item_type = get_item_type(self._entity_provider, item.item_type_id)
         if not item_type:
-            self._log.warning(f"The configured item type identified by '{item.item_type_id}' doesn't exist.")
+            self._log.warning(
+                f"The configured item type identified by '{item.item_type_id}' doesn't exist."
+            )
             return
         item_rank = get_item_rank(self._entity_provider, item.rank_id)
         if not item_rank:
-            self._log.warning(f"The configured item rank identified by '{item.rank_id}' doesn't exist.")
+            self._log.warning(
+                f"The configured item rank identified by '{item.rank_id}' doesn't exist."
+            )
             return
         if item_type.name == "Stigmata" and not item.name.endswith(STIGMATA_PARTS_FULL):
             item_names = [f"{item.name} ({part})" for part in STIGMATA_PARTS]
@@ -96,20 +102,23 @@ class GachaSimulator:
         self._pull_provider.pull_count_min = 1
         self._pull_provider.pull_count_max = pull_count
 
-        supply_type = supply_type.lower()
+        supply_type = supply_type.casefold()
         if not self._pull_provider.has_pool(supply_type):
-            print("Attempted to pull from an invalid supply.")
+            logging.error("Attempted to pull from an invalid supply.")
             return
         pulls = self._pull_provider.pull(supply_type, pull_count)
         if consolidate:
-            pulls = GachaSimulator._aggregate(pulls, {}, lambda c, p: GachaSimulator._consolidate(c, p)).values()
+            pulls = GachaSimulator._aggregate(
+                pulls, {}, lambda c, p: GachaSimulator._consolidate(c, p)
+            ).values()
         if sort:
             pulls = sorted(pulls, key=lambda pull: pull.name)
         formatted_pulls = [
-            "{} x{}{}".format(pull.name, pull.count, " (Rare)" if pull.is_rare else "") for pull in pulls
+            "{} x{}{}".format(pull.name, pull.count, " (Rare)" if pull.is_rare else "")
+            for pull in pulls
         ]
-        print(
-            "The supply '{}' provided the following items:\n{}".format(
+        logging.info(
+            "The supply '{}' provided the following items {}".format(
                 self._pull_provider.get_pool_name(supply_type),
                 "\n".join(formatted_pulls),
             )
@@ -133,6 +142,5 @@ parser.add_argument("count", nargs="?", default=10)
 args = parser.parse_args()
 
 gacha = GachaSimulator()
-print("Available pools:")
-print(*[pool_code for pool_code in gacha.get_pool_codes()])
+print(f"Available pools: {', '.join(gacha.get_pool_codes())}")
 gacha.pull(args.pool, int(args.count), bool(args.consolidate), bool(args.sort))
