@@ -61,7 +61,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
         self.ara = ara
 
     @command(brief="Find source for an image")
-    async def sauce(self, ctx: Context, image_url: str = None):
+    async def sauce(self, ctx: Context):
         image_url = self.get_image_url(ctx.message)
         if not image_url:
             await ctx.send("No image or link provided")
