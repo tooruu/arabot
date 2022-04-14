@@ -80,7 +80,7 @@ class pfxless:
         return (
             (self.allow_prefix or not await pfx_factory(msg))
             and (self.allow_bots or not msg.author.bot)
-            and re.search(self.pattern, msg.content, 0 if self.case_sensitive else re.I)
+            and re.search(self.pattern, msg.content, 0 if self.case_sensitive else re.IGNORECASE)
         )
 
     async def _run_checks(self, msg: Message) -> bool:
