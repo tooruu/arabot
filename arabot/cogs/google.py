@@ -261,7 +261,8 @@ class Translate(Cog, category=Category.LOOKUP):
             case [source, target, *text] if text:
                 text = " ".join(text)
 
-                if source := find_lang(source):
+                if temp := find_lang(source):
+                    source = temp
                     if temp := find_lang(target):
                         target = temp
                     else:
