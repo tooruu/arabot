@@ -200,6 +200,9 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
         elif match(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", image_url):
             return image_url
 
+        elif msg.stickers:
+            image_url = msg.stickers[0].url
+
         elif msg.embeds:
             for embed in msg.embeds:
                 if image_url := embed.image.url:
