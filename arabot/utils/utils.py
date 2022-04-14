@@ -30,7 +30,7 @@ __all__ = (
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.0.1"
+BOT_VERSION = "5.0.2"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -176,7 +176,7 @@ def search_directory(path) -> Generator[str, None, None]:
     with_prefix = lambda f: ".".join((path / f).parts)
 
     modules, packages = set(), set()
-    for _, name, ispkg in iter_modules([path]):
+    for _, name, ispkg in iter_modules([str(path)]):
         if not name.startswith("_"):
             (packages if ispkg else modules).add(name)
     dirs = {dir.rstrip(os.sep) for dir in glob("[!_]*/", root_dir=path)} - packages
