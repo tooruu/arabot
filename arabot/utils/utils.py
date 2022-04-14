@@ -30,7 +30,7 @@ __all__ = (
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.0.2"
+BOT_VERSION = "5.0.3"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -79,18 +79,23 @@ def system_info() -> str:
             os_ver = "{0.system} {0.release} (version {0.version})".format(os_info)
         case "Darwin":
             os_info = platform.mac_ver()
-            os_ver = "Mac OSX {0[0]} {0[1]}".format(os_info).strip()
+            os_ver = "Mac OSX {0[0]} {0[1]}".format(os_info)
         case "Linux":
-            import distro  # type: ignore
-
-            os_info = distro.linux_distribution()
-            os_ver = "{0[0]} {0[1]}".format(os_info).strip()
+            try:
+                import distro  # pyright: reportMissingImports=false
+            except ModuleNotFoundError:
+                os_info = platform.uname()
+                os_ver = "{0[0]} {0[2]}".format(os_info)
+            else:
+                os_info = distro.linux_distribution()
+                os_ver = "{0[0]} {0[1]}".format(os_info)
         case _:
-            os_ver = platform.platform()
+            os_info = platform.uname()
+            os_ver = "{0[0]} {0[2]}".format(os_info)
 
     return f"""Debug Info:
 
-OS version: {os_ver}
+OS version: {os_ver.strip()}
 Python executable: {sys.executable}
 Python version: {sys.version}
 {disnake.__title__.title()} version: {disnake.__version__}
@@ -184,4 +189,4 @@ def search_directory(path) -> Generator[str, None, None]:
     yield from map(with_prefix, modules)
     yield from map(with_prefix, packages)
     for dir in dirs:
-        yield from search_directory(str(path / dir))
+        yield from search_directory(path / dir)
