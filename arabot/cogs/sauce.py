@@ -71,7 +71,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             "https://saucenao.com/search.php",
             params={
                 "output_type": 2,
-                "api_key": self.saucenao_key,
+                "api_key": self.key,
                 "db": 999,
                 "numres": 1,
                 "url": image_url,
