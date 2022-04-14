@@ -30,7 +30,7 @@ __all__ = (
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.0.1"
+BOT_VERSION = "5.0.2"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -184,4 +184,4 @@ def search_directory(path) -> Generator[str, None, None]:
     yield from map(with_prefix, modules)
     yield from map(with_prefix, packages)
     for dir in dirs:
-        yield from search_directory(path / dir)
+        yield from search_directory(str(path / dir))
