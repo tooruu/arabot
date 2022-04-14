@@ -127,6 +127,10 @@ class General(Cog, category=Category.GENERAL):
             .set_footer(text=target.display_name + "'s banner")
         )
 
+    async def say(self, ctx: Context, *, msg):
+        await ctx.message.delete()
+        await ctx.send(msg)
+
 
 def setup(ara: Ara):
     ara.add_cog(General(ara))
