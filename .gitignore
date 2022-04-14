@@ -3,7 +3,6 @@ __pycache__/
 .env
 .venv/
 .pytest_cache
-resources/ogg/
 
 # Visual Studio Code
 .vscode/*
