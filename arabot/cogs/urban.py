@@ -67,8 +67,8 @@ class Urban(Cog, category=Category.LOOKUP):
             )
             return
 
-        ud = await self.ara.session.fetch_json(self.BASE_URL, params={"term": quote_plus(term)})
-        if not ud.get("list"):
+        data = await self.ara.session.fetch_json(self.BASE_URL, params={"term": quote_plus(term)})
+        if not (ud := data.get("list")):
             if ctx.prefix:
                 await ctx.send(f"Definition for {bold(term)} not found")
             return
@@ -86,9 +86,8 @@ class Urban(Cog, category=Category.LOOKUP):
     @pfxless(regex=QUERY_PREFIX + rf"((?:(?!{WORDS_IGNORE}).)*?)\??$")
     async def urban_listener(self, msg):
         if self.urban.enabled:
-            return
-        t = re.search(self.QUERY_PREFIX + r"(.*?)\??$", msg.content.lower(), re.IGNORECASE).group(1)
-        await self.urban(await self.ara.get_context(msg), term=t)
+            term = re.search(self.QUERY_PREFIX + r"(.*?)\??$", msg.content, re.IGNORECASE).group(1)
+            await self.urban(await self.ara.get_context(msg), term=term)
 
 
 def setup(ara: Ara):
