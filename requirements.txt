@@ -1,5 +1,13 @@
-discord.py[voice]                                         # Discord API wrapper + voice support
-jikanpy                                                   # MyAnimeList API wrapper
-matplotlib                                                # ping graph
-git+https://github.com/rexor12/gacha.py.git@develop/1.0   # Generic Gacha System
-pytz                                                      # time zones
+disnake[voice]
+# Speedups
+aiodns
+Brotli
+orjson
+
+# Libraries
+jikanpy
+matplotlib
+git+https://github.com/rexor12/gacha.py.git
+python-dotenv
+tzdata
+git+https://github.com/aio-libs/async-lru.git@3574af7691371015c47faf77e0abf8c7b06a3cdc

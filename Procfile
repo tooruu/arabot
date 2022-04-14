@@ -1,1 +1,1 @@
-worker: python -m bot
+worker: python -OO -m arabot

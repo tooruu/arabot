@@ -19,7 +19,7 @@ class DatabaseEditor:
         self.logs_enabled = True
 
     # TODO Make the argument parser more obvious, because specifying the "names" argument here makes no sense.
-    # python .\bot\tools\database_editor.py listtables all
+    # python arabot/tools/database_editor.py listtables all
     def list_tables(self, options) -> bool:
         """Lists the names of the tables available in the database."""
         for table_id in self.database.keys():
@@ -160,14 +160,18 @@ class DatabaseEditor:
                 other_item_list = descriptor.get("items", [])
                 if item_id in other_item_list:
                     other_item_list.remove(item_id)
-                    self._log(f"Item '{name}' has been removed with drop rate {descriptor.get('rate', 0.0)}.")
+                    self._log(
+                        f"Item '{name}' has been removed with drop rate {descriptor.get('rate', 0.0)}."
+                    )
                     if len(other_item_list) == 0:
                         loot_table.pop(descriptor_index)
                     break
             item_list.append(item_id)
             has_changed = True
             self._log(f"Added item '{name}' to the pool with drop rate {rate}.")
-        self._log(f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}.")
+        self._log(
+            f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}."
+        )
         self._validate_pool_total_rate(options.pool)
         return has_changed and len(item_list) > 0
 
@@ -256,7 +260,9 @@ class DatabaseEditor:
     # database_editor.py clonepool foca focb "Focused Supply B"
     def clone_pool(self, options) -> bool:
         if len(options.names) != 3:
-            raise ValueError("You must specify the source and the target pool identifiers, and the target pool name.")
+            raise ValueError(
+                "You must specify the source and the target pool identifiers, and the target pool name."
+            )
         pools = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
         pool = pools.get(pool_id)
@@ -267,7 +273,9 @@ class DatabaseEditor:
         new_pool["code"] = options.names[1]
         new_pool_id = self._get_next_id(TABLE_POOLS)
         self.database[TABLE_POOLS][new_pool_id] = new_pool
-        self._log(f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'.")
+        self._log(
+            f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'."
+        )
         return True
 
     @staticmethod
@@ -300,7 +308,9 @@ class DatabaseEditor:
             return 0.0
         return DatabaseEditor._aggregate(loot_table, 0.0, lambda c, i: c + i.get("rate", 0.0))
 
-    def _find_ids_by_field(self, table_name: str, field_name: str, field_value: str, is_exact: bool = True):
+    def _find_ids_by_field(
+        self, table_name: str, field_name: str, field_value: str, is_exact: bool = True
+    ):
         """
         Finds all the identifiers in the table with the specified ``table_name``
         whose fields identified by the specified ``field_name``
@@ -308,7 +318,9 @@ class DatabaseEditor:
         If ``is_exact`` is set to ``True``, only exact matches are returned.
         """
         predicate = (
-            (lambda text: text == field_value) if is_exact else (lambda text: field_value.lower() in text.lower())
+            (lambda text: text == field_value)
+            if is_exact
+            else (lambda text: field_value.casefold() in text.casefold())
         )
         for key, item in self.database.setdefault(table_name, {}).items():
             if predicate(item.get(field_name, "")):
@@ -334,7 +346,9 @@ class DatabaseEditor:
     def _find_valkyrie_fragment_id(self, valkyrie_name: str) -> str:
         """Finds the unique identifier of fragment/soul that belongs to the Valkyrie with the specified name."""
         # TODO Mark valkyries with "is_awakened": True so it's easier to find the matching frag/soul.
-        return self._find_item_id(f"{valkyrie_name} fragment") or self._find_item_id(f"{valkyrie_name} soul")
+        return self._find_item_id(f"{valkyrie_name} fragment") or self._find_item_id(
+            f"{valkyrie_name} soul"
+        )
 
     def _validate_pool_total_rate(self, pool_code: str):
         """
@@ -369,18 +383,28 @@ class DatabaseEditor:
             return False
         new_item_id = self._find_item_id(new_item_name)
         if new_item_id is None:
-            self._log(f"The item '{new_item_name}' doesn't exist, hence it won't replace the item '{old_item_name}'.")
+            self._log(
+                f"The item '{new_item_name}' doesn't exist, hence it won't replace the item '{old_item_name}'."
+            )
             return False
         if self._replace_pool_item_internal(loot_table, old_item_id, new_item_id):
-            self._log(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
+            self._log(
+                f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'."
+            )
             return True
-        self._log(f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced.")
+        self._log(
+            f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced."
+        )
         return False
 
-    def _replace_pool_valkyrie_fragment(self, loot_table, old_valkyrie_name: str, new_valkyrie_name: str) -> bool:
+    def _replace_pool_valkyrie_fragment(
+        self, loot_table, old_valkyrie_name: str, new_valkyrie_name: str
+    ) -> bool:
         old_item_id = self._find_valkyrie_fragment_id(old_valkyrie_name)
         if old_item_id is None:
-            self._log(f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced.")
+            self._log(
+                f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced."
+            )
             return False
         new_item_id = self._find_valkyrie_fragment_id(new_valkyrie_name)
         if new_item_id is None:
