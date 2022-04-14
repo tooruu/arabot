@@ -48,6 +48,29 @@ class Fun(Cog, category=Category.FUN):
         ):
             await msg.add_reaction(i)
 
+    @message_command(name="Who asked?")
+    async def whoasked(self, inter: ApplicationCommandInteraction, msg: Message):
+        await inter.response.send_message("Adding reactions", ephemeral=True)
+        try:
+            for i in (
+                "🇼",
+                "🇭",
+                "🇴",
+                "🇦",
+                "🇸",
+                "🇰",
+                "🇪",
+                "🇩",
+                CustomEmoji.FUKAWHY,
+            ):
+                await msg.add_reaction(i)
+        except Forbidden:
+            await (await inter.original_message()).edit(
+                content="I don't have permission to add reactions"
+            )
+        else:
+            await (await inter.original_message()).edit(content="Reactions added")
+
     @cooldown(1, 10, BucketType.channel)
     @command(brief="Who cares?", hidden=True)
     async def wc(self, ctx: Context, msg: Message = None):
@@ -71,19 +94,19 @@ class Fun(Cog, category=Category.FUN):
         ):
             await msg.add_reaction(i)
 
-    @message_command(name="Who asked?")
-    async def whoasked(self, inter: ApplicationCommandInteraction, msg: Message):
+    @message_command(name="Who cares?")
+    async def whocares(self, inter: ApplicationCommandInteraction, msg: Message):
         await inter.response.send_message("Adding reactions", ephemeral=True)
         try:
             for i in (
                 "🇼",
                 "🇭",
                 "🇴",
+                "🇨",
                 "🇦",
-                "🇸",
-                "🇰",
+                "🇷",
                 "🇪",
-                "🇩",
+                "🇸",
                 CustomEmoji.FUKAWHY,
             ):
                 await msg.add_reaction(i)
