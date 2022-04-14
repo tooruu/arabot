@@ -62,7 +62,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
 
     @command(brief="Find source for an image")
     async def sauce(self, ctx: Context):
-        image_url = self.get_image_url(ctx.message)
+        image_url = await self.find_image_url(ctx.message)
         if not image_url:
             await ctx.send("No image or link provided")
             return
@@ -189,19 +189,27 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
         raw_data = "\n".join(f"{k}: {v}" for k, v in data.items())
         logging.debug(raw_data, end="\n\n")
 
-    def get_image_url(self, msg: Message):
+    async def find_image_url(self, msg: Message) -> str | None:
         image_url = msg.content
-        for prefix in self.ara.command_prefix:
-            image_url = image_url.removeprefix(prefix + self.sauce.name).lstrip()
+        if prefix := await self.ara.command_prefix(self.ara, msg):
+            image_url = image_url.removeprefix(prefix).strip().removeprefix(self.sauce.name).strip()
 
         if msg.attachments:
             return msg.attachments[0].url
+
         elif match(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", image_url):
             return image_url
+
+        elif msg.embeds:
+            for embed in msg.embeds:
+                if image_url := embed.image.url:
+                    return image_url
+
         elif msg.reference:
             ref = msg.reference.cached_message or msg.reference.resolved
             if isinstance(ref, Message):
-                return self.get_image_url(ref)
+                return await self.find_image_url(ref)
+
         return None
 
 
