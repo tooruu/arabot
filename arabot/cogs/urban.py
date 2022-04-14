@@ -1,14 +1,14 @@
-from re import search
+import re
 from urllib.parse import quote_plus
 
 from arabot.core import Ara, Cog, Context, pfxless
 from arabot.utils import Category, bold, dsafe
 from disnake import Embed
-from disnake.ext.commands import check, command
+from disnake.ext.commands import command
 
 
 class Urban(Cog, category=Category.LOOKUP):
-
+    BASE_URL = "https://api.urbandictionary.com/v0/define"
     QUERY_PREFIX = r"^(?:wh?[ao]t(?:['’]?s|\sis)\s)"
     WORDS_IGNORE = "|".join(
         (
@@ -67,45 +67,28 @@ class Urban(Cog, category=Category.LOOKUP):
             )
             return
 
-        if ud := (
-            await self.ara.session.fetch_json(
-                "https://api.urbandictionary.com/v0/define?term=" + quote_plus(term)
-            )
-        ).get("list"):
-            embed = Embed()
-            for result in ud[:3]:
-                d = dsafe(result["definition"].replace("[", "").replace("]", ""))[:1024]
-                embed.add_field(name=result["word"], value=d, inline=False)
-
-            await ctx.send(embed=embed)
-        elif ctx.prefix:
-            await ctx.send(f"Definition for {bold(term)} not found")
-
-        if not (
-            ud := (
-                await self.ara.session.fetch_json(
-                    "https://api.urbandictionary.com/v0/define?term=" + quote_plus(term)
-                )
-            ).get("list")
-        ):
+        ud = await self.ara.session.fetch_json(self.BASE_URL, params={"term": quote_plus(term)})
+        if not ud.get("list"):
             if ctx.prefix:
                 await ctx.send(f"Definition for {bold(term)} not found")
             return
+
         embed = Embed().set_author(
             name=term,
             url="https://www.urbandictionary.com/define.php?term=" + quote_plus(term),
         )
+
         for result in ud[:3]:
             d = dsafe(result["definition"].replace("[", "").replace("]", ""))[:1024]
             embed.add_field(name=result["word"], value=d, inline=False)
         await ctx.send(embed=embed)
 
     @pfxless(regex=QUERY_PREFIX + rf"((?:(?!{WORDS_IGNORE}).)*?)\??$")
-    @check(lambda msg: len(msg.content) < 25)
     async def urban_listener(self, msg):
-        term = search(self.QUERY_PREFIX + r"(.*?)\??$", msg.content.casefold()).group(1)
         if self.urban.enabled:
-            await self.urban(await self.ara.get_context(msg), term=term)
+            return
+        t = re.search(self.QUERY_PREFIX + r"(.*?)\??$", msg.content.lower(), re.IGNORECASE).group(1)
+        await self.urban(await self.ara.get_context(msg), term=t)
 
 
 def setup(ara: Ara):

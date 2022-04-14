@@ -17,12 +17,6 @@ class Moderation(Cog, category=Category.MODERATION):
 
     @command(hidden=True)
     @has_permissions(manage_messages=True)
-    async def say(self, ctx: Context, *, msg):
-        await ctx.message.delete()
-        await ctx.send(msg)
-
-    @command(hidden=True)
-    @has_permissions(manage_messages=True)
     async def csay(self, ctx: Context, chl: AnyTChl, *, msg):
         await ctx.message.delete()
         if chl:
