@@ -127,6 +127,7 @@ class General(Cog, category=Category.GENERAL):
             .set_footer(text=target.display_name + "'s banner")
         )
 
+    @command(brief="Make Ara say something")
     async def say(self, ctx: Context, *, msg):
         await ctx.message.delete()
         await ctx.send(msg)
