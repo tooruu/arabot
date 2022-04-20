@@ -2,8 +2,8 @@ from contextlib import suppress
 from glob import glob
 from itertools import groupby
 
-from arabot.core import Ara, Cog, Context
-from arabot.utils import BOT_VERSION, Category, bold, mono
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import BOT_VERSION, bold, mono
 from disnake import Embed
 from disnake.ext.commands import MinimalHelpCommand, command
 
@@ -56,7 +56,7 @@ class AraHelp(MinimalHelpCommand):
         return f"{self.context.bot.name} v{BOT_VERSION}"
 
 
-class CoreCommands(Cog, category=Category.META):
+class Meta(Cog, category=Category.META):
     def __setup_help_command(self):
         self._orig_help_command = self.ara.help_command
         self.ara.help_command = AraHelp(aliases=["halp", "h"], brief="Show this message")
@@ -99,4 +99,4 @@ class CoreCommands(Cog, category=Category.META):
 
 
 def setup(ara: Ara):
-    ara.add_cog(CoreCommands(ara))
+    ara.add_cog(Meta(ara))

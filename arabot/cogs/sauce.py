@@ -1,11 +1,10 @@
 import logging
 from enum import IntEnum
 from pprint import pformat
-from re import match
 
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Category, dsafe
-from disnake import Embed, Message
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import dsafe
+from disnake import Embed
 from disnake.ext.commands import command
 from jikanpy import AioJikan
 
@@ -62,10 +61,11 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
 
     @command(brief="Find source for an image")
     async def sauce(self, ctx: Context):
-        image_url = await self.find_image_url(ctx.message)
+        image_url = await ctx.message.rsearch(ctx, "image_url")
         if not image_url:
             await ctx.send("No image or link provided")
             return
+
         await ctx.trigger_typing()
         nao_json = await self.ara.session.fetch_json(
             "https://saucenao.com/search.php",
@@ -86,7 +86,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             await ctx.reply("No results found")
             return
         data = nao_json["results"][0]["data"]
-        header = nao_json["results"][0]["header"]
+        header = nao_json["results"][0]["header"]  # TODO: Hide low similarity results
         embed = Embed()
         try:
             match header["index_id"]:
@@ -188,32 +188,6 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
         data |= header
         raw_data = "\n".join(f"{k}: {v}" for k, v in data.items())
         logging.debug(raw_data, end="\n\n")
-
-    async def find_image_url(self, msg: Message) -> str | None:
-        image_url = msg.content
-        if prefix := await self.ara.command_prefix(self.ara, msg):
-            image_url = image_url.removeprefix(prefix).strip().removeprefix(self.sauce.name).strip()
-
-        if msg.attachments:
-            return msg.attachments[0].url
-
-        elif match(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?$", image_url):
-            return image_url
-
-        elif msg.stickers and (image_url := msg.stickers[0].url):
-            return image_url
-
-        elif msg.embeds:
-            for embed in msg.embeds:
-                if image_url := embed.image.url:
-                    return image_url
-
-        elif msg.reference:
-            ref = msg.reference.cached_message or msg.reference.resolved
-            if isinstance(ref, Message):
-                return await self.find_image_url(ref)
-
-        return None
 
 
 def setup(ara: Ara):

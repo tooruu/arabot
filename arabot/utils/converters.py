@@ -15,11 +15,11 @@ __all__ = (
     "AnyRole",
     "AnyTChl",
     "AnyVChl",
-    "CslsEmoji",
-    "CslsMember",
-    "CslsRole",
-    "CslsTChl",
-    "CslsVChl",
+    "CIEmoji",
+    "CIMember",
+    "CIRole",
+    "CITextChl",
+    "CIVoiceChl",
     "Empty",
     "Twemoji",
     "Codeblocks",
@@ -58,7 +58,7 @@ class Twemoji(commands.Converter):
                 return False
 
 
-class CslsMember(commands.Converter):
+class CIMember(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Member:
         if found := find(
             lambda member: argument.casefold() in member.display_name.casefold(), ctx.guild.members
@@ -67,7 +67,7 @@ class CslsMember(commands.Converter):
         raise commands.MemberNotFound(argument)
 
 
-class CslsEmoji(commands.Converter):
+class CIEmoji(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Emoji:
         guilds = ctx.bot.guilds
         # Put ctx.guild in the start
@@ -81,7 +81,7 @@ class CslsEmoji(commands.Converter):
         raise commands.EmojiNotFound(argument)
 
 
-class CslsTChl(commands.Converter):
+class CITextChl(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.TextChannel:
         if found := find(
             lambda chl: argument.casefold() in chl.name.casefold(), ctx.guild.text_channels
@@ -90,7 +90,7 @@ class CslsTChl(commands.Converter):
         raise commands.ChannelNotFound(argument)
 
 
-class CslsVChl(commands.Converter):
+class CIVoiceChl(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.VoiceChannel:
         if found := find(
             lambda chl: argument.casefold() in chl.name.casefold(), ctx.guild.voice_channels
@@ -99,7 +99,7 @@ class CslsVChl(commands.Converter):
         raise commands.ChannelNotFound(argument)
 
 
-class CslsRole(commands.Converter):
+class CIRole(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Role:
         if found := find(lambda role: argument.casefold() in role.name.casefold(), ctx.guild.roles):
             return found
@@ -120,9 +120,9 @@ class Codeblocks(commands.Converter):
         ]
 
 
-AnyMember = disnake.Member | CslsMember | Empty
-AnyEmoji = disnake.Emoji | disnake.PartialEmoji | CslsEmoji | Twemoji | Empty
-AnyTChl = disnake.TextChannel | CslsTChl | Empty
-AnyVChl = disnake.VoiceChannel | CslsVChl | Empty
+AnyMember = disnake.Member | CIMember | Empty
+AnyEmoji = disnake.Emoji | disnake.PartialEmoji | CIEmoji | Twemoji | Empty
+AnyTChl = disnake.TextChannel | CITextChl | Empty
+AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
 AnyChl = AnyTChl | AnyVChl | Empty
-AnyRole = disnake.Role | CslsRole | Empty
+AnyRole = disnake.Role | CIRole | Empty

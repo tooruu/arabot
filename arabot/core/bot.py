@@ -13,10 +13,10 @@ from arabot.utils import DEBUG, MissingEnvVar, getkeys, mono, search_directory, 
 from disnake import DiscordException
 from disnake.ext import commands
 
-from .rewrites import Context, ContextMixin
+from .rewrites import Context
 
 
-class Ara(ContextMixin, commands.Bot):
+class Ara(commands.Bot):
     _default_cogs_path = "arabot/cogs"
 
     def __init__(self, *args, **kwargs):
@@ -34,7 +34,7 @@ class Ara(ContextMixin, commands.Bot):
         async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
             pfx_pattern = r"a; *" if DEBUG else rf"; *|ara +|<@!?{ara.user.id}> *"
             if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
-                return found.group().strip()
+                return found.group()
 
         default_kwargs = dict(
             activity=activity,
@@ -42,7 +42,6 @@ class Ara(ContextMixin, commands.Bot):
             case_insensitive=True,
             command_prefix=prefix_manager,
             intents=intents,
-            owner_id=447138372121788417,
         )
 
         if DEBUG:
@@ -68,12 +67,24 @@ class Ara(ContextMixin, commands.Bot):
             logging.critical("No internet connection")
             sys.exit(69)
 
+    async def _fill_owners(self) -> None:
+        if self.owner_id or self.owner_ids:
+            return
+
+        await self.wait_until_first_connect()
+
+        app = await self.application_info()
+        self.name = app.name
+        if app.team:
+            self.owners = set(app.team.members)
+            self.owner_ids = {m.id for m in app.team.members}
+        else:
+            self.owner = app.owner
+            self.owner_id = app.owner.id
+
     async def start(self):
-        await self.login()
-        appinfo = await self.application_info()
-        self.name = appinfo.name
-        self.owner = appinfo.owner
         async with aiohttp.ClientSession() as self.session:
+            await self.login()
             self.load_extensions()
             await self.connect()
 
@@ -86,6 +97,9 @@ class Ara(ContextMixin, commands.Bot):
             for task in pending:
                 task.cancel()
             await asyncio.gather(*pending, return_exceptions=True)
+
+    async def get_context(self, message: disnake.Message, *, cls=Context):
+        return await super().get_context(message, cls=cls)
 
     def load_extensions(self, path: str = _default_cogs_path) -> None:
         trim_amount = len(Path(path).parts)
@@ -122,21 +136,19 @@ class Ara(ContextMixin, commands.Bot):
             case commands.MissingPermissions():
                 if not ctx.command.hidden:
                     await ctx.reply("Missing permissions")
-            case commands.CommandInvokeError(original=cause):
-                match cause:
-                    case aiohttp.ClientResponseError(status=status):
-                        match status:
-                            case 403:
-                                await ctx.reply(
-                                    f"{mono(ctx.invoked_with)} doesn't work without "
-                                    f"cloud-billing,\nask `{self.owner}` to enable it."
-                                )
-                            case _:
-                                logging.error(f"CmdInvErr:CliResErr: {format_error(cause)}")
-                                await ctx.reply("A network error occurred")
-                    case _:
-                        logging.error(f"CmdInvErr: {format_error(cause)}")
-                        await ctx.reply("An error occurred")
+            case commands.CommandInvokeError(
+                original=aiohttp.ClientResponseError(status=status)
+            ) if ctx.cog.qualified_name in ("GSearch", "ImageSearch", "Translate", "TextToSpeech"):
+                match status:
+                    case 403:
+                        await ctx.reply(
+                            f"{mono(ctx.invoked_with)} doesn't work without "
+                            f"cloud-billing,\nask `{self.owner}` to enable it."
+                        )
+                    case 429:
+                        await ctx.send(
+                            f"Sorry, I've exceeded today's quota for {mono(ctx.invoked_with)}"
+                        )
             case commands.MissingRequiredArgument():
                 await ctx.reply("Missing required argument")
             case commands.UserInputError():

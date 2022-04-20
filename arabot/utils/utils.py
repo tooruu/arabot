@@ -1,9 +1,12 @@
+import logging
 import os
 import platform
+import re
 import sys
 from asyncio import sleep
 from collections.abc import Generator
 from contextlib import _RedirectStream, contextmanager
+from functools import cache
 from glob import glob
 from pathlib import Path
 from pkgutil import iter_modules
@@ -14,7 +17,6 @@ from disnake.ext import commands
 __all__ = (
     "BOT_VERSION",
     "DEBUG",
-    "Category",
     "Color",
     "CustomEmoji",
     "get_unlimited_invite",
@@ -27,10 +29,13 @@ __all__ = (
     "Lockable",
     "stdin_from",
     "search_directory",
+    "rmsg_search",
+    "opus_from_file",
+    "connect_play_disconnect",
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.0.7"
+BOT_VERSION = "5.1.0"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -51,16 +56,6 @@ async def get_unlimited_invite(guild: disnake.Guild) -> str | None:
     for i in await guild.invites():
         if i.max_age == 0 and i.max_uses == 0:
             return i.url
-
-
-class Category:
-    GENERAL = "General"
-    FUN = "Fun"
-    META = "Meta"
-    LOOKUP = "Lookup"
-    COMMUNITY = "Community"
-    MODERATION = "Moderation"
-    GAMES = "Games"
 
 
 class CustomEmoji:
@@ -190,3 +185,53 @@ def search_directory(path) -> Generator[str, None, None]:
     yield from map(with_prefix, packages)
     for dir in dirs:
         yield from search_directory(path / dir)
+
+
+async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) -> str | None:
+    result = None
+    match target:
+        case "content":
+            result = ctx.argument_only
+
+        case "image_url":
+            if msg.attachments:
+                result = msg.attachments[0].url
+
+            elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?", ctx.argument_only):
+                result = ctx.argument_only
+
+            elif msg.stickers:
+                result = msg.stickers[0].url
+
+            elif msg.embeds:
+                for embed in msg.embeds:
+                    if image_url := embed.image.url:
+                        result = image_url
+                        break
+
+    if result:
+        return result
+
+    if msg.reference:
+        ref = msg.reference.cached_message or msg.reference.resolved
+        if isinstance(ref, disnake.Message):
+            ref_ctx = await ctx.ara.get_context(ref)
+            return await rmsg_search(ref, ref_ctx, target)
+
+    return None
+
+
+opus_from_file = cache(disnake.FFmpegOpusAudio)
+
+
+async def connect_play_disconnect(
+    channel: disnake.VoiceChannel, audio: disnake.AudioSource, *, force_disconnect=False
+) -> None:
+    try:
+        vc = await channel.connect()
+    except Exception:
+        logging.warning(f"Could not connect to voice channel {channel!r}")
+        return
+
+    disconnect = lambda _: vc.loop.create_task(vc.disconnect(force=force_disconnect))
+    vc.play(audio, after=disconnect)

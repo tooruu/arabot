@@ -1,7 +1,9 @@
-from arabot.core import Ara, Cog, Context
-from arabot.utils import AnyEmoji, AnyMember, Category, bold
+import re
+
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import AnyEmoji, AnyMember, bold
 from disnake import ButtonStyle, Embed, Forbidden, MessageInteraction, ui
-from disnake.ext.commands import BucketType, command, cooldown
+from disnake.ext.commands import BucketType, PartialEmojiConverter, command, cooldown
 
 
 class Avatar(ui.View):
@@ -30,10 +32,10 @@ class General(Cog, category=Category.GENERAL):
         target = target or ctx.author
         avatars = (
             Embed()
-            .set_image(url=target.avatar.with_static_format("png").url)
+            .set_image(url=target.avatar.compat.url)
             .set_footer(text=f"{target.display_name}'s user avatar"),
             Embed()
-            .set_image(url=target.display_avatar.with_static_format("png").url)
+            .set_image(url=target.display_avatar.compat.url)
             .set_footer(text=f"{target.display_name}'s server avatar"),
         )
 
@@ -68,7 +70,7 @@ class General(Cog, category=Category.GENERAL):
             .set_image(url=emoji.url)
             .set_footer(
                 text="reacted",
-                icon_url=ctx.author.avatar.with_static_format("png").url,
+                icon_url=ctx.author.avatar.compat.url,
             )
         )
 
@@ -100,9 +102,7 @@ class General(Cog, category=Category.GENERAL):
         ).set_author(
             name=ctx.guild.name,
             url=invite,
-            icon_url=ctx.guild.icon.with_static_format("png").url
-            if ctx.guild.icon
-            else Embed.Empty,
+            icon_url=ctx.guild.icon.compat.url if ctx.guild.icon else Embed.Empty,
         )
         try:
             await target.send(embed=embed)
@@ -123,9 +123,55 @@ class General(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=Embed()
-            .set_image(url=banner.with_static_format("png").with_size(4096).url)
+            .set_image(url=banner.compat.with_size(4096).url)
             .set_footer(text=target.display_name + "'s banner")
         )
+
+    @command(brief="Suggest server emoji")
+    async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after=None):
+        if em_before not in ctx.guild.emojis:
+            await ctx.send("Choose a valid server emoji to replace")
+            return
+        if em_after and ctx.message.attachments:
+            await ctx.send("You can only have one suggestion type in submission")
+            return
+        if not (em_after or ctx.message.attachments):
+            await ctx.send("You must include one emoji suggestion")
+            return
+
+        if ctx.message.attachments:
+            em_after = ctx.message.attachments[0].url
+
+        if re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?", em_after):
+            async with self.ara.session.get(em_after) as resp:
+                if not (resp.ok and resp.content_type.startswith("image/")):
+                    await ctx.send(f"Link a valid image to replace {em_before} with")
+                    return
+        elif re.fullmatch(r"<a?:[a-zA-Z0-9_]{2,32}:[0-9]{18,22}>", em_after):
+            if (emoji := await PartialEmojiConverter().convert(ctx, em_after)) in ctx.guild.emojis:
+                await ctx.send(f"We already have {em_after}")
+                return
+            em_after = emoji.url
+        else:
+            await ctx.send(f"Choose a valid emoji to replace {em_before} with")
+            return
+
+        if not ctx.message.attachments:
+            await ctx.message.delete()
+
+        embed = (
+            Embed(title="wants to change this →", description="to that ↓")
+            .set_thumbnail(url=em_before.url)
+            .set_image(url=em_after)
+            .set_author(
+                name=ctx.author.display_name,
+                icon_url=ctx.author.avatar.compat.url,
+            )
+        )
+
+        message = await ctx.send(embed=embed)
+        await message.add_reaction("👍")
+        await message.add_reaction("👎")
 
     @command(brief="Make Ara say something")
     async def say(self, ctx: Context, *, msg):

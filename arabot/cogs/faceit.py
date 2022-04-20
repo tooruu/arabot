@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from aiohttp import ClientSession
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Category
+from arabot.core import Ara, Category, Cog, Context
 from disnake import Embed
 from disnake.ext.commands import command
 
@@ -62,6 +61,9 @@ ELO: {elo}""",
                 inline=True,
             )
         await ctx.send(embed=embed)
+
+    def cog_unload(self):
+        self.ara.loop.create_task(self.session.close())
 
 
 def setup(ara: Ara):

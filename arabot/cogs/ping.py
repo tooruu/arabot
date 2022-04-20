@@ -1,8 +1,7 @@
 from collections import deque
 from io import BytesIO
 
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Category
+from arabot.core import Ara, Cog, Context, Category
 from disnake import File
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop

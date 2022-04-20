@@ -5,8 +5,8 @@ from collections import defaultdict, deque
 from functools import partial
 
 import disnake
-from arabot.core import Ara, Cog, Context
-from arabot.utils import AnyMember, Category, CustomEmoji
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import AnyMember, CustomEmoji
 from disnake.ext import commands
 
 COLUMN_EMOJI = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣")
@@ -497,7 +497,7 @@ class Games(Cog, category=Category.GAMES):
             return (
                 vote.author not in voted
                 and vote.mentions
-                and re.match(r"<@!?\d{15,21}>$", vote.content)
+                and re.fullmatch(r"<@!?\d{15,21}>", vote.content)
                 and vote.channel == ctx.channel
                 and vote.author in vc.members
                 and vote.mentions[0] in vc.members

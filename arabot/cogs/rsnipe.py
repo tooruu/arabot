@@ -48,7 +48,7 @@ class ReactionSnipe(Cog):
                 Embed()
                 .set_author(
                     name=user.display_name,
-                    icon_url=user.display_avatar.with_static_format("png").url,
+                    icon_url=user.display_avatar.compat.url,
                 )
                 .set_image(
                     url=Twemoji(reaction.emoji).url

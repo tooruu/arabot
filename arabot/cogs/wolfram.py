@@ -1,8 +1,8 @@
 from json import loads
 from urllib.parse import quote
 
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Category, dsafe
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 

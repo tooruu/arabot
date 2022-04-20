@@ -1,5 +1,5 @@
-from arabot.core import Ara, Cog, Context
-from arabot.utils import AnyTChl, Category
+from arabot.core import Ara, Cog, Context, Category
+from arabot.utils import AnyTChl
 from disnake.ext.commands import command, has_permissions
 
 

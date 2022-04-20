@@ -18,7 +18,7 @@ class CommandAlreadyEnabled(commands.CommandError):
     pass
 
 
-class OwnerCommands(Cog):
+class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
     async def cog_check(self, ctx: Context):
         return await ctx.ara.is_owner(ctx.author)
 
@@ -62,7 +62,7 @@ class OwnerCommands(Cog):
         await ctx.message.add_reaction("✅")
 
 
-class PluginManager(Cog):
+class PluginManager(Cog, command_attrs=dict(hidden=True)):
     def __init__(self, ara: Ara):
         self.COGS_PATH = ara._default_cogs_path
         self.COGS_PATH_DOTTED = ".".join(Path(self.COGS_PATH).parts)
@@ -225,12 +225,5 @@ class PluginManager(Cog):
 
 
 def setup(ara: Ara):
-    cog = OwnerCommands()
-    for cmd in cog.walk_commands():
-        cmd.hidden = True
-    ara.add_cog(cog)
-
-    cog = PluginManager(ara)
-    for cmd in cog.walk_commands():
-        cmd.hidden = True
-    ara.add_cog(cog)
+    ara.add_cog(OwnerCommands())
+    ara.add_cog(PluginManager(ara))

@@ -14,8 +14,8 @@ from typing import Any, Protocol
 
 import disnake
 from aiohttp import ClientResponseError, ClientSession
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Category, Codeblocks, Lockable, codeblock, stdin_from
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import Codeblocks, Lockable, codeblock, stdin_from
 from disnake.ext import commands
 
 
@@ -197,7 +197,7 @@ class Eval(Cog, category=Category.GENERAL):
             )
             result.set_footer(
                 text="Powered by myself 😌",
-                icon_url=ctx.ara.user.avatar.with_size(32).url,
+                icon_url=ctx.me.avatar.with_size(32).url,
             )
         else:
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)

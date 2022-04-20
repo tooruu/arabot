@@ -1,8 +1,8 @@
 import logging
 from collections.abc import Generator
 
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Category, bold, underline
+from arabot.core import Category, Ara, Cog, Context
+from arabot.utils import bold, underline
 from disnake import DiscordException
 from disnake.ext.commands import (
     BadArgument,

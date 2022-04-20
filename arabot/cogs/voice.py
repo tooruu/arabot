@@ -1,10 +1,10 @@
-import logging
 import re
 from os import listdir
 from random import choice
 
 import disnake
 from arabot.core import Ara, Cog, pfxless
+from arabot.utils import opus_from_file
 from disnake.ext.commands import check
 
 
@@ -14,9 +14,7 @@ class Voice(Cog):
         "|".join(re.escape(f[:-4]) for f in listdir(MISC_OGG_DIR))
     )
     GACHI_OGG_DIR = "resources/ogg/gachi"
-
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    GACHI_OGG_FILES = listdir(GACHI_OGG_DIR)
 
     @check(lambda msg: not msg.guild.voice_client)
     @check(lambda msg: getattr(msg.author.voice, "channel", None))
@@ -28,8 +26,8 @@ class Voice(Cog):
             return
 
         ogg = re.search(self.MISC_OGG_REGEX, msg.content.lower()).group(1)
-        audio = await disnake.FFmpegOpusAudio.from_probe(f"{self.MISC_OGG_DIR}/{ogg}.ogg")
-        await self.play_ogg(channel, audio)
+        audio = opus_from_file(f"{self.MISC_OGG_DIR}/{ogg}.ogg")
+        await channel.connect_play_disconnect(audio)
 
     @check(lambda msg: not msg.guild.voice_client)
     @check(lambda msg: getattr(msg.author.voice, "channel", None))
@@ -40,25 +38,16 @@ class Voice(Cog):
         if not any(not (m.bot or m.voice.deaf or m.voice.self_deaf) for m in channel.members):
             return
 
-        ogg = choice(listdir(self.GACHI_OGG_DIR))
-        audio = await disnake.FFmpegOpusAudio.from_probe(f"{self.GACHI_OGG_DIR}/{ogg}")
-        await self.play_ogg(channel, audio)
-
-    @staticmethod
-    async def play_ogg(channel: disnake.VoiceChannel, audio: disnake.FFmpegOpusAudio) -> None:
-        try:
-            vc = await channel.connect()
-        except Exception:
-            logging.warning(disnake.ClientException("Could not connect to voice channel"))
-            return
-
-        disconnect = lambda _: vc.loop.create_task(vc.disconnect())
-        vc.play(audio, after=disconnect)
-
-    def cog_unload(self):
-        for vc in self.ara.voice_clients:
-            vc.loop.create_task(vc.disconnect(force=True))
+        ogg = choice(self.GACHI_OGG_FILES)
+        audio = opus_from_file(f"{self.GACHI_OGG_DIR}/{ogg}")
+        await channel.connect_play_disconnect(audio)
 
 
 def setup(ara: Ara):
-    ara.add_cog(Voice(ara))
+    Voice.ara = ara  # pfxless needs cog.ara to check prefix
+    ara.add_cog(Voice())
+
+
+def teardown(ara: Ara):
+    for vc in ara.voice_clients:
+        vc.loop.create_task(vc.disconnect(force=True))
