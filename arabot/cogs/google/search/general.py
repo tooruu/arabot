@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus
+
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import bold
 from disnake import Embed
@@ -40,7 +42,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
         embed = Embed(
             title="Google search results",
             description="Showing top 3 search results",
-            url="https://google.com/search?q=" + query,
+            url="https://google.com/search?q=" + quote_plus(query),
         )
         for hit in data["items"]:
             embed.add_field(
