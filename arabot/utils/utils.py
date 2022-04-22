@@ -205,8 +205,7 @@ async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) 
 
             elif msg.embeds:
                 for embed in msg.embeds:
-                    if image_url := embed.image.url:
-                        result = image_url
+                    if result := embed.image.url:
                         break
 
     if result:

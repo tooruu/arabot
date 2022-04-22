@@ -33,7 +33,7 @@ class Translate(Cog, category=Category.LOOKUP):
             source = self.find_lang(detect_lang, all_langs)
 
         if source == target:
-            await ctx.reply("I can't translate from the same language to itself!")
+            await ctx.reply("I can't translate to the same language!")
             return
 
         embed = (
