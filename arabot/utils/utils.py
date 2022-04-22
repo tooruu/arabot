@@ -194,9 +194,12 @@ async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) 
             result = ctx.argument_only
 
         case "image_url":
-            if msg.attachments:
-                result = msg.attachments[0].url
-
+            if attachment := disnake.utils.find(
+                lambda a: a.content_type.startswith("image") and a.height, msg.attachments
+            ):
+                result = attachment.url
+            elif embed := disnake.utils.find(lambda e: e.image.url, msg.embeds):
+                result = embed.image.url
             elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?", ctx.argument_only):
                 result = ctx.argument_only
 
