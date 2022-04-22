@@ -26,6 +26,7 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
             langs = await self.voices()
             lang, text = self.parse_query(query, langs)
 
+            ctx.message.content = ""  # we already parsed message, this makes rsearch skip it
             if not text and not (text := await ctx.message.rsearch(ctx, "content")):
                 await ctx.send("I need text to synthesize")
                 return
@@ -47,6 +48,7 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
             langs = await self.voices()
             lang, text = self.parse_query(query, langs)
 
+            ctx.message.content = ""
             if not text and not (text := await ctx.message.rsearch(ctx, "content")):
                 await ctx.send("I need text to pronounce")
                 return

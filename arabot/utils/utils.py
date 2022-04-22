@@ -35,7 +35,7 @@ __all__ = (
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.1.1"
+BOT_VERSION = "5.1.2"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -202,14 +202,8 @@ async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) 
                 result = embed.image.url
             elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?", ctx.argument_only):
                 result = ctx.argument_only
-
             elif msg.stickers:
                 result = msg.stickers[0].url
-
-            elif msg.embeds:
-                for embed in msg.embeds:
-                    if result := embed.image.url:
-                        break
 
     if result:
         return result
