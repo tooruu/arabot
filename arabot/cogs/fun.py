@@ -107,7 +107,7 @@ class Fun(Cog, category=Category.FUN):
                 "🇷",
                 "🇪",
                 "🇸",
-                CustomEmoji.FUKAWHY,
+                CustomEmoji.TOORUWEARY,
             ):
                 await msg.add_reaction(i)
         except Forbidden:
