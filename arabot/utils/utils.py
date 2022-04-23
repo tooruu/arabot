@@ -35,7 +35,7 @@ __all__ = (
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.1.2"
+BOT_VERSION = "5.1.3"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 

@@ -1,9 +1,7 @@
 import datetime
 from base64 import b64decode
-from functools import partial
 from io import BytesIO
 
-from aiohttp import ClientResponseError
 from arabot.core import Ara, Category, Cog, Context
 from async_lru import alru_cache
 from disnake import File, PCMAudio
@@ -13,8 +11,6 @@ from disnake.utils import find
 
 
 class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
-    DEFAULT_LANGUAGE = "en"
-
     def __init__(self, ara: Ara):
         self.ara = ara
         self._invalidate_voices_cache.start()
@@ -23,16 +19,8 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     @cooldown(5, 60, BucketType.guild)
     async def tts(self, ctx: Context, *query):
         async with ctx.typing():
-            langs = await self.voices()
-            lang, text = self.parse_query(query, langs)
-
-            ctx.message.content = ""  # we already parsed message, this makes rsearch skip it
-            if not text and not (text := await ctx.message.rsearch(ctx, "content")):
-                await ctx.send("I need text to synthesize")
-                return
-
-            ogg = await self.text_to_audio(text, lang)
-            await ctx.reply(file=File(ogg, text + ".ogg"))
+            if pcm := await self.parse_check_detect_synthesize(ctx, query):
+                await ctx.reply(file=File(pcm, "audio.wav"))
 
     @command(aliases=["pronounce"], brief="Pronounce text in voice channel")
     @cooldown(5, 60, BucketType.guild)
@@ -45,26 +33,33 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
             return
 
         async with ctx.typing():
-            langs = await self.voices()
-            lang, text = self.parse_query(query, langs)
+            if pcm := await self.parse_check_detect_synthesize(ctx, query):
+                await ctx.author.voice.channel.connect_play_disconnect(PCMAudio(pcm))
 
-            ctx.message.content = ""
-            if not text and not (text := await ctx.message.rsearch(ctx, "content")):
-                await ctx.send("I need text to pronounce")
-                return
+    async def parse_check_detect_synthesize(self, ctx: Context, query: list[str]) -> BytesIO | None:
+        langs = await self.voices()
+        lang, text = self.parse_query(query, langs)
 
-            pcm = await self.text_to_audio(text, lang, "LINEAR16")
-        await ctx.author.voice.channel.connect_play_disconnect(PCMAudio(pcm))
+        ctx.message.content = ""
+        if not text and not (text := await ctx.message.rsearch(ctx, "content")):
+            await ctx.send("I need text to pronounce")
+            return
+
+        if not lang and not self.find_lang(lang := await self.detect_language(text), langs):
+            await ctx.send("Couldn't detect language")
+            return
+
+        audio = await self.synthesize(text, lang, "LINEAR16")
+        return BytesIO(audio)
 
     def parse_query(self, query: str, langs: list[dict]) -> tuple[str | None, str | None]:
-        find_lang = partial(self.find_lang, langs=langs)
         match query:
             case []:
                 lang = None
                 text = None
 
             case [text]:
-                if find_lang(text):
+                if self.find_lang(text, langs):
                     lang = text
                     text = None
                 else:
@@ -72,22 +67,19 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
 
             case [lang, *text]:
                 text = " ".join(text)
-                if not find_lang(lang):
+                if not self.find_lang(lang, langs):
                     text = f"{lang} {text}"
                     lang = None
 
         return lang, text
 
     @staticmethod
-    def find_lang(string: str, langs: list[dict]) -> str | None:
+    def find_lang(string: str, langs: list[dict[str, list[str]]]) -> str | None:
+        if not string:
+            return None
         return find(lambda lng: lng["languageCodes"][0].split("-")[0] == string.lower(), langs)
 
-    async def text_to_audio(self, text: str, lang=None, encoding="OGG_OPUS") -> BytesIO:
-        lang = lang or await self.detect_language(text) or self.DEFAULT_LANGUAGE
-        audio = await self.synthesize(text, lang, encoding)
-        return BytesIO(audio)
-
-    async def synthesize(self, text: str, lang=DEFAULT_LANGUAGE, encoding="OGG_OPUS") -> bytes:
+    async def synthesize(self, text: str, lang: str, encoding: str) -> bytes:
         data = await self.ara.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/text:synthesize",
             method="post",
@@ -97,7 +89,7 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
                 "voice": {"languageCode": lang},
                 "audioConfig": {
                     "audioEncoding": encoding,
-                    "sampleRateHertz": 96000,  # idk why but this works for both ;tts and ;speak
+                    "sampleRateHertz": 96000,  # somehow fixes high-pitched voice
                 },
             },
         )
@@ -112,16 +104,12 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         return data["voices"]
 
     async def detect_language(self, text: str) -> str | None:
-        try:
-            data: dict[str, dict[str, list[list[dict]]]] = await self.ara.session.fetch_json(
-                "https://translation.googleapis.com/language/translate/v2/detect",
-                params={"key": self.g_tts_key, "q": text},
-            )
-        except ClientResponseError:
-            return None
-        else:
-            lang = data["data"]["detections"][0][0]["language"]
-            return lang if lang != "und" else None
+        data: dict[str, dict[str, list[list[dict]]]] = await self.ara.session.fetch_json(
+            "https://translation.googleapis.com/language/translate/v2/detect",
+            params={"key": self.g_tts_key, "q": text},
+        )
+        lang = data["data"]["detections"][0][0]["language"]
+        return lang if lang != "und" else None
 
     @tasks.loop(time=datetime.time())
     async def _invalidate_voices_cache(self):
