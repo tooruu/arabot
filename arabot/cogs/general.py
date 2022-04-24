@@ -142,12 +142,12 @@ class General(Cog, category=Category.GENERAL):
         if ctx.message.attachments:
             em_after = ctx.message.attachments[0].url
 
-        if re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?", em_after):
+        if re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", em_after):
             async with self.ara.session.get(em_after) as resp:
                 if not (resp.ok and resp.content_type.startswith("image/")):
                     await ctx.send(f"Link a valid image to replace {em_before} with")
                     return
-        elif re.fullmatch(r"<a?:[a-zA-Z0-9_]{2,32}:[0-9]{18,22}>", em_after):
+        elif re.fullmatch(r"<a?:\w{2,32}:\d{18,22}>", em_after, re.ASCII):
             if (emoji := await PartialEmojiConverter().convert(ctx, em_after)) in ctx.guild.emojis:
                 await ctx.send(f"We already have {em_after}")
                 return

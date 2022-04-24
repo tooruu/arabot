@@ -47,23 +47,16 @@ class Chat(Cog):
         finally:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
 
+    BAD_GAMES = re.compile(
+        r"\b(кс|cs|мм|mm|ра[фс]т|r(af|us)t|фортнайт|fortnite|осу|osu|дест[еи]ни|destiny)\b",
+        re.IGNORECASE,
+    )
+
+    @pfxless(regex=BAD_GAMES)
     @is_in_guild(433298614564159488)
-    @pfxless()
-    async def gaygames(self, msg: disnake.Message):
-        shit = "|".join(
-            (
-                "кс|cs",
-                "мм|mm",
-                "ра[фс]т|r(af|us)t",
-                "фортнайт|fortnite",
-                "осу|osu",
-                "дест[еи]ни|destiny",
-            )
-        )
-        if not (res := re.search(rf"\b{shit}\b", msg)):
-            return
-        gaym = res.group()
-        await msg.channel.send(f"{gaym}? Ебать ты гей 🤡, иди в мут нахуй")
+    async def badgames(self, msg: disnake.Message):
+        game_name = self.BAD_GAMES.search(msg.content).group()
+        await msg.channel.send(f"{game_name}? Ебать ты гей 🤡, иди в мут нахуй")
         await msg.channel.temp_mute_member(msg.author, 20, "геюга ебаная")
 
 
