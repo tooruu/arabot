@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 from .core import Ara
+from .utils import DEBUG
 
 
 def main():
     logging.basicConfig(
         format="%(asctime)s|%(levelname)s|%(module)s|%(lineno)s|%(message)s",
-        level=logging.INFO,
+        level=logging.INFO if DEBUG else logging.WARNING,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     loop = asyncio.new_event_loop()
