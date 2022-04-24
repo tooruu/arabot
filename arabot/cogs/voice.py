@@ -4,43 +4,40 @@ from random import choice
 
 import disnake
 from arabot.core import Ara, Cog, pfxless
-from arabot.utils import opus_from_file
 from disnake.ext.commands import check
 
 
 class Voice(Cog):
     MISC_OGG_DIR = "resources/ogg/misc"
-    MISC_OGG_REGEX = r"(?<![:\w])({})(?![:\w])".format(
-        "|".join(re.escape(f[:-4]) for f in listdir(MISC_OGG_DIR))
-    )
+    MISC_OGG_REGEX = rf"\b{'|'.join(re.escape(f[:-4]) for f in listdir(MISC_OGG_DIR))}\b"
     GACHI_OGG_DIR = "resources/ogg/gachi"
     GACHI_OGG_FILES = listdir(GACHI_OGG_DIR)
 
-    @check(lambda msg: not msg.guild.voice_client)
+    @check(
+        lambda msg: not all(
+            m.bot or m.voice.deaf or m.voice.self_deaf for m in msg.author.voice.channel.members
+        )
+    )
     @check(lambda msg: getattr(msg.author.voice, "channel", None))
+    @check(lambda msg: not msg.guild.voice_client)
     @pfxless(regex=MISC_OGG_REGEX)
-    async def voice_reaction(self, msg: disnake.Message):
-        channel = msg.author.voice.channel
+    async def misc_voice(self, msg: disnake.Message):
+        filename = re.search(self.MISC_OGG_REGEX, msg.content, re.IGNORECASE).group() + ".ogg"
+        audio = disnake.FFmpegOpusAudio(f"{self.MISC_OGG_DIR}/{filename}")
+        await msg.author.voice.channel.connect_play_disconnect(audio)
 
-        if not any(not (m.bot or m.voice.deaf or m.voice.self_deaf) for m in channel.members):
-            return
-
-        ogg = re.search(self.MISC_OGG_REGEX, msg.content.lower()).group(1)
-        audio = opus_from_file(f"{self.MISC_OGG_DIR}/{ogg}.ogg")
-        await channel.connect_play_disconnect(audio)
-
-    @check(lambda msg: not msg.guild.voice_client)
+    @check(
+        lambda msg: not all(
+            m.bot or m.voice.deaf or m.voice.self_deaf for m in msg.author.voice.channel.members
+        )
+    )
     @check(lambda msg: getattr(msg.author.voice, "channel", None))
-    @pfxless(regex=r"(?<![:\w])gachi(?![:\w])")
-    async def gachi_reaction(self, msg: disnake.Message):
-        channel = msg.author.voice.channel
-
-        if not any(not (m.bot or m.voice.deaf or m.voice.self_deaf) for m in channel.members):
-            return
-
-        ogg = choice(self.GACHI_OGG_FILES)
-        audio = opus_from_file(f"{self.GACHI_OGG_DIR}/{ogg}")
-        await channel.connect_play_disconnect(audio)
+    @check(lambda msg: not msg.guild.voice_client)
+    @pfxless()
+    async def gachi(self, msg: disnake.Message):
+        filename = choice(self.GACHI_OGG_FILES)
+        audio = disnake.FFmpegOpusAudio(f"{self.GACHI_OGG_DIR}/{filename}")
+        await msg.author.voice.channel.connect_play_disconnect(audio)
 
 
 def setup(ara: Ara):

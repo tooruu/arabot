@@ -6,7 +6,6 @@ import sys
 from asyncio import sleep
 from collections.abc import Generator
 from contextlib import _RedirectStream, contextmanager
-from functools import cache
 from glob import glob
 from pathlib import Path
 from pkgutil import iter_modules
@@ -30,12 +29,11 @@ __all__ = (
     "stdin_from",
     "search_directory",
     "rmsg_search",
-    "opus_from_file",
     "connect_play_disconnect",
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.1.3"
+BOT_VERSION = "5.2.0"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -200,7 +198,7 @@ async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) 
                 result = attachment.url
             elif embed := disnake.utils.find(lambda e: e.image.url, msg.embeds):
                 result = embed.image.url
-            elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?", ctx.argument_only):
+            elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", ctx.argument_only):
                 result = ctx.argument_only
             elif msg.stickers:
                 result = msg.stickers[0].url
@@ -217,11 +215,8 @@ async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) 
     return None
 
 
-opus_from_file = cache(disnake.FFmpegOpusAudio)
-
-
 async def connect_play_disconnect(
-    channel: disnake.VoiceChannel, audio: disnake.AudioSource, *, force_disconnect=False
+    channel: disnake.VoiceChannel, audio: disnake.AudioSource, *, force_disconnect: bool = False
 ) -> None:
     try:
         vc = await channel.connect()
