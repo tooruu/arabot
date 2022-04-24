@@ -35,16 +35,34 @@ def copy_dpy_attrs_from(donor):
 
 class pfxless:
     def __init__(self, **attrs):
-        self.pattern: str = attrs.get("regex")
-        self.case_sensitive: bool = attrs.get("case_sensitive", False)
+        regex: str | re.Pattern[str] = attrs.get("regex")
+        re_flags: int | re.RegexFlag = attrs.get("re_flags")
         self.enabled: bool = attrs.get("enabled", True)
         self.chance: float = attrs.get("chance", 1.0)
         self.allow_prefix: bool = attrs.get("allow_prefix", False)
         self.allow_bots: bool = attrs.get("allow_bots", False)
+        self.plain_text_only: bool = attrs.get("plain_text_only", True)
+
+        match regex:
+            case str() | None:
+                self.pattern = regex
+                self.re_flags = re_flags if re_flags is not None else re.IGNORECASE
+            case re.Pattern(pattern=str(pattern), flags=flags):
+                if re_flags:
+                    raise TypeError("Cannot process re_flags argument with a compiled pattern")
+                self.pattern = pattern
+                self.re_flags = flags
+            case bytes() | re.Pattern(pattern=bytes()):
+                raise TypeError("pattern argument must not be bytes")
+            case _:
+                raise TypeError("pattern argument must be str or re.Pattern[str]")
 
     def __call__(self, func: CogMsgListener) -> CogMsgListener:
         if self.pattern is None:
             self.pattern = rf"\b{func.__name__.replace('_', ' ')}\b"
+
+        if self.plain_text_only:
+            self.pattern = rf"(?<![:\w])(?:{self.pattern})(?![:\w])"  # TODO: exclude mentions too
 
         self.event = self.wrap_callback(func)
         return self.event
@@ -80,7 +98,7 @@ class pfxless:
         return (
             (self.allow_prefix or not await pfx_factory(msg))
             and (self.allow_bots or not msg.author.bot)
-            and re.search(self.pattern, msg.content, 0 if self.case_sensitive else re.IGNORECASE)
+            and re.search(self.pattern, msg.content, self.re_flags)
         )
 
     async def _run_checks(self, msg: Message) -> bool:
