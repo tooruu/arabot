@@ -20,7 +20,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
     async def image(self, ctx: Context, *, query):
         async with ctx.typing():
             images = await self.fetch_images(query)
-            async for image_file in self.without_svg(images):
+            async for image_file in self.filtered(images):
                 await ctx.send(file=image_file)
                 break
             else:
@@ -38,15 +38,19 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
         )
         return data.get("items", [])
 
-    async def without_svg(self, im: list[dict]) -> disnake.File:
-        for item in im:
+    async def filtered(self, images: list[dict]) -> disnake.File:
+        for item in images:
             if self.SVG_MIME in (item.get("mime"), item.get("fileFormat")):
                 continue
 
             image_url = item["link"]
             try:
                 async with self.ara.session.get(image_url) as resp:
-                    if not resp.ok or resp.content_type == self.SVG_MIME:
+                    if (
+                        not resp.ok
+                        or resp.content_type == self.SVG_MIME
+                        or not resp.content_type.startswith("image/")
+                    ):
                         continue
                     image = await resp.read()
             except Exception as e:
@@ -61,6 +65,6 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
         fn = Path(
             getattr(response.content_disposition, "filename", response.url.path) or "image"
         ).stem
-        ext = guess_extension(response.headers.get("Content-Type", "image/png"), strict=False)
+        ext = guess_extension(response.headers.get("Content-Type", ""), strict=False) or ".png"
 
         return fn + ext
