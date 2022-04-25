@@ -1,9 +1,6 @@
-import logging
 import os
 import platform
-import re
 import sys
-from asyncio import sleep
 from collections.abc import Generator
 from contextlib import _RedirectStream, contextmanager
 from glob import glob
@@ -18,22 +15,17 @@ __all__ = (
     "DEBUG",
     "Color",
     "CustomEmoji",
-    "get_unlimited_invite",
     "system_info",
-    "temp_mute_channel_member",
     "is_in_guild",
-    "fetch_json",
     "MissingEnvVar",
     "getkeys",
     "Lockable",
     "stdin_from",
     "search_directory",
-    "rmsg_search",
-    "connect_play_disconnect",
 )
 
 DEBUG = bool(os.getenv("debug"))
-BOT_VERSION = "5.2.0"
+BOT_VERSION = "5.3.0"
 if DEBUG:
     BOT_VERSION += " (DEBUG MODE)"
 
@@ -48,12 +40,6 @@ class Color:
     fuchsia = disnake.Colour.from_rgb(235, 69, 158)
     red = disnake.Colour.from_rgb(237, 66, 69)
     black = disnake.Colour.from_rgb(35, 39, 42)
-
-
-async def get_unlimited_invite(guild: disnake.Guild) -> str | None:
-    for i in await guild.invites():
-        if i.max_age == 0 and i.max_uses == 0:
-            return i.url
 
 
 class CustomEmoji:
@@ -96,34 +82,11 @@ Bot version: {BOT_VERSION}
 """
 
 
-async def temp_mute_channel_member(
-    channel: disnake.abc.Messageable,
-    member: disnake.Member,
-    duration: float,
-    reason: str | None = "Temp mute",
-):
-    old_perms = channel.overwrites_for(member)
-    temp_perms = channel.overwrites_for(member)
-    temp_perms.send_messages = False
-    try:
-        await channel.set_permissions(member, overwrite=temp_perms, reason=reason)
-        await sleep(duration)
-    finally:
-        await channel.set_permissions(
-            member, overwrite=None if old_perms.is_empty() else old_perms, reason=reason
-        )
-
-
 def is_in_guild(guild_id):
     async def predicate(ctx):
         return ctx.guild and ctx.guild.id == guild_id
 
     return commands.check(predicate)
-
-
-async def fetch_json(self, url: str, *, method: str = "get", **kwargs):
-    async with self.request(method, url, **{"raise_for_status": True, **kwargs}) as resp:
-        return await resp.json()
 
 
 class MissingEnvVar(Exception):
@@ -183,46 +146,3 @@ def search_directory(path) -> Generator[str, None, None]:
     yield from map(with_prefix, packages)
     for dir in dirs:
         yield from search_directory(path / dir)
-
-
-async def rmsg_search(msg: disnake.Message, ctx: commands.Context, target: str) -> str | None:
-    result = None
-    match target:
-        case "content":
-            result = ctx.argument_only
-
-        case "image_url":
-            if attachment := disnake.utils.find(
-                lambda a: a.content_type.startswith("image") and a.height, msg.attachments
-            ):
-                result = attachment.url
-            elif embed := disnake.utils.find(lambda e: e.image.url, msg.embeds):
-                result = embed.image.url
-            elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", ctx.argument_only):
-                result = ctx.argument_only
-            elif msg.stickers:
-                result = msg.stickers[0].url
-
-    if result:
-        return result
-
-    if msg.reference:
-        ref = msg.reference.cached_message or msg.reference.resolved
-        if isinstance(ref, disnake.Message):
-            ref_ctx = await ctx.ara.get_context(ref)
-            return await rmsg_search(ref, ref_ctx, target)
-
-    return None
-
-
-async def connect_play_disconnect(
-    channel: disnake.VoiceChannel, audio: disnake.AudioSource, *, force_disconnect: bool = False
-) -> None:
-    try:
-        vc = await channel.connect()
-    except Exception:
-        logging.warning(f"Could not connect to voice channel {channel!r}")
-        return
-
-    disconnect = lambda _: vc.loop.create_task(vc.disconnect(force=force_disconnect))
-    vc.play(audio, after=disconnect)

@@ -1,3 +1,3 @@
 from .bot import Ara
+from .patch import Category, Cog, Context
 from .pfxless import pfxless
-from .rewrites import Category, Cog, Context

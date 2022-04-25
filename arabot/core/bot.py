@@ -13,7 +13,7 @@ from arabot.utils import DEBUG, MissingEnvVar, getkeys, mono, search_directory, 
 from disnake import DiscordException
 from disnake.ext import commands
 
-from .rewrites import Context
+from .patch import Context
 
 
 class Ara(commands.Bot):

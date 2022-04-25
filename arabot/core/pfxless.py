@@ -35,8 +35,8 @@ def copy_dpy_attrs_from(donor):
 
 class pfxless:
     def __init__(self, **attrs):
-        regex: str | re.Pattern[str] = attrs.get("regex")
-        re_flags: int | re.RegexFlag = attrs.get("re_flags")
+        regex: str | re.Pattern[str] | None = attrs.get("regex")
+        re_flags: int | re.RegexFlag | None = attrs.get("re_flags")
         self.enabled: bool = attrs.get("enabled", True)
         self.chance: float = attrs.get("chance", 1.0)
         self.allow_prefix: bool = attrs.get("allow_prefix", False)
