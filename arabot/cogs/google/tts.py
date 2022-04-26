@@ -44,9 +44,11 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
             await ctx.send("I need text to pronounce")
             return
 
-        if not lang and not self.find_lang(lang := await self.detect_language(text), langs):
-            await ctx.send("Couldn't detect language")
-            return
+        if not lang:
+            lang = await self.detect_language(text)
+            if not self.find_lang(lang, langs):
+                await ctx.send("Couldn't detect language")
+                return
 
         audio = await self.synthesize(text, lang, "LINEAR16")
         return BytesIO(audio)
@@ -54,22 +56,12 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     def parse_query(self, query: str, langs: list[dict]) -> tuple[str | None, str | None]:
         match query:
             case []:
-                lang = None
-                text = None
-
-            case [text]:
-                if self.find_lang(text, langs):
-                    lang = text
-                    text = None
-                else:
-                    lang = None
-
-            case [lang, *text]:
-                text = " ".join(text)
-                if not self.find_lang(lang, langs):
-                    text = f"{lang} {text}"
-                    lang = None
-
+                lang = text = None
+            case [str1]:
+                text = None if (lang := self.find_lang(str1, langs)) else str1
+            case [str1, *str2]:
+                str2 = " ".join(str2)
+                text = str2 if (lang := self.find_lang(str1, langs)) else f"{str1} {str2}"
         return lang, text
 
     @staticmethod
