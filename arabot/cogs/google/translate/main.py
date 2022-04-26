@@ -11,78 +11,79 @@ from .client import LangCodeAndOrName, TranslationClient
 
 
 class Translate(Cog, category=Category.LOOKUP):
-    DEFAULT_TARGET = ["en", "English"]
+    DEFAULT_TARGET: list[str] = ["en", "English"]
 
     def __init__(self, trans_client: TranslationClient):
         self.gtrans = trans_client
 
     @command(aliases=["tr", "trans"], brief="Translates text")
     async def translate(self, ctx: Context, *query):
-        if not query:
-            if not (query := await ctx.message.rsearch(ctx, "content")):
-                await ctx.reply("I need text to translate!")
-                return
-            query = query.split(" ")  # TODO: Add languages support
+        langs = await self.gtrans.languages(target=self.DEFAULT_TARGET[0])
+        source, target, text = self.parse_query(query, langs)
 
-        all_langs = await self.gtrans.languages(target=self.DEFAULT_TARGET[0])
-        source, target, text = self.parse_query(query, all_langs)
-
-        translated, detect_lang = await self.gtrans.translate(text, target[0], source and source[0])
-        if detect_lang:  # Exists only if source is None (auto-detect)
-            source = self.find_lang(detect_lang, all_langs)
-
-        if source == target:
-            await ctx.reply("I can't translate to the same language!")
+        if not text and not (text := await ctx.rsearch("content")):
+            await ctx.send("I need text to translate")
             return
 
+        if not source:
+            detected = await self.detect_language(text)
+            source = self.find_lang(detected, langs)
+            if not source:
+                await ctx.send("Couldn't detect language")
+                return
+
+        target = target or self.DEFAULT_TARGET
+        if source == target:
+            await ctx.reply("Cannot translate to the same language")
+            return
+
+        translation = await self.gtrans.translate(text, target[0], source[0])[0]
         embed = (
             Embed()
             .add_field(name=self.format_lang(source), value=dsafe(text)[:1024])
-            .add_field(name=self.format_lang(target), value=dsafe(translated)[:1024], inline=False)
+            .add_field(name=self.format_lang(target), value=dsafe(translation)[:1024], inline=False)
         )
         await ctx.send(embed=embed)
 
     def parse_query(
         self, query: str, langs: list[LangCodeAndOrName]
-    ) -> tuple[LangCodeAndOrName | None, LangCodeAndOrName, str]:
+    ) -> tuple[LangCodeAndOrName | None, LangCodeAndOrName | None, str | None]:
         find_lang = partial(self.find_lang, langs=langs)
         match query:
-            case [source, target, *text] if text:
-                text = " ".join(text)
+            case []:
+                source = target = text = None
 
-                if temp := find_lang(source):
-                    source = temp
-                    if temp := find_lang(target):
-                        target = temp
+            case [str1]:
+                source = None
+                text = None if (target := find_lang(str1)) else str1
+
+            case [str1, str2]:
+                if source := find_lang(str1):
+                    if target := find_lang(str2):
+                        text = None
                     else:
-                        text = f"{target} {text}"
-                        target = source
-                        source = None
+                        source, target = None, source
+                        text = str2
                 else:
-                    text = f"{source} {target} {text}"
-                    target = self.DEFAULT_TARGET
-                    source = None
+                    target = None
+                    text = f"{str1} {str2}"
 
-            case [target, text]:
-                source = None
-
-                if temp := find_lang(target):
-                    target = temp
+            case [str1, str2, *text]:
+                text = " ".join(text)
+                if source := find_lang(str1):
+                    if not (target := find_lang(str2)):
+                        source, target = None, source
+                        text = f"{str2} {text}"
                 else:
-                    text = f"{target} {text}"
-                    target = self.DEFAULT_TARGET
-
-            case [text]:
-                target = self.DEFAULT_TARGET
-                source = None
-
-            case _:
-                raise ValueError("Empty query")
+                    target = None
+                    text = f"{str1} {str2} {text}"
 
         return source, target, text
 
     @staticmethod
     def find_lang(string: str, langs: list[LangCodeAndOrName]) -> LangCodeAndOrName | None:
+        if not string:
+            return None
         return find(lambda lang: re.fullmatch("|".join(lang), string, re.IGNORECASE), langs)
 
     @staticmethod
