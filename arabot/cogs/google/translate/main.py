@@ -7,8 +7,7 @@ from disnake import Embed
 from disnake.ext.commands import command
 from disnake.utils import find
 
-from .client import TranslationClient
-from .types import LangCodeAndOrName
+from .client import LangCodeAndOrName, TranslationClient
 
 
 class Translate(Cog, category=Category.LOOKUP):

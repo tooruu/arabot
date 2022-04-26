@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from async_lru import alru_cache
 from disnake.ext import tasks
 
-from .types import Detection, LangCodeAndOrName
+LangCodeAndOrName = list[str]
 
 
 class TranslationClient:
@@ -42,14 +42,15 @@ class TranslationClient:
         detected_source_language = translation.get("detectedSourceLanguage")
         return translated_text, detected_source_language
 
-    async def detect(self, text: str) -> Detection:
+    async def detect(self, text: str) -> str:
         data = await self._api("/detect", q=text)
-        detections: list[Detection] = data["data"]["detections"]
-        return detections[0]
+        detections: list[list[dict[str, str]]] = data["data"]["detections"]
+        lang = detections[0][0]["language"]
+        return lang if lang != "und" else None
 
     @alru_cache(cache_exceptions=False)
-    async def languages(self, target: str | None = None) -> list[LangCodeAndOrName]:
-        data = await self._api("/languages", target=target or "")
+    async def languages(self, repr_lang: str | None = None) -> list[LangCodeAndOrName]:
+        data = await self._api("/languages", target=repr_lang or "")
         languages: list[dict[str, str]] = data["data"]["languages"]
         return [list(lang.values()) for lang in languages]
 
