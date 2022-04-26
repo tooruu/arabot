@@ -24,7 +24,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
                 "num": 1,
             },
         )
-        await ctx.send(json["items"][0]["link"] if json.get("items") else "No results found")
+        await ctx.reply(json["items"][0]["link"] if json.get("items") else "No results found")
 
     @command(aliases=["g3"], brief="Top 3 Google Search results")
     async def google3(self, ctx: Context, *, query):
@@ -39,7 +39,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
         )
 
         if not data.get("items"):
-            await ctx.send("No results found")
+            await ctx.reply("No results found")
             return
 
         embed = Embed(
@@ -53,7 +53,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
                 value=f"{bold(hit['title'])}\n{hit['snippet']}",
                 inline=False,
             )
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @command(aliases=["yt"], brief="Top search result from YouTube")
     async def youtube(self, ctx: Context, *, query):
@@ -67,7 +67,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
                 "regionCode": "US",
             },
         )
-        await ctx.send(
+        await ctx.reply(
             "https://youtu.be/" + data["items"][0]["id"]["videoId"]
             if data.get("items")
             else "No videos found"

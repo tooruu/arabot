@@ -21,10 +21,10 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
         async with ctx.typing():
             images = await self.fetch_images(query)
             async for image_file in self.filtered(images):
-                await ctx.send(file=image_file)
+                await ctx.reply(file=image_file)
                 break
             else:
-                await ctx.send("No images found")
+                await ctx.reply("No images found")
 
     async def fetch_images(self, query) -> list:
         data = await self.ara.session.fetch_json(
