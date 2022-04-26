@@ -26,7 +26,7 @@ class Translate(Cog, category=Category.LOOKUP):
             return
 
         if not source:
-            detected = await self.detect_language(text)
+            detected = await self.gtrans.detect(text)
             source = self.find_lang(detected, langs)
             if not source:
                 await ctx.send("Couldn't detect language")
@@ -37,7 +37,7 @@ class Translate(Cog, category=Category.LOOKUP):
             await ctx.reply("Cannot translate to the same language")
             return
 
-        translation = await self.gtrans.translate(text, target[0], source[0])[0]
+        translation, _ = await self.gtrans.translate(text, target[0], source[0])
         embed = (
             Embed()
             .add_field(name=self.format_lang(source), value=dsafe(text)[:1024])
