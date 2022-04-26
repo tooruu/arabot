@@ -18,7 +18,7 @@ class Translate(Cog, category=Category.LOOKUP):
 
     @command(aliases=["tr", "trans"], brief="Translates text")
     async def translate(self, ctx: Context, *query):
-        langs = await self.gtrans.languages(target=self.DEFAULT_TARGET[0])
+        langs = await self.gtrans.languages(repr_lang=self.DEFAULT_TARGET[0])
         source, target, text = self.parse_query(query, langs)
 
         if not text and not (text := await ctx.rsearch("content")):
