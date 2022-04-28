@@ -104,7 +104,7 @@ class Meta(Cog, category=Category.META):
         await self.ara.wait_until_ready()
         await ctx.send(utils.codeblock(self._version, "less"))
 
-    @command(bried="Show bot's source code line count")
+    @command(brief="Show bot's source code line count")
     async def lines(self, ctx: Context):
         if not self._line_count:
             await ctx.send("Couldn't read files")
