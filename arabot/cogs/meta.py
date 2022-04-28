@@ -2,6 +2,7 @@ from glob import glob
 from itertools import groupby
 from os import getenv
 from subprocess import check_output
+from urllib.parse import urlencode
 
 import arabot
 from arabot.core import Ara, Category, Cog, Context, utils
@@ -58,58 +59,78 @@ class AraHelp(MinimalHelpCommand):
 
 
 class Meta(Cog, category=Category.META):
+    def __init__(self, ara: Ara):
+        self.ara = ara
+        self.__setup_help_command()
+        self._line_count = self.__get_line_count()
+
     def __setup_help_command(self):
         self._orig_help_command = self.ara.help_command
         self.ara.help_command = AraHelp(aliases=["halp", "h"], brief="Show this message")
         self.ara.help_command.cog = self
 
-    def __set_line_count(self):
+    def __get_ara_invite_link(self):
+        params = urlencode(
+            dict(
+                client_id=self.ara.application_id,
+                permissions=8 or 385088,
+                scope=" ".join(["bot", "applications.commands"]),
+            )
+        )
+        return "https://discord.com/oauth2/authorize?" + params
+
+    def __get_line_count(self):
         count = 0
-        with suppress(OSError):
+        try:
             for g in glob("arabot/**/*.py", recursive=True):
-                with suppress(OSError):
-                    with open(g, encoding="utf8") as f:
-                        count += len(f.readlines())
-        self._line_count = count
+                with open(g, encoding="utf8") as f:
+                    count += len(f.readlines())
+        except OSError:
+            return 0
+        return count
 
-    def __set_git_status(self):
+    def __get_version(self):
         if rev_hash := getenv("HEROKU_SLUG_COMMIT"):
-            dirty = False
+            dirty_indicator = ""
         else:
-            dirty = bool(check_output(["git", "status", "-s"]))
             rev_hash = check_output(["git", "rev-parse", "HEAD", "--"]).decode().strip()
-        self._worktree_dirty = dirty
-        self._rev_hash = rev_hash
-        self._rev_hash_short = rev_hash[:7]
+            dirty_indicator = ".dirty" if check_output(["git", "status", "-s"]) else ""
 
-    def __init__(self, ara: Ara):
-        self.ara = ara
-        self.__setup_help_command()
-        self.__set_line_count()
-        self.__set_git_status()
+        sha1 = rev_hash[:7] if arabot.TESTING else ""
+        return f"{self.ara.name} v{arabot.__version__}+{sha1}{dirty_indicator}".rstrip("+")
 
     @command(aliases=["ver", "v"], brief="Show bot's version")
     async def version(self, ctx: Context):
-        dirty_indicator = "*" if self._worktree_dirty else ""
-        ver = f"{ctx.ara.name} v{__version__} `{self._rev_hash_short}{dirty_indicator}`"
-        await ctx.send(ver)
+        await self.ara.wait_until_ready()
+        await ctx.send(utils.codeblock(self._version, "less"))
 
-    @command()
+    @command(bried="Show bot's source code line count")
     async def lines(self, ctx: Context):
         if not self._line_count:
             await ctx.send("Couldn't read files")
             return
         await ctx.send(
-            f"{ctx.ara.name} v{__version__} consists of **{self._line_count}** lines of Python code"
+            f"{ctx.ara.name} v{arabot.__version__} consists "
+            f"of **{self._line_count}** lines of Python code"
         )
 
-    @command(aliases=["github", "gh"])
+    @command(aliases=["github", "gh"], brief="Open bot's code repository")
     async def repo(self, ctx: Context):
-        await ctx.send("https://github.com/tooruu/AraBot")
+        await ctx.send("<https://github.com/tooruu/AraBot>")
 
-    @command(brief="Show server's invite link")
-    async def invite(self, ctx: Context):
+    @command(name="invite", brief="Show server's invite link")
+    async def server_invite_link(self, ctx: Context):
         await ctx.send(await ctx.guild.get_unlimited_invite() or "Couldn't find invite link")
+
+    @command(name="arabot", brief="Show bot's invite link")  # TODO: dynamically change name
+    async def ara_invite_link(self, ctx: Context):
+        await self.ara.wait_until_ready()
+        await ctx.send(self._bot_invite_link)
+
+    async def cog_load(self):
+        await self.ara.wait_until_ready()
+        self._version = self.__get_version()
+        self._bot_invite_link = self.__get_ara_invite_link()
 
     def cog_unload(self):
         self.ara.help_command = self._orig_help_command
