@@ -7,7 +7,7 @@
     ],
     "python.linting.flake8Args": [
         "--max-line-length=100",
-        "--ignore=E402,W503,E501,E722,E731,E741,E203,F405"
+        "--ignore=E402,W503,E501,E722,E731,E741,E203,F405,F403"
     ],
     "python.formatting.blackArgs": ["--line-length=100"],
     "python.terminal.activateEnvInCurrentTerminal": true
