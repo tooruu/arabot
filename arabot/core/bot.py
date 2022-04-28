@@ -89,6 +89,9 @@ class Ara(commands.Bot):
             await self.connect()
 
     async def close(self):
+        if self.is_closed():
+            return
+
         logging.info("Bot is shutting down..")
         try:
             await super().close()

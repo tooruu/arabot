@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from traceback import format_exc
+import signal
 
 from dotenv import load_dotenv
 
@@ -15,15 +15,24 @@ def main():
         level=logging.INFO if DEBUG else logging.WARNING,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+
     ara = Ara(loop=loop)
+
+    try:
+        for s in signal.SIGINT, signal.SIGTERM:
+            loop.add_signal_handler(s, loop.create_task, ara.close())
+    except NotImplementedError:
+        pass
+
     try:
         loop.run_until_complete(ara.start())
     except (KeyboardInterrupt, SystemExit, asyncio.CancelledError):
         loop.run_until_complete(ara.close())
     except Exception:
-        logging.critical(f"Bot has crashed: {format_exc()}")
+        logging.critical("Bot has crashed", exc_info=True)
         loop.run_until_complete(ara.close())
     finally:
         loop.run_until_complete(loop.shutdown_asyncgens())
