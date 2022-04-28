@@ -1,12 +1,11 @@
+import asyncio
 import random
 import re
-from asyncio import TimeoutError, wait_for
 from collections import defaultdict, deque
 from functools import partial
 
 import disnake
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import AnyMember, CustomEmoji
+from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
 from disnake.ext import commands
 
 COLUMN_EMOJI = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣")
@@ -454,8 +453,8 @@ class Games(Cog, category=Category.GAMES):
                     return True
 
         try:
-            exact_guess = await wait_for(voting(), timeout=VOTE_TIMEOUT)
-        except TimeoutError:
+            exact_guess = await asyncio.wait_for(voting(), timeout=VOTE_TIMEOUT)
+        except asyncio.TimeoutError:
             exact_guess = False
 
         # Winner phase
@@ -516,8 +515,8 @@ class Games(Cog, category=Category.GAMES):
                 voted.append(vote.author)
 
         try:
-            await wait_for(voting(), timeout=VOTE_TIMEOUT)
-        except TimeoutError:
+            await asyncio.wait_for(voting(), timeout=VOTE_TIMEOUT)
+        except asyncio.TimeoutError:
             pass
 
         # Ejection phase

@@ -2,18 +2,51 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import re
 import sys
+from collections.abc import Generator
+from glob import glob
 from pathlib import Path
-from traceback import format_exception
+from pkgutil import iter_modules
 
 import aiohttp
 import disnake
-from arabot.utils import DEBUG, MissingEnvVar, getkeys, mono, search_directory, system_info
-from disnake import DiscordException
+from arabot import TESTING
 from disnake.ext import commands
 
-from .patch import Context
+from .patches import Context
+from .utils import MissingEnvVar, getkeys, mono, system_info
+
+
+def search_directory(path) -> Generator[str, None, None]:
+    path = Path(path)
+
+    if ".." in os.path.relpath(path):
+        raise ValueError("Paths outside the cwd are not supported")
+    if not path.exists():
+        raise ValueError(f"Provided path '{path.resolve()}' does not exist")
+    if not path.is_dir():
+        raise ValueError(f"Provided path '{path.resolve()}' is not a directory")
+
+    with_prefix = lambda f: ".".join((path / f).parts)
+
+    modules, packages = set(), set()
+    for _, name, ispkg in iter_modules([str(path)]):
+        if not name.startswith("_"):
+            (packages if ispkg else modules).add(name)
+    dirs = {dir.rstrip(os.sep) for dir in glob("[!_]*/", root_dir=path)} - packages
+
+    yield from map(with_prefix, modules)
+    yield from map(with_prefix, packages)
+    for dir in dirs:
+        yield from search_directory(path / dir)
+
+
+async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
+    pfx_pattern = r"a; *" if TESTING else rf"; *|ara +|<@!?{ara.user.id}> *"
+    if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
+        return found.group()
 
 
 class Ara(commands.Bot):
@@ -31,11 +64,6 @@ class Ara(commands.Bot):
             guild_reactions=True,
         )
 
-        async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
-            pfx_pattern = r"a; *" if DEBUG else rf"; *|ara +|<@!?{ara.user.id}> *"
-            if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
-                return found.group()
-
         default_kwargs = dict(
             activity=activity,
             allowed_mentions=disnake.AllowedMentions.none(),
@@ -44,7 +72,7 @@ class Ara(commands.Bot):
             intents=intents,
         )
 
-        if DEBUG:
+        if TESTING:
             default_kwargs |= dict(
                 reload=True,
                 test_guilds=[676889696302792774, 933568919413866526, 954134299119091772],
@@ -119,9 +147,7 @@ class Ara(commands.Bot):
             else:
                 logging.info(f"Loaded {short}")
 
-    async def on_command_error(self, ctx: Context, error: DiscordException) -> None:
-        format_error = lambda e: "".join(format_exception(e))
-
+    async def on_command_error(self, ctx: Context, error: disnake.DiscordException) -> None:
         if hasattr(ctx.command, "on_error"):
             return
 
@@ -163,9 +189,8 @@ class Ara(commands.Bot):
             ):
                 pass
             case _:
-                logging.error(format_error(error))
+                logging.error("Unhandled exception", exc_info=error)
                 await ctx.reply("An error occurred")
-                raise error
 
     async def on_ready(self) -> None:
         logging.info(system_info())

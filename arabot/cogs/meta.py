@@ -1,9 +1,12 @@
 from contextlib import suppress
 from glob import glob
 from itertools import groupby
+from os import getenv
+from subprocess import check_output
 
+from arabot import __version__
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import BOT_VERSION, bold, mono
+from arabot.core.utils import bold, mono
 from disnake import Embed
 from disnake.ext.commands import MinimalHelpCommand, command
 
@@ -53,7 +56,7 @@ class AraHelp(MinimalHelpCommand):
         )
 
     def get_ending_note(self):
-        return f"{self.context.bot.name} v{BOT_VERSION}"
+        return f"{self.context.bot.name} v{__version__}"
 
 
 class Meta(Cog, category=Category.META):
@@ -71,19 +74,35 @@ class Meta(Cog, category=Category.META):
                         count += len(f.readlines())
         self._line_count = count
 
+    def __set_git_status(self):
+        if rev_hash := getenv("HEROKU_SLUG_COMMIT"):
+            dirty = False
+        else:
+            dirty = bool(check_output(["git", "status", "-s"]))
+            rev_hash = check_output(["git", "rev-parse", "HEAD", "--"]).decode().strip()
+        self._worktree_dirty = dirty
+        self._rev_hash = rev_hash
+        self._rev_hash_short = rev_hash[:7]
+
     def __init__(self, ara: Ara):
         self.ara = ara
         self.__setup_help_command()
         self.__set_line_count()
+        self.__set_git_status()
 
     @command(aliases=["ver", "v"], brief="Show bot's version")
     async def version(self, ctx: Context):
-        await ctx.send(f"{ctx.ara.name} v{BOT_VERSION}")
+        dirty_indicator = "*" if self._worktree_dirty else ""
+        ver = f"{ctx.ara.name} v{__version__} `{self._rev_hash_short}{dirty_indicator}`"
+        await ctx.send(ver)
 
     @command()
     async def lines(self, ctx: Context):
+        if not self._line_count:
+            await ctx.send("Couldn't read files")
+            return
         await ctx.send(
-            f"{ctx.ara.name} {BOT_VERSION} consists of **{self._line_count}** lines of Python code"
+            f"{ctx.ara.name} v{__version__} consists of **{self._line_count}** lines of Python code"
         )
 
     @command(aliases=["github", "gh"])

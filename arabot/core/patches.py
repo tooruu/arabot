@@ -5,8 +5,15 @@ from collections.abc import Iterable
 
 import aiohttp
 import disnake
-from arabot.utils import getkeys
 from disnake.ext import commands
+
+from .enums import Category
+from .utils import getkeys
+
+__all__ = [
+    "Context",
+    "Cog",
+]
 
 
 class Context(commands.Context):
@@ -71,16 +78,6 @@ class Context(commands.Context):
                 return await ref_ctx._rsearch(target)
 
         return None
-
-
-class Category:
-    GENERAL = "General"
-    FUN = "Fun"
-    META = "Meta"
-    LOOKUP = "Lookup"
-    COMMUNITY = "Community"
-    MODERATION = "Moderation"
-    GAMES = "Games"
 
 
 class Cog(commands.Cog):

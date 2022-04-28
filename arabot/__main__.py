@@ -2,17 +2,14 @@ import asyncio
 import logging
 import signal
 
-from dotenv import load_dotenv
-
-load_dotenv()
+from . import TESTING
 from .core import Ara
-from .utils import DEBUG
 
 
 def main():
     logging.basicConfig(
         format="%(asctime)s|%(levelname)s|%(module)s|%(lineno)s|%(message)s",
-        level=logging.INFO if DEBUG else logging.WARNING,
+        level=logging.INFO if TESTING else logging.WARNING,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
@@ -23,7 +20,7 @@ def main():
 
     try:
         for s in signal.SIGINT, signal.SIGTERM:
-            loop.add_signal_handler(s, loop.create_task, ara.close())
+            loop.add_signal_handler(s, lambda: loop.create_task(ara.close()))
     except NotImplementedError:
         pass
 

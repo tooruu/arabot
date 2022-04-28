@@ -1,5 +1,5 @@
 from arabot.core import Ara
-from arabot.utils import getkeys
+from arabot.core.utils import getkeys
 
 from .search import GSearch, ImageSearch
 from .translate import Translate, TranslationClient

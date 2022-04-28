@@ -2,7 +2,7 @@ import re
 from functools import partial
 
 from arabot.core import Category, Cog, Context
-from arabot.utils import dsafe
+from arabot.core.utils import dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 from disnake.utils import find

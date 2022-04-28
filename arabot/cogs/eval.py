@@ -14,8 +14,8 @@ from typing import Any, Protocol
 
 import disnake
 from aiohttp import ClientResponseError, ClientSession
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import Codeblocks, Lockable, codeblock, stdin_from
+from arabot.core import Ara, Category, Codeblocks, Cog, Context
+from arabot.core.utils import Lockable, codeblock, stdin_from
 from disnake.ext import commands
 
 
