@@ -23,7 +23,7 @@ class Voice(Cog):
     @pfxless(regex=MISC_OGG_REGEX)
     async def misc_voice(self, msg: disnake.Message):
         filename = re.search(self.MISC_OGG_REGEX, msg.content, re.IGNORECASE).group() + ".ogg"
-        audio = disnake.FFmpegOpusAudio(f"{self.MISC_OGG_DIR}/{filename}")
+        audio = disnake.FFmpegOpusAudio(f"{self.MISC_OGG_DIR}/{filename.lower()}")
         await msg.author.voice.channel.connect_play_disconnect(audio)
 
     @check(
