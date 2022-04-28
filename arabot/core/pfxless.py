@@ -8,7 +8,7 @@ from disnake import Message
 from disnake.ext import commands
 from disnake.utils import async_all
 
-from .bot import prefix_manager
+from .bot import Ara, prefix_manager
 
 CogMsgListener = TypeVar("CogMsgListener", bound=Callable[[commands.Cog, Message], Awaitable])
 
@@ -77,7 +77,7 @@ class pfxless:
         @functools.wraps(coro)
         @copy_dpy_attrs_from(coro)
         async def wrapper(cog: commands.Cog, msg: Message) -> None:
-            if not (wrapper.enabled and await self.prepare(msg)):
+            if not (wrapper.enabled and await self.prepare(msg, cog.ara)):
                 return
             try:
                 await coro(cog, msg)
@@ -88,9 +88,9 @@ class pfxless:
         wrapper.enabled = self.enabled
         return wrapper
 
-    async def prepare(self, msg: Message) -> bool:
+    async def prepare(self, msg: Message, ara: Ara) -> bool:  # TODO: remove dependency on bot
         return (
-            await self._check_message(msg, functools.partial(prefix_manager, None))
+            await self._check_message(msg, functools.partial(prefix_manager, ara))
             and await self._run_checks(msg)
             and await self._check_concurrency(msg)
             and self._check_cooldown(msg)

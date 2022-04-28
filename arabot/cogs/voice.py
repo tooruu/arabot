@@ -8,6 +8,9 @@ from disnake.ext.commands import check
 
 
 class Voice(Cog):
+    def __init__(self, ara: Ara):
+        self.ara = ara
+
     MISC_OGG_DIR = "resources/ogg/misc"
     MISC_OGG_REGEX = rf"\b{'|'.join(re.escape(f[:-4]) for f in listdir(MISC_OGG_DIR))}\b"
     GACHI_OGG_DIR = "resources/ogg/gachi"
@@ -41,8 +44,7 @@ class Voice(Cog):
 
 
 def setup(ara: Ara):
-    Voice.ara = ara  # pfxless needs cog.ara to check prefix
-    ara.add_cog(Voice())
+    ara.add_cog(Voice(ara))
 
 
 def teardown(ara: Ara):
