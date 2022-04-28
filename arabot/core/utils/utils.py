@@ -3,8 +3,8 @@ import platform
 import sys
 from contextlib import _RedirectStream, contextmanager
 
+import arabot
 import disnake
-from arabot import __version__
 
 __all__ = [
     "system_info",
@@ -42,7 +42,7 @@ OS version: {os_ver.strip()}
 Python executable: {sys.executable}
 Python version: {sys.version}
 {disnake.__title__.title()} version: {disnake.__version__}
-Bot version: {__version__}
+Bot version: {arabot.__version__}
 """
 
 

@@ -1,12 +1,10 @@
-from contextlib import suppress
 from glob import glob
 from itertools import groupby
 from os import getenv
 from subprocess import check_output
 
-from arabot import __version__
-from arabot.core import Ara, Category, Cog, Context
-from arabot.core.utils import bold, mono
+import arabot
+from arabot.core import Ara, Category, Cog, Context, utils
 from disnake import Embed
 from disnake.ext.commands import MinimalHelpCommand, command
 
@@ -37,14 +35,14 @@ class AraHelp(MinimalHelpCommand):
             )
             val = ""
             for cmd in commands:
-                cell = mono(cmd.name)
+                cell = utils.mono(cmd.name)
                 if cmd.brief:
                     cell = f"[{cell}](http://. '{cmd.brief}')"
                 if len(val + cell) > 1024:
                     break
                 val += cell + " "
 
-            embed.add_field(name=bold(category), value=val[:-1] or "No commands")
+            embed.add_field(name=utils.bold(category), value=val[:-1] or "No commands")
 
         await self.get_destination().send(embed=embed)
 
@@ -56,7 +54,7 @@ class AraHelp(MinimalHelpCommand):
         )
 
     def get_ending_note(self):
-        return f"{self.context.bot.name} v{__version__}"
+        return f"{self.context.bot.name} v{arabot.__version__}"
 
 
 class Meta(Cog, category=Category.META):

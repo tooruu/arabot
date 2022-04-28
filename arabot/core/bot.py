@@ -139,7 +139,7 @@ class Ara(commands.Bot):
             try:
                 self.load_extension(module)
             except commands.ExtensionFailed as e:
-                logging.error(e)
+                logging.error(f"Failed to load {short}", exc_info=e.original)
             except commands.NoEntryPointError:
                 logging.error(f"No entry point in {short}")
             except commands.ExtensionNotFound:

@@ -225,9 +225,8 @@ class Connect4(Cog, category=Category.GAMES):
         await message.edit(embed=game.get_embed(custom_footer=footer))
         del self.active_games[message.id]
 
-    @commands.command(aliases=["c4"])
+    @commands.command(aliases=["c4"], brief="Start a game of Connect 4")
     async def connect4(self, ctx: Context):
-        """Start a game of Connect 4"""
         await self.start_invite(ctx)
 
     @commands.Cog.listener()
@@ -532,7 +531,7 @@ class Games(Cog, category=Category.GAMES):
         await imposter.move_to(None, reason="Imposter")
         await ctx.send(f"{imposter.mention} was ejected")
 
-    @commands.command()
+    @commands.command(brief="Start a game of Tic-Tac-Toe")
     @commands.cooldown(1, 60, commands.BucketType.channel)
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
         if opponent is None:
