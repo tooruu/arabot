@@ -30,7 +30,7 @@ class Ping(Cog, category=Category.META):
     async def ping(self, ctx: Context):
         self.plot_graph()
         image = self.plt_to_file()
-        await ctx.send(f"🏓 Pong - {self.ara.latency * 1000:.0f}ms", file=image)
+        await ctx.send(f"🏓 Pong - {ctx.ara.latency * 1000:.0f}ms", file=image)
 
     def plot_graph(self):
         Y_PADDING = 5

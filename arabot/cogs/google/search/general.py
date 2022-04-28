@@ -1,6 +1,7 @@
 from urllib.parse import quote_plus
 
-from arabot.core import Ara, Category, Cog, Context
+from aiohttp import ClientSession
+from arabot.core import Category, Cog, Context
 from arabot.utils import bold
 from disnake import Embed
 from disnake.ext.commands import command
@@ -10,12 +11,12 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
     GSEARCH_BASE_URL = "https://www.googleapis.com/customsearch/v1"
     YT_BASE_URL = "https://www.googleapis.com/youtube/v3/search"
 
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    def __init__(self, session: ClientSession):
+        self.session = session
 
     @command(aliases=["g"], brief="Top Google Search result")
     async def google(self, ctx: Context, *, query):
-        json = await self.ara.session.fetch_json(
+        json = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
             params={
                 "key": self.g_search_key,
@@ -28,7 +29,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
 
     @command(aliases=["g3"], brief="Top 3 Google Search results")
     async def google3(self, ctx: Context, *, query):
-        data = await self.ara.session.fetch_json(
+        data = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
             params={
                 "key": self.g_search_key,
@@ -57,7 +58,7 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
 
     @command(aliases=["yt"], brief="Top search result from YouTube")
     async def youtube(self, ctx: Context, *, query):
-        data = await self.ara.session.fetch_json(
+        data = await self.session.fetch_json(
             self.YT_BASE_URL,
             params={
                 "key": self.g_yt_key,

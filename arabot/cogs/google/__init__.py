@@ -7,11 +7,9 @@ from .tts import TextToSpeech
 
 
 def setup(ara: Ara):
-    ara.add_cog(GSearch(ara))
-
-    ara.add_cog(ImageSearch(ara))
-
-    trans_client = TranslationClient(getkeys("g_trans_key")[0], ara.session)
+    session = ara.session
+    trans_client = TranslationClient(getkeys("g_trans_key")[0], session)
     ara.add_cog(Translate(trans_client))
-
-    ara.add_cog(TextToSpeech(ara))
+    ara.add_cog(GSearch(session))
+    ara.add_cog(ImageSearch(session))
+    ara.add_cog(TextToSpeech(session))

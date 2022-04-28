@@ -443,7 +443,7 @@ class Games(Cog, category=Category.GAMES):
 
         async def voting():
             while True:
-                vote = await self.ara.wait_for("message", check=is_valid_guess)
+                vote = await ctx.ara.wait_for("message", check=is_valid_guess)
                 try:
                     await vote.add_reaction("☑️")
                 except disnake.Forbidden:
@@ -506,7 +506,7 @@ class Games(Cog, category=Category.GAMES):
 
         async def voting():
             while True:
-                vote = await self.ara.wait_for("message", check=is_valid_vote)
+                vote = await ctx.ara.wait_for("message", check=is_valid_vote)
                 await vote.delete()
                 mentioned = vote.mentions[0]
                 # Punish who voted for a streamer

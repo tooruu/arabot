@@ -1,6 +1,7 @@
 from json import loads
 from urllib.parse import quote
 
+from aiohttp import ClientSession
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import dsafe
 from disnake import Embed
@@ -8,14 +9,14 @@ from disnake.ext.commands import command
 
 
 class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    def __init__(self, session: ClientSession):
+        self.session = session
 
     @command(brief="Answer a question")
     async def calc(self, ctx: Context, *, query: str):
         await ctx.trigger_typing()
         query = query.strip("`")
-        async with self.ara.session.get(
+        async with self.session.get(
             "https://api.wolframalpha.com/v2/query",
             params={
                 "input": query,
@@ -57,4 +58,4 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
 
 
 def setup(ara: Ara):
-    ara.add_cog(Wolfram(ara))
+    ara.add_cog(Wolfram(ara.session))

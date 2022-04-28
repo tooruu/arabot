@@ -1,7 +1,7 @@
 import re
 from urllib.parse import quote_plus
 
-from arabot.core import Ara, Cog, Category, Context, pfxless
+from arabot.core import Ara, Category, Cog, Context, pfxless
 from arabot.utils import bold, dsafe
 from disnake import Embed
 from disnake.ext.commands import command
@@ -45,29 +45,29 @@ class Urban(Cog, category=Category.LOOKUP):
 
     @command(brief="Search term in Urban Dictionary", aliases=["ud"])
     async def urban(self, ctx: Context, *, term: str):
-        if term.lower() == self.ara.owner.name.lower():
+        if term.lower() == ctx.ara.owner.name.lower():
             invite = (
-                await self.ara.get_guild(676889696302792774).get_unlimited_invite() or Embed.Empty
+                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite() or Embed.Empty
             )
             await ctx.send(
                 embed=Embed(description="An awesome guy").set_author(
-                    name=self.ara.owner.name.lower(), url=invite
+                    name=ctx.ara.owner.name.lower(), url=invite
                 )
             )
             return
 
-        if term.lower() == self.ara.name.lower():
+        if term.lower() == ctx.ara.name.lower():
             invite = (
-                await self.ara.get_guild(676889696302792774).get_unlimited_invite() or Embed.Empty
+                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite() or Embed.Empty
             )
             await ctx.send(
                 embed=Embed(description="An awesome bot written by an awesome guy").set_author(
-                    name=self.ara.name, url=invite
+                    name=ctx.ara.name, url=invite
                 )
             )
             return
 
-        data = await self.ara.session.fetch_json(self.BASE_URL, params={"term": quote_plus(term)})
+        data = await ctx.ara.session.fetch_json(self.BASE_URL, params={"term": quote_plus(term)})
         if not (ud := data.get("list")):
             if ctx.prefix:
                 await ctx.send(f"Definition for {bold(term)} not found")

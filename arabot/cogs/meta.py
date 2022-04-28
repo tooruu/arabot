@@ -78,12 +78,12 @@ class Meta(Cog, category=Category.META):
 
     @command(aliases=["ver", "v"], brief="Show bot's version")
     async def version(self, ctx: Context):
-        await ctx.send(f"{self.ara.name} v{BOT_VERSION}")
+        await ctx.send(f"{ctx.ara.name} v{BOT_VERSION}")
 
     @command()
     async def lines(self, ctx: Context):
         await ctx.send(
-            f"{self.ara.name} {BOT_VERSION} consists of **{self._line_count}** lines of Python code"
+            f"{ctx.ara.name} {BOT_VERSION} consists of **{self._line_count}** lines of Python code"
         )
 
     @command(aliases=["github", "gh"])

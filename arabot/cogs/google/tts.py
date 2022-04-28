@@ -2,7 +2,8 @@ import datetime
 from base64 import b64decode
 from io import BytesIO
 
-from arabot.core import Ara, Category, Cog, Context
+from aiohttp import ClientSession
+from arabot.core import Category, Cog, Context
 from async_lru import alru_cache
 from disnake import File, PCMAudio
 from disnake.ext import tasks
@@ -11,8 +12,8 @@ from disnake.utils import find
 
 
 class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    def __init__(self, session: ClientSession):
+        self.session = session
         self._invalidate_voices_cache.start()
 
     @command(aliases=["synth"], brief="Synthesize speech from text")
@@ -71,7 +72,7 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         return find(lambda lng: lng["languageCodes"][0].split("-")[0] == string.lower(), langs)
 
     async def synthesize(self, text: str, lang: str, encoding: str) -> bytes:
-        data = await self.ara.session.fetch_json(
+        data = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/text:synthesize",
             method="post",
             params={"key": self.g_tts_key},
@@ -88,14 +89,14 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
 
     @alru_cache(cache_exceptions=False)
     async def voices(self, language_code: str | None = None) -> list[dict]:
-        data: dict[str, list[dict]] = await self.ara.session.fetch_json(
+        data: dict[str, list[dict]] = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/voices",
             params={"key": self.g_tts_key, "languageCode": language_code or ""},
         )
         return data["voices"]
 
     async def detect_language(self, text: str) -> str | None:
-        data: dict[str, dict[str, list[list[dict]]]] = await self.ara.session.fetch_json(
+        data: dict[str, dict[str, list[list[dict]]]] = await self.session.fetch_json(
             "https://translation.googleapis.com/language/translate/v2/detect",
             params={"key": self.g_tts_key, "q": text},
         )

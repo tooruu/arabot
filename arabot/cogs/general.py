@@ -117,7 +117,7 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send("User not found")
             return
         target = target or ctx.author
-        banner = (await self.ara.fetch_user(target.id)).banner
+        banner = (await ctx.ara.fetch_user(target.id)).banner
         if not banner:
             await ctx.send("User has no banner")
             return
@@ -143,7 +143,7 @@ class General(Cog, category=Category.GENERAL):
             em_after = ctx.message.attachments[0].url
 
         if re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", em_after):
-            async with self.ara.session.get(em_after) as resp:
+            async with ctx.session.get(em_after) as resp:
                 if not (resp.ok and resp.content_type.startswith("image/")):
                     await ctx.send(f"Link a valid image to replace {em_before} with")
                     return

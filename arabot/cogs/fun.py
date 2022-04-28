@@ -2,7 +2,7 @@ from io import BytesIO
 from random import choice
 from urllib.parse import quote
 
-from aiohttp import ClientResponseError
+from aiohttp import ClientResponseError, ClientSession
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import AnyMember, CustomEmoji
 from disnake import AllowedMentions, ApplicationCommandInteraction, File, Forbidden, Message
@@ -10,18 +10,18 @@ from disnake.ext.commands import BucketType, command, cooldown, message_command
 
 
 class Fun(Cog, category=Category.FUN):
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    def __init__(self, session: ClientSession):
+        self.session = session
 
     @command(brief="Get a random inspirational quote")
     async def inspire(self, ctx: Context):
-        async with self.ara.session.get("https://inspirobot.me/api?generate=true") as r:
+        async with self.session.get("https://inspirobot.me/api?generate=true") as r:
             image_link = await r.text()
         await ctx.send(image_link)
 
     @command(brief="Get a randomly generated face", aliases=["person"])
     async def face(self, ctx: Context):
-        async with self.ara.session.get("https://thispersondoesnotexist.com/image") as r:
+        async with self.session.get("https://thispersondoesnotexist.com/image") as r:
             image = BytesIO(await r.read())
             await ctx.send(file=File(image, "face.png"))
 
@@ -135,7 +135,7 @@ class Fun(Cog, category=Category.FUN):
     async def eight_ball(self, ctx: Context, *, question=" "):
         try:
             url = "https://8ball.delegator.com/magic/JSON/" + quote(question, safe="")
-            json = await self.ara.session.fetch_json(url)
+            json = await self.session.fetch_json(url)
             answer = json["magic"]["answer"]
         except ClientResponseError:
             answer = choice(("Yes", "No"))
@@ -143,4 +143,4 @@ class Fun(Cog, category=Category.FUN):
 
 
 def setup(ara: Ara):
-    ara.add_cog(Fun(ara))
+    ara.add_cog(Fun(ara.session))

@@ -2,6 +2,7 @@ import logging
 from enum import IntEnum
 from pprint import pformat
 
+from aiohttp import ClientSession
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import dsafe
 from disnake import Embed
@@ -56,8 +57,8 @@ class Source(IntEnum):
 
 
 class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    def __init__(self, session: ClientSession):
+        self.session = session
 
     @command(brief="Find source for an image")
     async def sauce(self, ctx: Context):
@@ -67,7 +68,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             return
 
         await ctx.trigger_typing()
-        nao_json = await self.ara.session.fetch_json(
+        nao_json = await self.session.fetch_json(
             "https://saucenao.com/search.php",
             params={
                 "output_type": 2,
@@ -101,7 +102,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                 ):
                     embed.color = 0x2E51A2
                     mal_json = (
-                        await AioJikan(session=self.ara.session).anime(data["mal_id"])
+                        await AioJikan(session=self.session).anime(data["mal_id"])
                         if "mal_id" in data
                         else None
                     )
@@ -191,4 +192,4 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
 
 
 def setup(ara: Ara):
-    ara.add_cog(Sauce(ara))
+    ara.add_cog(Sauce(ara.session))

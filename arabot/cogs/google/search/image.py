@@ -4,8 +4,8 @@ from mimetypes import guess_extension
 from pathlib import Path
 
 import disnake
-from aiohttp import ClientResponse
-from arabot.core import Ara, Category, Cog, Context
+from aiohttp import ClientResponse, ClientSession
+from arabot.core import Category, Cog, Context
 from disnake.ext.commands import command
 
 
@@ -13,8 +13,8 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
     BASE_URL = "https://www.googleapis.com/customsearch/v1"
     SVG_MIME = "image/svg+xml"
 
-    def __init__(self, ara: Ara):
-        self.ara = ara
+    def __init__(self, session: ClientSession):
+        self.session = session
 
     @command(aliases=["i", "img"], brief="Top search result from Google Images")
     async def image(self, ctx: Context, *, query):
@@ -27,7 +27,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
                 await ctx.reply("No images found")
 
     async def fetch_images(self, query) -> list:
-        data = await self.ara.session.fetch_json(
+        data = await self.session.fetch_json(
             self.BASE_URL,
             params={
                 "key": self.g_isearch_key,
@@ -45,7 +45,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
 
             image_url = item["link"]
             try:
-                async with self.ara.session.get(image_url) as resp:
+                async with self.session.get(image_url) as resp:
                     if (
                         not resp.ok
                         or resp.content_type == self.SVG_MIME
