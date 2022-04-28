@@ -1,12 +1,11 @@
+import asyncio
 import random
 import re
-from asyncio import TimeoutError, wait_for
 from collections import defaultdict, deque
 from functools import partial
 
 import disnake
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import AnyMember, CustomEmoji
+from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
 from disnake.ext import commands
 
 COLUMN_EMOJI = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣")
@@ -226,9 +225,8 @@ class Connect4(Cog, category=Category.GAMES):
         await message.edit(embed=game.get_embed(custom_footer=footer))
         del self.active_games[message.id]
 
-    @commands.command(aliases=["c4"])
+    @commands.command(aliases=["c4"], brief="Start a game of Connect 4")
     async def connect4(self, ctx: Context):
-        """Start a game of Connect 4"""
         await self.start_invite(ctx)
 
     @commands.Cog.listener()
@@ -454,8 +452,8 @@ class Games(Cog, category=Category.GAMES):
                     return True
 
         try:
-            exact_guess = await wait_for(voting(), timeout=VOTE_TIMEOUT)
-        except TimeoutError:
+            exact_guess = await asyncio.wait_for(voting(), timeout=VOTE_TIMEOUT)
+        except asyncio.TimeoutError:
             exact_guess = False
 
         # Winner phase
@@ -516,8 +514,8 @@ class Games(Cog, category=Category.GAMES):
                 voted.append(vote.author)
 
         try:
-            await wait_for(voting(), timeout=VOTE_TIMEOUT)
-        except TimeoutError:
+            await asyncio.wait_for(voting(), timeout=VOTE_TIMEOUT)
+        except asyncio.TimeoutError:
             pass
 
         # Ejection phase
@@ -533,7 +531,7 @@ class Games(Cog, category=Category.GAMES):
         await imposter.move_to(None, reason="Imposter")
         await ctx.send(f"{imposter.mention} was ejected")
 
-    @commands.command()
+    @commands.command(brief="Start a game of Tic-Tac-Toe")
     @commands.cooldown(1, 60, commands.BucketType.channel)
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
         if opponent is None:

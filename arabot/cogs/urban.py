@@ -2,7 +2,7 @@ import re
 from urllib.parse import quote_plus
 
 from arabot.core import Ara, Category, Cog, Context, pfxless
-from arabot.utils import bold, dsafe
+from arabot.core.utils import bold, dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 

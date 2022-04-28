@@ -8,7 +8,7 @@ from aiohttp import ClientSession
 from disnake.ext import commands
 from disnake.utils import find
 
-__all__ = (
+__all__ = [
     "AnyChl",
     "AnyEmoji",
     "AnyMember",
@@ -23,7 +23,7 @@ __all__ = (
     "Empty",
     "Twemoji",
     "Codeblocks",
-)
+]
 
 
 class Twemoji(commands.Converter):

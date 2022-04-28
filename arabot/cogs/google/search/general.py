@@ -2,7 +2,7 @@ from urllib.parse import quote_plus
 
 from aiohttp import ClientSession
 from arabot.core import Category, Cog, Context
-from arabot.utils import bold
+from arabot.core.utils import bold
 from disnake import Embed
 from disnake.ext.commands import command
 

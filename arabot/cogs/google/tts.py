@@ -16,15 +16,15 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         self.session = session
         self._invalidate_voices_cache.start()
 
-    @command(aliases=["synth"], brief="Synthesize speech from text")
     @cooldown(5, 60, BucketType.guild)
+    @command(aliases=["synth"], brief="Synthesize speech from text")
     async def tts(self, ctx: Context, *query):
         async with ctx.typing():
             if pcm := await self.parse_check_detect_synthesize(ctx, query):
                 await ctx.reply(file=File(pcm, "audio.wav"))
 
-    @command(aliases=["pronounce"], brief="Pronounce text in voice channel")
     @cooldown(5, 60, BucketType.guild)
+    @command(aliases=["pronounce"], brief="Pronounce text in voice channel")
     async def speak(self, ctx: Context, *query):
         if ctx.guild.voice_client:
             await ctx.send("I'm already speaking")

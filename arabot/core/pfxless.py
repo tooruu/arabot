@@ -8,9 +8,14 @@ from disnake import Message
 from disnake.ext import commands
 from disnake.utils import async_all
 
-from .bot import Ara
+from .bot import prefix_manager
 
 CogMsgListener = TypeVar("CogMsgListener", bound=Callable[[commands.Cog, Message], Awaitable])
+
+__all__ = [
+    "PfxlessOnCooldown",
+    "pfxless",
+]
 
 
 class PfxlessOnCooldown(commands.CommandOnCooldown):
@@ -72,7 +77,7 @@ class pfxless:
         @functools.wraps(coro)
         @copy_dpy_attrs_from(coro)
         async def wrapper(cog: commands.Cog, msg: Message) -> None:
-            if not (wrapper.enabled and await self.prepare(cog.ara, msg)):
+            if not (wrapper.enabled and await self.prepare(msg)):
                 return
             try:
                 await coro(cog, msg)
@@ -83,9 +88,9 @@ class pfxless:
         wrapper.enabled = self.enabled
         return wrapper
 
-    async def prepare(self, ara: Ara, msg: Message) -> bool:
+    async def prepare(self, msg: Message) -> bool:
         return (
-            await self._check_message(msg, functools.partial(ara.command_prefix, ara))
+            await self._check_message(msg, functools.partial(prefix_manager, None))
             and await self._run_checks(msg)
             and await self._check_concurrency(msg)
             and self._check_cooldown(msg)

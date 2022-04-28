@@ -4,8 +4,7 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any, TypeVar
 
-from arabot.core import Ara, Cog, Context
-from arabot.utils import Color
+from arabot.core import Ara, Cog, Color, Context
 from disnake import Activity, ActivityType, Embed
 from disnake.ext import commands
 
