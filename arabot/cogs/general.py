@@ -45,10 +45,7 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.send(embed=avatars[1], view=Avatar(avatars))
 
-    @command(
-        aliases=["emote", "e"],
-        brief="Show full-sized versions of emoji(s)",
-    )
+    @command(aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)")
     async def emoji(self, ctx: Context, *emojis: AnyEmoji):
         emojis = list(dict.fromkeys(e for e in emojis if e))[:10]
         if not emojis:

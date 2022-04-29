@@ -18,7 +18,7 @@ class Fun(Cog, category=Category.FUN):
             image_link = await r.text()
         await ctx.send(image_link)
 
-    @command(brief="Get a randomly generated face", aliases=["person"])
+    @command(aliases=["person"], brief="Get a randomly generated face")
     async def face(self, ctx: Context):
         async with self.session.get("https://thispersondoesnotexist.com/image") as r:
             image = BytesIO(await r.read())

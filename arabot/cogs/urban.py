@@ -8,6 +8,9 @@ from disnake.ext.commands import command
 
 
 class Urban(Cog, category=Category.LOOKUP):
+    def __init__(self, ara: Ara):
+        self.ara = ara
+
     BASE_URL = "https://api.urbandictionary.com/v0/define"
     QUERY_PREFIX = r"^(?:wh?[ao]t(?:['’]?s|\sis)\s)"
     WORDS_IGNORE = "|".join(
@@ -40,10 +43,7 @@ class Urban(Cog, category=Category.LOOKUP):
         )
     )
 
-    def __init__(self, ara: Ara):
-        self.ara = ara
-
-    @command(brief="Search term in Urban Dictionary", aliases=["ud"])
+    @command(aliases=["ud"], brief="Search term in Urban Dictionary")
     async def urban(self, ctx: Context, *, term: str):
         if term.lower() == ctx.ara.owner.name.lower():
             invite = (
