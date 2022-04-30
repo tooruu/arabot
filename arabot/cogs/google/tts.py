@@ -8,7 +8,6 @@ from async_lru import alru_cache
 from disnake import File, PCMAudio
 from disnake.ext import tasks
 from disnake.ext.commands import BucketType, command, cooldown
-from disnake.utils import find
 
 
 class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
@@ -69,7 +68,10 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     def find_lang(string: str, langs: list[dict[str, list[str]]]) -> str | None:
         if not string:
             return None
-        return find(lambda lng: lng["languageCodes"][0].split("-")[0] == string.lower(), langs)
+        for lng in langs:
+            if (lang := lng["languageCodes"][0].split("-")[0]) == string.lower():
+                return lang
+        return None
 
     async def synthesize(self, text: str, lang: str, encoding: str) -> bytes:
         data = await self.session.fetch_json(
