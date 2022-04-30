@@ -17,9 +17,9 @@ class Translate(Cog, category=Category.LOOKUP):
         self.gtrans = trans_client
 
     @command(aliases=["tr", "trans"], brief="Translates text")
-    async def translate(self, ctx: Context, *query):
+    async def translate(self, ctx: Context):
         langs = await self.gtrans.languages(repr_lang=self.DEFAULT_TARGET[0])
-        source, target, text = self.parse_query(query, langs)
+        source, target, text = self.parse_query(ctx.argument_only, langs)
 
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send("I need text to translate")
@@ -49,7 +49,7 @@ class Translate(Cog, category=Category.LOOKUP):
         self, query: str, langs: list[LangCodeAndOrName]
     ) -> tuple[LangCodeAndOrName | None, LangCodeAndOrName | None, str | None]:
         find_lang = partial(self.find_lang, langs=langs)
-        match query:
+        match query.split(maxsplit=2):
             case []:
                 source = target = text = None
 
@@ -68,8 +68,7 @@ class Translate(Cog, category=Category.LOOKUP):
                     target = None
                     text = f"{str1} {str2}"
 
-            case [str1, str2, *text]:
-                text = " ".join(text)
+            case [str1, str2, text]:
                 if source := find_lang(str1):
                     if not (target := find_lang(str2)):
                         source, target = None, source

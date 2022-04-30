@@ -17,14 +17,14 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
 
     @cooldown(5, 60, BucketType.guild)
     @command(aliases=["synth"], brief="Synthesize speech from text")
-    async def tts(self, ctx: Context, *query):
+    async def tts(self, ctx: Context):
         async with ctx.typing():
-            if pcm := await self.parse_check_detect_synthesize(ctx, query):
+            if pcm := await self.parse_check_detect_synthesize(ctx):
                 await ctx.reply(file=File(pcm, "audio.wav"))
 
     @cooldown(5, 60, BucketType.guild)
     @command(aliases=["pronounce"], brief="Pronounce text in voice channel")
-    async def speak(self, ctx: Context, *query):
+    async def speak(self, ctx: Context):
         if ctx.guild.voice_client:
             await ctx.send("I'm already speaking")
             return
@@ -33,12 +33,12 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
             return
 
         async with ctx.typing():
-            if pcm := await self.parse_check_detect_synthesize(ctx, query):
+            if pcm := await self.parse_check_detect_synthesize(ctx):
                 await ctx.author.voice.channel.connect_play_disconnect(PCMAudio(pcm))
 
-    async def parse_check_detect_synthesize(self, ctx: Context, query: list[str]) -> BytesIO | None:
+    async def parse_check_detect_synthesize(self, ctx: Context) -> BytesIO | None:
         langs = await self.voices()
-        lang, text = self.parse_query(query, langs)
+        lang, text = self.parse_query(ctx.argument_only, langs)
 
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send("I need text to pronounce")
@@ -54,13 +54,12 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         return BytesIO(audio)
 
     def parse_query(self, query: str, langs: list[dict]) -> tuple[str | None, str | None]:
-        match query:
+        match query.split(maxsplit=1):
             case []:
                 lang = text = None
             case [str1]:
                 text = None if (lang := self.find_lang(str1, langs)) else str1
-            case [str1, *str2]:
-                str2 = " ".join(str2)
+            case [str1, str2]:
                 text = str2 if (lang := self.find_lang(str1, langs)) else f"{str1} {str2}"
         return lang, text
 
