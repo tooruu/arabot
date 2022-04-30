@@ -8,7 +8,7 @@ from .core import Ara
 
 def main():
     logging.basicConfig(
-        format="%(asctime)s|%(levelname)s|%(module)s|%(lineno)s|%(message)s",
+        format="%(asctime)s|%(levelname)s|%(message)s",
         level=logging.INFO if TESTING else logging.WARNING,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
