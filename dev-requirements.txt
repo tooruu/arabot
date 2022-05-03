@@ -1,6 +1,5 @@
 -r requirements.txt
 
-# Workflow
-flake8
+# Linting & Formatting
+prospector
 black
-pytest
