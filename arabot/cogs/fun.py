@@ -100,6 +100,25 @@ class Fun(Cog, category=Category.FUN):
             answer = choice(("Yes", "No"))
         await ctx.reply(f"🎱 | {answer}")
 
+    @command(aliases=["ren"], brief="Rename a person")
+    @cooldown(1, 60 * 60 * 24 * 3.5, BucketType.member)
+    async def rename(self, ctx: Context, target: AnyMember, *, nick: str | None = None):
+        if not target:
+            ctx.command.reset_cooldown(ctx)
+            await ctx.send("User not found")
+            return
+        if ctx.author.top_role < target.top_role:
+            ctx.command.reset_cooldown(ctx)
+            await ctx.send("Cannot rename users ranked higher than you")
+            return
+        if nick and len(nick) > 32:
+            ctx.command.reset_cooldown(ctx)
+            await ctx.send("Nickname too long")
+            return
+
+        await target.edit(nick=nick)
+        await ctx.tick()
+
 
 def setup(ara: Ara):
     ara.add_cog(Fun(ara.session))
