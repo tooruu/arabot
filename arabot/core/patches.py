@@ -79,6 +79,15 @@ class Context(commands.Context):
 
         return None
 
+    async def tick(self) -> bool:
+        try:
+            await self.message.add_reaction("✅")
+        except (disnake.HTTPException, disnake.Forbidden):
+            return False
+        return True
+
+    temp_channel_mute_author = temp_channel_mute_message_author
+
 
 class Cog(commands.Cog):
     def __init_subclass__(cls, category: Category = None, keys: Iterable[str] = (), **kwargs):

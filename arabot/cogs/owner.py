@@ -58,7 +58,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
 
         act = Activity(type=acts[act_type], name=act_name) if act_type else None
         await ctx.ara.change_presence(activity=act)
-        await ctx.message.add_reaction("✅")
+        await ctx.tick()
 
 
 class PluginManager(Cog, command_attrs=dict(hidden=True)):
