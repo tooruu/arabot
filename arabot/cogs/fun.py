@@ -34,34 +34,14 @@ class Fun(Cog, category=Category.FUN):
                     break
             else:
                 return
-        for i in (
-            "🇼",
-            "🇭",
-            "🇴",
-            "🇦",
-            "🇸",
-            "🇰",
-            "🇪",
-            "🇩",
-            CustomEmoji.FUKAWHY,
-        ):
+        for i in ("🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FUKAWHY):
             await msg.add_reaction(i)
 
     @message_command(name="Who asked?")
     async def whoasked(self, inter: ApplicationCommandInteraction, msg: Message):
         await inter.response.send_message("Adding reactions", ephemeral=True)
         try:
-            for i in (
-                "🇼",
-                "🇭",
-                "🇴",
-                "🇦",
-                "🇸",
-                "🇰",
-                "🇪",
-                "🇩",
-                CustomEmoji.FUKAWHY,
-            ):
+            for i in ("🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FUKAWHY):
                 await msg.add_reaction(i)
         except Forbidden:
             await (await inter.original_message()).edit(
@@ -80,34 +60,14 @@ class Fun(Cog, category=Category.FUN):
                     break
             else:
                 return
-        for i in (
-            "🇼",
-            "🇭",
-            "🇴",
-            "🇨",
-            "🇦",
-            "🇷",
-            "🇪",
-            "🇸",
-            CustomEmoji.TOORUWEARY,
-        ):
+        for i in ("🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TOORUWEARY):
             await msg.add_reaction(i)
 
     @message_command(name="Who cares?")
     async def whocares(self, inter: ApplicationCommandInteraction, msg: Message):
         await inter.response.send_message("Adding reactions", ephemeral=True)
         try:
-            for i in (
-                "🇼",
-                "🇭",
-                "🇴",
-                "🇨",
-                "🇦",
-                "🇷",
-                "🇪",
-                "🇸",
-                CustomEmoji.TOORUWEARY,
-            ):
+            for i in ("🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TOORUWEARY):
                 await msg.add_reaction(i)
         except Forbidden:
             await (await inter.original_message()).edit(
@@ -127,7 +87,7 @@ class Fun(Cog, category=Category.FUN):
         await ctx.message.delete()
         if not target:
             return
-        invis = "||​||" * 198 + " _" * 6
+        invis = "||\u200b||" * 198 + " _" * 6
         await ctx.send(f"{msg} {invis} {target.mention}", allowed_mentions=AllowedMentions.all())
 
     @command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")

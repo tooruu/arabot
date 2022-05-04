@@ -56,7 +56,7 @@ class Chat(Cog):
     async def badgames(self, msg: disnake.Message):
         game_name = self.BAD_GAMES.search(msg.content).group()
         await msg.channel.send(f"{game_name}? Ебать ты гей 🤡, иди в мут нахуй")
-        await msg.channel.temp_mute_member(msg.author, 20, "геюга ебаная")
+        await msg.temp_channel_mute_author(20, "геюга ебаная")
 
 
 def setup(ara: Ara):

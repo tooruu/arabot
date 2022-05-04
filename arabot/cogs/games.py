@@ -338,7 +338,7 @@ class TicTacToeButton(disnake.ui.Button):
         await interaction.response.edit_message(content=content, view=view)
         if loser:
             await interaction.followup.send(f"{loser.mention} loser has been muted for 1 minute!")
-            await interaction.channel.temp_mute_member(loser, 60, "Tic Tac Toe loser")
+            await interaction.channel.temp_mute_member(loser, reason="Tic Tac Toe loser")
 
 
 class TicTacToe(disnake.ui.View):
@@ -406,7 +406,7 @@ class Games(Cog, category=Category.GAMES):
             )
             cache.append(ctx.author.id)
             await ctx.reply("**BOOM**")
-            await ctx.channel.temp_mute_member(ctx.author, 60, "Russian Roulette")
+            await ctx.temp_channel_mute_author(reason="Russian Roulette")
         else:  # Same user loses 3 times in a row
             cache.clear()
             await ctx.reply("***__BIG BOOM__***")
@@ -415,9 +415,6 @@ class Games(Cog, category=Category.GAMES):
     @commands.command(brief="Guess a number")
     @commands.cooldown(1, 90, commands.BucketType.channel)
     async def guess(self, ctx: Context, *ceiling):
-        VOTE_TIMEOUT = 20
-        MUTE_TIMEOUT = 60
-
         # Initializing
         try:
             ceiling = max(abs(int(ceiling[-1])), 2)
@@ -452,7 +449,7 @@ class Games(Cog, category=Category.GAMES):
                     return True
 
         try:
-            exact_guess = await asyncio.wait_for(voting(), timeout=VOTE_TIMEOUT)
+            exact_guess = await asyncio.wait_for(voting(), timeout=20)
         except asyncio.TimeoutError:
             exact_guess = False
 
@@ -468,7 +465,7 @@ class Games(Cog, category=Category.GAMES):
             + f" number {number}\n"
             f"Enjoy your 1 minute mute! {CustomEmoji.TERICELEBRATE}"
         )
-        await ctx.channel.temp_mute_member(winner, MUTE_TIMEOUT, "Guessed the number")
+        await ctx.channel.temp_mute_member(winner, reason="Guessed the number")
 
     @commands.check(
         lambda msg: (vc := getattr(msg.author.voice, "channel", None))
