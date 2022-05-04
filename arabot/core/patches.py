@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import re
 from asyncio import sleep
@@ -14,6 +16,12 @@ __all__ = [
     "Context",
     "Cog",
 ]
+
+
+async def temp_channel_mute_message_author(
+    self: disnake.Message | Context, duration: float = 60.0, reason: str | None = None
+):
+    await self.channel.temp_mute_member(self.author, duration, reason)
 
 
 class Context(commands.Context):
@@ -106,8 +114,8 @@ async def get_unlimited_invite(self: disnake.Guild) -> str | None:
 async def temp_mute_channel_member(
     self: disnake.abc.Messageable,
     member: disnake.Member,
-    duration: float,
-    reason: str | None = "Temp mute",
+    duration: float = 60.0,
+    reason: str | None = None,
 ):
     old_perms = self.overwrites_for(member)
     temp_perms = self.overwrites_for(member)
@@ -144,3 +152,4 @@ disnake.Guild.get_unlimited_invite = get_unlimited_invite
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.VoiceChannel.connect_play_disconnect = connect_play_disconnect
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
+disnake.Message.temp_channel_mute_author = temp_channel_mute_message_author
