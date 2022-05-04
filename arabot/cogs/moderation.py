@@ -1,4 +1,9 @@
-from arabot.core import AnyTChl, Ara, Category, Cog, Context
+import asyncio
+import re
+from contextlib import suppress
+
+import disnake
+from arabot.core import AnyTChl, Ara, Category, Cog, Context, CustomEmoji
 from disnake.ext.commands import command, has_permissions
 
 
@@ -20,6 +25,31 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
         await ctx.message.delete()
         if chl:
             await chl.send(msg)
+
+    @command()
+    @has_permissions(manage_channels=True)
+    async def mutenext(self, ctx: Context, timeout: int | None = 60, *, pattern: str):
+        await ctx.message.add_reaction(CustomEmoji.KANNASTARE)
+
+        def bad_msg_check(msg: disnake.Message):
+            return (
+                msg.channel == ctx.channel
+                and not msg.author.bot
+                and re.search(pattern, msg.content, re.IGNORECASE)
+            )
+
+        try:
+            bad_msg = await ctx.ara.wait_for("message", check=bad_msg_check, timeout=timeout)
+        except asyncio.TimeoutError:
+            return
+        else:
+            with suppress(disnake.Forbidden):
+                await bad_msg.add_reaction("🤫")
+            await bad_msg.reply(f"{bad_msg.author.mention} was muted for 1 minute")
+            await bad_msg.temp_channel_mute_author()
+        finally:
+            with suppress(disnake.NotFound):
+                await ctx.message.remove_reaction(CustomEmoji.KANNASTARE, ctx.me)
 
 
 def setup(ara: Ara):
