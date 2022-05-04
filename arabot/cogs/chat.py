@@ -33,7 +33,7 @@ class Chat(Cog):
         temp_perms.send_messages = False
         try:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
-            await msg.channel.send(CustomEmoji.DIO)
+            await msg.channel.send(CustomEmoji.KONODIODA)
             msgs = []
             msgs.append(await msg.channel.send("***Toki yo tomare!***"))
             for i in "Ichi", "Ni", "San", "Yon", "Go":

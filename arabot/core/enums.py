@@ -14,7 +14,7 @@ class Color:
 
 
 class CustomEmoji:
-    DIO = "<:KonoDioDa:937687826693251102>"
+    KONODIODA = "<:KonoDioDa:937687826693251102>"
     TERICELEBRATE = "<:TeriCelebrate:937695453506596906>"
     FUKAWHY = "<:FukaWhy:937695447626182676>"
     TOORUWEARY = "<:TooruWeary:937695447487774743>"

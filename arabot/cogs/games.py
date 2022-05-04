@@ -481,7 +481,7 @@ class Games(Cog, category=Category.GAMES):
 
         # Initializing
         vc = ctx.author.voice.channel
-        await ctx.send(CustomEmoji.DIO)
+        await ctx.send(CustomEmoji.KONODIODA)
         await ctx.send(
             f"You have {VOTE_TIMEOUT} seconds to find the imposter!\n"
             "*Ping the person you think the imposter is to vote*"
