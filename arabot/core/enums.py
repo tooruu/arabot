@@ -20,6 +20,7 @@ class CustomEmoji:
     TOORUWEARY = "<:TooruWeary:937695447487774743>"
     KANNAPAT = "<:KannaPat:937695447718453248>"
     MEISTARE = "<:MeiStare:937695447932370994>"
+    KANNASTARE = "<:KannaStare:971188689428443276>"
 
 
 class Category:
