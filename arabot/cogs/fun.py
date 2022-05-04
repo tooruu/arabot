@@ -100,7 +100,7 @@ class Fun(Cog, category=Category.FUN):
             answer = choice(("Yes", "No"))
         await ctx.reply(f"🎱 | {answer}")
 
-    @command(aliases=["ren"], brief="Rename a person")
+    @command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     @cooldown(1, 60 * 60 * 24 * 3.5, BucketType.member)
     async def rename(self, ctx: Context, target: AnyMember, *, nick: str | None = None):
         if not target:
