@@ -6,6 +6,7 @@ import os
 import re
 import sys
 from collections.abc import Generator
+from datetime import timedelta
 from glob import glob
 from pathlib import Path
 from pkgutil import iter_modules
@@ -16,7 +17,7 @@ from arabot import TESTING
 from disnake.ext import commands
 
 from .patches import Context
-from .utils import MissingEnvVar, getkeys, mono, system_info
+from .utils import MissingEnvVar, getkeys, mono, strfdelta, system_info
 
 
 def search_directory(path) -> Generator[str, None, None]:
@@ -153,7 +154,11 @@ class Ara(commands.Bot):
 
         match error:
             case commands.CommandOnCooldown():
-                await ctx.reply(f"Cooldown expires in {error.retry_after:.0f} seconds")
+                if error.retry_after > 60:
+                    remaining = strfdelta(timedelta(seconds=error.retry_after))
+                else:
+                    remaining = f"{error.retry_after:.0f} seconds"
+                await ctx.reply(f"Cooldown expires in {remaining}")
             case commands.DisabledCommand():
                 await ctx.reply("This command is disabled!")
             case commands.MaxConcurrencyReached(number=n):

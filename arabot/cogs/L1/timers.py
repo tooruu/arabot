@@ -3,6 +3,7 @@ from functools import partial
 from zoneinfo import ZoneInfo
 
 from arabot.core import Ara, Cog
+from arabot.core.utils import strfdelta
 from disnake import Forbidden, HTTPException
 from disnake.ext.tasks import loop
 
@@ -109,27 +110,13 @@ class ChannelTimers(Cog):
     async def update_channels(self):
         for chl_id, timer_info in self.timers.items():
             fmt, timer = timer_info
-            time_left = self.strfdelta(timer.till_next_phase)
+            time_left = strfdelta(timer.till_next_phase)
             name = fmt.format(timer.status, time_left)
             channel = self.ara.get_channel(chl_id)
             try:
                 await channel.edit(name=name)
             except (Forbidden, HTTPException):
                 pass
-
-    @staticmethod
-    def strfdelta(delta: timedelta) -> str:
-        days = delta.days
-        hours = delta.seconds // 3600
-        minutes = delta.seconds % 3600 // 60
-        time_left = ""
-        if days:
-            time_left += f"{days}d "
-        if hours:
-            time_left += f"{hours}h"
-        if not days:
-            time_left += f" {minutes}m"
-        return time_left
 
     @Cog.listener()
     async def on_ready(self):

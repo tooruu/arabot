@@ -2,6 +2,7 @@ import os
 import platform
 import sys
 from contextlib import _RedirectStream, contextmanager
+from datetime import timedelta
 
 import arabot
 import disnake
@@ -12,6 +13,7 @@ __all__ = [
     "getkeys",
     "Lockable",
     "stdin_from",
+    "strfdelta",
 ]
 
 
@@ -79,3 +81,17 @@ class Lockable:
 
 class stdin_from(_RedirectStream):
     _stream = "stdin"
+
+
+def strfdelta(delta: timedelta) -> str:
+    days = delta.days
+    hours = delta.seconds // 3600
+    minutes = delta.seconds % 3600 // 60
+    time_left = ""
+    if days:
+        time_left += f"{days}d "
+    if hours:
+        time_left += f"{hours}h"
+    if not days:
+        time_left += f" {minutes}m"
+    return time_left
