@@ -112,7 +112,13 @@ class Fun(Cog, category=Category.FUN):
             await ctx.send("Nickname too long")
             return
 
-        await target.edit(nick=nick)
+        try:
+            await target.edit(nick=nick)
+        except Forbidden:
+            ctx.reset_cooldown()
+            await ctx.send("I don't have permission to rename this user")
+            return
+
         await ctx.tick()
 
 
