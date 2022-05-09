@@ -25,6 +25,8 @@ __all__ = [
     "Codeblocks",
 ]
 
+arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
+
 
 class Twemoji(commands.Converter):
     base_url = "https://twemoji.maxcdn.com/v/latest/72x72/{}.png"
@@ -60,48 +62,45 @@ class Twemoji(commands.Converter):
 
 class CIMember(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Member:
+        member_search = arg_ci_re_search(argument)
         if found := find(
-            lambda member: argument.casefold() in member.display_name.casefold(), ctx.guild.members
-        ) or find(lambda member: argument.casefold() in member.name.casefold(), ctx.guild.members):
+            lambda member: member_search(member.display_name), ctx.guild.members
+        ) or find(lambda member: member_search(member.name), ctx.guild.members):
             return found
         raise commands.MemberNotFound(argument)
 
 
 class CIEmoji(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Emoji:
+        emoji_search = arg_ci_re_search(argument)
         guilds = ctx.bot.guilds
-        # Put ctx.guild in the start
-        guilds.insert(0, guilds.pop(guilds.index(ctx.guild)))
+        guilds.insert(0, guilds.pop(guilds.index(ctx.guild)))  # Move ctx.guild to the beginning
         for guild in guilds:
-            if emoji := find(
-                lambda emoji: argument.lower() in emoji.name.lower() or argument == str(emoji.id),
-                guild.emojis,
-            ):
+            if emoji := find(lambda emoji: emoji_search(emoji.name), guild.emojis):
                 return emoji
         raise commands.EmojiNotFound(argument)
 
 
 class CITextChl(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.TextChannel:
-        if found := find(
-            lambda chl: argument.casefold() in chl.name.casefold(), ctx.guild.text_channels
-        ):
+        t_channel_search = arg_ci_re_search(argument)
+        if found := find(lambda channel: t_channel_search(channel.name), ctx.guild.text_channels):
             return found
         raise commands.ChannelNotFound(argument)
 
 
 class CIVoiceChl(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.VoiceChannel:
-        if found := find(
-            lambda chl: argument.casefold() in chl.name.casefold(), ctx.guild.voice_channels
-        ):
+        v_channel_search = arg_ci_re_search(argument)
+        if found := find(lambda channel: v_channel_search(channel.name), ctx.guild.voice_channels):
             return found
         raise commands.ChannelNotFound(argument)
 
 
 class CIRole(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Role:
-        if found := find(lambda role: argument.casefold() in role.name.casefold(), ctx.guild.roles):
+        role_search = arg_ci_re_search(argument)
+        if found := find(lambda role: role_search(role.name), ctx.guild.roles):
             return found
         raise commands.RoleNotFound(argument)
 
