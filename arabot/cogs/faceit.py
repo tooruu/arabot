@@ -33,9 +33,9 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
                 player["last_infraction_date"], "%a %b %d %H:%M:%S UTC %Y"
             )
         except (KeyError, ValueError):
-            last_infraction = " | Last infraction: " + last_infraction.strftime("%d %b %Y")
-        else:
             last_infraction = ""
+        else:
+            last_infraction = " | Last infraction: " + last_infraction.strftime("%d %b %Y")
 
         embed = (
             Embed(
