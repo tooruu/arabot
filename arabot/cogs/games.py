@@ -455,7 +455,7 @@ class Games(Cog, category=Category.GAMES):
 
         # Winner phase
         if not exact_guess and len(guesses) < 2:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("No one has won")
             return
         winner = min(guesses, key=lambda m: abs(guesses[m] - number))
@@ -532,15 +532,15 @@ class Games(Cog, category=Category.GAMES):
     @commands.cooldown(1, 60, commands.BucketType.channel)
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
         if opponent is None:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.reply("User not found")
             return
         if ctx.author == opponent:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.reply("Can't play against yourself")
             return
         if opponent and opponent.bot:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.reply("Can't play against bots")
             return
         players = [ctx.author, opponent or None]

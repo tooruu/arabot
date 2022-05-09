@@ -75,19 +75,19 @@ class General(Cog, category=Category.GENERAL):
     @command(brief="DM user to summon them")
     async def summon(self, ctx: Context, target: AnyMember = False, *, msg=None):
         if target is False:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("Specify a user to summon")
             return
         if target is None:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("User not found")
             return
         if target.bot:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("Cannot summon bots")
             return
         if target not in ctx.channel.members:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send(f"{target.mention} doesn't have access to this channel")
             return
         invite = await ctx.guild.get_unlimited_invite() or Embed.Empty

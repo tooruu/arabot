@@ -96,6 +96,12 @@ class Context(commands.Context):
 
     temp_channel_mute_author = temp_channel_mute_message_author
 
+    def reset_cooldown(self) -> bool:
+        if not self.command:
+            return False
+        self.command.reset_cooldown(self)
+        return True
+
 
 class Cog(commands.Cog):
     def __init_subclass__(cls, category: Category = None, keys: Iterable[str] = (), **kwargs):

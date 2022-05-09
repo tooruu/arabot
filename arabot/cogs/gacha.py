@@ -79,7 +79,7 @@ class Gacha(Cog, category=Category.GAMES):
         supply_type = supply_type.casefold()
         if not self._pull_provider.has_pool(supply_type):
             await ctx.reply("The supply type you specified doesn't exist")
-            self.gacha.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             return
         pulls = self._pull_provider.pull(supply_type, pull_count)
         formatted_pulls = self._format_pulls(pulls)
@@ -112,7 +112,7 @@ class Gacha(Cog, category=Category.GAMES):
             )
             return
         await ctx.reply("An error occurred")
-        self.gacha.reset_cooldown(ctx)
+        ctx.reset_cooldown()
         raise error
 
     @staticmethod

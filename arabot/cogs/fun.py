@@ -100,15 +100,15 @@ class Fun(Cog, category=Category.FUN):
     @cooldown(1, 60 * 60 * 24 * 3.5, BucketType.member)
     async def rename(self, ctx: Context, target: AnyMember, *, nick: str | None = None):
         if not target:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("User not found")
             return
         if ctx.author.top_role < target.top_role:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("Cannot rename users ranked higher than you")
             return
         if nick and len(nick) > 32:
-            ctx.command.reset_cooldown(ctx)
+            ctx.reset_cooldown()
             await ctx.send("Nickname too long")
             return
 
