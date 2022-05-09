@@ -180,7 +180,7 @@ class Connect4(Cog, category=Category.GAMES):
         self.waiting_games[message.id] = (message, player1, token)
         await message.clear_reaction(token)
         content = message.content.split("\n")[0]
-        await message.edit(content=content + f" - They have chosen {token}\nPick a color to join")
+        await message.edit(content + f" - They have chosen {token}\nPick a color to join")
 
     async def start_game(
         self,
@@ -194,13 +194,13 @@ class Connect4(Cog, category=Category.GAMES):
         notification = await message.channel.send(
             f"Hey {player1.mention} - {player2.display_name} has joined your game!"
         )
-        await message.edit(content="Loading ....")
+        await message.edit("Loading ....")
         for emoji in COLUMN_EMOJI:
             await message.add_reaction(emoji)
         await message.add_reaction(CANCEL_EMOJI)
         game = Connect4Game(player1, player2, p1_token, p2_token)
         self.active_games[message.id] = (game, message)
-        await message.edit(content=None, embed=game.get_embed())
+        await message.edit(None, embed=game.get_embed())
         await notification.delete()
 
     async def finish_game(self, game, message: disnake.Message, result):

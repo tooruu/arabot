@@ -1,4 +1,4 @@
-disnake[voice]
+disnake[voice]~=2.5.0
 # Speedups
 aiodns
 Brotli
