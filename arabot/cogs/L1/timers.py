@@ -105,6 +105,7 @@ class ChannelTimers(Cog):
 
     def __init__(self, ara: Ara):
         self.ara = ara
+        self.update_channels.start()
 
     @loop(minutes=5)  # rate limit: 2 updates per 10 mins
     async def update_channels(self):
@@ -118,9 +119,9 @@ class ChannelTimers(Cog):
             except (Forbidden, HTTPException):
                 pass
 
-    @Cog.listener()
-    async def on_ready(self):
-        self.update_channels.start()
+    @update_channels.before_loop
+    async def ensure_ready(self):
+        await self.ara.wait_until_ready()
 
     def cog_unload(self):
         self.update_channels.cancel()
