@@ -8,7 +8,7 @@ from disnake import Message
 from disnake.ext import commands
 from disnake.utils import async_all
 
-from .bot import Ara, prefix_manager
+from .bot import Ara
 
 CogMsgListener = TypeVar("CogMsgListener", bound=Callable[[commands.Cog, Message], Awaitable])
 
@@ -90,7 +90,7 @@ class pfxless:
 
     async def prepare(self, msg: Message, ara: Ara) -> bool:  # TODO: remove dependency on bot
         return (
-            await self._check_message(msg, functools.partial(prefix_manager, ara))
+            await self._check_message(msg, functools.partial(ara.command_prefix, ara))
             and await self._run_checks(msg)
             and await self._check_concurrency(msg)
             and self._check_cooldown(msg)

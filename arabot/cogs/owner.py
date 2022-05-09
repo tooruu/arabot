@@ -63,7 +63,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
 
 class PluginManager(Cog, command_attrs=dict(hidden=True)):
     def __init__(self, ara: Ara):
-        self.COGS_PATH = ara._default_cogs_path
+        self.COGS_PATH = ara._cogs_path
         self.COGS_PATH_DOTTED = ".".join(Path(self.COGS_PATH).parts)
 
     async def cog_check(self, ctx: Context):

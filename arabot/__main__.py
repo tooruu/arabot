@@ -1,22 +1,61 @@
 import asyncio
 import logging
+import re
 import signal
+
+import disnake
 
 from . import TESTING
 from .core import Ara
 
 
-def main():
+def setup_logging():
     logging.basicConfig(
         format="%(asctime)s|%(levelname)s|%(message)s",
         level=logging.INFO if TESTING else logging.WARNING,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
+
+async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
+    pfx_pattern = r"a; *" if TESTING else rf"; *|ara +|<@!?{ara.user.id}> *"
+    if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
+        return found.group()
+
+
+def create_ara(*args, **kwargs) -> Ara:
+    intents = disnake.Intents(
+        emojis_and_stickers=True,
+        guild_messages=True,
+        guild_reactions=True,
+        guilds=True,
+        members=True,
+        voice_states=True,
+    )
+    default_kwargs = dict(
+        activity=disnake.Activity(type=disnake.ActivityType.competing, name="McDonalds"),
+        allowed_mentions=disnake.AllowedMentions.none(),
+        case_insensitive=True,
+        command_prefix=prefix_manager,
+        embed_color=0xE91E63,
+        intents=intents,
+    )
+    if TESTING:
+        default_kwargs |= dict(
+            reload=True,
+            test_guilds=[954134299119091772, 676889696302792774],
+        )
+
+    return Ara(*args, **default_kwargs | kwargs)
+
+
+def main():
+    setup_logging()
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    ara = Ara(loop=loop)
+    ara = create_ara(loop=loop)
 
     try:
         for s in signal.SIGINT, signal.SIGTERM:

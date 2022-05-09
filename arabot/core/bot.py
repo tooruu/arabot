@@ -1,9 +1,6 @@
-from __future__ import annotations
-
 import asyncio
 import logging
 import os
-import re
 import sys
 from collections.abc import Generator
 from datetime import timedelta
@@ -13,7 +10,6 @@ from pkgutil import iter_modules
 
 import aiohttp
 import disnake
-from arabot import TESTING
 from disnake.ext import commands
 
 from .patches import Context
@@ -44,43 +40,13 @@ def search_directory(path) -> Generator[str, None, None]:
         yield from search_directory(path / dir)
 
 
-async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
-    pfx_pattern = r"a; *" if TESTING else rf"; *|ara +|<@!?{ara.user.id}> *"
-    if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
-        return found.group()
-
-
 class Ara(commands.Bot):
-    _default_cogs_path = "arabot/cogs"
-
     def __init__(self, *args, **kwargs):
-        activity = disnake.Activity(type=disnake.ActivityType.competing, name="McDonalds")
+        self._cogs_path: str = kwargs.pop("cogs_path", "arabot/cogs")
+        embed_color: int | disnake.Color | None = kwargs.pop("embed_color", None)
 
-        intents = disnake.Intents(
-            guilds=True,
-            members=True,
-            emojis_and_stickers=True,
-            voice_states=True,
-            guild_messages=True,
-            guild_reactions=True,
-        )
-
-        default_kwargs = dict(
-            activity=activity,
-            allowed_mentions=disnake.AllowedMentions.none(),
-            case_insensitive=True,
-            command_prefix=prefix_manager,
-            intents=intents,
-        )
-
-        if TESTING:
-            default_kwargs |= dict(
-                reload=True,
-                test_guilds=[676889696302792774, 933568919413866526, 954134299119091772],
-            )
-
-        super().__init__(*args, **default_kwargs | kwargs)
-        disnake.Embed.set_default_color(0xE91E63)
+        disnake.Embed.set_default_color(embed_color)
+        super().__init__(*args, **kwargs)
 
     async def login(self):
         try:
@@ -133,9 +99,9 @@ class Ara(commands.Bot):
     async def get_context(self, message: disnake.Message, *, cls=Context):
         return await super().get_context(message, cls=cls)
 
-    def load_extensions(self, path: str = _default_cogs_path) -> None:
-        trim_amount = len(Path(path).parts)
-        for module in search_directory(path):
+    def load_extensions(self) -> None:
+        trim_amount = len(Path(self._cogs_path).parts)
+        for module in search_directory(self._cogs_path):
             short = module.split(".", maxsplit=trim_amount)[-1]
             try:
                 self.load_extension(module)
