@@ -20,6 +20,7 @@ class EvalException(Exception):
 
 class LocalEvalException(EvalException):
     def __init__(self, error: BaseException):
+        super().__init__(error)
         self.original = error
 
     def format(self, *, source: str | Sequence = "", filename: str = Evaluator.TB_FILENAME) -> str:
@@ -65,6 +66,7 @@ class LocalEvalExecuteException(LocalEvalException):
 
 class RemoteEvalException(EvalException):
     def __init__(self, error: str, output_before_error: str = "", exit_code: int = 1):
+        super().__init__(error)
         self.error = error
         self.stdout = output_before_error
         self.exit_code = exit_code
@@ -81,4 +83,5 @@ class RemoteEvalException(EvalException):
 
 class RemoteEvalBadResponse(Exception):
     def __init__(self, message: str):
+        super().__init__(message)
         self.message = message

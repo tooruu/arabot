@@ -38,7 +38,7 @@ def copy_dpy_attrs_from(donor):
     return transplantation
 
 
-class pfxless:
+class pfxless:  # noqa: N801
     def __init__(self, **attrs):
         regex: str | re.Pattern[str] | None = attrs.get("regex")
         re_flags: int | re.RegexFlag | None = attrs.get("re_flags")

@@ -38,7 +38,7 @@ class Chat(Cog):
             msgs.append(await msg.channel.send("***Toki yo tomare!***"))
             for i in "Ichi", "Ni", "San", "Yon", "Go":
                 await sleep(1.5)
-                msgs.append(await msg.channel.send(content=f"*{i} byou keika*"))
+                msgs.append(await msg.channel.send(f"*{i} byou keika*"))
             await sleep(1)
             msgs.append(await msg.channel.send("Toki wa ugoki dasu"))
             await sleep(1)

@@ -50,14 +50,13 @@ class Twemoji(commands.Converter):
     async def read(
         self,
         *,
-        session: ClientSession = None,
+        session: ClientSession | None = None,
         ensure_only: bool = False,
     ) -> bytes | bool:
         async with (session or ClientSession()).get(self.url) as resp:
             if resp.ok:
                 return True if ensure_only else await resp.read()
-            else:
-                return False
+            return False
 
 
 class CIMember(commands.Converter):
@@ -106,7 +105,7 @@ class CIRole(commands.Converter):
 
 
 class Empty(commands.Converter):
-    async def convert(*_) -> None:
+    async def convert(self, ctx: commands.Context, argument: str) -> None:
         return None
 
 

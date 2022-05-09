@@ -40,11 +40,12 @@ class Timer:
         return timedelta(seconds=total_seconds)
 
     @property
-    def status(self) -> str:
+    def status(self) -> str | None:
         next_phase = self.next_phase
         for tup in self.sched[next_phase.isoweekday()]:
             if tup[0] == next_phase.timetz():
                 return tup[1]
+        return None
 
 
 class ChannelTimers(Cog):

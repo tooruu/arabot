@@ -26,7 +26,7 @@ class TranslationClient:
         text: str,
         target: str,
         source: str | None = None,
-        format: Literal["text", "html"] = "text",
+        format_: Literal["text", "html"] = "text",
     ) -> tuple[str, str | None]:
         data = await self._api(
             "/",
@@ -34,7 +34,7 @@ class TranslationClient:
             q=text,
             target=target,
             source=source or "",
-            format=format,
+            format=format_,
         )
         translations: list[dict[str, str]] = data["data"]["translations"]
         translation = translations[0]

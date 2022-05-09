@@ -70,11 +70,7 @@ class Gacha(Cog, category=Category.GAMES):
         self._pull_provider = Gacha._initialize_pull_provider()
 
     @cooldown(1, 60, BucketType.user)
-    @command(
-        aliases=["pull"],
-        brief="Try out your luck for free",
-        cooldown_after_parsing=True,
-    )
+    @command(aliases=["pull"], brief="Try out your luck for free", cooldown_after_parsing=True)
     async def gacha(self, ctx: Context, supply_type: str, pull_count: int = 10):
         supply_type = supply_type.casefold()
         if not self._pull_provider.has_pool(supply_type):

@@ -10,14 +10,14 @@ from typing import Any
 from aiohttp import ClientSession
 from arabot.core.utils import Lockable, stdin_from
 
+from . import errors
 from .abc import Evaluator
-from .errors import *
 
 
 class RemoteEval(Evaluator):
     API = "https://emkc.org/api/v2/piston/execute"
 
-    def __init__(self, *, session: ClientSession = None, stdin: str = ""):
+    def __init__(self, *, session: ClientSession | None = None, stdin: str = ""):
         self.session = session or ClientSession()
         self.stdin = stdin
 
@@ -32,7 +32,7 @@ class RemoteEval(Evaluator):
             metadata = await response.json()
 
         if "message" in metadata:
-            raise RemoteEvalBadResponse(metadata["message"])
+            raise errors.RemoteEvalBadResponse(metadata["message"])
 
         response.raise_for_status()
 
@@ -44,7 +44,7 @@ class RemoteEval(Evaluator):
         exit_code = data["code"]
 
         if exit_code:
-            raise RemoteEvalException(data["stderr"], stdout, exit_code)
+            raise errors.RemoteEvalException(data["stderr"], stdout, exit_code)
 
         return stdout, None
 
@@ -62,19 +62,19 @@ class LocalEval(Lockable, Evaluator):
             except SyntaxError:
                 return compile_for("exec")
         except BaseException as exc:
-            raise LocalEvalCompileException(exc) from exc
+            raise errors.LocalEvalCompileException(exc) from exc
 
     async def execute(self, compiled_code: CodeType) -> tuple[str, Any]:
         output_buffer = StringIO()
         try:
             with stdin_from(self.stdin), redirect_stdout(output_buffer):
                 if compiled_code.co_flags & inspect.CO_COROUTINE:
-                    r = await eval(compiled_code, self.env)
+                    r = await eval(compiled_code, self.env)  # pylint: disable=eval-used
                 else:
-                    r = eval(compiled_code, self.env)
+                    r = eval(compiled_code, self.env)  # pylint: disable=eval-used
         except BaseException as exc:
             stdout = output_buffer.getvalue()
-            raise LocalEvalExecuteException(exc, stdout) from exc
+            raise errors.LocalEvalExecuteException(exc, stdout) from exc
         else:
             stdout = output_buffer.getvalue()
             return stdout, r

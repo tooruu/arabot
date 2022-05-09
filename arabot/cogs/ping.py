@@ -20,7 +20,7 @@ class Ping(Cog, category=Category.META):
         self.log.append(round(self.ara.latency * 1000))
 
     @store.before_loop
-    async def wait(self):
+    async def ensure_ready(self):
         await self.ara.wait_until_ready()
 
     @command(brief="View Discord server's connectivity")
@@ -30,7 +30,7 @@ class Ping(Cog, category=Category.META):
         await ctx.send(f"🏓 Pong - {ctx.ara.latency * 1000:.0f}ms", file=image)
 
     def plot_graph(self):
-        Y_PADDING = 5
+        y_padding = 5
         x, y = range(self.log.maxlen), self.log
         ax = plt.subplots(figsize=(3, 1))[1]
         plt.plot(x, y, linewidth=0.5)
@@ -40,7 +40,7 @@ class Ping(Cog, category=Category.META):
         plt.ylabel("Ping (ms)", fontsize=7)
         plt.xlabel("The last hour", fontsize=8)
         ax.set_xlim(x[0], x[-1])
-        ax.set_ylim(min(set(y) - {0} or [Y_PADDING]) - Y_PADDING, max(y) + Y_PADDING)
+        ax.set_ylim(min(set(y) - {0} or [y_padding]) - y_padding, max(y) + y_padding)
         ax.get_yaxis().set_major_locator(MaxNLocator(integer=True, nbins=5))
         plt.fill_between(x, y, color="cyan", alpha=0.45)
 

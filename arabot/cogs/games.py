@@ -8,13 +8,13 @@ import disnake
 from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
 from disnake.ext import commands
 
-COLUMN_EMOJI = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣")
+COLUMN_EMOJI = "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"
 CANCEL_EMOJI = "🚪"
 BACKGROUND = "⚫"
-TOKENS = ("🟡", "🔴", "🟠", "🟣", "🟤", "🔵", "⚪")
+TOKENS = "🟡", "🔴", "🟠", "🟣", "🟤", "🔵", "⚪"
 LAST_COLUMN_INDICATOR = "⬇️"
 FILLER = "➖"  # ⬛
-BOARD_EMOJI = (*COLUMN_EMOJI, CANCEL_EMOJI, BACKGROUND, LAST_COLUMN_INDICATOR, FILLER)
+BOARD_EMOJI = *COLUMN_EMOJI, CANCEL_EMOJI, BACKGROUND, LAST_COLUMN_INDICATOR, FILLER
 
 
 class Connect4Engine:
@@ -39,7 +39,7 @@ class Connect4Engine:
         if self._next_up != player:
             return self.WRONG_PLAYER
 
-        # Invalid Column
+        # Invalid column
         if not 1 <= column <= 7:
             return self.INVALID_MOVE
 
@@ -54,15 +54,8 @@ class Connect4Engine:
         self._state[next_empty] = 1 if player == self._player1 else 2
         winning_move = self._check_4_in_a_row(next_empty)
         if winning_move:
-            if player == self._player1:
-                return self.PLAYER1_WINNER
-            else:
-                return self.PLAYER2_WINNER
-        else:
-            if self._state.count(0) == 0:
-                return self.DRAW
-            else:
-                return self.MOVE_ACCEPTED
+            return self.PLAYER1_WINNER if player == self._player1 else self.PLAYER2_WINNER
+        return self.MOVE_ACCEPTED if 0 in self._state else self.DRAW
 
     def _check_4_in_a_row(self, last_added):
         target_value = self._state[last_added]
@@ -82,7 +75,7 @@ class Connect4Engine:
             -8: min(space_up, space_left),
         }
 
-        in_a_row = dict()
+        in_a_row = {}
         for direction, distance in directions.items():
             distance = min(distance, 3)
             current = last_added
@@ -139,7 +132,7 @@ class Connect4Game(Connect4Engine):
             content = ""
 
         for line in range(6):
-            line_state = self.state[line * 7 : (line + 1) * 7]
+            line_state = self.state[line * 7 : (line + 1) * 7]  # noqa: E203
             content += "".join(str(self.tokens[x]) for x in line_state) + "\n"
 
         content += "".join(COLUMN_EMOJI)
@@ -258,7 +251,7 @@ class Connect4(Cog, category=Category.GAMES):
 
         elif reaction.message.id in self.active_games:
             game, message = self.active_games[reaction.message.id]
-            if game.next_up != user or reaction.emoji not in (*COLUMN_EMOJI, CANCEL_EMOJI):
+            if game.next_up != user or reaction.emoji not in {*COLUMN_EMOJI, CANCEL_EMOJI}:
                 await message.remove_reaction(reaction.emoji, user)
                 return
 
@@ -267,7 +260,7 @@ class Connect4(Cog, category=Category.GAMES):
                 return
 
             result = game.play_move(user, COLUMN_EMOJI.index(reaction.emoji) + 1)
-            if result in (game.PLAYER1_WINNER, game.PLAYER2_WINNER, game.DRAW):
+            if result in {game.PLAYER1_WINNER, game.PLAYER2_WINNER, game.DRAW}:
                 await self.finish_game(game, message, result)
             elif result == 0:
                 await message.edit(embed=game.get_embed())
@@ -281,30 +274,28 @@ class TicTacToeButton(disnake.ui.Button):
         self.x = x
         self.y = y
 
-    async def callback(self, interaction: disnake.MessageInteraction):
+    async def callback(self, inter: disnake.MessageInteraction):
         view: TicTacToe = self.view
         if view.board[self.y][self.x] is not None:
             return
 
         if view.current_player is None:
             if view.p1 is None:
-                if interaction.author == view.p2:
-                    await interaction.response.send_message("It's not your turn!", ephemeral=True)
+                if inter.author == view.p2:
+                    await inter.response.send_message("It's not your turn!", ephemeral=True)
                     return
-                view.p1 = view.current_player = interaction.author
+                view.p1 = view.current_player = inter.author
             else:
-                if interaction.author == view.p1:
-                    await interaction.response.send_message("It's not your turn!", ephemeral=True)
+                if inter.author == view.p1:
+                    await inter.response.send_message("It's not your turn!", ephemeral=True)
                     return
-                view.p2 = view.current_player = interaction.author
+                view.p2 = view.current_player = inter.author
 
-        if view.current_player != interaction.author:
-            if interaction.author in (view.p1, view.p2):
-                await interaction.response.send_message("It's not your turn!", ephemeral=True)
+        if view.current_player != inter.author:
+            if inter.author in {view.p1, view.p2}:
+                await inter.response.send_message("It's not your turn!", ephemeral=True)
             else:
-                await interaction.response.send_message(
-                    "You are not part of this game!", ephemeral=True
-                )
+                await inter.response.send_message("You are not part of this game!", ephemeral=True)
             return
 
         if view.current_player is view.p1:
@@ -335,10 +326,10 @@ class TicTacToeButton(disnake.ui.Button):
 
             view.stop()
 
-        await interaction.response.edit_message(content=content, view=view)
+        await inter.response.edit_message(content, view=view)
         if loser:
-            await interaction.followup.send(f"{loser.mention} loser has been muted for 1 minute!")
-            await interaction.channel.temp_mute_member(loser, reason="Tic Tac Toe loser")
+            await inter.followup.send(f"{loser.mention} loser has been muted for 1 minute!")
+            await inter.channel.temp_mute_member(loser, reason="Tic Tac Toe loser")
 
 
 class TicTacToe(disnake.ui.View):
@@ -367,14 +358,14 @@ class TicTacToe(disnake.ui.View):
             if self.board[0][line] is self.board[1][line] is self.board[2][line]:
                 return self.board[0][line]
 
-        # Check diagonals
+        # Check diagonal
         if (
             self.board[0][2] is self.board[1][1] is self.board[2][0]
             or self.board[0][0] is self.board[1][1] is self.board[2][2]
         ):
             return self.board[1][1]
 
-        # Check if a tie was made
+        # Check tie
         if all(cell for row in self.board for cell in row):
             return True
 
@@ -435,6 +426,7 @@ class Games(Cog, category=Category.GAMES):
                     )
                 except ValueError:
                     return False
+            return False
 
         async def voting():
             while True:
@@ -469,18 +461,18 @@ class Games(Cog, category=Category.GAMES):
 
     @commands.check(
         lambda msg: (vc := getattr(msg.author.voice, "channel", None))
-        and [m.bot for m in vc.members].count(False) > 2
+        and [m.bot for m in vc.members].count(False) > 2  # pylint: disable=used-before-assignment
     )
     @commands.command(aliases=["impostor", "impasta"])
     @commands.cooldown(1, 120, commands.BucketType.guild)
     async def imposter(self, ctx: Context):
-        VOTE_TIMEOUT = 20
+        vote_timeout = 20
 
         # Initializing
         vc = ctx.author.voice.channel
         await ctx.send(CustomEmoji.KONODIODA)
         await ctx.send(
-            f"You have {VOTE_TIMEOUT} seconds to find the imposter!\n"
+            f"You have {vote_timeout} seconds to find the imposter!\n"
             "*Ping the person you think the imposter is to vote*"
         )
 
@@ -511,7 +503,7 @@ class Games(Cog, category=Category.GAMES):
                 voted.append(vote.author)
 
         try:
-            await asyncio.wait_for(voting(), timeout=VOTE_TIMEOUT)
+            await asyncio.wait_for(voting(), timeout=vote_timeout)
         except asyncio.TimeoutError:
             pass
 

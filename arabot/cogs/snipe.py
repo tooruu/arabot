@@ -109,7 +109,7 @@ class Snipe(Cog, category=Category.FUN):
         await ctx.send(embed=embed)
 
     @purge.before_loop
-    async def wait(self):
+    async def ensure_ready(self):
         await self.ara.wait_until_ready()
 
     def cog_unload(self):

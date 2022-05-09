@@ -1,40 +1,40 @@
 import re
 
+import disnake
 from arabot.core import AnyEmoji, AnyMember, Ara, Category, Cog, Context
 from arabot.core.utils import bold
-from disnake import ButtonStyle, Embed, Forbidden, MessageInteraction, ui
-from disnake.ext.commands import BucketType, PartialEmojiConverter, command, cooldown
+from disnake.ext import commands
 
 
-class Avatar(ui.View):
+class Avatar(disnake.ui.View):
     def __init__(self, avatars):
         super().__init__(timeout=None)
         self.avatars = avatars
 
-    @ui.button(label="Default", style=ButtonStyle.blurple)
-    async def user_avatar(self, button: ui.Button, interaction: MessageInteraction):
-        await interaction.response.edit_message(embed=self.avatars[0])
+    @disnake.ui.button(label="Default", style=disnake.ButtonStyle.blurple)
+    async def user_avatar(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+        await inter.response.edit_message(embed=self.avatars[0])
 
-    @ui.button(label="Server", style=ButtonStyle.blurple)
-    async def server_avatar(self, button: ui.Button, interaction: MessageInteraction):
-        await interaction.response.edit_message(embed=self.avatars[1])
+    @disnake.ui.button(label="Server", style=disnake.ButtonStyle.blurple)
+    async def server_avatar(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+        await inter.response.edit_message(embed=self.avatars[1])
 
 
 class General(Cog, category=Category.GENERAL):
     def __init__(self, ara: Ara):
         self.ara = ara
 
-    @command(aliases=["a", "pfp"], brief="Show user's avatar")
+    @commands.command(aliases=["a", "pfp"], brief="Show user's avatar")
     async def avatar(self, ctx: Context, *, target: AnyMember = False):
         if target is None:
             await ctx.send("User not found")
             return
         target = target or ctx.author
         avatars = (
-            Embed()
+            disnake.Embed()
             .set_image(url=target.avatar.compat.url)
             .set_footer(text=f"{target.display_name}'s user avatar"),
-            Embed()
+            disnake.Embed()
             .set_image(url=target.display_avatar.compat.url)
             .set_footer(text=f"{target.display_name}'s server avatar"),
         )
@@ -45,25 +45,25 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.send(embed=avatars[1], view=Avatar(avatars))
 
-    @command(aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)")
+    @commands.command(aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)")
     async def emoji(self, ctx: Context, *emojis: AnyEmoji):
         emojis = list(dict.fromkeys(e for e in emojis if e))[:10]
         if not emojis:
             await ctx.send("No emojis found")
             return
-        embed = Embed()
+        embed = disnake.Embed()
         for e in emojis:
             embed.add_field(name=e, value=f"[{e.name}]({e.url})", inline=False)
         await ctx.reply(embed=embed)
 
-    @command(aliases=["r"], brief="Express your reaction with a big emoji")
+    @commands.command(aliases=["r"], brief="Express your reaction with a big emoji")
     async def react(self, ctx: Context, emoji: AnyEmoji | None):
         if not emoji:
             await ctx.send("Emoji not found")
             return
         await ctx.message.delete()
         await ctx.send(
-            embed=Embed()
+            embed=disnake.Embed()
             .set_image(url=emoji.url)
             .set_footer(
                 text="reacted",
@@ -71,8 +71,8 @@ class General(Cog, category=Category.GENERAL):
             )
         )
 
-    @cooldown(1, 60, BucketType.member)
-    @command(brief="DM user to summon them")
+    @commands.cooldown(1, 60, commands.BucketType.member)
+    @commands.command(brief="DM user to summon them")
     async def summon(self, ctx: Context, target: AnyMember = False, *, msg=None):
         if target is False:
             ctx.reset_cooldown()
@@ -90,25 +90,23 @@ class General(Cog, category=Category.GENERAL):
             ctx.reset_cooldown()
             await ctx.send(f"{target.mention} doesn't have access to this channel")
             return
-        invite = await ctx.guild.get_unlimited_invite() or Embed.Empty
-        embed = Embed(
+        invite = await ctx.guild.get_unlimited_invite() or disnake.Embed.Empty
+        embed = disnake.Embed(
             description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}"
-            "\n{}\n[Jump to message]({})".format(
-                f"\n{bold(msg)}" if msg else "", ctx.message.jump_url
-            )
+            "\n%s\n[Jump to message](%s)" % (f"\n{bold(msg)}" if msg else "", ctx.message.jump_url)
         ).set_author(
             name=ctx.guild.name,
             url=invite,
-            icon_url=ctx.guild.icon.compat.url if ctx.guild.icon else Embed.Empty,
+            icon_url=ctx.guild.icon.compat.url if ctx.guild.icon else disnake.Embed.Empty,
         )
         try:
             await target.send(embed=embed)
-        except Forbidden:
+        except disnake.Forbidden:
             await ctx.send(f"Cannot send messages to {target.mention}")
         else:
             await ctx.send(f"Summoning {target.mention}")
 
-    @command(brief="Show users's banner")
+    @commands.command(brief="Show users's banner")
     async def banner(self, ctx: Context, target: AnyMember = False):
         if target is None:
             await ctx.send("User not found")
@@ -119,12 +117,12 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send("User has no banner")
             return
         await ctx.send(
-            embed=Embed()
+            embed=disnake.Embed()
             .set_image(url=banner.compat.with_size(4096).url)
             .set_footer(text=target.display_name + "'s banner")
         )
 
-    @command(brief="Suggest server emoji")
+    @commands.command(brief="Suggest server emoji")
     async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after=None):
         if em_before not in ctx.guild.emojis:
             await ctx.send("Choose a valid server emoji to replace")
@@ -145,7 +143,8 @@ class General(Cog, category=Category.GENERAL):
                     await ctx.send(f"Link a valid image to replace {em_before} with")
                     return
         elif re.fullmatch(r"<a?:\w{2,32}:\d{18,22}>", em_after, re.ASCII):
-            if (emoji := await PartialEmojiConverter().convert(ctx, em_after)) in ctx.guild.emojis:
+            emoji = await commands.PartialEmojiConverter().convert(ctx, em_after)
+            if emoji in ctx.guild.emojis:
                 await ctx.send(f"We already have {em_after}")
                 return
             em_after = emoji.url
@@ -157,7 +156,7 @@ class General(Cog, category=Category.GENERAL):
             await ctx.message.delete()
 
         embed = (
-            Embed(title="wants to change this →", description="to that ↓")
+            disnake.Embed(title="wants to change this →", description="to that ↓")
             .set_thumbnail(url=em_before.url)
             .set_image(url=em_after)
             .set_author(
@@ -170,7 +169,7 @@ class General(Cog, category=Category.GENERAL):
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 
-    @command(brief="Make Ara say something")
+    @commands.command(brief="Make Ara say something")
     async def say(self, ctx: Context, *, msg):
         await ctx.message.delete()
         await ctx.send(msg)

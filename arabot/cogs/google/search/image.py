@@ -54,7 +54,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
                         continue
                     image = await resp.read()
             except Exception as e:
-                logging.error(f"{e}\nFailed image: {image_url}")
+                logging.error("%s\nFailed image: %s", e, image_url)
             else:
                 image = BytesIO(image)
                 filename = self.extract_filename(resp)

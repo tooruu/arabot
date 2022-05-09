@@ -36,8 +36,8 @@ def search_directory(path) -> Generator[str, None, None]:
 
     yield from map(with_prefix, modules)
     yield from map(with_prefix, packages)
-    for dir in dirs:
-        yield from search_directory(path / dir)
+    for directory in dirs:
+        yield from search_directory(path / directory)
 
 
 class Ara(commands.Bot):
@@ -106,53 +106,58 @@ class Ara(commands.Bot):
             try:
                 self.load_extension(module)
             except commands.ExtensionFailed as e:
-                logging.error(f"Failed to load {short}", exc_info=e.original)
+                logging.error("Failed to load %s", short, exc_info=e.original)
             except commands.NoEntryPointError:
-                logging.error(f"No entry point in {short}")
+                logging.error("No entry point in %s", short)
             except commands.ExtensionNotFound:
-                logging.error(f"Module not found: {short}")
+                logging.error("Module not found: %s", short)
             else:
-                logging.info(f"Loaded {short}")
+                logging.info("Loaded %s", short)
 
-    async def on_command_error(self, ctx: Context, error: disnake.DiscordException) -> None:
-        if hasattr(ctx.command, "on_error"):
+    async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
+        if hasattr(context.command, "on_error"):
             return
 
-        match error:
+        match exception:
             case commands.CommandOnCooldown():
-                if error.retry_after > 60:
-                    remaining = strfdelta(timedelta(seconds=error.retry_after))
+                if exception.retry_after > 60:
+                    remaining = strfdelta(timedelta(seconds=exception.retry_after))
                 else:
-                    remaining = f"{error.retry_after:.0f} seconds"
-                await ctx.reply(f"Cooldown expires in {remaining}")
+                    remaining = f"{exception.retry_after:.0f} seconds"
+                await context.reply(f"Cooldown expires in {remaining}")
             case commands.DisabledCommand():
-                await ctx.reply("This command is disabled!")
+                await context.reply("This command is disabled!")
             case commands.MaxConcurrencyReached(number=n):
-                await ctx.reply(
+                await context.reply(
                     "Another instance of this command is already running"
                     if n == 1
                     else f"{n} instances of this command are already running"
                 )
             case commands.MissingPermissions():
-                if not ctx.command.hidden:
-                    await ctx.reply("Missing permissions")
+                if not context.command.hidden:
+                    await context.reply("Missing permissions")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
-            ) if ctx.cog.qualified_name in ("GSearch", "ImageSearch", "Translate", "TextToSpeech"):
+            ) if context.cog.qualified_name in {
+                "GSearch",
+                "ImageSearch",
+                "Translate",
+                "TextToSpeech",
+            }:
                 match status:
                     case 403:
-                        await ctx.reply(
-                            f"{mono(ctx.invoked_with)} doesn't work without "
-                            f"cloud-billing,\nask `{self.owner}` to enable it."
+                        await context.reply(
+                            f"{mono(context.invoked_with)} doesn't work without "
+                            f"cloud-billing,\nask `{mono(self.owner)}` to enable it."
                         )
                     case 429:
-                        await ctx.send(
-                            f"Sorry, I've exceeded today's quota for {mono(ctx.invoked_with)}"
+                        await context.send(
+                            f"Sorry, I've exceeded today's quota for {mono(context.invoked_with)}"
                         )
             case commands.MissingRequiredArgument():
-                await ctx.reply("Missing required argument")
+                await context.reply("Missing required argument")
             case commands.UserInputError():
-                await ctx.reply("Invalid argument")
+                await context.reply("Invalid argument")
             case (
                 commands.CommandNotFound()
                 | commands.CheckFailure()
@@ -160,8 +165,8 @@ class Ara(commands.Bot):
             ):
                 pass
             case _:
-                logging.error("Unhandled exception", exc_info=error)
-                await ctx.reply("An error occurred")
+                logging.error("Unhandled exception", exc_info=exception)
+                await context.reply("An error occurred")
 
     async def on_ready(self) -> None:
         logging.info(system_info())

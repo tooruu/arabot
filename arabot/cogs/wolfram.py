@@ -43,7 +43,9 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
                     embed.add_field(
                         name="Input",
                         value=f"[{dsafe(pod['subpods'][0]['plaintext'])}]"
-                        f"(https://www.wolframalpha.com/input/?i={quote(pod['subpods'][0]['plaintext'], safe='')})",
+                        # pylint: disable=consider-using-f-string
+                        + "(https://www.wolframalpha.com/input/?i=%s)"
+                        % quote(pod["subpods"][0]["plaintext"], safe=""),
                     )
                 if "primary" in pod:
                     embed.add_field(

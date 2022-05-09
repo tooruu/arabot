@@ -48,10 +48,10 @@ class AraHelp(MinimalHelpCommand):
         await self.get_destination().send(embed=embed)
 
     def get_opening_note(self):
-        command_name = self.invoked_with
+        command_repr = self.context.clean_prefix + self.invoked_with
         return (
-            f"Use `{self.context.clean_prefix}{command_name} [command]` for more info on a command.\n"
-            f"You can also use `{self.context.clean_prefix}{command_name} [category]` for more info on a category."
+            f"Use `{command_repr} [command]` for more info on a command.\n"
+            f"You can also use `{command_repr} [category]` for more info on a category."
         )
 
     def get_ending_note(self):

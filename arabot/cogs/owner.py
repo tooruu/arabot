@@ -2,10 +2,10 @@ import logging
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, Awaitable, TypeVar
 
+import disnake
 from arabot.core import Ara, Cog, Color, Context
-from disnake import Activity, ActivityType, Embed
 from disnake.ext import commands
 
 _T = TypeVar("_T")
@@ -18,7 +18,7 @@ class CommandAlreadyEnabled(commands.CommandError):
 
 
 class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
-    async def cog_check(self, ctx: Context):
+    async def cog_check(self, ctx: Context):  # pylint: disable=invalid-overridden-method
         return await ctx.ara.is_owner(ctx.author)
 
     @commands.command(
@@ -42,10 +42,10 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
     @commands.command()
     async def presence(self, ctx: Context, act_type="", *, act_name=""):
         acts = {
-            "playing": ActivityType.playing,
-            "listening": ActivityType.listening,
-            "watching": ActivityType.watching,
-            "competing": ActivityType.competing,
+            "playing": disnake.ActivityType.playing,
+            "listening": disnake.ActivityType.listening,
+            "watching": disnake.ActivityType.watching,
+            "competing": disnake.ActivityType.competing,
         }
 
         if act_type and act_type not in acts:
@@ -56,7 +56,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
             await ctx.send("You must specify name of activity")
             return
 
-        act = Activity(type=acts[act_type], name=act_name) if act_type else None
+        act = disnake.Activity(type=acts[act_type], name=act_name) if act_type else None
         await ctx.ara.change_presence(activity=act)
         await ctx.tick()
 
@@ -66,7 +66,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         self.COGS_PATH = ara._cogs_path
         self.COGS_PATH_DOTTED = ".".join(Path(self.COGS_PATH).parts)
 
-    async def cog_check(self, ctx: Context):
+    async def cog_check(self, ctx: Context):  # pylint: disable=invalid-overridden-method
         return await ctx.ara.is_owner(ctx.author)
 
     @commands.group(invoke_without_command=True)
@@ -76,7 +76,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     @ext.command(name="list")
     async def ext_list(self, ctx: Context):
         trim_amount = len(Path(self.COGS_PATH).parts)
-        embed = Embed(color=Color.yellow).add_field(
+        embed = disnake.Embed(color=Color.yellow).add_field(
             name="Extensions",
             value="\n".join(module.split(".", trim_amount)[-1] for module in ctx.bot.extensions),
         )
@@ -146,14 +146,13 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             CommandAlreadyEnabled: "Already enabled",
         }
 
-        def enable(command):
-            if cmd := ctx.ara.get_command(command):
-                if cmd.enabled:
-                    raise CommandAlreadyEnabled
-                else:
-                    cmd.enabled = True
-            else:
+        def enable(cmd: str):
+            command = ctx.ara.get_command(cmd)
+            if not command:
                 raise commands.CommandNotFound
+            if command.enabled:
+                raise CommandAlreadyEnabled
+            command.enabled = True
 
         await self.do_action_group_format_embed_send(enable, cmds, statuses, ctx.send)
 
@@ -169,14 +168,13 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             commands.DisabledCommand: "Already disabled",
         }
 
-        def disable(command):
-            if cmd := ctx.ara.get_command(command):
-                if cmd.enabled:
-                    cmd.enabled = False
-                else:
-                    raise commands.DisabledCommand
-            else:
+        def disable(cmd: str):
+            command = ctx.ara.get_command(cmd)
+            if not command:
                 raise commands.CommandNotFound
+            if not command.enabled:
+                raise commands.DisabledCommand
+            command.enabled = False
 
         await self.do_action_group_format_embed_send(disable, cmds, statuses, ctx.send)
 
@@ -190,14 +188,14 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             try:
                 action(arg)
             except Exception as e:
-                logging.info(f"{type(e)} raised for {arg}")
+                logging.info("%s raised for %s", type(e), arg)
                 mapping[type(e)].append(arg)
             else:
                 mapping[None].append(arg)
         return mapping
 
     @staticmethod
-    def embed_add_groups(embed: Embed, groups: dict[str, list[str]]) -> Embed:
+    def embed_add_groups(embed: disnake.Embed, groups: dict[str, list[str]]) -> disnake.Embed:
         for field, items in groups.items():
             if items:
                 embed.add_field(name=field, value="\n".join(items))
@@ -212,15 +210,15 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         action: Callable[[_T], Any],
         arguments: Iterable[_T],
         exc_repr: dict[Exception | None, str],
-        send,
-    ) -> Embed:
+        sender: Callable[..., Awaitable[disnake.Message]],
+    ) -> None:
         grouped = self.group_by_exc_raised(action, arguments)
         merged = self.merge_dict_values(grouped, exc_repr)
-        embed = self.embed_add_groups(Embed(), merged)
+        embed = self.embed_add_groups(disnake.Embed(), merged)
         if embed.fields:
-            await send(embed=embed)
+            await sender(embed=embed)
         else:
-            await send("No items provided")
+            await sender("No items provided")
 
 
 def setup(ara: Ara):

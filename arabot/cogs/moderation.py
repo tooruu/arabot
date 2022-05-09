@@ -45,7 +45,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
         else:
             with suppress(disnake.Forbidden):
                 await bad_msg.add_reaction("🤫")
-            await bad_msg.reply(f"{bad_msg.author.mention} was muted for 1 minute")
+            await bad_msg.reply(f"{bad_msg.author.mention} has been muted for 1 minute")
             await bad_msg.temp_channel_mute_author()
         finally:
             with suppress(disnake.NotFound):

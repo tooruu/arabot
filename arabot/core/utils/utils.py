@@ -21,22 +21,24 @@ def system_info() -> str:
     match platform.system():
         case "Windows":
             os_info = platform.uname()
-            os_ver = "{0.system} {0.release} (version {0.version})".format(os_info)
+            os_ver = f"{os_info.system} {os_info.release} (version {os_info.version})"
         case "Darwin":
             os_info = platform.mac_ver()
-            os_ver = "Mac OSX {0[0]} {0[1]}".format(os_info)
+            os_ver = f"Mac OSX {os_info[0]} {os_info[1]}"
         case "Linux":
             try:
-                import distro  # pyright: reportMissingImports=false
+                # pyright: reportMissingImports=false
+                # pylint: disable=import-outside-toplevel
+                import distro
             except ModuleNotFoundError:
                 os_info = platform.uname()
-                os_ver = "{0[0]} {0[2]}".format(os_info)
+                os_ver = f"{os_info[0]} {os_info[2]}"
             else:
                 os_info = distro.linux_distribution()
-                os_ver = "{0[0]} {0[1]}".format(os_info)
+                os_ver = f"{os_info[0]} {os_info[1]}"
         case _:
             os_info = platform.uname()
-            os_ver = "{0[0]} {0[2]}".format(os_info)
+            os_ver = f"{os_info[0]} {os_info[2]}"
 
     return f"""Debug Info:
 
@@ -79,7 +81,7 @@ class Lockable:
                     delattr(self, key)
 
 
-class stdin_from(_RedirectStream):
+class stdin_from(_RedirectStream):  # noqa: N801
     _stream = "stdin"
 
 

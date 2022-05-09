@@ -165,7 +165,8 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     )
                     embed.description = f"Similarity: {header['similarity']}%"
                     match data.get("creator"):
-                        case str() as c if c not in ("", "Unknown"):
+                        # pylint: disable=used-before-assignment
+                        case str() as c if c not in {"", "Unknown"}:
                             embed.set_author(name=c)
                         case list() as c if c != ["Unknown"]:
                             embed.set_author(name=", ".join(c))
@@ -173,7 +174,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                         raise KeyError
                     embed.set_image(url=header["thumbnail"])
         except KeyError:
-            logging.error(f"Sauce failed: {pformat(data)}")
+            logging.error("Sauce failed: %s", pformat(data))
             data["similarity"] = header["similarity"]
             raw_data = "\n".join(f"{k}: {v}" for k, v in data.items())
             embed.description = (

@@ -104,7 +104,9 @@ class Context(commands.Context):
 
 
 class Cog(commands.Cog):
-    def __init_subclass__(cls, category: Category = None, keys: Iterable[str] = (), **kwargs):
+    def __init_subclass__(
+        cls, category: Category | None = None, keys: Iterable[str] = (), **kwargs
+    ):
         cls.category = category
         for key_name, key in zip(keys, getkeys(*keys)):
             setattr(cls, key_name, key)
@@ -146,7 +148,7 @@ async def connect_play_disconnect(
     try:
         vc = await self.connect()
     except Exception:
-        logging.warning(f"Could not connect to voice channel {self!r}")
+        logging.warning("Could not connect to voice channel %r", self)
         return
 
     disconnect = lambda _: vc.loop.create_task(vc.disconnect(force=force_disconnect))
