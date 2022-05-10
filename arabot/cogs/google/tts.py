@@ -82,7 +82,7 @@ class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
                 "voice": {"languageCode": lang},
                 "audioConfig": {
                     "audioEncoding": encoding,
-                    "sampleRateHertz": 96000,  # somehow fixes high-pitched voice
+                    "sampleRateHertz": 96000,  # Somehow fixes high-pitched voice
                 },
             },
         )

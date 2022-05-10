@@ -108,7 +108,7 @@ class ChannelTimers(Cog):
         self.ara = ara
         self.update_channels.start()
 
-    @loop(minutes=5)  # rate limit: 2 updates per 10 mins
+    @loop(minutes=5)  # Rate limit: 2 updates per 10 mins
     async def update_channels(self):
         for chl_id, timer_info in self.timers.items():
             fmt, timer = timer_info

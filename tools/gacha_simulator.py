@@ -18,9 +18,9 @@ from gacha.utils.entity_provider_utils import get_item, get_item_rank, get_item_
 
 # ::: Usage examples :::
 # Pull 10 items from the "foca" supply:
-# python .\bot\tools\gacha_simulator.py foca
+# python tools/gacha_simulator.py foca
 # Pull 100 items from the "foca" supply, consolidate and sort them:
-# python .\bot\tools\gacha_simulator.py -c -s foca 100
+# python tools/gacha_simulator.py -c -s foca 100
 
 DATABASE_FILE_PATH = "resources/database.json"
 LOG_LEVEL = LogLevel.INFORMATION

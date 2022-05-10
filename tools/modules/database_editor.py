@@ -19,7 +19,7 @@ class DatabaseEditor:
         self.logs_enabled = True
 
     # TODO Make the argument parser more obvious, because specifying the "names" argument here makes no sense.
-    # python arabot/tools/database_editor.py listtables all
+    # python tools/database_editor.py listtables all
     def list_tables(self, options) -> bool:
         """Lists the names of the tables available in the database."""
         for table_id in self.database.keys():
