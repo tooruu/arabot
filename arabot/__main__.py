@@ -40,6 +40,7 @@ def create_ara(*args, **kwargs) -> Ara:
         command_prefix=prefix_manager,
         embed_color=0xE91E63,
         intents=intents,
+        max_messages=10_000,
     )
     if TESTING:
         default_kwargs |= dict(
