@@ -375,33 +375,43 @@ class TicTacToe(disnake.ui.View):
 class Games(Cog, category=Category.GAMES):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.rr_bullet_pos = random.randint(1, 6)
-        self.rr_use_count = 0
-        deque_factory = partial(deque, maxlen=2)
-        self.rr_last_deaths: dict[int, deque[int]] = defaultdict(deque_factory)
+        self.rr_barrel: dict[int, int] = defaultdict(lambda: [1, random.randint(1, 6)])
+        self.rr_last_user: dict[int, int] = {}
+        self.rr_last_deaths: dict[int, deque[int]] = defaultdict(partial(deque, maxlen=2))
 
     @commands.command(name="rr", brief="People get killed here, careful")
-    @commands.cooldown(1, 10, commands.BucketType.channel)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     async def russian_roulette(self, ctx: Context):
-        self.rr_use_count += 1
-        if self.rr_use_count != self.rr_bullet_pos:
+        if self.rr_last_user.get(ctx.guild.id) == ctx.author.id:
+            await ctx.reply("You have to pass the gun to someone else")
+            return
+
+        self.rr_last_user[ctx.guild.id] = ctx.author.id
+        barrel = self.rr_barrel[ctx.guild.id]
+        if barrel[0] != barrel[1]:
+            barrel[0] += 1
             await ctx.reply("_\\*click*_")
             return
-        self.rr_bullet_pos = random.randint(1, 6)
-        self.rr_use_count = 0
 
-        cache = self.rr_last_deaths[ctx.channel.id]
-        if cache.count(ctx.author.id) < cache.maxlen:
-            ctx.command._buckets.update_rate_limit(
-                ctx.message, ctx.message.created_at.timestamp() + 60
-            )
-            cache.append(ctx.author.id)
-            await ctx.reply("**BOOM**")
+        del self.rr_barrel[ctx.guild.id]
+        del self.rr_last_user[ctx.guild.id]
+        ctx.command._buckets.update_rate_limit(ctx.message, ctx.message.created_at.timestamp() + 60)
+
+        last_deaths = self.rr_last_deaths[ctx.guild.id]
+        if last_deaths.count(ctx.author.id) < last_deaths.maxlen:
+            last_deaths.append(ctx.author.id)
+            await ctx.reply("***BOOM***")  # TODO: Make it look better, maybe with an emoji or a gif
+            await ctx.send("Cooling down and reloading barrel...")
             await ctx.temp_channel_mute_author(reason="Russian Roulette")
-        else:  # Same user loses 3 times in a row
-            cache.clear()
-            await ctx.reply("***__BIG BOOM__***")
+            return
+
+        # Same user loses 3 times in a row
+        last_deaths.clear()
+        await ctx.reply("***__KABOOM__***")
+        try:
             await ctx.author.kick(reason="Russian Roulette")
+        except disnake.Forbidden:
+            await ctx.temp_channel_mute_author(180, reason="Russian Roulette")
 
     @commands.command(brief="Guess a number")
     @commands.cooldown(1, 90, commands.BucketType.channel)
