@@ -58,6 +58,30 @@ class Chat(Cog):
         await msg.channel.send(f"{game_name}? Ебать ты гей 🤡, иди в мут нахуй")
         await msg.temp_channel_mute_author(20, "геюга ебаная")
 
+    @pfxless(regex=r"\b(communis[mt]|gulag)\b")
+    @commands.cooldown(1, 60, commands.BucketType.channel)
+    async def communism(self, msg: disnake.Message):
+        gulag = """
+bbbbbbbbbbbbbbb
+bbbbbbbbcbbbbbb
+bbbbbccbccbbbbb
+bbbbcccbbccbbbb
+bbbccccbbbccbbb
+bccccccbbbbccbb
+bbccbcccbbbcccb
+
+bbbbbbcccbbbccb
+bbbbbbbcccbcccb
+bbbbcbbbcccccbb
+bbbcccbbbcccbbb
+bcccbccccccccbb
+bccbbbcccbbccbb
+bbbbbbbbbbbbbbb
+"""
+        for camp in gulag.split("\n\n"):
+            camp = camp.replace("b", "🅱️").replace("c", CustomEmoji.CommuThink)
+            await msg.channel.send(camp)
+
 
 def setup(ara: Ara):
     ara.add_cog(Chat(ara))

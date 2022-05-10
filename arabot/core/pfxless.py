@@ -67,6 +67,7 @@ class pfxless:  # noqa: N801
             self.pattern = rf"\b{func.__name__.replace('_', ' ')}\b"
 
         if self.plain_text_only:
+            # For now this only checks if word containing pattern is not adjacent to a colon
             self.pattern = rf"(?<![:\w])(?:{self.pattern})(?![:\w])"  # TODO: exclude mentions too
 
         self.event = self.wrap_callback(func)
