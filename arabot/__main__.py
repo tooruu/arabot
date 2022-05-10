@@ -73,7 +73,8 @@ def main():
         loop.run_until_complete(ara.close())
     finally:
         loop.run_until_complete(loop.shutdown_asyncgens())
-        loop.run_until_complete(asyncio.sleep(1))  # fixes RuntimeError on Windows w/ Proactor loop
+        if isinstance(loop, asyncio.ProactorEventLoop):
+            loop.run_until_complete(asyncio.sleep(1))  # Fixes RuntimeError on Windows
         asyncio.set_event_loop(None)
         loop.stop()
         loop.close()
