@@ -14,13 +14,13 @@ class Color:
 
 
 class CustomEmoji:
-    KONODIODA = "<:KonoDioDa:937687826693251102>"
-    TERICELEBRATE = "<:TeriCelebrate:937695453506596906>"
-    FUKAWHY = "<:FukaWhy:937695447626182676>"
-    TOORUWEARY = "<:TooruWeary:937695447487774743>"
-    KANNAPAT = "<:KannaPat:937695447718453248>"
-    MEISTARE = "<:MeiStare:937695447932370994>"
-    KANNASTARE = "<:KannaStare:971188689428443276>"
+    KonoDioDa = "<:KonoDioDa:937687826693251102>"
+    TeriCelebrate = "<:TeriCelebrate:937695453506596906>"
+    FukaWhy = "<:FukaWhy:937695447626182676>"
+    TooruWeary = "<:TooruWeary:937695447487774743>"
+    KannaPat = "<:KannaPat:937695447718453248>"
+    MeiStare = "<:MeiStare:937695447932370994>"
+    KannaStare = "<:KannaStare:971188689428443276>"
 
 
 class Category:

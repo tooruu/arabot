@@ -455,7 +455,7 @@ class Games(Cog, category=Category.GAMES):
             f"{winner.mention} "
             + ("guessed" if exact_guess else "was the closest to")
             + f" number {number}\n"
-            f"Enjoy your 1 minute mute! {CustomEmoji.TERICELEBRATE}"
+            f"Enjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}"
         )
         await ctx.channel.temp_mute_member(winner, reason="Guessed the number")
 
@@ -470,7 +470,7 @@ class Games(Cog, category=Category.GAMES):
 
         # Initializing
         vc = ctx.author.voice.channel
-        await ctx.send(CustomEmoji.KONODIODA)
+        await ctx.send(CustomEmoji.KonoDioDa)
         await ctx.send(
             f"You have {vote_timeout} seconds to find the imposter!\n"
             "*Ping the person you think the imposter is to vote*"

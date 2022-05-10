@@ -29,7 +29,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
     @command()
     @has_permissions(manage_channels=True)
     async def mutenext(self, ctx: Context, timeout: int | None = 60, *, pattern: str):
-        await ctx.message.add_reaction(CustomEmoji.KANNASTARE)
+        await ctx.message.add_reaction(CustomEmoji.KannaStare)
 
         def bad_msg_check(msg: disnake.Message):
             return (
@@ -49,7 +49,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             await bad_msg.temp_channel_mute_author()
         finally:
             with suppress(disnake.NotFound):
-                await ctx.message.remove_reaction(CustomEmoji.KANNASTARE, ctx.me)
+                await ctx.message.remove_reaction(CustomEmoji.KannaStare, ctx.me)
 
 
 def setup(ara: Ara):

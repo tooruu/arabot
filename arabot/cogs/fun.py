@@ -34,14 +34,14 @@ class Fun(Cog, category=Category.FUN):
                     break
             else:
                 return
-        for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FUKAWHY:
+        for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
             await msg.add_reaction(i)
 
     @commands.message_command(name="Who asked?")
     async def whoasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
         await inter.response.send_message("Adding reactions", ephemeral=True)
         try:
-            for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FUKAWHY:
+            for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
             await (await inter.original_message()).edit("I don't have permission to add reactions")
@@ -58,14 +58,14 @@ class Fun(Cog, category=Category.FUN):
                     break
             else:
                 return
-        for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TOORUWEARY:
+        for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
             await msg.add_reaction(i)
 
     @commands.message_command(name="Who cares?")
     async def whocares(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
         await inter.response.send_message("Adding reactions", ephemeral=True)
         try:
-            for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TOORUWEARY:
+            for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
             await (await inter.original_message()).edit("I don't have permission to add reactions")

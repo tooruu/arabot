@@ -23,7 +23,7 @@ class Chat(Cog):
 
     @pfxless(regex=";-;")
     async def cry(self, msg):
-        await msg.reply(f"don't cry {CustomEmoji.KANNAPAT}")
+        await msg.reply(f"don't cry {CustomEmoji.KannaPat}")
 
     @pfxless()
     @commands.cooldown(1, 60, commands.BucketType.channel)
@@ -33,7 +33,7 @@ class Chat(Cog):
         temp_perms.send_messages = False
         try:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
-            await msg.channel.send(CustomEmoji.KONODIODA)
+            await msg.channel.send(CustomEmoji.KonoDioDa)
             msgs = []
             msgs.append(await msg.channel.send("***Toki yo tomare!***"))
             for i in "Ichi", "Ni", "San", "Yon", "Go":
