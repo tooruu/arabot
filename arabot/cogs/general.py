@@ -138,7 +138,7 @@ class General(Cog, category=Category.GENERAL):
             em_after = ctx.message.attachments[0].url
 
         if re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", em_after):
-            async with ctx.session.get(em_after) as resp:
+            async with ctx.ara.session.get(em_after) as resp:
                 if not (resp.ok and resp.content_type.startswith("image/")):
                     await ctx.send(f"Link a valid image to replace {em_before} with")
                     return
