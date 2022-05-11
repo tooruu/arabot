@@ -40,7 +40,7 @@ class Snipe(Cog, category=Category.FUN):
         }
 
     @command(brief="View deleted messages within the last hour")
-    async def snipe(self, ctx: Context, target: AnyMember | False = False):
+    async def snipe(self, ctx: Context, target: AnyMember = False):
         if target is None:
             await ctx.send("User not found")
             return
@@ -86,7 +86,7 @@ class Snipe(Cog, category=Category.FUN):
         await ctx.send(embed=embed)
 
     @command(brief="View the last deleted message")
-    async def last(self, ctx: Context, target: AnyMember | False = False):
+    async def last(self, ctx: Context, target: AnyMember = False):
         if target is None:
             await ctx.send("User not found")
             return

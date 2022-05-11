@@ -45,7 +45,7 @@ class NicknameSnipe(Cog, category=Category.FUN):
                     {
                         member_id: [
                             (nick, changed_at)
-                            for nick, changed_at in nicks[-self.MAX_NICKS :]
+                            for nick, changed_at in nicks[-self.MAX_NICKS :]  # noqa: E203
                             if (now - changed_at).days < self.PURGE_AFTER_DAYS
                         ]
                         for member_id, nicks in members.items()
@@ -57,13 +57,13 @@ class NicknameSnipe(Cog, category=Category.FUN):
             },
         )
 
-    @command(aliases=["sn"], brief="View recent nick history of a user")
+    @command(aliases=["sn", "ns"], brief="View recent nick history of a user")
     async def nicksnipe(self, ctx: Context, target: AnyMember):
         if target is None:
             await ctx.send("User not found")
             return
 
-        history = self._cache.get(ctx.guild.id, {}).get(target.id)
+        history = self._cache.get(ctx.guild.id, {}).get(target.id, [])[:]
         if not history:
             await ctx.send(self.EMPTY_SNIPE_MSG.format(user=target.display_name))
             return
@@ -71,9 +71,9 @@ class NicknameSnipe(Cog, category=Category.FUN):
         if history[0][1] == history[1][1]:
             history[0] = (history[0][0], None)  # Check the comment in `on_member_update`
 
-        embed = Embed(color=0x87011D)
-        for nick, dt in history[-self.MAX_NICKS :]:
-            when_changed = f"<t:{int(dt.timestamp())}:R>" if dt else "Sometime in the past..."
+        embed = Embed()
+        for nick, dt in history[-self.MAX_NICKS :]:  # noqa: E203
+            when_changed = f"<t:{int(dt.timestamp())}:R>" if dt else "Sometime in the past"
             embed.add_field(when_changed, nick, inline=False)
 
         await ctx.send(embed=embed)
