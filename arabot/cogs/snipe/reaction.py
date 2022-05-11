@@ -12,25 +12,25 @@ class ReactionSnipe(Cog):
 
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.mapping: dict[int, dict[int, dict[int, tuple[bool, datetime]]]] = {}
-        self.purge.start()
+        self._cache: dict[int, dict[int, dict[int, tuple[bool, datetime]]]] = {}
+        self.purge_cache.start()
 
     @Cog.listener()
     async def on_reaction_add(self, reaction: Reaction, user: User):
         if await reaction.users().get(bot=True):
             return
         on_cd = (
-            self.mapping.setdefault(user.id, {})
+            self._cache.setdefault(user.id, {})
             .setdefault(reaction.message.id, {})
             .get(hash(reaction), [False])[0]
         )
-        self.mapping[user.id][reaction.message.id][hash(reaction)] = on_cd, utcnow()
+        self._cache[user.id][reaction.message.id][hash(reaction)] = on_cd, utcnow()
 
     @Cog.listener()
     async def on_reaction_remove(self, reaction: Reaction, user: User):
         now = utcnow()
         on_cd, reacted_at = (
-            self.mapping.get(user.id, {})
+            self._cache.get(user.id, {})
             .get(reaction.message.id, {})
             .get(hash(reaction), [None] * 2)
         )
@@ -41,7 +41,7 @@ class ReactionSnipe(Cog):
             return
 
         # rate limit the reaction
-        self.mapping[user.id][reaction.message.id][hash(reaction)] = True, now
+        self._cache[user.id][reaction.message.id][hash(reaction)] = True, now
         await reaction.message.reply(
             embed=(
                 Embed()
@@ -59,17 +59,17 @@ class ReactionSnipe(Cog):
         )
 
     @loop(minutes=1)
-    async def purge(self):
-        self.mapping = {
+    async def purge_cache(self):
+        self._cache = {
             user: messages
-            for user, messages in self.mapping.items()
+            for user, messages in self._cache.items()
             for message, reactions in messages.items()
             for reaction, cd__time in reactions.items()
             if utcnow() - cd__time[1] <= (self.COOLDOWN if cd__time[0] else self.THRESHOLD)
         }
 
     def cog_unload(self):
-        self.purge.cancel()
+        self.purge_cache.cancel()
 
 
 def setup(ara: Ara):
