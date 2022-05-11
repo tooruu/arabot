@@ -21,21 +21,22 @@ class Snipe(Cog, category=Category.FUN):
 
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.log: dict[int, list[RawDeletedMessage]] = {}
-        self.purge.start()
+        self._cache: dict[int, list[RawDeletedMessage]] = {}
+        self.purge_cache.start()
 
     @Cog.listener()
     async def on_message_delete(self, msg: Message):
         if not msg.author.bot and msg.content:
-            self.log.setdefault(msg.channel, []).append(RawDeletedMessage(msg))
+            self._cache.setdefault(msg.channel.id, []).append(RawDeletedMessage(msg))
 
     @loop(minutes=1)
-    async def purge(self):
-        self.log = {
-            chl: msgs
-            for chl, msgs in self.log.items()
-            for msg in msgs
-            if (utcnow() - msg.deleted_at).total_seconds() <= 3600
+    async def purge_cache(self):
+        now = utcnow()
+        self._cache = {
+            channel_id: messages
+            for channel_id, messages in self._cache.items()
+            for msg in messages
+            if (now - msg.deleted_at).total_seconds() <= 3600
         }
 
     @command(brief="View deleted messages within the last hour")
@@ -43,14 +44,15 @@ class Snipe(Cog, category=Category.FUN):
         if target is None:
             await ctx.send("User not found")
             return
-        if ctx.channel not in self.log:
+        if ctx.channel.id not in self._cache:
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
-        msg_pool = filter(
-            lambda m: m.author == target if target else True,
-            sorted(self.log[ctx.channel], key=lambda msg: msg.created_at),
+        msg_pool = list(
+            filter(
+                lambda m: not target or m.author == target,
+                sorted(self._cache[ctx.channel.id], key=lambda msg: msg.created_at)[-10:],
+            )
         )
-        msg_pool = list(msg_pool)[-10:]
         if not msg_pool:
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
@@ -88,14 +90,14 @@ class Snipe(Cog, category=Category.FUN):
         if target is None:
             await ctx.send("User not found")
             return
-        if ctx.channel not in self.log:
+        if ctx.channel.id not in self._cache:
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         try:
             last_msg = next(
                 filter(
-                    lambda m: m.author == target if target else True,
-                    reversed(self.log[ctx.channel]),
+                    lambda m: not target or m.author == target,
+                    reversed(self._cache[ctx.channel.id]),
                 )
             )
         except StopIteration:
@@ -108,12 +110,12 @@ class Snipe(Cog, category=Category.FUN):
         embed.add_field(name=field_name, value=last_msg.content[-1024:])
         await ctx.send(embed=embed)
 
-    @purge.before_loop
+    @purge_cache.before_loop
     async def ensure_ready(self):
         await self.ara.wait_until_ready()
 
     def cog_unload(self):
-        self.purge.cancel()
+        self.purge_cache.cancel()
 
 
 def setup(ara: Ara):
