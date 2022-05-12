@@ -43,7 +43,7 @@ class AraHelp(MinimalHelpCommand):
                     break
                 val += cell + " "
 
-            embed.add_field(name=utils.bold(category), value=val[:-1] or "No commands")
+            embed.add_field(utils.bold(category), val[:-1] or "No commands")
 
         await self.get_destination().send(embed=embed)
 

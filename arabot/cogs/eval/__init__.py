@@ -98,7 +98,7 @@ class Eval(Cog, category=Category.GENERAL):
         if len(value) > maxlen:
             embed.description += f"{name} trimmed to last {maxlen} characters."
         value = codeblock(value[-maxlen:], lang)
-        embed.add_field(name=name, value=value, inline=False)
+        embed.add_field(name, value, inline=False)
 
 
 def setup(ara: Ara):

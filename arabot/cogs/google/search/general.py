@@ -50,8 +50,8 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
         )
         for hit in data["items"]:
             embed.add_field(
-                name=hit["link"],
-                value=f"{bold(hit['title'])}\n{hit['snippet']}",
+                hit["link"],
+                f"{bold(hit['title'])}\n{hit['snippet']}",
                 inline=False,
             )
         await ctx.reply(embed=embed)

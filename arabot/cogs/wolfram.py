@@ -1,5 +1,5 @@
 from json import loads
-from urllib.parse import quote
+from urllib.parse import quote_plus
 
 from aiohttp import ClientSession
 from arabot.core import Ara, Category, Cog, Context
@@ -30,7 +30,7 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
         embed = Embed(
             color=0xF4684C,
             title=dsafe(query),
-            url="https://www.wolframalpha.com/input/?i=" + quote(query, safe=""),
+            url="https://wolframalpha.com/input/?i=" + quote_plus(query),
         ).set_footer(
             icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png",
             text="Wolfram|Alpha",
@@ -40,17 +40,16 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
                 embed.description = wa["warnings"]["text"]
             for pod in wa["pods"]:
                 if pod["id"] == "Recognized input":
+                    detected_input = pod["subpods"][0]["plaintext"]
                     embed.add_field(
-                        name="Input",
-                        value=f"[{dsafe(pod['subpods'][0]['plaintext'])}]"
-                        # pylint: disable=consider-using-f-string
-                        + "(https://www.wolframalpha.com/input/?i=%s)"
-                        % quote(pod["subpods"][0]["plaintext"], safe=""),
+                        "Input",
+                        f"[{dsafe(detected_input)}]"
+                        f"(https://wolframalpha.com/input/?i={quote_plus(detected_input)})",
                     )
                 if "primary" in pod:
                     embed.add_field(
-                        name="Result",
-                        value="\n".join(dsafe(subpod["plaintext"]) for subpod in pod["subpods"]),
+                        "Result",
+                        "\n".join(dsafe(subpod["plaintext"]) for subpod in pod["subpods"]),
                         inline=False,
                     )
                     break

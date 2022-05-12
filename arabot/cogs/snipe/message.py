@@ -70,7 +70,7 @@ class Snipe(Cog, category=Category.FUN):
             ):
                 field_name = f"{last_sender.display_name}, {dtformat(group_start)}:"
                 msg_group = "\n".join(msg_group)[-1024:]
-                embed.add_field(name=field_name, value=msg_group, inline=False)
+                embed.add_field(field_name, msg_group, inline=False)
                 msg_group = []
                 last_sender = msg.author
                 group_start = msg.created_at
@@ -78,7 +78,7 @@ class Snipe(Cog, category=Category.FUN):
             msg_group.append(msg.content)
         field_name = f"{last_sender.display_name}, {dtformat(group_start)}:"
         msg_group = "\n".join(msg_group)[-1024:]
-        embed.add_field(name=field_name, value=msg_group, inline=False)
+        embed.add_field(field_name, msg_group, inline=False)
         while len(embed) > 6000:
             del embed.fields[0]
         await ctx.send(embed=embed)
@@ -103,7 +103,7 @@ class Snipe(Cog, category=Category.FUN):
             return
         embed = Embed(color=0x87011D)
         field_name = f"{last_msg.author.display_name}, {dtformat(last_msg.created_at)}:"
-        embed.add_field(name=field_name, value=last_msg.content[-1024:])
+        embed.add_field(field_name, last_msg.content[-1024:])
         await ctx.send(embed=embed)
 
     @purge_cache.before_loop

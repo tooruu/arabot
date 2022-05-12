@@ -119,7 +119,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                         if len(synopsis) > (maxlen := 600):
                             synopsis = ".".join(synopsis[:maxlen].split(".")[:-1]) + "..."
                         embed.set_image(url=mal_json["image_url"])
-                        embed.add_field(name="Synopsis", value=synopsis)
+                        embed.add_field("Synopsis", synopsis)
                         embed.set_thumbnail(url=header["thumbnail"])
                     else:
                         embed.set_image(url=header["thumbnail"])

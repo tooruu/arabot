@@ -77,8 +77,8 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     async def ext_list(self, ctx: Context):
         trim_amount = len(Path(self.COGS_PATH).parts)
         embed = disnake.Embed(color=Color.yellow).add_field(
-            name="Extensions",
-            value="\n".join(module.split(".", trim_amount)[-1] for module in ctx.bot.extensions),
+            "Extensions",
+            "\n".join(module.split(".", trim_amount)[-1] for module in ctx.bot.extensions),
         )
         await ctx.send(embed=embed)
 
@@ -196,9 +196,9 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
 
     @staticmethod
     def embed_add_groups(embed: disnake.Embed, groups: dict[str, list[str]]) -> disnake.Embed:
-        for field, items in groups.items():
+        for field_name, items in groups.items():
             if items:
-                embed.add_field(name=field, value="\n".join(items))
+                embed.add_field(field_name, "\n".join(items))
         return embed
 
     @staticmethod

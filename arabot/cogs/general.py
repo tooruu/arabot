@@ -52,8 +52,8 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send("No emojis found")
             return
         embed = disnake.Embed()
-        for e in emojis:
-            embed.add_field(name=e, value=f"[{e.name}]({e.url})", inline=False)
+        for emoji in emojis:
+            embed.add_field(emoji, f"[{emoji.name}]({emoji.url})", inline=False)
         await ctx.reply(embed=embed)
 
     @commands.command(aliases=["r"], brief="Express your reaction with a big emoji")

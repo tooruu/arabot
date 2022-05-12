@@ -79,8 +79,8 @@ class Urban(Cog, category=Category.LOOKUP):
         )
 
         for result in ud[:3]:
-            d = dsafe(result["definition"].replace("[", "").replace("]", ""))[:1024]
-            embed.add_field(name=result["word"], value=d, inline=False)
+            definition = result["definition"].replace("[", "").replace("]", "")
+            embed.add_field(result["word"], dsafe(definition)[:1024], inline=False)
         await ctx.send(embed=embed)
 
     @pfxless(regex=QUERY_PREFIX + rf"((?:(?!{WORDS_IGNORE}).)*?)\??$")

@@ -53,12 +53,11 @@ FACEIT membership type: {player["membership_type"]}""",
             skill_level = player["games"][game]["skill_level"]
             elo = player["games"][game]["faceit_elo"]
             embed.add_field(
-                name=game.replace("_", " ").upper(),
-                value=f"""Player name: {player_name}
-Region: {region}
-Skill level: {skill_level}
-ELO: {elo}""",
-                inline=True,
+                game.replace("_", " ").upper(),
+                f"Player name: {player_name}\n"
+                f"Region: {region}\n"
+                f"Skill level: {skill_level}\n"
+                f"ELO: {elo}",
             )
         await ctx.send(embed=embed)
 

@@ -40,8 +40,8 @@ class Translate(Cog, category=Category.LOOKUP):
         translation, _ = await self.gtrans.translate(text, target[0], source[0])
         embed = (
             Embed()
-            .add_field(name=self.format_lang(source), value=dsafe(text)[:1024])
-            .add_field(name=self.format_lang(target), value=dsafe(translation)[:1024], inline=False)
+            .add_field(self.format_lang(source), dsafe(text)[:1024])
+            .add_field(self.format_lang(target), dsafe(translation)[:1024], inline=False)
         )
         await ctx.send(embed=embed)
 
