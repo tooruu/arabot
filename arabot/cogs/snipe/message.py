@@ -1,4 +1,5 @@
 from arabot.core import AnyMember, Ara, Category, Cog, Context
+from arabot.core.utils import dtformat
 from disnake import Embed, Message
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
@@ -57,7 +58,6 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
-        now = utcnow()
         msg_group = []
         last_sender = msg_pool[0].author
         group_tail = msg_pool[0].created_at
@@ -68,8 +68,7 @@ class Snipe(Cog, category=Category.FUN):
                 msg.author != last_sender
                 or (msg.created_at - group_tail).seconds >= self.GROUP_AGE_THRESHOLD
             ):
-                minutes_passed = (now - group_start).seconds // 60
-                field_name = f"{last_sender.display_name}, {minutes_passed}m ago:"
+                field_name = f"{last_sender.display_name}, {dtformat(group_start)}:"
                 msg_group = "\n".join(msg_group)[-1024:]
                 embed.add_field(name=field_name, value=msg_group, inline=False)
                 msg_group = []
@@ -77,8 +76,7 @@ class Snipe(Cog, category=Category.FUN):
                 group_start = msg.created_at
             group_tail = msg.created_at
             msg_group.append(msg.content)
-        minutes_passed = (now - group_start).seconds // 60
-        field_name = f"{last_sender.display_name}, {minutes_passed}m ago:"
+        field_name = f"{last_sender.display_name}, {dtformat(group_start)}:"
         msg_group = "\n".join(msg_group)[-1024:]
         embed.add_field(name=field_name, value=msg_group, inline=False)
         while len(embed) > 6000:
@@ -104,9 +102,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
-        minutes_passed = (utcnow() - last_msg.created_at).seconds // 60
-        last_sender = last_msg.author.display_name
-        field_name = f"{last_sender}, {minutes_passed}m ago:"
+        field_name = f"{last_msg.author.display_name}, {dtformat(last_msg.created_at)}:"
         embed.add_field(name=field_name, value=last_msg.content[-1024:])
         await ctx.send(embed=embed)
 

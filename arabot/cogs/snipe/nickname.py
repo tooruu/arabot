@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from arabot.core import AnyMember, Ara, Category, Cog, Context
+from arabot.core.utils import dtformat
 from disnake import Embed, Member
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
@@ -72,8 +73,8 @@ class NicknameSnipe(Cog, category=Category.FUN):
             history[0] = (history[0][0], None)  # Check the comment in `on_member_update`
 
         embed = Embed()
-        for nick, dt in history[-self.MAX_NICKS :]:  # noqa: E203
-            when_changed = f"<t:{int(dt.timestamp())}:R>" if dt else "Sometime in the past"
+        for nick, changed_at in history[-self.MAX_NICKS :]:  # noqa: E203
+            when_changed = dtformat(changed_at) if changed_at else "Sometime in the past"
             embed.add_field(when_changed, nick, inline=False)
 
         await ctx.send(embed=embed)
