@@ -102,9 +102,9 @@ class General(Cog, category=Category.GENERAL):
         try:
             await target.send(embed=embed)
         except disnake.Forbidden:
-            await ctx.send(f"Cannot send messages to {target.mention}")
+            await ctx.send_mention(f"Cannot send messages to {target.mention}")
         else:
-            await ctx.send(f"Summoning {target.mention}")
+            await ctx.send_mention(f"Summoning {target.mention}")
 
     @commands.command(brief="Show users's banner")
     async def banner(self, ctx: Context, target: AnyMember = False):

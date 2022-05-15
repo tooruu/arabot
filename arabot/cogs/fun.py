@@ -84,9 +84,7 @@ class Fun(Cog, category=Category.FUN):
         if not target:
             return
         invis = "||\u200b||" * 198 + " _" * 6
-        await ctx.send(
-            f"{msg} {invis} {target.mention}", allowed_mentions=disnake.AllowedMentions.all()
-        )
+        await ctx.send_mention(f"{msg} {invis} {target.mention}")
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context, *, question=" "):

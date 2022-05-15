@@ -4,6 +4,7 @@ import logging
 import re
 from asyncio import sleep
 from collections.abc import Iterable
+from functools import partialmethod
 
 import aiohttp
 import disnake
@@ -101,6 +102,11 @@ class Context(commands.Context):
             return False
         self.command.reset_cooldown(self)
         return True
+
+    reply_mention = partialmethod(reply, allowed_mentions=disnake.AllowedMentions.all())
+    send_mention = partialmethod(
+        commands.Context.send, allowed_mentions=disnake.AllowedMentions.all()
+    )
 
 
 class Cog(commands.Cog):
