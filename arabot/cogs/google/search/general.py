@@ -46,8 +46,9 @@ class GSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse", "g_y
         embed = Embed(
             title="Google search results",
             description="Showing top 3 search results",
-            url="https://google.com/search?q=" + quote_plus(query),
+            url=f"https://google.com/search?q={quote_plus(query)}",
         )
+
         for hit in data["items"]:
             embed.add_field(
                 hit["link"],

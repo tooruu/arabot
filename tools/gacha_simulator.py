@@ -114,9 +114,10 @@ class GachaSimulator:
         if sort:
             pulls = sorted(pulls, key=lambda pull: pull.name)
         formatted_pulls = [
-            "{} x{}{}".format(pull.name, pull.count, " (Rare)" if pull.is_rare else "")
+            f'{pull.name} x{pull.count}{" (Rare)" if pull.is_rare else ""}'
             for pull in pulls
         ]
+
         logging.info(
             "The supply '{}' provided the following items {}".format(
                 self._pull_provider.get_pool_name(supply_type),

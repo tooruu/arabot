@@ -59,8 +59,7 @@ class Main:
         operation = self._operations.get(options.operation)
         if operation is not None:
             logging.info(f"Invoking operation '{options.operation}'...")
-            has_database_changed = operation(options)
-            if has_database_changed:
+            if has_database_changed := operation(options):
                 self._save_database()
             logging.info(f"Operation '{options.operation}' finished.")
         else:

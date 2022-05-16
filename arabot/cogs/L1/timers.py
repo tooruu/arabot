@@ -42,10 +42,14 @@ class Timer:
     @property
     def status(self) -> str | None:
         next_phase = self.next_phase
-        for tup in self.sched[next_phase.isoweekday()]:
-            if tup[0] == next_phase.timetz():
-                return tup[1]
-        return None
+        return next(
+            (
+                tup[1]
+                for tup in self.sched[next_phase.isoweekday()]
+                if tup[0] == next_phase.timetz()
+            ),
+            None,
+        )
 
 
 class ChannelTimers(Cog):
