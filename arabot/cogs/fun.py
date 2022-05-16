@@ -83,8 +83,9 @@ class Fun(Cog, category=Category.FUN):
         await ctx.message.delete()
         if not target:
             return
-        invis = "||\u200b||" * 198 + " _" * 6
-        await ctx.send_mention(f"{msg} {invis} {target.mention}")
+        invis_bug = "||\u200b||" * 198 + "_ _"
+        if len(message := msg + invis_bug + target.mention) <= 2000:
+            await ctx.send_mention(message)
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context, *, question=" "):
