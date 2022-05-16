@@ -3,6 +3,7 @@ import random
 import re
 from collections import defaultdict, deque
 from functools import partial
+from itertools import product
 
 import disnake
 from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
@@ -341,9 +342,8 @@ class TicTacToe(disnake.ui.View):
             [None, None, None],
         ]
 
-        for x in range(3):
-            for y in range(3):
-                self.add_item(TicTacToeButton(x, y))
+        for x, y in product(range(3), range(3)):
+            self.add_item(TicTacToeButton(x, y))
 
     def check_board_winner(self) -> disnake.abc.User | bool:
         # Check horizontal
