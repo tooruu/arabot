@@ -41,9 +41,7 @@ class RemoteEval(Evaluator):
     async def run(self, code: str, *, stdin: str | None = None) -> tuple[str, None]:
         data = await self.fetch_response(code, stdin=stdin or self.stdin)
         stdout = data["stdout"]
-        exit_code = data["code"]
-
-        if exit_code:
+        if exit_code := data["code"]:
             raise errors.RemoteEvalException(data["stderr"], stdout, exit_code)
 
         return stdout, None

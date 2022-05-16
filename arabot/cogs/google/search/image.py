@@ -32,10 +32,11 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
             params={
                 "key": self.g_isearch_key,
                 "cx": self.g_cse,
-                "q": query + " -filetype:svg",
+                "q": f"{query} -filetype:svg",
                 "searchType": "image",
             },
         )
+
         return data.get("items", [])
 
     async def filtered(self, images: list[dict]) -> disnake.File:
