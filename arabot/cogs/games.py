@@ -52,8 +52,7 @@ class Connect4Engine:
     def _apply_move(self, player, column):
         next_empty = self._find_next_empty(column)
         self._state[next_empty] = 1 if player == self._player1 else 2
-        winning_move = self._check_4_in_a_row(next_empty)
-        if winning_move:
+        if self._check_4_in_a_row(next_empty):
             return self.PLAYER1_WINNER if player == self._player1 else self.PLAYER2_WINNER
         return self.MOVE_ACCEPTED if 0 in self._state else self.DRAW
 
@@ -90,11 +89,7 @@ class Connect4Engine:
 
     def _find_next_empty(self, column):
         current = column - 1
-        while True:
-            if current + 7 > 41:
-                break
-            if self._state[current + 7]:
-                break
+        while current <= 34 and not self._state[current + 7]:
             current += 7
         return current
 
@@ -173,7 +168,7 @@ class Connect4(Cog, category=Category.GAMES):
         self.waiting_games[message.id] = (message, player1, token)
         await message.clear_reaction(token)
         content = message.content.split("\n")[0]
-        await message.edit(content + f" - They have chosen {token}\nPick a color to join")
+        await message.edit(f"{content} - They have chosen {token}\nPick a color to join")
 
     async def start_game(
         self,
@@ -234,9 +229,8 @@ class Connect4(Cog, category=Category.GAMES):
                 if emoji == CANCEL_EMOJI:
                     await self.cancel_invite(message)
                     return
-                if emoji not in BOARD_EMOJI and isinstance(emoji, str):
-                    if p1_token is None:
-                        await self.p1_token_pick(message, emoji)
+                if emoji not in BOARD_EMOJI and isinstance(emoji, str) and p1_token is None:
+                    await self.p1_token_pick(message, emoji)
 
             elif p1_token:
                 emoji = reaction.emoji
@@ -301,17 +295,16 @@ class TicTacToeButton(disnake.ui.Button):
         if view.current_player is view.p1:
             self.style = disnake.ButtonStyle.red
             self.label = "X"
-            self.disabled = True
             view.board[self.y][self.x] = view.p1
             view.current_player = view.p2
             content = f"It is now {view.p2.mention if view.p2 else 'O'}'s turn"
         else:
             self.style = disnake.ButtonStyle.green
             self.label = "O"
-            self.disabled = True
             view.board[self.y][self.x] = view.p2
             view.current_player = view.p1
             content = f"It is now {view.p1.mention}'s turn"
+        self.disabled = True
 
         loser = None
         if winner := view.check_board_winner():

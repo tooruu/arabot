@@ -41,7 +41,7 @@ class AraHelp(MinimalHelpCommand):
                     cell = f"[{cell}](http://. '{cmd.brief}')"
                 if len(val + cell) > 1024:
                     break
-                val += cell + " "
+                val += f"{cell} "
 
             embed.add_field(utils.bold(category), val[:-1] or "No commands")
 
@@ -77,7 +77,7 @@ class Meta(Cog, category=Category.META):
                 scope=" ".join(["bot", "applications.commands"]),
             )
         )
-        return "https://discord.com/oauth2/authorize?" + params
+        return f"https://discord.com/oauth2/authorize?{params}"
 
     def __get_line_count(self):
         count = 0

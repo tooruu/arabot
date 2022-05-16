@@ -43,19 +43,17 @@ class ReactionSnipe(Cog):
         # rate limit the reaction
         self._cache[user.id][reaction.message.id][hash(reaction)] = True, now
         await reaction.message.reply(
-            embed=(
-                Embed()
-                .set_author(
-                    name=user.display_name,
-                    icon_url=user.display_avatar.compat.url,
-                )
-                .set_image(
-                    url=Twemoji(reaction.emoji).url
-                    if isinstance(reaction.emoji, str)
-                    else reaction.emoji.url + "?size=64"
-                )
-                .set_footer(text="Sniped reaction")
+            embed=Embed()
+            .set_author(
+                name=user.display_name,
+                icon_url=user.display_avatar.compat.url,
             )
+            .set_image(
+                url=Twemoji(reaction.emoji).url
+                if isinstance(reaction.emoji, str)
+                else f"{reaction.emoji.url}?size=64"
+            )
+            .set_footer(text="Sniped reaction")
         )
 
     @loop(minutes=1)

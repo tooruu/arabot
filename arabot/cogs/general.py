@@ -155,8 +155,8 @@ class General(Cog, category=Category.GENERAL):
         if not ctx.message.attachments:
             await ctx.message.delete()
 
-        embed = (
-            disnake.Embed(title="wants to change this →", description="to that ↓")
+        message = await ctx.send(
+            embed=disnake.Embed(title="wants to change this →", description="to that ↓")
             .set_thumbnail(url=em_before.url)
             .set_image(url=em_after)
             .set_author(
@@ -164,8 +164,6 @@ class General(Cog, category=Category.GENERAL):
                 icon_url=ctx.author.avatar.compat.url,
             )
         )
-
-        message = await ctx.send(embed=embed)
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 

@@ -19,7 +19,7 @@ class Chat(Cog):
     @pfxless(regex=r"^([ıi](['’]?m|\sam)\s)+((an?|the)\s)?\w+$", chance=0.5)
     async def im_hi(self, msg: disnake.Message):
         regex = re.match(r"(?:[ıi](?:['’]?m|\sam)\s)+(?:(?:an?|the)\s)?(\w+)", msg.content.lower())
-        await msg.channel.send("hi " + regex.group(1))
+        await msg.channel.send(f"hi {regex[1]}")
 
     @pfxless(regex=";-;")
     async def cry(self, msg):
@@ -34,8 +34,7 @@ class Chat(Cog):
         try:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
             await msg.channel.send(CustomEmoji.KonoDioDa)
-            msgs = []
-            msgs.append(await msg.channel.send("***Toki yo tomare!***"))
+            msgs = [await msg.channel.send("***Toki yo tomare!***")]
             for i in "Ichi", "Ni", "San", "Yon", "Go":
                 await sleep(1.5)
                 msgs.append(await msg.channel.send(f"*{i} byou keika*"))
@@ -54,7 +53,7 @@ class Chat(Cog):
     @pfxless(regex=BAD_GAMES)
     @is_in_guild(433298614564159488)
     async def badgames(self, msg: disnake.Message):
-        game_name = self.BAD_GAMES.search(msg.content).group()
+        game_name = self.BAD_GAMES.search(msg.content)[0]
         await msg.channel.send(f"{game_name}? Ебать ты гей 🤡, иди в мут нахуй")
         await msg.temp_channel_mute_author(20, "геюга ебаная")
 

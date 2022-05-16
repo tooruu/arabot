@@ -20,7 +20,7 @@ def setup_logging():
 async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
     pfx_pattern = r"a; *" if TESTING else rf"; *|ara +|<@!?{ara.user.id}> *"
     if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
-        return found.group()
+        return found[0]
 
 
 def create_ara(*args, **kwargs) -> Ara:

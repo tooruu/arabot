@@ -49,9 +49,7 @@ class LocalEvalException(EvalException):
                 frame._line = source[frame.lineno - 1]
             tb_repl_frames.append(frame)
         tb.stack = traceback.StackSummary.from_list(tb_repl_frames)
-        tb_formatted = "".join(tb.format(chain=False))
-
-        return tb_formatted
+        return "".join(tb.format(chain=False))
 
 
 class LocalEvalCompileException(LocalEvalException):
@@ -72,13 +70,12 @@ class RemoteEvalException(EvalException):
         self.exit_code = exit_code
 
     def format(self, *, filename: str = Evaluator.TB_FILENAME) -> str:
-        tb_formatted = re.sub(
+        return re.sub(
             r'(?<=^ {2}File ")/piston/jobs/[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}/[^/]+?(?=")',
             filename,
             self.error,
             flags=re.ASCII | re.MULTILINE,
         )
-        return tb_formatted
 
 
 class RemoteEvalBadResponse(Exception):

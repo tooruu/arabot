@@ -34,7 +34,7 @@ class DatabaseEditor:
             raise ValueError("The item type must be specified.")
         if len(options.names) == 0:
             return False
-        for _, item_name in enumerate(options.names):
+        for item_name in options.names:
             item_id = self._add_item_internal(item_name, options.type, options.rank, options.single)
             self._log(f"Added item '{item_name}' with identifier '{item_id}'.")
         return True
@@ -54,7 +54,7 @@ class DatabaseEditor:
     def delete_item(self, options) -> bool:
         table = self.database.setdefault(TABLE_ITEMS, {})
         has_changed = False
-        for _, name in enumerate(options.names):
+        for name in options.names:
             if not options.field and table.pop(name, None):
                 has_changed = True
                 self._log(f"Deleted item '{name}'.")
@@ -108,7 +108,7 @@ class DatabaseEditor:
     def remove_pool(self, options) -> bool:
         table = self.database.setdefault(TABLE_POOLS, {})
         has_changed = False
-        for _, name in enumerate(options.names):
+        for name in options.names:
             pool_id = self._find_id_by_field(TABLE_POOLS, "code", name)
             if pool_id is None:
                 self._log(f"The pool '{name}' doesn't exist.")
@@ -146,7 +146,7 @@ class DatabaseEditor:
         item_list = matching_descriptor.get("items")
         if item_list is None:
             matching_descriptor["items"] = item_list = []
-        for _, name in enumerate(options.names):
+        for name in options.names:
             item_id = self._find_item_id(name)
             if item_id is None:
                 self._log(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
@@ -185,7 +185,7 @@ class DatabaseEditor:
             raise ValueError("The specified pool doesn't exist.")
         loot_table = pool.setdefault("loot_table", [])
         has_changed = False
-        for _, name in enumerate(options.names):
+        for name in options.names:
             item_id = self._find_item_id(name)
             if item_id is None:
                 self._log(f"Item '{name}' doesn't exist, hence it won't be added to the pool.")
@@ -218,7 +218,7 @@ class DatabaseEditor:
             raise ValueError("The specified pool doesn't exist.")
         loot_table = pool.setdefault("loot_table", [])
         has_changed = False
-        for old_item_name, new_item_name in zip(options.names[0::2], options.names[1::2]):
+        for old_item_name, new_item_name in zip(options.names[::2], options.names[1::2]):
             if not self._replace_pool_item(loot_table, old_item_name, new_item_name):
                 continue
             has_changed = True
@@ -241,7 +241,7 @@ class DatabaseEditor:
             for item_id in descriptor.get("items", []):
                 item = items.get(item_id, {})
                 item_names.append(item.get("name", "Unknown item"))
-            self._log("Rate '{}': {}".format(rate, ", ".join(item_names)))
+            self._log(f"Rate '{rate}': {', '.join(item_names)}")
         self._log(f"Total drop rate is '{self._get_pool_total_rate(options.names[0])}'.")
         return False
 
