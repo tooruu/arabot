@@ -9,7 +9,7 @@ from disnake.ext.commands import command
 class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.session = ClientSession(headers={"Authorization": "Bearer " + self.faceit_key})
+        self.session = ClientSession(headers={"Authorization": f"Bearer {self.faceit_key}"})
 
     @command(brief="View player's FACEIT profile")
     async def faceit(self, ctx: Context, nickname):

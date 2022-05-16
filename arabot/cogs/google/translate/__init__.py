@@ -28,9 +28,9 @@ class Translate(Cog, category=Category.LOOKUP):
         if not source:
             detected = await self.gtrans.detect(text)
             source = self.find_lang(detected, langs)
-            if not source:
-                await ctx.send("Couldn't detect language")
-                return
+        if not source:
+            await ctx.send("Couldn't detect language")
+            return
 
         target = target or self.DEFAULT_TARGET
         if source == target:
@@ -38,12 +38,11 @@ class Translate(Cog, category=Category.LOOKUP):
             return
 
         translation, _ = await self.gtrans.translate(text, target[0], source[0])
-        embed = (
-            Embed()
+        await ctx.send(
+            embed=Embed()
             .add_field(self.format_lang(source), dsafe(text)[:1024])
             .add_field(self.format_lang(target), dsafe(translation)[:1024], inline=False)
         )
-        await ctx.send(embed=embed)
 
     def parse_query(
         self, query: str, langs: list[LangCodeAndOrName]
@@ -92,7 +91,7 @@ class Translate(Cog, category=Category.LOOKUP):
 
         field_name = lang[0].upper()
         if lang[1:]:
-            field_name += " - " + lang[1].title()
+            field_name += f" - {lang[1].title()}"
         return field_name
 
     def cog_unload(self) -> None:

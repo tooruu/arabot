@@ -30,7 +30,7 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
         embed = Embed(
             color=0xF4684C,
             title=dsafe(query),
-            url="https://wolframalpha.com/input/?i=" + quote_plus(query),
+            url=f"https://wolframalpha.com/input/?i={quote_plus(query)}",
         ).set_footer(
             icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png",
             text="Wolfram|Alpha",
