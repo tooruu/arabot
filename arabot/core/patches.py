@@ -120,9 +120,11 @@ class Cog(commands.Cog):
 
 
 async def get_unlimited_invite(self: disnake.Guild) -> str | None:
-    for i in await self.invites():
-        if i.max_age == 0 and i.max_uses == 0:
-            return i.url
+    try:
+        invites = await self.invites()
+    except disnake.Forbidden:
+        return None
+    return next(filter(lambda i: i.max_age == 0 and i.max_uses == 0, invites), None)
 
 
 async def temp_mute_channel_member(
