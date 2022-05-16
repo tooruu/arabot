@@ -103,7 +103,17 @@ class Fun(Cog, category=Category.FUN):
             ctx.reset_cooldown()
             await ctx.send("User not found")
             return
-        if ctx.author.top_role < target.top_role:
+        if target == ctx.author:
+            ctx.reset_cooldown()
+            await ctx.send("Cannot rename yourself")
+            return
+
+        # Get highest role that has at least one permission to exclude dummy roles e.g. colors
+        get_top_role = lambda r: r.permissions.value != 0 or r == ctx.guild.default_role
+        author_role = next(filter(get_top_role, reversed(ctx.author.roles)))
+        target_role = next(filter(get_top_role, reversed(target.roles)))
+
+        if author_role < target_role:
             ctx.reset_cooldown()
             await ctx.send("Cannot rename users ranked higher than you")
             return
