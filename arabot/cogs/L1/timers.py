@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 from arabot.core import Ara, Cog
 from arabot.core.utils import strfdelta
-from disnake import Forbidden, HTTPException
+from disnake import HTTPException
 from disnake.ext.tasks import loop
 
 
@@ -43,12 +43,9 @@ class Timer:
     def status(self) -> str | None:
         next_phase = self.next_phase
         return next(
-            (
-                tup[1]
-                for tup in self.sched[next_phase.isoweekday()]
-                if tup[0] == next_phase.timetz()
-            ),
-            None,
+            status_name
+            for when, status_name in self.sched[next_phase.isoweekday()]
+            if when == next_phase.timetz()
         )
 
 
@@ -121,7 +118,7 @@ class ChannelTimers(Cog):
             channel = self.ara.get_channel(chl_id)
             try:
                 await channel.edit(name=name)
-            except (Forbidden, HTTPException):
+            except HTTPException:
                 pass
 
     @update_channels.before_loop

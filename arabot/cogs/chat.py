@@ -19,7 +19,7 @@ class Chat(Cog):
     @pfxless(regex=r"^([ıi](['’]?m|\sam)\s)+((an?|the)\s)?\w+$", chance=0.5)
     async def im_hi(self, msg: disnake.Message):
         regex = re.match(r"(?:[ıi](?:['’]?m|\sam)\s)+(?:(?:an?|the)\s)?(\w+)", msg.content.lower())
-        await msg.channel.send("hi " + regex[1])
+        await msg.channel.send(f"hi {regex[1]}")
 
     @pfxless(regex=";-;")
     async def cry(self, msg):

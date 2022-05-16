@@ -115,9 +115,9 @@ class Fun(Cog, category=Category.FUN):
             return
 
         # Get highest role that has at least one permission to exclude dummy roles e.g. colors
-        get_top_role = lambda r: r.permissions.value != 0 or r == ctx.guild.default_role
-        author_role = next(filter(get_top_role, reversed(ctx.author.roles)))
-        target_role = next(filter(get_top_role, reversed(target.roles)))
+        get_top_role = lambda r: r.permissions.value != 0
+        author_role = next(filter(get_top_role, reversed(ctx.author.roles)), ctx.guild.default_role)
+        target_role = next(filter(get_top_role, reversed(target.roles)), ctx.guild.default_role)
 
         if author_role < target_role:
             ctx.reset_cooldown()

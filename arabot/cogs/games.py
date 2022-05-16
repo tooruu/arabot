@@ -52,7 +52,7 @@ class Connect4Engine:
     def _apply_move(self, player, column):
         next_empty = self._find_next_empty(column)
         self._state[next_empty] = 1 if player == self._player1 else 2
-        if winning_move := self._check_4_in_a_row(next_empty):
+        if self._check_4_in_a_row(next_empty):
             return self.PLAYER1_WINNER if player == self._player1 else self.PLAYER2_WINNER
         return self.MOVE_ACCEPTED if 0 in self._state else self.DRAW
 
@@ -168,9 +168,7 @@ class Connect4(Cog, category=Category.GAMES):
         self.waiting_games[message.id] = (message, player1, token)
         await message.clear_reaction(token)
         content = message.content.split("\n")[0]
-        await message.edit(
-            f"{content} - They have chosen {token}\nPick a color to join"
-        )
+        await message.edit(f"{content} - They have chosen {token}\nPick a color to join")
 
     async def start_game(
         self,
@@ -231,11 +229,7 @@ class Connect4(Cog, category=Category.GAMES):
                 if emoji == CANCEL_EMOJI:
                     await self.cancel_invite(message)
                     return
-                if (
-                    emoji not in BOARD_EMOJI
-                    and isinstance(emoji, str)
-                    and p1_token is None
-                ):
+                if emoji not in BOARD_EMOJI and isinstance(emoji, str) and p1_token is None:
                     await self.p1_token_pick(message, emoji)
 
             elif p1_token:
@@ -310,8 +304,8 @@ class TicTacToeButton(disnake.ui.Button):
             view.board[self.y][self.x] = view.p2
             view.current_player = view.p1
             content = f"It is now {view.p1.mention}'s turn"
-
         self.disabled = True
+
         loser = None
         if winner := view.check_board_winner():
             if winner is True:

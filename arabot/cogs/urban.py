@@ -78,19 +78,15 @@ class Urban(Cog, category=Category.LOOKUP):
             url=f"https://www.urbandictionary.com/define.php?term={quote_plus(term)}",
         )
 
-
         for result in ud[:3]:
             definition = result["definition"].replace("[", "").replace("]", "")
             embed.add_field(result["word"], dsafe(definition)[:1024], inline=False)
         await ctx.send(embed=embed)
 
-    @pfxless(regex=f"{QUERY_PREFIX}((?:(?!{WORDS_IGNORE}).)*?)\\??$")
+    @pfxless(regex=rf"{QUERY_PREFIX}((?:(?!{WORDS_IGNORE}).)*?)\??$")
     async def urban_listener(self, msg):
         if self.urban.enabled:
-            term = re.search(
-                self.QUERY_PREFIX + r"(.*?)\??$", msg.content, re.IGNORECASE
-            )[1]
-
+            term = re.search(rf"{self.QUERY_PREFIX}(.*?)\??$", msg.content, re.IGNORECASE)[1]
             await self.urban(await self.ara.get_context(msg), term=term)
 
 

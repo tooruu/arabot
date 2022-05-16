@@ -35,7 +35,6 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
             icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png",
             text="Wolfram|Alpha",
         )
-
         if wa["success"]:
             if "warnings" in wa:
                 embed.description = wa["warnings"]["text"]

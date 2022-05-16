@@ -241,7 +241,7 @@ class DatabaseEditor:
             for item_id in descriptor.get("items", []):
                 item = items.get(item_id, {})
                 item_names.append(item.get("name", "Unknown item"))
-            self._log(f"""Rate '{rate}': {", ".join(item_names)}""")
+            self._log(f"Rate '{rate}': {', '.join(item_names)}")
         self._log(f"Total drop rate is '{self._get_pool_total_rate(options.names[0])}'.")
         return False
 

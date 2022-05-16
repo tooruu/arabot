@@ -38,12 +38,11 @@ class Translate(Cog, category=Category.LOOKUP):
             return
 
         translation, _ = await self.gtrans.translate(text, target[0], source[0])
-        embed = (
-            Embed()
+        await ctx.send(
+            embed=Embed()
             .add_field(self.format_lang(source), dsafe(text)[:1024])
             .add_field(self.format_lang(target), dsafe(translation)[:1024], inline=False)
         )
-        await ctx.send(embed=embed)
 
     def parse_query(
         self, query: str, langs: list[LangCodeAndOrName]
@@ -81,14 +80,9 @@ class Translate(Cog, category=Category.LOOKUP):
 
     @staticmethod
     def find_lang(string: str, langs: list[LangCodeAndOrName]) -> LangCodeAndOrName | None:
-        return (
-            find(
-                lambda lang: re.fullmatch("|".join(lang), string, re.IGNORECASE),
-                langs,
-            )
-            if string
-            else None
-        )
+        if not string:
+            return None
+        return find(lambda lang: re.fullmatch("|".join(lang), string, re.IGNORECASE), langs)
 
     @staticmethod
     def format_lang(lang: LangCodeAndOrName) -> str:
