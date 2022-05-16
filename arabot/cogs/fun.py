@@ -76,7 +76,12 @@ class Fun(Cog, category=Category.FUN):
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):
         member = choice(ctx.channel.members)
-        await ctx.reply(member.mention)
+        user_profile = disnake.Embed().set_author(
+            name=member.display_name,
+            icon_url=member.avatar.compat.icon.url,
+            url=f"https://discord.com/users/{member.id}",
+        )
+        await ctx.reply(embed=user_profile)
 
     @commands.command(aliases=["gp"], brief="Secretly ping a person", hidden=True)
     async def ghostping(self, ctx: Context, target: AnyMember, *, msg):
