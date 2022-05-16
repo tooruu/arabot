@@ -4,7 +4,9 @@ import logging
 import re
 from asyncio import sleep
 from collections.abc import Iterable
-from functools import partialmethod
+from contextlib import suppress
+from functools import partial, partialmethod
+from typing import Awaitable, Callable
 
 import aiohttp
 import disnake
@@ -17,12 +19,6 @@ __all__ = [
     "Context",
     "Cog",
 ]
-
-
-async def temp_channel_mute_message_author(
-    self: disnake.Message | Context, duration: float = 60.0, reason: str | None = None
-):
-    await self.channel.temp_mute_member(self.author, duration, reason)
 
 
 class Context(commands.Context):
@@ -95,7 +91,7 @@ class Context(commands.Context):
             return False
         return True
 
-    temp_channel_mute_author = temp_channel_mute_message_author
+    temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
 
     def reset_cooldown(self) -> bool:
         if not self.command:
@@ -132,17 +128,37 @@ async def temp_mute_channel_member(
     member: disnake.Member,
     duration: float = 60.0,
     reason: str | None = None,
+    *,
+    success_msg: Callable[[], Awaitable] | str | bool = True,
+    failure_msg: Callable[[], Awaitable] | str | bool = False,
 ):
     old_perms = self.overwrites_for(member)
     temp_perms = self.overwrites_for(member)
     temp_perms.send_messages = False
+
     try:
         await self.set_permissions(member, overwrite=temp_perms, reason=reason)
+        if success_msg:
+            if isinstance(success_msg, str):
+                success_msg = partial(self.send, success_msg)
+            elif success_msg is True:
+                success_msg = partial(
+                    self.send, f"{member.mention} has been muted for {duration:.0f} seconds"
+                )
+            await success_msg()
         await sleep(duration)
+    except disnake.Forbidden:
+        if failure_msg:
+            if isinstance(failure_msg, str):
+                failure_msg = partial(self.send, failure_msg)
+            elif failure_msg is True:
+                failure_msg = partial(self.send, f"I lack permission to mute {member.mention}")
+            await failure_msg()
     finally:
-        await self.set_permissions(
-            member, overwrite=None if old_perms.is_empty() else old_perms, reason=reason
-        )
+        with suppress(disnake.Forbidden):
+            await self.set_permissions(
+                member, overwrite=None if old_perms.is_empty() else old_perms, reason=reason
+            )
 
 
 async def fetch_json(self: aiohttp.ClientSession, url: str, *, method: str = "get", **kwargs):
@@ -168,5 +184,7 @@ disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Asset.icon = property(lambda self: self.with_size(32))
 disnake.Guild.get_unlimited_invite = get_unlimited_invite
-disnake.Message.temp_channel_mute_author = temp_channel_mute_message_author
+disnake.Message.temp_channel_mute_author = property(
+    lambda self: partial(self.channel.temp_mute_member, self.author)
+)
 disnake.VoiceChannel.connect_play_disconnect = connect_play_disconnect

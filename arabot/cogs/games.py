@@ -321,8 +321,13 @@ class TicTacToeButton(disnake.ui.Button):
 
         await inter.response.edit_message(content, view=view)
         if loser:
-            await inter.followup.send(f"{loser.mention} loser has been muted for 1 minute!")
-            await inter.channel.temp_mute_member(loser, reason="Tic Tac Toe loser")
+            await inter.channel.temp_mute_member(
+                loser,
+                reason="Tic Tac Toe loser",
+                success_msg=lambda: inter.followup.send(
+                    f"{loser.mention} loser has been muted for 1 minute!"
+                ),
+            )
 
 
 class TicTacToe(disnake.ui.View):
@@ -395,7 +400,9 @@ class Games(Cog, category=Category.GAMES):
             last_deaths.append(ctx.author.id)
             await ctx.reply("***BOOM***")  # TODO: Make it look better, maybe with an emoji or a gif
             await ctx.send("Cooling down and reloading barrel...")
-            await ctx.temp_channel_mute_author(reason="Russian Roulette")
+            await ctx.temp_channel_mute_author(
+                reason="Russian Roulette", success_msg=False, failure_msg=True
+            )
             return
 
         # Same user loses 3 times in a row
@@ -404,7 +411,9 @@ class Games(Cog, category=Category.GAMES):
         try:
             await ctx.author.kick(reason="Russian Roulette")
         except disnake.Forbidden:
-            await ctx.temp_channel_mute_author(180, reason="Russian Roulette")
+            await ctx.temp_channel_mute_author(
+                180, reason="Russian Roulette", success_msg=False, failure_msg=True
+            )
 
     @commands.command(brief="Guess a number")
     @commands.cooldown(1, 90, commands.BucketType.channel)
@@ -454,13 +463,14 @@ class Games(Cog, category=Category.GAMES):
             await ctx.send("No one has won")
             return
         winner = min(guesses, key=lambda m: abs(guesses[m] - number))
-        await ctx.send(
-            f"{winner.mention} "
+        await ctx.channel.temp_mute_member(
+            winner,
+            reason="Guessed the number",
+            success_msg=f"{winner.mention} "
             + ("guessed" if exact_guess else "was the closest to")
             + f" number {number}\n"
-            f"Enjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}"
+            f"Enjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}",
         )
-        await ctx.channel.temp_mute_member(winner, reason="Guessed the number")
 
     @commands.check(
         lambda msg: (vc := getattr(msg.author.voice, "channel", None))
