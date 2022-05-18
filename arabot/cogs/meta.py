@@ -21,9 +21,9 @@ class AraHelp(MinimalHelpCommand):
             Embed(description=self.get_opening_note() or Embed.Empty)
             .set_author(
                 name=f"{bot.name} help",
-                icon_url=bot.user.avatar.compat.icon.url,
+                icon_url=self.context.me.display_avatar.as_icon.compat.url,
             )
-            .set_thumbnail(url=bot.user.avatar.with_format("png").url)
+            .set_thumbnail(url=bot.user.avatar.compat.url)
             .set_footer(text=self.get_ending_note() or Embed.Empty)
         )
 

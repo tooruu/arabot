@@ -78,7 +78,7 @@ class Fun(Cog, category=Category.FUN):
         member = choice(ctx.channel.members)
         user_profile = disnake.Embed().set_author(
             name=member.display_name,
-            icon_url=member.avatar.compat.icon.url,
+            icon_url=member.display_avatar.as_icon.compat.url,
             url=f"https://discord.com/users/{member.id}",
         )
         await ctx.reply(embed=user_profile)

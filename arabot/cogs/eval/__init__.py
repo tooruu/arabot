@@ -46,7 +46,7 @@ class Eval(Cog, category=Category.GENERAL):
             )
             result.set_footer(
                 text="Powered by myself 😌",
-                icon_url=ctx.me.avatar.icon.url,
+                icon_url=ctx.me.display_avatar.as_icon.compat.url,
             )
         else:
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)

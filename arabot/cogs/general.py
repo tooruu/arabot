@@ -6,7 +6,7 @@ from arabot.core.utils import bold
 from disnake.ext import commands
 
 
-class Avatar(disnake.ui.View):
+class AvatarView(disnake.ui.View):
     def __init__(self, avatars):
         super().__init__(timeout=None)
         self.avatars = avatars
@@ -32,7 +32,7 @@ class General(Cog, category=Category.GENERAL):
         target = target or ctx.author
         avatars = (
             disnake.Embed()
-            .set_image(url=target.avatar.compat.url)
+            .set_image(url=(target.avatar or target.default_avatar).compat.url)
             .set_footer(text=f"{target.display_name}'s user avatar"),
             disnake.Embed()
             .set_image(url=target.display_avatar.compat.url)
@@ -43,7 +43,7 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send(embed=avatars[0])
             return
 
-        await ctx.send(embed=avatars[1], view=Avatar(avatars))
+        await ctx.send(embed=avatars[1], view=AvatarView(avatars))
 
     @commands.command(aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)")
     async def emoji(self, ctx: Context, *emojis: AnyEmoji):
@@ -67,7 +67,7 @@ class General(Cog, category=Category.GENERAL):
             .set_image(url=emoji.url)
             .set_footer(
                 text="reacted",
-                icon_url=ctx.author.avatar.compat.url,
+                icon_url=ctx.author.display_avatar.as_icon.compat.url,
             )
         )
 
@@ -161,7 +161,7 @@ class General(Cog, category=Category.GENERAL):
             .set_image(url=em_after)
             .set_author(
                 name=ctx.author.display_name,
-                icon_url=ctx.author.avatar.compat.url,
+                icon_url=ctx.author.display_avatar.as_icon.compat.url,
             )
         )
         await message.add_reaction("👍")

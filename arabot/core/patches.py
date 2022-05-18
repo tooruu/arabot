@@ -182,7 +182,7 @@ async def connect_play_disconnect(
 aiohttp.ClientSession.fetch_json = fetch_json
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
-disnake.Asset.icon = property(lambda self: self.with_size(32))
+disnake.Asset.as_icon = property(lambda self: self.with_size(32))
 disnake.Guild.get_unlimited_invite = get_unlimited_invite
 disnake.Message.temp_channel_mute_author = property(
     lambda self: partial(self.channel.temp_mute_member, self.author)
