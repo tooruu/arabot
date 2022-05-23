@@ -1,4 +1,5 @@
 import logging
+from asyncio import sleep
 from functools import partial
 from io import StringIO
 from typing import Any
@@ -41,6 +42,7 @@ class Eval(Cog, category=Category.GENERAL):
                     disnake=disnake,
                     discord=disnake,
                     embed=disnake.Embed(),
+                    sleep=sleep,
                 ),
                 stdin=StringIO(inputlines),
             )
