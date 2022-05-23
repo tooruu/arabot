@@ -16,7 +16,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(aliases=["i", "img"], brief="Top search result from Google Images")
+    @command(aliases=["i", "img"], brief="Top search result from Google Images", enabled=False)
     async def image(self, ctx: Context, *, query):
         async with ctx.typing():
             images = await self.fetch_images(query)
