@@ -56,20 +56,25 @@ class General(Cog, category=Category.GENERAL):
             embed.add_field(emoji, f"[{emoji.name}]({emoji.url})", inline=False)
         await ctx.reply(embed=embed)
 
-    @commands.command(aliases=["r"], brief="Express your reaction with a big emoji")
-    async def react(self, ctx: Context, emoji: AnyEmoji | None):
+    @commands.command(aliases=["r"], brief="React to a message")
+    async def react(self, ctx: Context, emoji: AnyEmoji = False):
+        if not (ref_msg := await ctx.getch_reference_message()):
+            await ctx.send("Reply to the message to react to")
+            return
+        if emoji is False:
+            await ctx.reply("Specify an emoji to react with")
+            return
         if not emoji:
             await ctx.send("Emoji not found")
             return
-        await ctx.message.delete()
-        await ctx.send(
-            embed=disnake.Embed()
-            .set_image(url=emoji.url)
-            .set_footer(
-                text="reacted",
-                icon_url=ctx.author.display_avatar.as_icon.compat.url,
-            )
-        )
+
+        try:
+            await ref_msg.add_reaction(emoji)
+        except disnake.Forbidden:
+            try:
+                await ctx.message.add_reaction("⛔")
+            except disnake.Forbidden:
+                await ctx.reply(f"Cannot add reactions to {ref_msg.author.mention}'s messages")
 
     @commands.cooldown(1, 60, commands.BucketType.member)
     @commands.command(brief="DM user to summon them")
