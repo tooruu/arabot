@@ -168,7 +168,10 @@ class Fun(Cog, category=Category.FUN):
         await sleep(20)
         message_x = await ctx.fetch_message(message_x.id)
         reaction = disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, message_x.reactions)
-        await ctx.send(f"{reaction.count - 1} people have doubted {message_x.author.mention}")
+        if reaction:
+            await ctx.send(f"{reaction.count - 1} people have doubted {message_x.author.mention}")
+        else:
+            await ctx.send("Someone removed all doubts 👀")
 
 
 def setup(ara: Ara):
