@@ -172,6 +172,10 @@ class General(Cog, category=Category.GENERAL):
         await ctx.message.delete()
         await ctx.send(msg)
 
+    @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
+    async def eight_ball(self, ctx: Context):
+        answer = random.choice(("Yes", "No"))
+        await ctx.reply(f"🎱 | {answer}")
 
 def setup(ara: Ara):
     ara.add_cog(General(ara))

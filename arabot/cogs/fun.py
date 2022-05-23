@@ -1,9 +1,8 @@
 from io import BytesIO
 from random import choice
-from urllib.parse import quote
 
 import disnake
-from aiohttp import ClientResponseError, ClientSession
+from aiohttp import ClientSession
 from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
 from disnake.ext import commands
 
@@ -91,16 +90,6 @@ class Fun(Cog, category=Category.FUN):
         invis_bug = "||\u200b||" * 198 + "_ _"
         if len(message := msg + invis_bug + target.mention) <= 2000:
             await ctx.send_mention(message)
-
-    @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
-    async def eight_ball(self, ctx: Context, *, question=" "):
-        try:
-            url = "https://8ball.delegator.com/magic/JSON/" + quote(question, safe="")
-            json = await self.session.fetch_json(url)
-            answer = json["magic"]["answer"]
-        except ClientResponseError:
-            answer = choice(("Yes", "No"))
-        await ctx.reply(f"🎱 | {answer}")
 
     @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     @commands.cooldown(1, 60 * 60 * 24 * 3.5, commands.BucketType.member)
