@@ -59,6 +59,7 @@ class General(Cog, category=Category.GENERAL):
 
     @commands.command(aliases=["r"], brief="React to a message")
     async def react(self, ctx: Context, emoji: AnyEmoji = False):
+        await ctx.message.delete()
         if not (ref_msg := await ctx.getch_reference_message()):
             await ctx.send("Reply to the message to react to")
             return
