@@ -80,7 +80,7 @@ class Snipe(Cog, category=Category.FUN):
         msg_group = "\n".join(msg_group)[-1024:]
         embed.add_field(field_name, msg_group, inline=False)
         while len(embed) > 6000:
-            del embed.fields[0]
+            embed.remove_field(0)
         await ctx.send(embed=embed)
 
     @command(brief="View the last deleted message")
