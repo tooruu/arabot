@@ -76,11 +76,9 @@ class Context(commands.Context):
         if result:
             return result
 
-        if msg.reference:
-            ref = msg.reference.cached_message or msg.reference.resolved
-            if isinstance(ref, disnake.Message):
-                ref_ctx = await self.ara.get_context(ref)
-                return await ref_ctx._rsearch(target)
+        if ref_msg := await self.getch_reference_message():
+            ref_ctx = await self.bot.get_context(ref_msg)
+            return await ref_ctx._rsearch(target)
 
         return None
 
@@ -103,6 +101,12 @@ class Context(commands.Context):
     send_mention = partialmethod(
         commands.Context.send, allowed_mentions=disnake.AllowedMentions.all()
     )
+
+    async def getch_reference_message(self) -> disnake.Message | False | None:
+        if not (ref := self.message.reference):
+            return False
+        ref_msg = ref.cached_message or ref.resolved or await self.fetch_message(ref.message_id)
+        return ref_msg if isinstance(ref_msg, disnake.Message) else None
 
 
 class Cog(commands.Cog):
