@@ -1,3 +1,4 @@
+import random
 import re
 
 import disnake
@@ -181,6 +182,16 @@ class General(Cog, category=Category.GENERAL):
     async def eight_ball(self, ctx: Context):
         answer = random.choice(("Yes", "No"))
         await ctx.reply(f"🎱 | {answer}")
+
+    @commands.command(aliases=["pick"], brief="Make a choice for you")
+    async def choose(self, ctx: Context, *, options: str):
+        options = options.split("|")
+        if len(options) < 2:
+            await ctx.send("Not enough options provided")
+            return
+        pick = random.choice(options).strip()
+        await ctx.reply(f"I pick {pick}")
+
 
 def setup(ara: Ara):
     ara.add_cog(General(ara))
