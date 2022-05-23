@@ -22,6 +22,7 @@ class CustomEmoji:
     MeiStare = "<:MeiStare:937695447932370994>"
     KannaStare = "<:KannaStare:971188689428443276>"
     CommuThink = "<:ct:973587602798153760>"
+    Doubt = "<:doubt:978288495489613854>"
 
 
 class Category:

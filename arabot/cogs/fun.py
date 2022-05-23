@@ -1,3 +1,4 @@
+from asyncio import sleep
 from io import BytesIO
 from random import choice
 
@@ -125,6 +126,49 @@ class Fun(Cog, category=Category.FUN):
             return
 
         await ctx.tick()
+
+    @commands.command(aliases=["x"], brief="Doubt someone")
+    @commands.cooldown(1, 21, commands.BucketType.channel)
+    async def doubt(self, ctx: Context, target: AnyMember = False):
+        if target is None:
+            ctx.reset_cooldown()
+            await ctx.send("User not found")
+            return
+
+        if target:
+            if target == ctx.author:
+                ctx.reset_cooldown()
+                await ctx.send("Never doubt yourself!")
+                return
+
+            async for message_x in ctx.history(limit=20):
+                if message_x.author == target:
+                    break
+            else:
+                ctx.reset_cooldown()
+                await ctx.reply("Message not found")
+                return
+
+        elif not (message_x := await ctx.getch_reference_message()):
+            if message_x is False:
+                if history := await ctx.history(before=ctx.message, limit=1).flatten():
+                    message_x = history[0]
+            if not message_x:
+                ctx.reset_cooldown()
+                await ctx.reply("Message not found")
+                return
+
+        try:
+            await message_x.add_reaction(CustomEmoji.Doubt)
+        except disnake.Forbidden:
+            ctx.reset_cooldown()
+            await ctx.reply(f"Cannot react to {message_x.author.mention}'s messages")
+            return
+
+        await sleep(20)
+        reaction = disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, message_x.reactions)
+        reacted = len(reaction.count) - 1
+        await ctx.send(f"{reacted} people have doubted {message_x.author.mention}")
 
 
 def setup(ara: Ara):
