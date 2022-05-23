@@ -141,37 +141,41 @@ class Fun(Cog, category=Category.FUN):
                 await ctx.send("Never doubt yourself!")
                 return
 
-            async for message_x in ctx.history(limit=20):
-                if message_x.author == target:
+            async for msg_x in ctx.history(limit=20):
+                if msg_x.author == target:
                     break
             else:
                 ctx.reset_cooldown()
                 await ctx.reply("Message not found")
                 return
 
-        elif not (message_x := await ctx.getch_reference_message()):
-            if message_x is False:
+        elif not (msg_x := await ctx.getch_reference_message()):
+            if msg_x is False:
                 if history := await ctx.history(before=ctx.message, limit=1).flatten():
-                    message_x = history[0]
-            if not message_x:
+                    msg_x = history[0]
+            if not msg_x:
                 ctx.reset_cooldown()
                 await ctx.reply("Message not found")
                 return
 
         try:
-            await message_x.add_reaction(CustomEmoji.Doubt)
+            await msg_x.add_reaction(CustomEmoji.Doubt)
         except disnake.Forbidden:
             ctx.reset_cooldown()
-            await ctx.reply(f"Cannot react to {message_x.author.mention}'s messages")
+            await ctx.reply(f"Cannot react to {msg_x.author.mention}'s messages")
             return
 
         await sleep(20)
-        message_x = await ctx.fetch_message(message_x.id)
-        reaction = disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, message_x.reactions)
-        if reaction:
-            await ctx.send(f"{reaction.count - 1} people have doubted {message_x.author.mention}")
+        try:
+            msg_x = await ctx.fetch_message(msg_x.id)
+        except disnake.NotFound:
+            await ctx.reply(f"Message was deleted {CustomEmoji.TooruWeary}")
+            return
+
+        if reaction := disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, msg_x.reactions):
+            await msg_x.reply(f"{reaction.count - 1} people have doubted {msg_x.author.mention}")
         else:
-            await ctx.send("Someone removed all doubts 👀")
+            await msg_x.reply("Someone cleared all the doubts 👀")
 
 
 def setup(ara: Ara):
