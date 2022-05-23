@@ -89,8 +89,6 @@ class Context(commands.Context):
             return False
         return True
 
-    temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
-
     def reset_cooldown(self) -> bool:
         if not self.command:
             return False
@@ -102,11 +100,8 @@ class Context(commands.Context):
         commands.Context.send, allowed_mentions=disnake.AllowedMentions.all()
     )
 
-    async def getch_reference_message(self) -> disnake.Message | False | None:
-        if not (ref := self.message.reference):
-            return False
-        ref_msg = ref.cached_message or ref.resolved or await self.fetch_message(ref.message_id)
-        return ref_msg if isinstance(ref_msg, disnake.Message) else None
+    temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
+    getch_reference_message = property(lambda self: self.message.getch_reference_message)
 
 
 class Cog(commands.Cog):
@@ -183,11 +178,19 @@ async def connect_play_disconnect(
     vc.play(audio, after=disconnect)
 
 
+async def getch_reference_message(self: disnake.Message) -> disnake.Message | False | None:
+    if not (ref := self.reference):
+        return False
+    ref_msg = ref.cached_message or ref.resolved or await self.channel.fetch_message(ref.message_id)
+    return ref_msg if isinstance(ref_msg, disnake.Message) else None
+
+
 aiohttp.ClientSession.fetch_json = fetch_json
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Asset.as_icon = property(lambda self: self.with_size(32))
 disnake.Guild.get_unlimited_invite = get_unlimited_invite
+disnake.Message.getch_reference_message = getch_reference_message
 disnake.Message.temp_channel_mute_author = property(
     lambda self: partial(self.channel.temp_mute_member, self.author)
 )
