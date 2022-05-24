@@ -87,14 +87,14 @@ class Gacha(Cog, category=Category.GAMES):
     @gacha.error
     async def on_error(self, ctx: Context, error: DiscordException):
         if isinstance(error, CommandOnCooldown):
-            return
+            return True
         if isinstance(error, MissingRequiredArgument):
             pools = [
                 f"{bold(pool_code)} - {self._pull_provider.get_pool_name(pool_code)}"
                 for pool_code in self._pull_provider.get_pool_codes()
             ]
             await ctx.send("Currently available supplies:\n" + "\n".join(pools))
-            return
+            return True
         last_param = ctx.command.clean_params.popitem()[1]
         if (
             isinstance(error, BadArgument)
@@ -106,10 +106,9 @@ class Gacha(Cog, category=Category.GAMES):
                 if self.gacha.is_on_cooldown(ctx)
                 else "You specified an invalid amount"
             )
-            return
-        await ctx.reply("An error occurred")
+            return True
         ctx.reset_cooldown()
-        raise error
+        return False
 
     @staticmethod
     def _initialize_pull_provider() -> SimplePullProvider:
