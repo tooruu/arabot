@@ -1,11 +1,12 @@
+import random
 from asyncio import sleep
 from io import BytesIO
-from random import choice
 
 import disnake
 from aiohttp import ClientSession
 from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
 from disnake.ext import commands
+from numpy.random import default_rng
 
 
 class Fun(Cog, category=Category.FUN):
@@ -75,7 +76,7 @@ class Fun(Cog, category=Category.FUN):
     @commands.cooldown(3, 90, commands.BucketType.guild)
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):
-        member = choice(ctx.channel.members)
+        member = random.choice(ctx.channel.members)
         user_profile = disnake.Embed().set_author(
             name=member.display_name,
             icon_url=member.display_avatar.as_icon.compat.url,
@@ -176,6 +177,16 @@ class Fun(Cog, category=Category.FUN):
             await msg_x.reply(f"{reaction.count - 1} people have doubted {msg_x.author.mention}")
         else:
             await msg_x.reply("Someone cleared all the doubts 👀")
+
+    @commands.command(brief="Find out someone's pp size")
+    async def pp(self, ctx: Context, *, target: AnyMember = False):
+        if target is None:
+            await ctx.send("User not found")
+            return
+        target = target or ctx.author
+        size = round(default_rng().triangular(1, 15, 25))
+        pp = f"3{'='*(size-1)}D"
+        await ctx.send(f"{target.mention}'s pp size is **{size} cm**\n{pp}")
 
 
 def setup(ara: Ara):
