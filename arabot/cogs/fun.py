@@ -128,7 +128,7 @@ class Fun(Cog, category=Category.FUN):
         await ctx.tick()
 
     @commands.command(aliases=["x"], brief="Doubt someone")
-    @commands.cooldown(1, 21, commands.BucketType.channel)
+    @commands.max_concurrency(1, commands.BucketType.channel)
     async def doubt(self, ctx: Context, *, target: AnyMember = False):
         if target is None:
             ctx.reset_cooldown()
