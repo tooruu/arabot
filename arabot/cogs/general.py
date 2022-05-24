@@ -114,7 +114,7 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send_mention(f"Summoning {target.mention}")
 
     @commands.command(brief="Show user's banner")
-    async def banner(self, ctx: Context, target: AnyMember = False):
+    async def banner(self, ctx: Context, *, target: AnyMember = False):
         if target is None:
             await ctx.send("User not found")
             return

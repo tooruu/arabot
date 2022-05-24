@@ -59,7 +59,7 @@ class NicknameSnipe(Cog, category=Category.FUN):
         )
 
     @command(aliases=["sn", "ns"], brief="View recent nick history of a user")
-    async def nicksnipe(self, ctx: Context, target: AnyMember):
+    async def nicksnipe(self, ctx: Context, *, target: AnyMember):
         if target is None:
             await ctx.send("User not found")
             return
