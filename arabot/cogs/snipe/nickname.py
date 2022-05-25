@@ -46,8 +46,8 @@ class NicknameSnipe(Cog, category=Category.FUN):
                     {
                         member_id: [
                             (nick, changed_at)
-                            for nick, changed_at in nicks[-self.MAX_NICKS :]  # noqa: E203
-                            if (now - changed_at).days < self.PURGE_AFTER_DAYS
+                            for nick, changed_at in nicks[-self.MAX_NICKS :]
+                            if (now - changed_at).days < self.PURGE_AFTER_DAYS  # fmt: skip
                         ]
                         for member_id, nicks in members.items()
                         if nicks

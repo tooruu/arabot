@@ -128,7 +128,7 @@ class Connect4Game(Connect4Engine):
             content = ""
 
         for line in range(6):
-            line_state = self.state[line * 7 : (line + 1) * 7]  # noqa: E203
+            line_state = self.state[line * 7:(line + 1) * 7]  # fmt: skip
             content += "".join(str(self.tokens[x]) for x in line_state) + "\n"
 
         content += "".join(COLUMN_EMOJI)
