@@ -185,13 +185,38 @@ class General(Cog, category=Category.GENERAL):
         await ctx.reply(f"🎱 | {answer}")
 
     @commands.command(aliases=["pick"], brief="Make a choice for you")
-    async def choose(self, ctx: Context, *, options: str):
+    async def choose(self, ctx: Context, *, options):
         options = options.split("|")
         if len(options) < 2:
             await ctx.send("Not enough options provided")
             return
         pick = random.choice(options).strip()
         await ctx.reply(f"I pick {pick}")
+
+    @commands.command(aliases=["vote"], brief="Create a poll and count votes")
+    async def poll(self, ctx: Context, *, options):
+        options = [opt.strip() for opt in options.split("|")]
+        if not options:
+            await ctx.send("Poll topic is required")
+            return
+        topic = options.pop(0)
+        if len(options) == 1:
+            await ctx.send("Not enough options provided")
+            return
+        if len(options) > 10:
+            await ctx.send("More than 10 options provided")
+            return
+        options = options or ["Yes", "No"]
+
+        await ctx.message.delete()
+        indices = "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"
+        body = "\n".join(f"{n} {option}" for n, option in zip(indices, options))
+        embed = disnake.Embed(title=topic, description=body).set_author(
+            name=ctx.author.display_name, icon_url=ctx.author.display_avatar.as_icon.compat.url
+        )
+        poll = await ctx.send(embed=embed)
+        for i in indices[: len(options)]:
+            await poll.add_reaction(i)
 
 
 def setup(ara: Ara):
