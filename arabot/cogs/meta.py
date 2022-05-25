@@ -1,7 +1,7 @@
 from glob import glob
 from itertools import groupby
 from os import getenv
-from subprocess import check_output
+from subprocess import SubprocessError, check_output
 from urllib.parse import urlencode
 
 import arabot
@@ -90,14 +90,21 @@ class Meta(Cog, category=Category.META):
         return count
 
     def __get_version(self):
-        if rev_hash := getenv("HEROKU_SLUG_COMMIT"):
+        ver_str = f"{self.ara.name} v{arabot.__version__}"
+
+        if not arabot.TESTING:
+            return ver_str
+
+        if commit_sha := getenv("HEROKU_SLUG_COMMIT") or getenv("RAILWAY_GIT_COMMIT_SHA"):
             dirty_indicator = ""
         else:
-            rev_hash = check_output(["git", "rev-parse", "HEAD", "--"]).decode().strip()
-            dirty_indicator = ".dirty" if check_output(["git", "status", "-s"]) else ""
+            try:
+                commit_sha = check_output(["git", "rev-parse", "HEAD", "--"]).strip().decode()
+                dirty_indicator = ".dirty" if check_output(["git", "status", "-s"]) else ""
+            except (OSError, SubprocessError):
+                return ver_str
 
-        sha1 = rev_hash[:7] if arabot.TESTING else ""
-        return f"{self.ara.name} v{arabot.__version__}+{sha1}{dirty_indicator}".rstrip("+")
+        return f"{ver_str}+{commit_sha[:7]}{dirty_indicator}" if commit_sha else ver_str
 
     @command(aliases=["ver", "v"], brief="Show bot's version")
     async def version(self, ctx: Context):
