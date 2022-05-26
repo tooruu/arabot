@@ -62,12 +62,12 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
 
     @command(brief="Find source for an image")
     async def sauce(self, ctx: Context):
+        await ctx.trigger_typing()
         image_url = await ctx.rsearch("image_url")
         if not image_url:
             await ctx.send("No image or link provided")
             return
 
-        await ctx.trigger_typing()
         nao_json = await self.session.fetch_json(
             "https://saucenao.com/search.php",
             params={

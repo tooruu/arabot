@@ -18,7 +18,7 @@ class TranslationClient:
 
     async def _api(self, method: str, **params: dict[str, Any]) -> dict[str, Any]:
         return await self.session.fetch_json(
-            f"{self.BASE_URL}/{method.strip('/')}", params={"key": self.key, **params}
+            f"{self.BASE_URL}/{method.strip('/')}", params={"key": self.key} | params
         )
 
     async def translate(
@@ -36,8 +36,7 @@ class TranslationClient:
             source=source or "",
             format=format_,
         )
-        translations: list[dict[str, str]] = data["data"]["translations"]
-        translation = translations[0]
+        translation: dict[str, str] = data["data"]["translations"][0]
         translated_text = translation["translatedText"]
         detected_source_language = translation.get("detectedSourceLanguage")
         return translated_text, detected_source_language
