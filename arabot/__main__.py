@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import re
 import signal
 
@@ -74,7 +75,7 @@ def main():
         loop.run_until_complete(ara.close())
     finally:
         loop.run_until_complete(loop.shutdown_asyncgens())
-        if isinstance(loop, getattr(asyncio, "ProactorEventLoop", None)):
+        if os.name == "nt" and isinstance(loop, asyncio.ProactorEventLoop):
             loop.run_until_complete(asyncio.sleep(1))  # Fixes RuntimeError on Windows
         asyncio.set_event_loop(None)
         loop.stop()
