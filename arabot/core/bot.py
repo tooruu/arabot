@@ -143,6 +143,7 @@ class Ara(commands.Bot):
                 "ImageSearch",
                 "Translate",
                 "TextToSpeech",
+                "OpticalCharacterRecognition",
             }:
                 match status:
                     case 403:
