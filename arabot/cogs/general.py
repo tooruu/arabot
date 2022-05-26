@@ -166,10 +166,7 @@ class General(Cog, category=Category.GENERAL):
             embed=disnake.Embed(title="wants to change this →", description="to that ↓")
             .set_thumbnail(url=em_before.url)
             .set_image(url=em_after)
-            .set_author(
-                name=ctx.author.display_name,
-                icon_url=ctx.author.display_avatar.as_icon.compat.url,
-            )
+            .with_author(ctx.author)
         )
         await message.add_reaction("👍")
         await message.add_reaction("👎")
@@ -211,9 +208,7 @@ class General(Cog, category=Category.GENERAL):
         await ctx.message.delete()
         indices = "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"
         body = "\n".join(f"{n} {option}" for n, option in zip(indices, options))
-        embed = disnake.Embed(title=topic, description=body).set_author(
-            name=ctx.author.display_name, icon_url=ctx.author.display_avatar.as_icon.compat.url
-        )
+        embed = disnake.Embed(title=topic, description=body).with_author(ctx.author)
         poll = await ctx.send(embed=embed)
         for i in indices[: len(options)]:
             await poll.add_reaction(i)

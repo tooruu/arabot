@@ -185,10 +185,19 @@ async def getch_reference_message(self: disnake.Message) -> disnake.Message | Fa
     return ref_msg if isinstance(ref_msg, disnake.Message) else None
 
 
+def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Embed:
+    return self.set_author(
+        name=user.display_name,
+        icon_url=user.display_avatar.as_icon.compat.url,
+        url=f"https://discord.com/users/{user.id}",
+    )
+
+
 aiohttp.ClientSession.fetch_json = fetch_json
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
-disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Asset.as_icon = property(lambda self: self.with_size(32))
+disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
+disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite = get_unlimited_invite
 disnake.Message.getch_reference_message = getch_reference_message
 disnake.Message.temp_channel_mute_author = property(
