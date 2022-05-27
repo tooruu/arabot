@@ -96,9 +96,14 @@ class Translate(Cog, category=Category.LOOKUP):
 
     @staticmethod
     def find_lang(string: str, langs: list[LangCodeAndOrName]) -> LangCodeAndOrName | None:
-        if not string:
-            return None
-        return find(lambda lang: re.fullmatch("|".join(lang), string, re.IGNORECASE), langs)
+        return (
+            find(
+                lambda lang: re.fullmatch("|".join(lang), string, re.IGNORECASE),
+                langs,
+            )
+            if string
+            else None
+        )
 
     @staticmethod
     def format_lang(lang: LangCodeAndOrName) -> str:
