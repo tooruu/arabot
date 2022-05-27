@@ -19,8 +19,28 @@ class Translate(Cog, category=Category.LOOKUP):
     @command(aliases=["tr", "trans"], brief="Translates text")
     async def translate(self, ctx: Context):
         langs = await self.gtrans.languages(repr_lang=self.DEFAULT_TARGET[0])
-        source, target, text = self.parse_query(ctx.argument_only, langs)
+        user_args = self.parse_query(ctx.argument_only, langs)
+        if translation := await self.handle_translation(ctx, *user_args, langs):
+            (source, text), (target, translated_text) = translation
+            await ctx.send(
+                embed=Embed()
+                .add_field(self.format_lang(source), dsafe(text)[:1024])
+                .add_field(self.format_lang(target), dsafe(translated_text)[:1024], inline=False)
+                .set_footer(
+                    text="Google Cloud Translation",
+                    icon_url="https://gitlab.com/uploads/-/system"
+                    "/project/avatar/12400259/Cloud_Translation_API.png",
+                )
+            )
 
+    async def handle_translation(
+        self,
+        ctx: Context,
+        source: LangCodeAndOrName | None,
+        target: LangCodeAndOrName | None,
+        text: str | None,
+        langs: list[LangCodeAndOrName],
+    ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]] | None:
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send("I need text to translate")
             return
@@ -30,19 +50,15 @@ class Translate(Cog, category=Category.LOOKUP):
             source = self.find_lang(detected, langs)
         if not source:
             await ctx.send("Couldn't detect language")
-            return
+            return None
 
         target = target or self.DEFAULT_TARGET
         if source == target:
             await ctx.reply("Cannot translate to the same language")
-            return
+            return None
 
-        translation, _ = await self.gtrans.translate(text, target[0], source[0])
-        await ctx.send(
-            embed=Embed()
-            .add_field(self.format_lang(source), dsafe(text)[:1024])
-            .add_field(self.format_lang(target), dsafe(translation)[:1024], inline=False)
-        )
+        translated_text, _ = await self.gtrans.translate(text, target[0], source[0])
+        return (source, text), (target, translated_text)
 
     def parse_query(
         self, query: str, langs: list[LangCodeAndOrName]

@@ -1,5 +1,6 @@
+from os import getenv
+
 from arabot.core import Ara
-from arabot.core.utils import getkeys
 
 from .ocr import OpticalCharacterRecognition
 from .search import GSearch, ImageSearch
@@ -9,7 +10,9 @@ from .tts import TextToSpeech
 
 def setup(ara: Ara):
     session = ara.session
-    trans_client = TranslationClient(getkeys("g_trans_key")[0], session)
-    ara.add_cog(Translate(trans_client))
-    for cog in GSearch, ImageSearch, TextToSpeech, OpticalCharacterRecognition:
+    trans_client = TranslationClient(getenv("g_trans_key"), session)
+    trans = Translate(trans_client)
+    ara.add_cog(trans)
+    ara.add_cog(OpticalCharacterRecognition(trans))
+    for cog in GSearch, ImageSearch, TextToSpeech:
         ara.add_cog(cog(session))
