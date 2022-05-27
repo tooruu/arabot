@@ -17,8 +17,8 @@ from .abc import Evaluator
 class RemoteEval(Evaluator):
     API = "https://emkc.org/api/v2/piston/execute"
 
-    def __init__(self, *, session: ClientSession | None = None, stdin: str = ""):
-        self.session = session or ClientSession()
+    def __init__(self, *, session: ClientSession, stdin: str = ""):
+        self.session = session
         self.stdin = stdin
 
     async def fetch_response(self, code: str, *, stdin: str | None = None):

@@ -11,9 +11,9 @@ LangCodeAndOrName = list[str]
 class TranslationClient:
     BASE_URL = "https://translation.googleapis.com/language/translate/v2"
 
-    def __init__(self, key: str, session: ClientSession | None = None):
+    def __init__(self, key: str, session: ClientSession):
         self.key = key
-        self.session = session or ClientSession()
+        self.session = session
         self._invalidate_language_cache.start()
 
     async def _api(self, method: str, **params: dict[str, Any]) -> dict[str, Any]:
