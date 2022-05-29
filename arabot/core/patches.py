@@ -26,19 +26,6 @@ class Context(commands.Context):
         super().__init__(*args, **kwargs)
         self.ara: commands.Bot = self.bot
 
-    async def reply(
-        self, content: str | None = None, *, strict: bool = False, **kwargs
-    ) -> disnake.Message:
-        reply = super().reply(content, **kwargs)
-
-        if strict:
-            return await reply
-
-        try:
-            return await reply
-        except disnake.HTTPException:
-            return await self.send(content, **kwargs)
-
     @property
     def argument_only(self) -> str:
         if not self.valid:
@@ -95,13 +82,18 @@ class Context(commands.Context):
         self.command.reset_cooldown(self)
         return True
 
-    reply_mention = partialmethod(reply, allowed_mentions=disnake.AllowedMentions.all())
-    send_mention = partialmethod(
-        commands.Context.send, allowed_mentions=disnake.AllowedMentions.all()
-    )
+    @property
+    def reply_mention(self) -> Callable[..., Awaitable[disnake.Message]]:
+        return partialmethod(self.reply, allowed_mentions=disnake.AllowedMentions.all())
+
+    @property
+    def send_mention(self) -> Callable[..., Awaitable[disnake.Message]]:
+        return partialmethod(self.send, allowed_mentions=disnake.AllowedMentions.all())
 
     temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
-    getch_reference_message = property(lambda self: self.message.getch_reference_message)
+
+    async def getch_reference_message(self) -> disnake.Message | False | None:
+        return await self.message.getch_reference_message()
 
 
 class Cog(commands.Cog):
@@ -130,7 +122,7 @@ async def temp_mute_channel_member(
     *,
     success_msg: Callable[[], Awaitable] | str | bool = True,
     failure_msg: Callable[[], Awaitable] | str | bool = False,
-):
+) -> None:
     old_perms = self.overwrites_for(member)
     temp_perms = self.overwrites_for(member)
     temp_perms.send_messages = False
@@ -194,12 +186,19 @@ def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Em
 
 
 aiohttp.ClientSession.fetch_json = fetch_json
+disnake.abc.Messageable.send_mention = disnake.Webhook.send_mention = property(
+    lambda self: partial(self.send, allowed_mentions=disnake.AllowedMentions.all())
+)
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.as_icon = property(lambda self: self.with_size(32))
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite = get_unlimited_invite
 disnake.Message.getch_reference_message = getch_reference_message
+disnake.Message.reply = partialmethod(disnake.Message.reply, fail_if_not_exists=False)
+disnake.Message.reply_mention = partialmethod(
+    disnake.Message.reply, allowed_mentions=disnake.AllowedMentions.all()
+)
 disnake.Message.temp_channel_mute_author = property(
     lambda self: partial(self.channel.temp_mute_member, self.author)
 )
