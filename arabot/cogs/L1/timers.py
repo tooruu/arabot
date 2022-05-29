@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, time, timedelta, timezone, tzinfo
 from functools import partial
 from zoneinfo import ZoneInfo
@@ -6,6 +7,9 @@ from arabot.core import Ara, Cog
 from arabot.core.utils import strfdelta
 from disnake import HTTPException
 from disnake.ext.tasks import loop
+
+MHYEUTZ = ZoneInfo("Etc/GMT-1")
+HYLTZ = ZoneInfo("Etc/GMT-8")
 
 
 class Timer:
@@ -49,77 +53,77 @@ class Timer:
         )
 
 
-class ChannelTimers(Cog):
-    MHYEUTZ = ZoneInfo("Etc/GMT-1")
-    HYLTZ = ZoneInfo("Etc/GMT-8")
-    timers = {
-        678423053306298389: (
-            "OW🌍{} {}",
-            Timer(
-                {
-                    1: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
-                    4: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
-                    6: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
-                },
-                MHYEUTZ,
-            ),
+timers: dict[int, tuple[str, Timer]] = {
+    678423053306298389: (
+        "OW🌍{} {}",
+        Timer(
+            {
+                1: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
+                4: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
+                6: [(time(hour=3), "Ongoing"), (time(hour=4), "Finalizing")],
+            },
+            MHYEUTZ,
         ),
-        752382371596206141: (
-            "Abyss🔥{} {}",
-            Timer(
-                {
-                    1: [(time(hour=15), "Preparing")],
-                    3: [
-                        (time(hour=22), "Ongoing"),
-                        (time(hour=22, minute=30), "Finalizing"),
-                    ],
-                    5: [(time(hour=15), "Preparing")],
-                    7: [
-                        (time(hour=22), "Ongoing"),
-                        (time(hour=22, minute=30), "Finalizing"),
-                    ],
-                },
-                MHYEUTZ,
-            ),
+    ),
+    752382371596206141: (
+        "Abyss🔥{} {}",
+        Timer(
+            {
+                1: [(time(hour=15), "Preparing")],
+                3: [
+                    (time(hour=22), "Ongoing"),
+                    (time(hour=22, minute=30), "Finalizing"),
+                ],
+                5: [(time(hour=15), "Preparing")],
+                7: [
+                    (time(hour=22), "Ongoing"),
+                    (time(hour=22, minute=30), "Finalizing"),
+                ],
+            },
+            MHYEUTZ,
         ),
-        779022842372685854: (
-            "MA👹{} {}",
-            Timer(
-                {
-                    1: [(time(hour=4), "Ongoing")],
-                    2: [(time(hour=4), "Calculating")],
-                },
-                MHYEUTZ,
-            ),
+    ),
+    779022842372685854: (
+        "MA👹{} {}",
+        Timer(
+            {
+                1: [(time(hour=4), "Ongoing")],
+                2: [(time(hour=4), "Calculating")],
+            },
+            MHYEUTZ,
         ),
-        940719703825993738: ("Bosses🥵{1}", Timer({1: [(time(hour=4), None)]}, MHYEUTZ)),
-        904642451887783956: (
-            "HoYoLAB🌟{1}",
-            Timer({w: [(time(), None)] for w in range(1, 8)}, HYLTZ),
-        ),
-        779019769755861004: (
-            "Waifus reset💖{1}",
-            Timer(
-                {w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}
-            ),
-        ),
-    }
+    ),
+    940719703825993738: ("Bosses🥵{1}", Timer({1: [(time(hour=4), None)]}, MHYEUTZ)),
+    904642451887783956: (
+        "HoYoLAB🌟{1}",
+        Timer({w: [(time(), None)] for w in range(1, 8)}, HYLTZ),
+    ),
+    779019769755861004: (
+        "Waifus reset💖{1}",
+        Timer({w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}),
+    ),
+}
 
+
+class ChannelTimers(Cog):
     def __init__(self, ara: Ara):
         self.ara = ara
         self.update_channels.start()
 
     @loop(minutes=5)  # Rate limit: 2 updates per 10 mins
     async def update_channels(self):
-        for chl_id, timer_info in self.timers.items():
-            fmt, timer = timer_info
+        for chl_id, fmt, timer in [(cid, *timer_info) for cid, timer_info in timers.items()]:
+            if not (channel := self.ara.get_channel(chl_id)):
+                logging.warning("Timer channel %r not found", chl_id)
+                del timers[chl_id]
+                continue
+
             time_left = strfdelta(timer.till_next_phase)
-            name = fmt.format(timer.status, time_left)
-            channel = self.ara.get_channel(chl_id)
+            updated_channel_name = fmt.format(timer.status, time_left)
             try:
-                await channel.edit(name=name)
-            except HTTPException:
-                pass
+                await channel.edit(name=updated_channel_name)
+            except HTTPException as exc:
+                logging.warning("Failed to update timer channel %r: %s", chl_id, exc)
 
     @update_channels.before_loop
     async def ensure_ready(self):
