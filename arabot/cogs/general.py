@@ -231,10 +231,16 @@ class General(Cog, category=Category.GENERAL):
         )
 
     @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
-    async def impersonate(self, ctx: commands.Context, user: AnyUser, *, message):
+    async def impersonate(self, ctx: Context, user: AnyUser, *, message):
+        if not user:
+            await ctx.reply("User not found")
+            return
+
         await ctx.message.delete()
         webhook = await ctx.channel.create_webhook(name=user)
-        await webhook.send(message, username=user.display_name, avatar_url=user.display_avatar.url)
+        await webhook.send_mention(
+            message, username=user.display_name, avatar_url=user.display_avatar.url
+        )
         await webhook.delete()
 
 
