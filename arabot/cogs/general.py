@@ -2,7 +2,7 @@ import random
 import re
 
 import disnake
-from arabot.core import AnyEmoji, AnyMember, Ara, Category, Cog, Context
+from arabot.core import AnyEmoji, AnyMember, AnyUser, Ara, Category, Cog, Context
 from arabot.core.utils import bold
 from disnake.ext import commands
 
@@ -229,6 +229,13 @@ class General(Cog, category=Category.GENERAL):
             # fmt: on
             else "Invalid status code"
         )
+
+    @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
+    async def impersonate(self, ctx: commands.Context, user: AnyUser, *, message):
+        await ctx.message.delete()
+        webhook = await ctx.channel.create_webhook(name=user)
+        await webhook.send(message, username=user.display_name, avatar_url=user.display_avatar.url)
+        await webhook.delete()
 
 
 def setup(ara: Ara):
