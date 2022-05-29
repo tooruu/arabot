@@ -14,15 +14,16 @@ __all__ = [
     "AnyMember",
     "AnyRole",
     "AnyTChl",
+    "AnyUser",
     "AnyVChl",
     "CIEmoji",
     "CIMember",
     "CIRole",
     "CITextChl",
     "CIVoiceChl",
+    "Codeblocks",
     "Empty",
     "Twemoji",
-    "Codeblocks",
 ]
 
 arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
@@ -119,6 +120,7 @@ class Codeblocks(commands.Converter):
 
 
 AnyMember = disnake.Member | CIMember | Empty
+AnyUser = disnake.Member | CIMember | disnake.User | Empty
 AnyEmoji = disnake.Emoji | disnake.PartialEmoji | CIEmoji | Twemoji | Empty
 AnyTChl = disnake.TextChannel | CITextChl | Empty
 AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
