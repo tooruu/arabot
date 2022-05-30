@@ -82,13 +82,12 @@ class Context(commands.Context):
         self.command.reset_cooldown(self)
         return True
 
-    @property
-    def reply_mention(self) -> Callable[..., Awaitable[disnake.Message]]:
-        return partialmethod(self.reply, allowed_mentions=disnake.AllowedMentions.all())
-
-    @property
-    def send_mention(self) -> Callable[..., Awaitable[disnake.Message]]:
-        return partialmethod(self.send, allowed_mentions=disnake.AllowedMentions.all())
+    reply_mention = partialmethod(
+        commands.Context.reply, allowed_mentions=disnake.AllowedMentions.all()
+    )
+    send_mention = partialmethod(
+        commands.Context.send, allowed_mentions=disnake.AllowedMentions.all()
+    )
 
     temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
 
