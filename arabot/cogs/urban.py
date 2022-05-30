@@ -47,7 +47,8 @@ class Urban(Cog, category=Category.LOOKUP):
     async def urban(self, ctx: Context, *, term: str):
         if term.lower() == ctx.ara.owner.name.lower():
             invite = (
-                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite() or Embed.Empty
+                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite_link()
+                or Embed.Empty
             )
             await ctx.send(
                 embed=Embed(description="An awesome guy").set_author(
@@ -58,7 +59,8 @@ class Urban(Cog, category=Category.LOOKUP):
 
         if term.lower() == ctx.ara.name.lower():
             invite = (
-                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite() or Embed.Empty
+                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite_link()
+                or Embed.Empty
             )
             await ctx.send(
                 embed=Embed(description="An awesome bot written by an awesome guy").set_author(

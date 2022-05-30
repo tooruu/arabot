@@ -127,7 +127,7 @@ class Meta(Cog, category=Category.META):
 
     @command(name="invite", brief="Show server's invite link")
     async def server_invite_link(self, ctx: Context):
-        await ctx.send(await ctx.guild.get_unlimited_invite() or "Couldn't find invite link")
+        await ctx.send(await ctx.guild.get_unlimited_invite_link() or "Couldn't find invite link")
 
     @command(name="arabot", brief="Show bot's invite link")  # TODO: dynamically change name
     async def ara_invite_link(self, ctx: Context):
