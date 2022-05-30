@@ -97,7 +97,7 @@ class General(Cog, category=Category.GENERAL):
             ctx.reset_cooldown()
             await ctx.send(f"{target.mention} doesn't have access to this channel")
             return
-        invite = await ctx.guild.get_unlimited_invite() or disnake.Embed.Empty
+        invite = await ctx.guild.get_unlimited_invite_link() or disnake.Embed.Empty
         embed = disnake.Embed(
             description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}"
             "\n%s\n[Jump to message](%s)" % (f"\n{bold(msg)}" if msg else "", ctx.message.jump_url)

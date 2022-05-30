@@ -105,12 +105,14 @@ class Cog(commands.Cog):
         super().__init_subclass__(**kwargs)
 
 
-async def get_unlimited_invite(self: disnake.Guild) -> str | None:
-    try:
-        invites = await self.invites()
-    except disnake.Forbidden:
-        return None
-    return next(filter(lambda i: i.max_age == 0 and i.max_uses == 0, invites), None)
+async def get_unlimited_invite_link(self: disnake.Guild) -> str | False | None:
+    if self.vanity_url_code:
+        return f"https://discord.gg/{self.vanity_url_code}"
+    if not self.me.guild_permissions.manage_guild:
+        return False
+    invites = await self.invites()
+    invite = next(filter(lambda i: i.max_age == 0 and i.max_uses == 0, invites), None)
+    return str(invite) if invite else None
 
 
 async def temp_mute_channel_member(
@@ -192,7 +194,7 @@ disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.as_icon = property(lambda self: self.with_size(32))
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Embed.with_author = embed_with_author
-disnake.Guild.get_unlimited_invite = get_unlimited_invite
+disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link
 disnake.Message.getch_reference_message = getch_reference_message
 disnake.Message.reply = partialmethod(disnake.Message.reply, fail_if_not_exists=False)
 disnake.Message.reply_mention = partialmethod(
