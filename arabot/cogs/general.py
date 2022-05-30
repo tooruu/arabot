@@ -109,6 +109,7 @@ class General(Cog, category=Category.GENERAL):
         try:
             await target.send(embed=embed)
         except disnake.Forbidden:
+            ctx.reset_cooldown()
             await ctx.send_mention(f"Cannot send messages to {target.mention}")
         else:
             await ctx.send_mention(f"Summoning {target.mention}")
