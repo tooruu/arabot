@@ -12,6 +12,7 @@ __all__ = [
     "AnyChl",
     "AnyEmoji",
     "AnyMember",
+    "AnyMemberOrUser",
     "AnyRole",
     "AnyTChl",
     "AnyUser",
@@ -70,6 +71,15 @@ class CIMember(commands.Converter):
         raise commands.MemberNotFound(argument)
 
 
+class UserFromCIMember(CIMember):
+    async def convert(self, ctx: commands.Context, argument: str) -> disnake.User:
+        try:
+            member = await super().convert(ctx, argument)
+            return member._user
+        except commands.MemberNotFound:
+            raise commands.UserNotFound(argument) from None
+
+
 class CIEmoji(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Emoji:
         emoji_search = arg_ci_re_search(argument)
@@ -120,7 +130,8 @@ class Codeblocks(commands.Converter):
 
 
 AnyMember = disnake.Member | CIMember | Empty
-AnyUser = disnake.Member | CIMember | disnake.User | Empty
+AnyUser = disnake.User | UserFromCIMember | Empty
+AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
 AnyEmoji = disnake.Emoji | disnake.PartialEmoji | CIEmoji | Twemoji | Empty
 AnyTChl = disnake.TextChannel | CITextChl | Empty
 AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty

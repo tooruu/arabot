@@ -2,7 +2,7 @@ import random
 import re
 
 import disnake
-from arabot.core import AnyEmoji, AnyMember, AnyUser, Ara, Category, Cog, Context
+from arabot.core import AnyEmoji, AnyMember, AnyMemberOrUser, Ara, Category, Cog, Context
 from arabot.core.utils import bold
 from disnake.ext import commands
 
@@ -232,7 +232,7 @@ class General(Cog, category=Category.GENERAL):
         )
 
     @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
-    async def impersonate(self, ctx: Context, user: AnyUser, *, message):
+    async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, message):
         if not user:
             await ctx.reply("User not found")
             return
