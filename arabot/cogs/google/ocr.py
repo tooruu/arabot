@@ -6,7 +6,7 @@ from arabot.core.utils import codeblock, dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 
-from .translate import Translate
+from .translate import GoogleTranslate
 
 
 class OCRException(Exception):
@@ -17,8 +17,8 @@ class OCRException(Exception):
         self.message = message
 
 
-class OpticalCharacterRecognition(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
-    def __init__(self, trans: Translate):
+class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
+    def __init__(self, trans: GoogleTranslate):
         self.trans = trans
 
     @command(aliases=["read"], brief="Read text from image")

@@ -8,10 +8,11 @@ from aiohttp import ClientResponse, ClientSession
 from arabot.core import Category, Cog, Context
 from disnake.ext.commands import command
 
+SVG_MIME = "image/svg+xml"
 
-class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}):
+
+class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}):
     BASE_URL = "https://www.googleapis.com/customsearch/v1"
-    SVG_MIME = "image/svg+xml"
 
     def __init__(self, session: ClientSession):
         self.session = session
@@ -41,7 +42,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
 
     async def filtered(self, images: list[dict]) -> disnake.File:
         for item in images:
-            if self.SVG_MIME in (item.get("mime"), item.get("fileFormat")):
+            if SVG_MIME in (item.get("mime"), item.get("fileFormat")):
                 continue
 
             image_url = item["link"]
@@ -49,7 +50,7 @@ class ImageSearch(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}
                 async with self.session.get(image_url) as resp:
                     if (
                         not resp.ok
-                        or resp.content_type == self.SVG_MIME
+                        or resp.content_type == SVG_MIME
                         or not resp.content_type.startswith("image/")
                     ):
                         continue

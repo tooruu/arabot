@@ -10,7 +10,7 @@ from disnake.ext import tasks
 from disnake.ext.commands import BucketType, command, cooldown
 
 
-class TextToSpeech(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
+class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     def __init__(self, session: ClientSession):
         self.session = session
         self._invalidate_voices_cache.start()

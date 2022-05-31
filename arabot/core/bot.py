@@ -139,11 +139,12 @@ class Ara(commands.Bot):
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
             ) if context.cog.qualified_name in {
-                "GSearch",
-                "ImageSearch",
-                "Translate",
-                "TextToSpeech",
-                "OpticalCharacterRecognition",
+                "GoogleImages",
+                "GoogleOCR",
+                "GoogleSearch",
+                "GoogleTranslate",
+                "GoogleTTS",
+                "Youtube",
             }:
                 match status:
                     case 403:

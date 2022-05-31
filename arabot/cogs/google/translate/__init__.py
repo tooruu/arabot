@@ -10,7 +10,7 @@ from disnake.utils import find
 from .client import LangCodeAndOrName, TranslationClient
 
 
-class Translate(Cog, category=Category.LOOKUP):
+class GoogleTranslate(Cog, category=Category.LOOKUP):
     DEFAULT_TARGET: list[str] = ["en", "English"]
 
     def __init__(self, trans_client: TranslationClient):
