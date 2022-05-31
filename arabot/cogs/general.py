@@ -114,7 +114,7 @@ class General(Cog, category=Category.GENERAL):
         else:
             await ctx.send_mention(f"Summoning {target.mention}")
 
-    @commands.command(brief="Show user's banner")
+    @commands.command(aliases=["b"], brief="Show user's banner")
     async def banner(self, ctx: Context, *, target: AnyMember = False):
         if target is None:
             await ctx.send("User not found")
@@ -127,7 +127,7 @@ class General(Cog, category=Category.GENERAL):
         await ctx.send(
             embed=disnake.Embed()
             .set_image(url=banner.compat.with_size(4096).url)
-            .set_footer(text=target.display_name + "'s banner")
+            .set_footer(text=f"{target.display_name}'s banner")
         )
 
     @commands.command(brief="Suggest server emoji")
