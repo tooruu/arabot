@@ -71,13 +71,13 @@ class Userinfo(Cog, category=Category.GENERAL):
             disnake.Embed(
                 color=target.accent_color or disnake.Embed.get_default_color(),
                 title=target,
-                url=f"https://discord.gg/users/{target.id}",
+                url=f"https://discord.com/users/{target.id}",
                 timestamp=disnake.utils.utcnow(),
             )
             .set_author(
                 name=target.id,
                 icon_url="https://twemoji.maxcdn.com/v/latest/72x72/1f194.png",
-                url=f"https://discord.gg/users/{target.id}",
+                url=f"https://discord.com/users/{target.id}",
             )
             .set_thumbnail(url=(target.avatar or target.default_avatar).compat.url)
             .add_field("Created at", format_dt(target.created_at, "D"))
