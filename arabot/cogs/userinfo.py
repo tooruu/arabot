@@ -3,18 +3,18 @@ from arabot.core import AnyMember, Ara, Category, Cog, Context
 from disnake.ext import commands
 
 
-class AvatarView(disnake.ui.View):
-    def __init__(self, avatars):
+class GlobalOrGuildUserVariant(disnake.ui.View):
+    def __init__(self, embeds):
         super().__init__(timeout=None)
-        self.avatars = avatars
+        self.embeds = embeds
 
-    @disnake.ui.button(label="Default", style=disnake.ButtonStyle.blurple)
-    async def user_avatar(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        await inter.response.edit_message(embed=self.avatars[0])
+    @disnake.ui.button(label="Global", style=disnake.ButtonStyle.blurple)
+    async def global_variant(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+        await inter.response.edit_message(embed=self.embeds[0])
 
     @disnake.ui.button(label="Server", style=disnake.ButtonStyle.blurple)
-    async def server_avatar(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        await inter.response.edit_message(embed=self.avatars[1])
+    async def guild_variant(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+        await inter.response.edit_message(embed=self.embeds[1])
 
 
 class Userinfo(Cog, category=Category.GENERAL):
@@ -30,7 +30,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         avatars = (
             disnake.Embed()
             .set_image(url=(target.avatar or target.default_avatar).compat.url)
-            .set_footer(text=f"{target.display_name}'s user avatar"),
+            .set_footer(text=f"{target.display_name}'s global avatar"),
             disnake.Embed()
             .set_image(url=target.display_avatar.compat.url)
             .set_footer(text=f"{target.display_name}'s server avatar"),
@@ -40,7 +40,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             await ctx.send(embed=avatars[0])
             return
 
-        await ctx.send(embed=avatars[1], view=AvatarView(avatars))
+        await ctx.send(embed=avatars[1], view=GlobalOrGuildUserVariant(avatars))
 
     @commands.command(aliases=["b"], brief="Show user's banner")
     async def banner(self, ctx: Context, *, target: AnyMember = False):
