@@ -100,12 +100,7 @@ class Fun(Cog, category=Category.FUN):
             await ctx.send("Cannot rename yourself")
             return
 
-        # Get highest role that has at least one permission to exclude dummy roles e.g. colors
-        get_top_role = lambda r: r.permissions.value != 0
-        author_role = next(filter(get_top_role, reversed(ctx.author.roles)), ctx.guild.default_role)
-        target_role = next(filter(get_top_role, reversed(target.roles)), ctx.guild.default_role)
-
-        if author_role < target_role:
+        if ctx.author.top_perm_role < target.top_perm_role:
             ctx.reset_cooldown()
             await ctx.send("Cannot rename users ranked higher than you")
             return

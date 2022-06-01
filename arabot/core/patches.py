@@ -186,6 +186,12 @@ def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Em
     )
 
 
+def top_perm_role(self: disnake.Member) -> disnake.Role:
+    "Get highest role that has at least one permission to exclude dummy roles e.g. colors"
+    is_perm_role = lambda r: r.permissions.value != 0
+    return next(filter(is_perm_role, reversed(self.roles)), self.guild.default_role)
+
+
 aiohttp.ClientSession.fetch_json = fetch_json
 disnake.abc.Messageable.send_mention = disnake.Webhook.send_mention = property(
     lambda self: partial(self.send, allowed_mentions=disnake.AllowedMentions.all())
@@ -195,6 +201,7 @@ disnake.Asset.as_icon = property(lambda self: self.with_size(32))
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link
+disnake.Member.top_perm_role = property(top_perm_role)
 disnake.Message.getch_reference_message = getch_reference_message
 disnake.Message.reply = partialmethod(disnake.Message.reply, fail_if_not_exists=False)
 disnake.Message.reply_mention = partialmethod(
