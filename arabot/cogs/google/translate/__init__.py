@@ -1,7 +1,7 @@
 import re
 from functools import partial
 
-from arabot.core import Category, Cog, Context
+from arabot.core import Category, Cog, Context, StopCommand
 from arabot.core.utils import dsafe
 from disnake import Embed
 from disnake.ext.commands import command
@@ -20,18 +20,18 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
     async def translate(self, ctx: Context):
         langs = await self.gtrans.languages(repr_lang=self.DEFAULT_TARGET[0])
         user_args = self.parse_query(ctx.argument_only, langs)
-        if translation := await self.handle_translation(ctx, *user_args, langs):
-            (source, text), (target, translated_text) = translation
-            await ctx.send(
-                embed=Embed()
-                .add_field(self.format_lang(source), dsafe(text)[:1024])
-                .add_field(self.format_lang(target), dsafe(translated_text)[:1024], inline=False)
-                .set_footer(
-                    text="Google Cloud Translation",
-                    icon_url="https://gitlab.com/uploads/-/system"
-                    "/project/avatar/12400259/Cloud_Translation_API.png",
-                )
+        translation = await self.handle_translation(ctx, *user_args, langs)
+        (source, text), (target, translated_text) = translation
+        await ctx.send(
+            embed=Embed()
+            .add_field(self.format_lang(source), dsafe(text)[:1024])
+            .add_field(self.format_lang(target), dsafe(translated_text)[:1024], inline=False)
+            .set_footer(
+                text="Google Cloud Translation",
+                icon_url="https://gitlab.com/uploads/-/system"
+                "/project/avatar/12400259/Cloud_Translation_API.png",
             )
+        )
 
     async def handle_translation(
         self,
@@ -40,22 +40,22 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         target: LangCodeAndOrName | None,
         text: str | None,
         langs: list[LangCodeAndOrName],
-    ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]] | None:
+    ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]]:
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send("I need text to translate")
-            return
+            raise StopCommand()
 
         if not source:
             detected = await self.gtrans.detect(text)
             source = self.find_lang(detected, langs)
         if not source:
             await ctx.send("Couldn't detect language")
-            return None
+            raise StopCommand()
 
         target = target or self.DEFAULT_TARGET
         if source == target:
             await ctx.reply("Cannot translate to the same language")
-            return None
+            raise StopCommand()
 
         translated_text, _ = await self.gtrans.translate(text, target[0], source[0])
         return (source, text), (target, translated_text)

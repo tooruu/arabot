@@ -12,6 +12,7 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 
+from .errors import StopCommand
 from .patches import Context
 from .utils import MissingEnvVar, getkeys, mono, strfdelta, system_info
 
@@ -48,7 +49,7 @@ class Ara(commands.Bot):
         disnake.Embed.set_default_color(embed_color)
         super().__init__(*args, **kwargs)
 
-    async def login(self):
+    async def login(self) -> None:
         try:
             token = getkeys("token")[0]
             await super().login(token)
@@ -77,13 +78,13 @@ class Ara(commands.Bot):
             self.owner = app.owner
             self.owner_id = app.owner.id
 
-    async def start(self):
+    async def start(self) -> None:
         async with aiohttp.ClientSession() as self.session:
             await self.login()
             self.load_extensions()
             await self.connect()
 
-    async def close(self):
+    async def close(self) -> None:
         if self.is_closed():
             return
 
@@ -96,7 +97,7 @@ class Ara(commands.Bot):
                 task.cancel()
             await asyncio.gather(*pending, return_exceptions=True)
 
-    async def get_context(self, message: disnake.Message, *, cls=Context):
+    async def get_context(self, message: disnake.Message, *, cls=Context) -> Context:
         return await super().get_context(message, cls=cls)
 
     def load_extensions(self) -> None:
@@ -138,14 +139,7 @@ class Ara(commands.Bot):
                     await context.reply("Missing permissions")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
-            ) if context.cog.qualified_name in {
-                "GoogleImages",
-                "GoogleOCR",
-                "GoogleSearch",
-                "GoogleTranslate",
-                "GoogleTTS",
-                "Youtube",
-            }:
+            ) if "Google" in context.cog.qualified_name or "Youtube" in context.cog.qualified_name:
                 match status:
                     case 403:
                         await context.reply(
@@ -161,7 +155,8 @@ class Ara(commands.Bot):
             case commands.UserInputError():
                 await context.reply("Invalid argument")
             case (
-                commands.CommandNotFound()
+                StopCommand()
+                | commands.CommandNotFound()
                 | commands.CheckFailure()
                 | commands.ExpectedClosingQuoteError()
             ):
