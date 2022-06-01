@@ -21,9 +21,6 @@ class GlobalOrGuildUserVariant(disnake.ui.View):
 
 
 class Userinfo(Cog, category=Category.GENERAL):
-    def __init__(self, ara: Ara):
-        self.ara = ara
-
     @commands.command(aliases=["a", "pfp"], brief="Show user's avatar")
     async def avatar(self, ctx: Context, *, target: AnyMember = False):
         if target is None:
@@ -69,7 +66,6 @@ class Userinfo(Cog, category=Category.GENERAL):
         target = target or ctx.author
         embed = (
             disnake.Embed(
-                color=target.accent_color or disnake.Embed.get_default_color(),
                 title=target,
                 url=f"https://discord.com/users/{target.id}",
                 timestamp=disnake.utils.utcnow(),
@@ -87,9 +83,6 @@ class Userinfo(Cog, category=Category.GENERAL):
             description[0].append("Bot")
         if target.public_flags.spammer:
             description[0].append("**Marked as spammer**")
-
-        if target.banner:
-            description[1].append(f"[Banner]({target.banner.url})")
 
         if isinstance(target, disnake.Member):
             embed.set_footer(text=target.guild.name, icon_url=ctx.guild.icon.as_icon.compat.url)
@@ -110,11 +103,19 @@ class Userinfo(Cog, category=Category.GENERAL):
                 embed.add_field("Muted until", format_dt(target.current_timeout, "D"))
             elif target.voice and target.voice.channel:
                 embed.add_field("Talking in", target.voice.channel.mention)
-            embed.add_field("Highest role", target.top_role.mention)
+            embed.add_field("Highest non-dummy role", target.top_perm_role.mention)
+            target = await ctx.ara.fetch_user(target.id)  # `Member.banner` is always None
+        elif not target.accent_color:  # Very unrealiable check if `User` is retrieved from cache
+            target = await ctx.ara.fetch_user(target.id)  # Fetching as `User.banner` is not cached
+
+        if target.accent_color:
+            embed.color = target.accent_color
+        if target.banner:
+            embed.set_image(url=target.banner.with_size(512).compat.url)
 
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
         await ctx.send(embed=embed)
 
 
 def setup(ara: Ara):
-    ara.add_cog(Userinfo(ara))
+    ara.add_cog(Userinfo())
