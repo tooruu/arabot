@@ -1,9 +1,8 @@
 from arabot.core import AnyMember, Ara, Category, Cog, Context
-from arabot.core.utils import dtformat
 from disnake import Embed, Message
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
-from disnake.utils import utcnow
+from disnake.utils import format_dt, utcnow
 
 
 class RawDeletedMessage:
@@ -68,7 +67,7 @@ class Snipe(Cog, category=Category.FUN):
                 msg.author != last_sender
                 or (msg.created_at - group_tail).seconds >= self.GROUP_AGE_THRESHOLD
             ):
-                field_name = f"{last_sender.display_name}, {dtformat(group_start)}:"
+                field_name = f"{last_sender.display_name}, {format_dt(group_start, 'R')}:"
                 msg_group = "\n".join(msg_group)[-1024:]
                 embed.add_field(field_name, msg_group, inline=False)
                 msg_group = []
@@ -76,7 +75,7 @@ class Snipe(Cog, category=Category.FUN):
                 group_start = msg.created_at
             group_tail = msg.created_at
             msg_group.append(msg.content)
-        field_name = f"{last_sender.display_name}, {dtformat(group_start)}:"
+        field_name = f"{last_sender.display_name}, {format_dt(group_start, 'R')}:"
         msg_group = "\n".join(msg_group)[-1024:]
         embed.add_field(field_name, msg_group, inline=False)
         while len(embed) > 6000:
@@ -102,7 +101,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
-        field_name = f"{last_msg.author.display_name}, {dtformat(last_msg.created_at)}:"
+        field_name = f"{last_msg.author.display_name}, {format_dt(last_msg.created_at)}:"
         embed.add_field(field_name, last_msg.content[-1024:])
         await ctx.send(embed=embed)
 

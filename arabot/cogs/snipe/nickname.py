@@ -2,11 +2,10 @@ from collections import defaultdict
 from datetime import datetime
 
 from arabot.core import AnyMember, Ara, Category, Cog, Context
-from arabot.core.utils import dtformat
 from disnake import Embed, Member
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
-from disnake.utils import utcnow
+from disnake.utils import format_dt, utcnow
 
 
 class NicknameSnipe(Cog, category=Category.FUN):
@@ -46,7 +45,7 @@ class NicknameSnipe(Cog, category=Category.FUN):
                     {
                         member_id: [
                             (nick, changed_at)
-                            for nick, changed_at in nicks[-self.MAX_NICKS :]
+                            for nick, changed_at in nicks[-self.MAX_NICKS:]
                             if (now - changed_at).days < self.PURGE_AFTER_DAYS  # fmt: skip
                         ]
                         for member_id, nicks in members.items()
@@ -74,7 +73,7 @@ class NicknameSnipe(Cog, category=Category.FUN):
 
         embed = Embed()
         for nick, changed_at in history[-self.MAX_NICKS :]:  # noqa: E203
-            when_changed = dtformat(changed_at) if changed_at else "Sometime in the past"
+            when_changed = format_dt(changed_at, "R") if changed_at else "Sometime in the past"
             embed.add_field(when_changed, nick, inline=False)
 
         await ctx.send(embed=embed)
