@@ -42,14 +42,14 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         langs: list[LangCodeAndOrName],
     ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]]:
         if not text and not (text := await ctx.rsearch("content")):
-            await ctx.send("I need text to translate")
+            await ctx.reply("I need text to translate")
             raise StopCommand()
 
         if not source:
             detected = await self.gtrans.detect(text)
             source = self.find_lang(detected, langs)
         if not source:
-            await ctx.send("Couldn't detect language")
+            await ctx.reply("Couldn't detect language")
             raise StopCommand()
 
         target = target or self.DEFAULT_TARGET
