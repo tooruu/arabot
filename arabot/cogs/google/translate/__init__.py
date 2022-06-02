@@ -22,6 +22,9 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         user_args = self.parse_query(ctx.argument_only, langs)
         translation = await self.handle_translation(ctx, *user_args, langs)
         (source, text), (target, translated_text) = translation
+        if source[0] == target[0]:
+            await ctx.reply("Cannot translate to the same language")
+            return
         await ctx.send(
             embed=Embed()
             .add_field(self.format_lang(source), dsafe(text)[:1024])
@@ -44,20 +47,16 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.reply("I need text to translate")
             raise StopCommand()
-
         if not source:
             detected = await self.gtrans.detect(text)
-            source = self.find_lang(detected, langs)
-        if not source:
-            await ctx.reply("Couldn't detect language")
-            raise StopCommand()
-
+            if not (source := self.find_lang(detected, langs)):
+                await ctx.reply("Couldn't detect language")
+                raise StopCommand()
         target = target or self.DEFAULT_TARGET
-        if source == target:
-            await ctx.reply("Cannot translate to the same language")
-            raise StopCommand()
-
-        translated_text, _ = await self.gtrans.translate(text, target[0], source[0])
+        if source[0] == target[0]:
+            translated_text = text
+        else:
+            translated_text, _ = await self.gtrans.translate(text, target[0], source[0])
         return (source, text), (target, translated_text)
 
     def parse_query(

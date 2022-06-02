@@ -44,12 +44,11 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
         source, target, _ = self.trans.parse_query(ctx.argument_only, langs)
         translation = await self.trans.handle_translation(ctx, source, target, text, langs)
         (source, text), (target, trans_text) = translation
-        await ctx.send(
-            embed=Embed()
-            .set_thumbnail(url=image_url)
-            .add_field(self.trans.format_lang(source), dsafe(text)[:1024])
-            .add_field(self.trans.format_lang(target), dsafe(trans_text)[:1024], inline=False)
-        )
+        embed = Embed().set_thumbnail(url=image_url)
+        if source[0] != target[0]:
+            embed.add_field(self.trans.format_lang(source), dsafe(text)[:1024])
+        embed.add_field(self.trans.format_lang(target), dsafe(trans_text)[:1024], inline=False)
+        await ctx.send(embed=embed)
 
     async def handle_annotation(self, ctx: Context, image_url: str | None) -> str:
         if not image_url and not (image_url := await ctx.rsearch("image_url")):
