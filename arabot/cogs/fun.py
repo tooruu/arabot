@@ -89,24 +89,21 @@ class Fun(Cog, category=Category.FUN):
             await ctx.send_mention(message)
 
     @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
-    @commands.cooldown(1, 60 * 60 * 24 * 3.5, commands.BucketType.member)
+    @commands.cooldown(2, 60 * 60 * 24 * 3.5, commands.BucketType.member)
     async def rename(self, ctx: Context, target: AnyMember, *, nick: str | None = None):
         if not target:
             ctx.reset_cooldown()
             await ctx.send("User not found")
             return
-        if target == ctx.author:
-            ctx.reset_cooldown()
-            await ctx.send("Cannot rename yourself")
-            return
-
-        if ctx.author.top_perm_role < target.top_perm_role:
-            ctx.reset_cooldown()
-            await ctx.send("Cannot rename users ranked higher than you")
-            return
         if nick and len(nick) > 32:
             ctx.reset_cooldown()
-            await ctx.send("Nickname too long")
+            await ctx.send("Nickname cannot exceed 32 characters")
+            return
+        if target == ctx.author:
+            ctx.reset_cooldown()
+        elif ctx.author.top_perm_role < target.top_perm_role:
+            ctx.reset_cooldown()
+            await ctx.send("Cannot rename users ranked higher than you")
             return
 
         try:
