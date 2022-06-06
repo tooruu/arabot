@@ -378,7 +378,6 @@ class Games(Cog, category=Category.GAMES):
         self.rr_last_deaths: dict[int, deque[int]] = defaultdict(partial(deque, maxlen=2))
 
     @commands.command(name="rr", brief="People get killed here, careful")
-    @commands.cooldown(1, 2, commands.BucketType.guild)
     async def russian_roulette(self, ctx: Context):
         if self.rr_last_user.get(ctx.guild.id) == ctx.author.id:
             await ctx.reply("You have to pass the gun to someone else")
@@ -415,8 +414,8 @@ class Games(Cog, category=Category.GAMES):
                 180, reason="Russian Roulette", success_msg=False, failure_msg=True
             )
 
+    @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number")
-    @commands.cooldown(1, 90, commands.BucketType.channel)
     async def guess(self, ctx: Context, *ceiling):
         # Initializing
         try:
@@ -476,8 +475,8 @@ class Games(Cog, category=Category.GAMES):
         lambda msg: (vc := getattr(msg.author.voice, "channel", None))
         and [m.bot for m in vc.members].count(False) > 2  # pylint: disable=used-before-assignment
     )
-    @commands.command(aliases=["impostor", "impasta"])
     @commands.cooldown(1, 120, commands.BucketType.guild)
+    @commands.command(aliases=["impostor", "impasta"])
     async def imposter(self, ctx: Context):
         vote_timeout = 20
 
@@ -534,7 +533,6 @@ class Games(Cog, category=Category.GAMES):
         await ctx.send(f"{imposter.mention} was ejected")
 
     @commands.command(brief="Start a game of Tic-Tac-Toe")
-    @commands.cooldown(1, 60, commands.BucketType.channel)
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
         if opponent is None:
             ctx.reset_cooldown()

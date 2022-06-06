@@ -73,7 +73,6 @@ class Fun(Cog, category=Category.FUN):
         else:
             await (await inter.original_message()).edit("Reactions added")
 
-    @commands.cooldown(3, 90, commands.BucketType.guild)
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):
         member = random.choice(ctx.channel.members)

@@ -15,6 +15,7 @@ from .client import LocalEval, RemoteEval
 
 
 class Eval(Cog, category=Category.GENERAL):
+    @commands.cooldown(5, 1)
     @commands.command(aliases=["exec", "eval", "code", "py"], brief="Evaluate a Python script")
     async def python(self, ctx: Context, *, codeblocks: Codeblocks):
         if not codeblocks:

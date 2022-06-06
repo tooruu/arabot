@@ -7,7 +7,7 @@ from arabot.core import Category, Cog, Context
 from async_lru import alru_cache
 from disnake import File, PCMAudio
 from disnake.ext import tasks
-from disnake.ext.commands import BucketType, command, cooldown
+from disnake.ext.commands import command
 
 
 class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
@@ -15,14 +15,12 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         self.session = session
         self._invalidate_voices_cache.start()
 
-    @cooldown(5, 60, BucketType.guild)
     @command(aliases=["synth"], brief="Synthesize speech from text")
     async def tts(self, ctx: Context):
         async with ctx.typing():
             if pcm := await self.parse_check_detect_synthesize(ctx):
                 await ctx.reply(file=File(pcm, "audio.wav"))
 
-    @cooldown(5, 60, BucketType.guild)
     @command(aliases=["pronounce"], brief="Pronounce text in voice channel")
     async def speak(self, ctx: Context):
         if ctx.guild.voice_client:
