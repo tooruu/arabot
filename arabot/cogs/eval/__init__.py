@@ -1,5 +1,5 @@
+import asyncio
 import logging
-from asyncio import sleep
 from functools import partial
 from io import StringIO
 from typing import Any
@@ -30,26 +30,24 @@ class Eval(Cog, category=Category.GENERAL):
         )
 
         if await ctx.ara.is_owner(ctx.author):
-            evaluator = LocalEval(
-                env=dict(
-                    ctx=ctx,
-                    msg=ctx.message,
-                    message=ctx.message,
-                    me=ctx.author,
-                    guild=ctx.guild,
-                    channel=ctx.channel,
-                    ara=ctx.bot,
-                    bot=ctx.bot,
-                    disnake=disnake,
-                    discord=disnake,
-                    embed=disnake.Embed(),
-                    sleep=sleep,
-                ),
-                stdin=StringIO(inputlines),
+            local_eval_env = dict(
+                ctx=ctx,
+                message=ctx.message,
+                msg=ctx.message,
+                me=ctx.author,
+                guild=ctx.guild,
+                channel=ctx.channel,
+                bot=ctx.bot,
+                ara=ctx.bot,
+                disnake=disnake,
+                discord=disnake,
+                Embed=disnake.Embed,
+                E=disnake.Embed,
+                sleep=asyncio.sleep,
             )
+            evaluator = LocalEval(env=local_eval_env, stdin=StringIO(inputlines))
             result.set_footer(
-                text="Powered by myself 😌",
-                icon_url=ctx.me.display_avatar.as_icon.compat.url,
+                text="Powered by myself 😌", icon_url=ctx.me.display_avatar.as_icon.compat.url
             )
         else:
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)
