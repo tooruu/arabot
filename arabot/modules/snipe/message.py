@@ -1,4 +1,5 @@
-from arabot.core import AnyMember, Ara, Category, Cog, Context
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import AnyMember
 from disnake import Embed, Message
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop

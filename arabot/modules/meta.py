@@ -5,7 +5,8 @@ from subprocess import SubprocessError, check_output
 from urllib.parse import urlencode
 
 import arabot
-from arabot.core import Ara, Category, Cog, Context, utils
+from arabot import utils
+from arabot.core import Ara, Category, Cog, Context
 from disnake import Embed
 from disnake.ext.commands import MinimalHelpCommand, command
 

@@ -3,7 +3,7 @@ from urllib.parse import quote_plus
 
 from aiohttp import ClientSession
 from arabot.core import Ara, Category, Cog, Context
-from arabot.core.utils import dsafe
+from arabot.utils import dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 

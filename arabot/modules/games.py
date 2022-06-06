@@ -6,7 +6,8 @@ from functools import partial
 from itertools import product
 
 import disnake
-from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
+from arabot.core import Ara, Category, Cog, Context, CustomEmoji
+from arabot.utils import AnyMember
 from disnake.ext import commands
 
 COLUMN_EMOJI = "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"
@@ -476,7 +477,7 @@ class Games(Cog, category=Category.GAMES):
         and [m.bot for m in vc.members].count(False) > 2  # pylint: disable=used-before-assignment
     )
     @commands.cooldown(1, 120, commands.BucketType.guild)
-    @commands.command(aliases=["impostor", "impasta"])
+    @commands.command(aliases=["impostor", "impasta"], brief="Eject imposter from voice chat")
     async def imposter(self, ctx: Context):
         vote_timeout = 20
 

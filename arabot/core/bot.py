@@ -12,9 +12,9 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 
+from ..utils import MissingEnvVar, getkeys, mono, strfdelta, system_info
 from .errors import StopCommand
 from .patches import Context
-from .utils import MissingEnvVar, getkeys, mono, strfdelta, system_info
 
 
 def search_directory(path) -> Generator[str, None, None]:
@@ -43,7 +43,7 @@ def search_directory(path) -> Generator[str, None, None]:
 
 class Ara(commands.Bot):
     def __init__(self, *args, **kwargs):
-        self._cogs_path: str = kwargs.pop("cogs_path", "arabot/cogs")
+        self._cogs_path: str = kwargs.pop("cogs_path", "arabot/modules")
         embed_color: int | disnake.Color | None = kwargs.pop("embed_color", None)
 
         disnake.Embed.set_default_color(embed_color)
@@ -57,7 +57,7 @@ class Ara(commands.Bot):
             logging.critical("Missing environment variable 'token'")
             sys.exit(69)
         except (disnake.LoginFailure, TypeError):
-            logging.critical("Invalid token")
+            logging.critical("Invalid token %r", token)
             sys.exit(69)
         except aiohttp.ClientConnectorError:
             logging.critical("No internet connection")

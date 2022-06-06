@@ -4,7 +4,7 @@ from functools import partial
 from zoneinfo import ZoneInfo
 
 from arabot.core import Ara, Cog
-from arabot.core.utils import strfdelta
+from arabot.utils import strfdelta
 from disnake import HTTPException
 from disnake.ext.tasks import loop
 

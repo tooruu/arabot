@@ -2,8 +2,8 @@ import random
 import re
 
 import disnake
-from arabot.core import AnyEmoji, AnyMember, AnyMemberOrUser, Ara, Category, Cog, Context
-from arabot.core.utils import bold
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import AnyEmoji, AnyMember, AnyMemberOrUser, bold
 from disnake.ext import commands
 
 

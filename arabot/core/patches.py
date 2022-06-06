@@ -12,8 +12,8 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 
+from ..utils import getkeys
 from .enums import Category
-from .utils import getkeys
 
 __all__ = [
     "Context",

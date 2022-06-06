@@ -8,7 +8,7 @@ from types import CodeType
 from typing import Any
 
 from aiohttp import ClientSession
-from arabot.core.utils import Lockable, stdin_from
+from arabot.utils import Lockable, stdin_from
 
 from . import errors
 from .abc import Evaluator

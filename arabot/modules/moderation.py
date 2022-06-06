@@ -3,7 +3,8 @@ import re
 from contextlib import suppress
 
 import disnake
-from arabot.core import AnyTChl, Ara, Category, Cog, Context, CustomEmoji
+from arabot.core import Ara, Category, Cog, Context, CustomEmoji
+from arabot.utils import AnyTChl
 from disnake.ext.commands import command, has_permissions
 
 

@@ -1,6 +1,6 @@
 from os import getenv
 
-from arabot.core import Ara
+from arabot import Ara
 
 from .images import GoogleImages
 from .ocr import GoogleOCR

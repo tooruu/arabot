@@ -2,7 +2,7 @@ import logging
 from base64 import b64encode
 
 from arabot.core import Category, Cog, Context, StopCommand
-from arabot.core.utils import codeblock, dsafe
+from arabot.utils import codeblock, dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 

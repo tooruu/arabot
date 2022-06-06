@@ -6,11 +6,10 @@ import signal
 
 import disnake
 
-from . import TESTING
-from .core import Ara
+from . import TESTING, Ara
 
 
-def setup_logging():
+def setup_logging() -> None:
     logging.basicConfig(
         format="%(asctime)s|%(levelname)s|%(message)s",
         level=logging.INFO if TESTING else logging.WARNING,
@@ -52,7 +51,7 @@ def create_ara(*args, **kwargs) -> Ara:
     return Ara(*args, **default_kwargs | kwargs)
 
 
-def main():
+def main() -> None:
     setup_logging()
 
     loop = asyncio.new_event_loop()

@@ -6,8 +6,8 @@ from typing import Any
 
 import disnake
 from aiohttp import ClientResponseError
-from arabot.core import Ara, Category, Codeblocks, Cog, Context
-from arabot.core.utils import codeblock
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import Codeblocks, codeblock
 from disnake.ext import commands
 
 from . import errors

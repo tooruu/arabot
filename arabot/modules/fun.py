@@ -4,7 +4,8 @@ from io import BytesIO
 
 import disnake
 from aiohttp import ClientSession
-from arabot.core import AnyMember, Ara, Category, Cog, Context, CustomEmoji
+from arabot.core import Ara, Category, Cog, Context, CustomEmoji
+from arabot.utils import AnyMember
 from disnake.ext import commands
 from numpy.random import default_rng
 

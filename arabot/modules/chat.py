@@ -2,7 +2,8 @@ import re
 from asyncio import sleep
 
 import disnake
-from arabot.core import Ara, Cog, CustomEmoji, is_in_guild, pfxless
+from arabot.core import Ara, Cog, CustomEmoji, pfxless
+from arabot.utils import is_in_guild
 from disnake.ext import commands
 
 

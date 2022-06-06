@@ -1,5 +1,5 @@
 from aiohttp import ClientSession
-from arabot.core import Ara, Category, Cog, Context
+from arabot.core import Category, Cog, Context
 from disnake.ext.commands import command
 
 
