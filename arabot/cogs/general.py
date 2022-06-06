@@ -79,7 +79,7 @@ class General(Cog, category=Category.GENERAL):
         else:
             await ctx.send_mention(f"Summoning {target.mention}")
 
-    @commands.command(brief="Suggest server emoji")
+    @commands.command(brief="Suggest server emoji", hidden=True)
     async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after=None):
         if em_before not in ctx.guild.emojis:
             await ctx.send("Choose a valid server emoji to replace")
