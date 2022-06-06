@@ -66,7 +66,9 @@ class Meta(Cog, category=Category.META):
 
     def __setup_help_command(self):
         self._orig_help_command = self.ara.help_command
-        self.ara.help_command = AraHelp(aliases=["halp", "h"], brief="Show this message")
+        self.ara.help_command = AraHelp(
+            aliases=["halp", "h", "commands"], brief="Show this message"
+        )
         self.ara.help_command.cog = self
 
     def __get_ara_invite_link(self):
