@@ -102,7 +102,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
-        field_name = f"{last_msg.author.display_name}, {format_dt(last_msg.created_at)}:"
+        field_name = f"{last_msg.author.display_name}, {format_dt(last_msg.created_at, 'R')}:"
         embed.add_field(field_name, last_msg.content[-1024:])
         await ctx.send(embed=embed)
 
