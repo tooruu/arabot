@@ -177,7 +177,7 @@ class General(Cog, category=Category.GENERAL):
                 500, 501, 502, 503, 504, 506, 507, 508, 509, 510, 511, 521, 523, 525, 599
             }
             # fmt: on
-            else "Invalid status code"
+            else "Invalid HTTP status code"
         )
 
     @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
