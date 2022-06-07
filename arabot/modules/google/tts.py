@@ -7,7 +7,7 @@ from arabot.core import Category, Cog, Context
 from async_lru import alru_cache
 from disnake import File, PCMAudio
 from disnake.ext import tasks
-from disnake.ext.commands import command
+from disnake.ext.commands import clean_content, command
 
 
 class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
@@ -41,6 +41,9 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send("I need text to pronounce")
             return
+        text = await clean_content(fix_channel_mentions=True, remove_markdown=True).convert(
+            ctx, text
+        )
 
         if not lang:
             lang = await self.detect_language(text)
