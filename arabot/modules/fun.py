@@ -1,5 +1,6 @@
 import random
 from asyncio import sleep
+from contextlib import suppress
 from io import BytesIO
 
 import disnake
@@ -28,16 +29,17 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who asked?", hidden=True)
-    async def wa(self, ctx: Context, msg: disnake.Message = None):
-        await ctx.message.delete()
-        if not msg:
-            async for msg in ctx.history(limit=3):
-                if msg.webhook_id or not msg.author.bot:
-                    break
-            else:
-                return
-        for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
-            await msg.add_reaction(i)
+    async def wa(self, ctx: Context, message: disnake.Message = None):
+        with suppress(disnake.Forbidden):
+            await ctx.message.delete()
+            if not message and not (message := await ctx.getch_reference_message()):
+                async for message in ctx.history(limit=4):
+                    if message.webhook_id or not message.author.bot:
+                        break
+                else:
+                    return
+            for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
+                await message.add_reaction(i)
 
     @commands.message_command(name="Who asked?")
     async def whoasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
@@ -52,16 +54,17 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who cares?", hidden=True)
-    async def wc(self, ctx: Context, msg: disnake.Message = None):
-        await ctx.message.delete()
-        if not msg:
-            async for msg in ctx.history(limit=3):
-                if msg.webhook_id or not msg.author.bot:
-                    break
-            else:
-                return
-        for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
-            await msg.add_reaction(i)
+    async def wc(self, ctx: Context, message: disnake.Message = None):
+        with suppress(disnake.Forbidden):
+            await ctx.message.delete()
+            if not message and not (message := await ctx.getch_reference_message()):
+                async for message in ctx.history(limit=4):
+                    if message.webhook_id or not message.author.bot:
+                        break
+                else:
+                    return
+            for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
+                await message.add_reaction(i)
 
     @commands.message_command(name="Who cares?")
     async def whocares(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
