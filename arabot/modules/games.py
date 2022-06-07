@@ -377,8 +377,18 @@ class Games(Cog, category=Category.GAMES):
         self.rr_barrel: dict[int, int] = defaultdict(lambda: [1, random.randint(1, 6)])
         self.rr_last_user: dict[int, int] = {}
         self.rr_last_deaths: dict[int, deque[int]] = defaultdict(partial(deque, maxlen=2))
+        self.russian_roulette._buckets = commands.DynamicCooldownMapping(
+            self.rr_cooldown, commands.BucketType.guild
+        )
 
-    @commands.command(name="rr", brief="People get killed here, careful")
+    def rr_cooldown(self, msg: disnake.Message) -> commands.Cooldown | None:
+        if self.rr_last_user.get(msg.guild.id) != msg.author.id:
+            barrel = self.rr_barrel[msg.guild.id]
+            if barrel[0] == barrel[1]:
+                return commands.Cooldown(1, 60)
+        return None
+
+    @commands.command(name="rr", brief="Russian Roulette")
     async def russian_roulette(self, ctx: Context):
         if self.rr_last_user.get(ctx.guild.id) == ctx.author.id:
             await ctx.reply("You have to pass the gun to someone else")
@@ -393,7 +403,6 @@ class Games(Cog, category=Category.GAMES):
 
         del self.rr_barrel[ctx.guild.id]
         del self.rr_last_user[ctx.guild.id]
-        ctx.command._buckets.update_rate_limit(ctx.message, ctx.message.created_at.timestamp() + 60)
 
         last_deaths = self.rr_last_deaths[ctx.guild.id]
         if last_deaths.count(ctx.author.id) < last_deaths.maxlen:
