@@ -166,7 +166,7 @@ class Fun(Cog, category=Category.FUN):
         if reaction := disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, msg_x.reactions):
             await msg_x.reply(f"{reaction.count - 1} people have doubted {msg_x.author.mention}")
         else:
-            await msg_x.reply("Someone cleared all the doubts 👀")
+            await msg_x.reply("Someone cleared all doubts 👀")
 
     @commands.command(brief="Find out someone's pp size")
     async def pp(self, ctx: Context, *, target: AnyMember = False):
