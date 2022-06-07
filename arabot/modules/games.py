@@ -425,7 +425,7 @@ class Games(Cog, category=Category.GAMES):
             )
 
     @commands.max_concurrency(1, commands.BucketType.channel)
-    @commands.command(brief="Guess a number")
+    @commands.command(brief="Guess a number", usage="[max=20]")
     async def guess(self, ctx: Context, *ceiling):
         # Initializing
         try:
@@ -542,7 +542,7 @@ class Games(Cog, category=Category.GAMES):
         await imposter.move_to(None, reason="Imposter")
         await ctx.send(f"{imposter.mention} was ejected")
 
-    @commands.command(brief="Start a game of Tic-Tac-Toe")
+    @commands.command(brief="Start a game of Tic-Tac-Toe", usage="[opponent]")
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
         if opponent is None:
             ctx.reset_cooldown()

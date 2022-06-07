@@ -15,13 +15,17 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         self.session = session
         self._invalidate_voices_cache.start()
 
-    @command(aliases=["synth"], brief="Synthesize speech from text")
+    @command(aliases=["synth"], brief="Synthesize speech from text", usage="[lang] <text or reply>")
     async def tts(self, ctx: Context):
         async with ctx.typing():
             if pcm := await self.parse_check_detect_synthesize(ctx):
                 await ctx.reply(file=File(pcm, "audio.wav"))
 
-    @command(aliases=["pronounce"], brief="Pronounce text in voice channel")
+    @command(
+        aliases=["pronounce"],
+        brief="Pronounce text in voice channel",
+        usage="[lang] <text or reply>",
+    )
     async def speak(self, ctx: Context):
         if ctx.guild.voice_client:
             await ctx.send("I'm already speaking")

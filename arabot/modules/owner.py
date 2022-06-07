@@ -39,7 +39,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         await ctx.send("I'm dying, master 🥶")
         await ctx.ara.close()
 
-    @commands.command()
+    @commands.command(usage="[activity]")
     async def presence(self, ctx: Context, act_type="", *, act_name=""):
         acts = {
             "playing": disnake.ActivityType.playing,
@@ -82,7 +82,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         )
         await ctx.send(embed=embed)
 
-    @ext.command(name="load", aliases=["enable"])
+    @ext.command(name="load", aliases=["enable"], usage="<extensions>")
     async def ext_load(self, ctx: Context, *extensions):
         if not extensions:
             await ctx.send("No extensions provided")
@@ -100,7 +100,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
 
         await self.do_action_group_format_embed_send(load, extensions, statuses, ctx.send)
 
-    @ext.command(name="unload", aliases=["disable"])
+    @ext.command(name="unload", aliases=["disable"], usage="<extensions>")
     async def ext_unload(self, ctx: Context, *extensions):
         if not extensions:
             await ctx.send("No extensions provided")
@@ -113,7 +113,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         unload = lambda ext: ctx.ara.unload_extension(f"{self.COGS_PATH_DOTTED}.{ext}")
         await self.do_action_group_format_embed_send(unload, extensions, statuses, ctx.send)
 
-    @ext.command(name="reload")
+    @ext.command(name="reload", usage="<extensions>")
     async def ext_reload(self, ctx: Context, *extensions):
         if not extensions:
             await ctx.send("No extensions provided")
@@ -134,7 +134,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     async def cmd(self, ctx: Context):
         pass
 
-    @cmd.command(name="enable", aliases=["load"])
+    @cmd.command(name="enable", aliases=["load"], usage="<commands>")
     async def cmd_enable(self, ctx: Context, *cmds):
         if not cmds:
             await ctx.send("No commands provided")
@@ -156,7 +156,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
 
         await self.do_action_group_format_embed_send(enable, cmds, statuses, ctx.send)
 
-    @cmd.command(name="disable", aliases=["unload"])
+    @cmd.command(name="disable", aliases=["unload"], usage="<commands>")
     async def cmd_disable(self, ctx: Context, *cmds):
         if not cmds:
             await ctx.send("No commands provided")

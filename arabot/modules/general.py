@@ -11,7 +11,9 @@ class General(Cog, category=Category.GENERAL):
     def __init__(self, ara: Ara):
         self.ara = ara
 
-    @commands.command(aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)")
+    @commands.command(
+        aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)", usage="<emojis...>"
+    )
     async def emoji(self, ctx: Context, *emojis: AnyEmoji):
         emojis = list(dict.fromkeys(e for e in emojis if e))[:10]
         if not emojis:
@@ -22,7 +24,7 @@ class General(Cog, category=Category.GENERAL):
             embed.add_field(emoji, f"[{emoji.name}]({emoji.url})", inline=False)
         await ctx.reply(embed=embed)
 
-    @commands.command(aliases=["r"], brief="React to a message")
+    @commands.command(aliases=["r"], brief="React to a message", usage="<emoji>")
     async def react(self, ctx: Context, emoji: AnyEmoji = False):
         await ctx.message.delete()
         if not (ref_msg := await ctx.getch_reference_message()):
@@ -44,42 +46,43 @@ class General(Cog, category=Category.GENERAL):
                 await ctx.reply(f"Cannot add reactions to {ref_msg.author.mention}'s messages")
 
     @commands.cooldown(1, 60, commands.BucketType.member)
-    @commands.command(brief="DM user to summon them")
-    async def summon(self, ctx: Context, target: AnyMember = False, *, msg=None):
-        if target is False:
+    @commands.command(brief="DM user to summon them", usage="<member> [text]")
+    async def summon(self, ctx: Context, member: AnyMember = False, *, text=None):
+        if member is False:
             ctx.reset_cooldown()
             await ctx.send("Specify a user to summon")
             return
-        if target is None:
+        if member is None:
             ctx.reset_cooldown()
             await ctx.send("User not found")
             return
-        if target.bot:
+        if member.bot:
             ctx.reset_cooldown()
             await ctx.send("Cannot summon bots")
             return
-        if target not in ctx.channel.members:
+        if member not in ctx.channel.members:
             ctx.reset_cooldown()
-            await ctx.send(f"{target.mention} doesn't have access to this channel")
+            await ctx.send(f"{member.mention} doesn't have access to this channel")
             return
         invite = await ctx.guild.get_unlimited_invite_link() or disnake.Embed.Empty
         embed = disnake.Embed(
             description=f"{ctx.author.mention} is summoning you to {ctx.channel.mention}"
-            "\n%s\n[Jump to message](%s)" % (f"\n{bold(msg)}" if msg else "", ctx.message.jump_url)
+            "\n%s\n[Jump to message](%s)"
+            % (f"\n{bold(text)}" if text else "", ctx.message.jump_url)
         ).set_author(
             name=ctx.guild.name,
             url=invite,
             icon_url=ctx.guild.icon.as_icon.compat.url if ctx.guild.icon else disnake.Embed.Empty,
         )
         try:
-            await target.send(embed=embed)
+            await member.send(embed=embed)
         except disnake.Forbidden:
             ctx.reset_cooldown()
-            await ctx.send_mention(f"Cannot send messages to {target.mention}")
+            await ctx.send_mention(f"Cannot send messages to {member.mention}")
         else:
-            await ctx.send_mention(f"Summoning {target.mention}")
+            await ctx.send_mention(f"Summoning {member.mention}")
 
-    @commands.command(brief="Suggest server emoji", hidden=True)
+    @commands.command(brief="Suggest server emoji", usage="<server emoji> <new emoji>", hidden=True)
     async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after=None):
         if em_before not in ctx.guild.emojis:
             await ctx.send("Choose a valid server emoji to replace")
@@ -122,16 +125,18 @@ class General(Cog, category=Category.GENERAL):
         await message.add_reaction("👎")
 
     @commands.command(brief="Make Ara say something")
-    async def say(self, ctx: Context, *, msg):
+    async def say(self, ctx: Context, *, text):
         await ctx.message.delete()
-        await ctx.send(msg)
+        await ctx.send(text)
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context):
         answer = random.choice(("Yes", "No"))
         await ctx.reply(f"🎱 | {answer}")
 
-    @commands.command(aliases=["pick"], brief="Make a choice for you")
+    @commands.command(
+        aliases=["pick"], brief="Make a choice for you", usage="<option 1>|<option 2>|..."
+    )
     async def choose(self, ctx: Context, *, options):
         options = options.split("|")
         if len(options) < 2:
@@ -140,7 +145,11 @@ class General(Cog, category=Category.GENERAL):
         pick = random.choice(options).strip()
         await ctx.reply(f"I pick {pick}")
 
-    @commands.command(aliases=["vote"], brief="Create a poll and count votes")
+    @commands.command(
+        aliases=["vote", "survey"],
+        brief="Create a poll",
+        usage="<topic> OR <topic>|<option 1>|<option 2>|...",
+    )
     async def poll(self, ctx: Context, *, options):
         options = [opt.strip() for opt in options.split("|")]
         if not options:
@@ -164,11 +173,11 @@ class General(Cog, category=Category.GENERAL):
             await poll.add_reaction(i)
 
     @commands.command(brief="HTTP Status Cats")
-    async def http(self, ctx: Context, status_code: int):
+    async def http(self, ctx: Context, http_status_code: int):
         await ctx.send(
-            f"https://http.cat/{status_code}"
+            f"https://http.cat/{http_status_code}"
             # fmt: off
-            if status_code in {
+            if http_status_code in {
                 100, 101, 102,
                 200, 201, 202, 203, 204, 206, 207,
                 300, 301, 302, 303, 304, 305, 307, 308,
@@ -181,7 +190,7 @@ class General(Cog, category=Category.GENERAL):
         )
 
     @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
-    async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, message):
+    async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text):
         if not user:
             await ctx.reply("User not found")
             return
@@ -189,7 +198,7 @@ class General(Cog, category=Category.GENERAL):
         await ctx.message.delete()
         webhook = await ctx.channel.create_webhook(name=user)
         await webhook.send_mention(
-            message, username=user.display_name, avatar_url=user.display_avatar.url
+            text, username=user.display_name, avatar_url=user.display_avatar.url
         )
         await webhook.delete()
 

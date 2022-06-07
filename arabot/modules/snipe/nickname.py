@@ -59,14 +59,14 @@ class NicknameSnipe(Cog, category=Category.FUN):
         )
 
     @command(aliases=["sn", "ns"], brief="View recent nick history of a user")
-    async def nicksnipe(self, ctx: Context, *, target: AnyMember):
-        if target is None:
+    async def nicksnipe(self, ctx: Context, *, member: AnyMember):
+        if member is None:
             await ctx.send("User not found")
             return
 
-        history = self._cache.get(ctx.guild.id, {}).get(target.id, [])[:]
+        history = self._cache.get(ctx.guild.id, {}).get(member.id, [])[:]
         if not history:
-            await ctx.send(self.EMPTY_SNIPE_MSG.format(user=target.display_name))
+            await ctx.send(self.EMPTY_SNIPE_MSG.format(user=member.display_name))
             return
 
         if history[0][1] == history[1][1]:

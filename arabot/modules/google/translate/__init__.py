@@ -16,7 +16,11 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
     def __init__(self, trans_client: TranslationClient):
         self.gtrans = trans_client
 
-    @command(aliases=["tr", "trans"], brief="Translates text")
+    @command(
+        aliases=["tr", "trans"],
+        brief="Translates text",
+        usage="[lang from] [lang to] <text or reply>",
+    )
     async def translate(self, ctx: Context):
         langs = await self.gtrans.languages(repr_lang=self.DEFAULT_TARGET[0])
         user_args = self.parse_query(ctx.argument_only, langs)

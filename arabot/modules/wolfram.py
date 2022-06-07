@@ -13,13 +13,13 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
         self.session = session
 
     @command(brief="Answer a question")
-    async def calc(self, ctx: Context, *, query: str):
+    async def calc(self, ctx: Context, *, question: str):
         await ctx.trigger_typing()
-        query = query.strip("`")
+        question = question.strip("`")
         async with self.session.get(
             "https://api.wolframalpha.com/v2/query",
             params={
-                "input": query,
+                "input": question,
                 "format": "plaintext",
                 "output": "json",
                 "appid": self.wolfram_id,
@@ -29,8 +29,8 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
             wa = loads(await wa.text())["queryresult"]
         embed = Embed(
             color=0xF4684C,
-            title=dsafe(query),
-            url=f"https://wolframalpha.com/input/?i={quote_plus(query)}",
+            title=dsafe(question),
+            url=f"https://wolframalpha.com/input/?i={quote_plus(question)}",
         ).set_footer(
             icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png",
             text="Wolfram|Alpha",

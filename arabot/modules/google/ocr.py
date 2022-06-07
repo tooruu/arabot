@@ -21,7 +21,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
     def __init__(self, trans: GoogleTranslate):
         self.trans = trans
 
-    @command(aliases=["read"], brief="Read text from image")
+    @command(aliases=["read"], brief="Read text from image", usage="<image or reply>")
     async def ocr(self, ctx: Context):
         await ctx.trigger_typing()
         image_url = await ctx.rsearch("image_url")
@@ -35,7 +35,11 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
             )
         )
 
-    @command(aliases=["otr", "ocrt", "octr", "ocrtrans"], brief="Read & translate text from image")
+    @command(
+        aliases=["otr", "ocrt", "octr", "ocrtrans"],
+        brief="Read & translate text from image",
+        usage="[lang from] [lang to] <image or reply>",
+    )
     async def ocrtranslate(self, ctx: Context):
         await ctx.trigger_typing()
         image_url = await ctx.rsearch("image_url")

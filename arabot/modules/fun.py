@@ -28,7 +28,7 @@ class Fun(Cog, category=Category.FUN):
             await ctx.send(file=disnake.File(image, "face.png"))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
-    @commands.command(brief="Who asked?", hidden=True)
+    @commands.command(brief="Who asked?", usage="[message or reply]", hidden=True)
     async def wa(self, ctx: Context, message: disnake.Message = None):
         with suppress(disnake.Forbidden):
             await ctx.message.delete()
@@ -53,7 +53,7 @@ class Fun(Cog, category=Category.FUN):
             await (await inter.original_message()).edit("Reactions added")
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
-    @commands.command(brief="Who cares?", hidden=True)
+    @commands.command(brief="Who cares?", usage="[message or reply]", hidden=True)
     async def wc(self, ctx: Context, message: disnake.Message = None):
         with suppress(disnake.Forbidden):
             await ctx.message.delete()
@@ -83,18 +83,18 @@ class Fun(Cog, category=Category.FUN):
         await ctx.reply(embed=disnake.Embed().with_author(member))
 
     @commands.command(aliases=["gp"], brief="Secretly ping a person", hidden=True)
-    async def ghostping(self, ctx: Context, target: AnyMember, *, msg):
+    async def ghostping(self, ctx: Context, member: AnyMember, *, text):
         await ctx.message.delete()
-        if not target:
+        if not member:
             return
         invis_bug = "||\u200b||" * 198 + "_ _"
-        if len(message := msg + invis_bug + target.mention) <= 2000:
+        if len(message := text + invis_bug + member.mention) <= 2000:
             await ctx.send_mention(message)
 
     @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     @commands.cooldown(2, 60 * 60 * 24 * 3.5, commands.BucketType.member)
-    async def rename(self, ctx: Context, target: AnyMember, *, nick: str | None = None):
-        if not target:
+    async def rename(self, ctx: Context, member: AnyMember, *, nick: str | None = None):
+        if not member:
             ctx.reset_cooldown()
             await ctx.send("User not found")
             return
@@ -102,15 +102,15 @@ class Fun(Cog, category=Category.FUN):
             ctx.reset_cooldown()
             await ctx.send("Nickname cannot exceed 32 characters")
             return
-        if target == ctx.author:
+        if member == ctx.author:
             ctx.reset_cooldown()
-        elif ctx.author.top_perm_role < target.top_perm_role:
+        elif ctx.author.top_perm_role < member.top_perm_role:
             ctx.reset_cooldown()
             await ctx.send("Cannot rename users ranked higher than you")
             return
 
         try:
-            await target.edit(nick=nick)
+            await member.edit(nick=nick)
         except disnake.Forbidden:
             ctx.reset_cooldown()
             await ctx.send("I don't have permission to rename this user")
@@ -118,22 +118,22 @@ class Fun(Cog, category=Category.FUN):
 
         await ctx.tick()
 
-    @commands.command(aliases=["x"], brief="Doubt someone")
+    @commands.command(aliases=["x"], brief="Doubt someone", usage="[member or reply]")
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def doubt(self, ctx: Context, *, target: AnyMember = False):
-        if target is None:
+    async def doubt(self, ctx: Context, *, member: AnyMember = False):
+        if member is None:
             ctx.reset_cooldown()
             await ctx.send("User not found")
             return
 
-        if target:
-            if target == ctx.author:
+        if member:
+            if member == ctx.author:
                 ctx.reset_cooldown()
                 await ctx.send("Never doubt yourself!")
                 return
 
             async for msg_x in ctx.history(limit=20):
-                if msg_x.author == target:
+                if msg_x.author == member:
                     break
             else:
                 ctx.reset_cooldown()
@@ -168,15 +168,15 @@ class Fun(Cog, category=Category.FUN):
         else:
             await msg_x.reply("Someone cleared all doubts 👀")
 
-    @commands.command(brief="Find out someone's pp size")
-    async def pp(self, ctx: Context, *, target: AnyMember = False):
-        if target is None:
+    @commands.command(brief="Find out someone's pp size", usage="[member]")
+    async def pp(self, ctx: Context, *, member: AnyMember = False):
+        if member is None:
             await ctx.send("User not found")
             return
-        target = target or ctx.author
+        member = member or ctx.author
         size = round(default_rng().triangular(1, 15, 25))
         pp = f"3{'='*(size-1)}D"
-        await ctx.send(f"{target.mention}'s pp size is **{size} cm**\n{pp}")
+        await ctx.send(f"{member.mention}'s pp size is **{size} cm**\n{pp}")
 
 
 def setup(ara: Ara):

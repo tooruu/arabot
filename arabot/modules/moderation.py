@@ -22,10 +22,10 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
 
     @command()
     @has_permissions(manage_messages=True)
-    async def csay(self, ctx: Context, chl: AnyTChl, *, msg: str):
+    async def csay(self, ctx: Context, channel: AnyTChl, *, text: str):
         await ctx.message.delete()
-        if chl:
-            await chl.send(msg)
+        if channel:
+            await channel.send(text)
 
     @command()
     @has_permissions(manage_channels=True)

@@ -40,9 +40,9 @@ class Snipe(Cog, category=Category.FUN):
             if (now - msg.deleted_at).total_seconds() <= 3600
         }
 
-    @command(brief="View deleted messages within the last hour")
-    async def snipe(self, ctx: Context, *, target: AnyMember = False):
-        if target is None:
+    @command(brief="View deleted messages within the last hour", usage="[member]")
+    async def snipe(self, ctx: Context, *, member: AnyMember = False):
+        if member is None:
             await ctx.send("User not found")
             return
         if ctx.channel.id not in self._cache:
@@ -50,7 +50,7 @@ class Snipe(Cog, category=Category.FUN):
             return
         msg_pool = list(
             filter(
-                lambda m: not target or m.author == target,
+                lambda m: not member or m.author == member,
                 sorted(self._cache[ctx.channel.id], key=lambda msg: msg.created_at)[-10:],
             )
         )
@@ -83,9 +83,9 @@ class Snipe(Cog, category=Category.FUN):
             embed.remove_field(0)
         await ctx.send(embed=embed)
 
-    @command(brief="View the last deleted message")
-    async def last(self, ctx: Context, *, target: AnyMember = False):
-        if target is None:
+    @command(brief="View the last deleted message", usage="[member]")
+    async def last(self, ctx: Context, *, member: AnyMember = False):
+        if member is None:
             await ctx.send("User not found")
             return
         if ctx.channel.id not in self._cache:
@@ -94,7 +94,7 @@ class Snipe(Cog, category=Category.FUN):
         try:
             last_msg = next(
                 filter(
-                    lambda m: not target or m.author == target,
+                    lambda m: not member or m.author == member,
                     reversed(self._cache[ctx.channel.id]),
                 )
             )
