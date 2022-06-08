@@ -26,8 +26,8 @@ class Chat(Cog):
     async def cry(self, msg):
         await msg.reply(f"don't cry {CustomEmoji.KannaPat}")
 
-    @pfxless()
     @commands.cooldown(1, 60, commands.BucketType.channel)
+    @pfxless()
     async def za_warudo(self, msg: disnake.Message):
         old_perms = msg.channel.overwrites_for(msg.guild.default_role)
         temp_perms = msg.channel.overwrites_for(msg.guild.default_role)
@@ -51,16 +51,16 @@ class Chat(Cog):
         re.IGNORECASE,
     )
 
-    @pfxless(regex=BAD_GAMES)
     @is_in_guild(433298614564159488)
+    @pfxless(regex=BAD_GAMES)
     async def badgames(self, msg: disnake.Message):
         game_name = self.BAD_GAMES.search(msg.content)[0]
         await msg.temp_channel_mute_author(
             20, "геюга ебаная", success_msg=f"{game_name}? Ебать ты гей 🤡, иди в мут нахуй"
         )
 
-    @pfxless(regex=r"\b(communis[mt]|gulag)\b")
     @commands.cooldown(1, 60, commands.BucketType.channel)
+    @pfxless(regex=r"\b(communis[mt]|gulag)\b")
     async def communism(self, msg: disnake.Message):
         gulag = """
 bbbbbbbbbbbbbbb

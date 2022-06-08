@@ -91,8 +91,8 @@ class Fun(Cog, category=Category.FUN):
         if len(message := text + invis_bug + member.mention) <= 2000:
             await ctx.send_mention(message)
 
-    @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     @commands.cooldown(2, 60 * 60 * 24 * 3.5, commands.BucketType.member)
+    @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     async def rename(self, ctx: Context, member: AnyMember, *, nick: str | None = None):
         if not member:
             ctx.reset_cooldown()
@@ -118,8 +118,8 @@ class Fun(Cog, category=Category.FUN):
 
         await ctx.tick()
 
-    @commands.command(aliases=["x"], brief="Doubt someone", usage="[member or reply]")
     @commands.max_concurrency(1, commands.BucketType.channel)
+    @commands.command(aliases=["x"], brief="Doubt someone", usage="[member or reply]")
     async def doubt(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
             ctx.reset_cooldown()
