@@ -91,7 +91,7 @@ class Fun(Cog, category=Category.FUN):
         if len(message := text + invis_bug + member.mention) <= 2000:
             await ctx.send_mention(message)
 
-    @commands.cooldown(2, 60 * 60 * 24 * 3.5, commands.BucketType.member)
+    @commands.cooldown(1, 60 * 60 * 24 * 1.75, commands.BucketType.member)
     @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     async def rename(self, ctx: Context, member: AnyMember, *, nick: str | None = None):
         if not member:
@@ -168,6 +168,7 @@ class Fun(Cog, category=Category.FUN):
         else:
             await msg_x.reply("Someone cleared all doubts 👀")
 
+    @commands.cooldown(1, 1800, commands.BucketType.member)
     @commands.command(brief="Find out someone's pp size", usage="[member]")
     async def pp(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
