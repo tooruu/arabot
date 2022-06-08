@@ -12,8 +12,8 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(brief="Answer a question")
-    async def calc(self, ctx: Context, *, question: str):
+    @command(aliases=["calc"], brief="Answer a question")
+    async def wolfram(self, ctx: Context, *, question: str):
         await ctx.trigger_typing()
         question = question.strip("`")
         async with self.session.get(
