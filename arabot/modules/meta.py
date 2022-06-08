@@ -5,58 +5,91 @@ from subprocess import SubprocessError, check_output
 from urllib.parse import urlencode
 
 import arabot
-from arabot import utils
+import disnake
 from arabot.core import Ara, Category, Cog, Context
-from disnake import Embed
-from disnake.ext.commands import MinimalHelpCommand, command
+from disnake.ext import commands
+from disnake.utils import utcnow
 
 
-class AraHelp(MinimalHelpCommand):
+class EmbedHelpCommand(commands.HelpCommand):
+    no_category = "No Category"
+
     def __init__(self, **command_attrs):
         super().__init__(command_attrs=command_attrs)
 
-    async def send_bot_help(self, mapping):
+    async def prepare_help_command(self, ctx: commands.Context, command: str | None = None):
+        bot: commands.Bot = ctx.bot
+        self.embed = (
+            disnake.Embed(timestamp=utcnow())
+            .set_author(
+                name=f"{bot.name} Help Menu",
+                icon_url=ctx.me.display_avatar.as_icon.compat.url,
+            )
+            .set_footer(text=f"{bot.name} v{arabot.__version__}")
+        )
+
+    async def send_bot_help(self, mapping: dict[commands.Cog | None, list[commands.Command]]):
         bot: Ara = self.context.bot
 
-        embed = (
-            Embed(description=self.get_opening_note() or Embed.Empty)
-            .set_author(
-                name=f"{bot.name} help",
-                icon_url=self.context.me.display_avatar.as_icon.compat.url,
-            )
-            .set_thumbnail(url=bot.user.avatar.compat.url)
-            .set_footer(text=self.get_ending_note() or Embed.Empty)
-        )
+        help_command_repr = self.context.clean_prefix + self.invoked_with
+        self.embed.description = f"Use `{help_command_repr} [command]` for more info on a command"
+        self.embed.set_thumbnail(url=bot.user.avatar.compat.url)
 
-        get_category = lambda command: getattr(command.cog, "category", None) or self.no_category
+        get_category = lambda command: getattr(command.cog, "category", self.no_category)
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
-
-        for category, commands in groupby(filtered, key=get_category):
-            commands = (
-                sorted(commands, key=lambda c: c.name) if self.sort_commands else list(commands)
-            )
-            val = ""
-            for cmd in commands:
-                cell = utils.mono(cmd.name)
-                if cmd.brief:
-                    cell = f"[{cell}](http://. '{cmd.brief}')"
-                if len(val + cell) > 1024:
+        grouped = {cat: list(cmds) for cat, cmds in groupby(filtered, key=get_category)}
+        sorted_ = sorted(grouped.items(), key=lambda group: sum(len(c.name) for c in group[1]))
+        for category, cmds in sorted_:
+            commands_field = ""
+            for command in sorted(cmds, key=lambda c: c.name):
+                command_repr = arabot.utils.mono(command.name)
+                if command.brief:
+                    command_repr = f"[{command_repr}](http://. '{command.short_doc}')"
+                if len(commands_field + command_repr) > 1024:
                     break
-                val += f"{cell} "
+                commands_field += f"{command_repr} "
+            self.embed.add_field(arabot.utils.bold(category), commands_field[:-1] or "No commands")
 
-            embed.add_field(utils.bold(category), val[:-1] or "No commands")
+        await self.get_destination().send(embed=self.embed)
 
-        await self.get_destination().send(embed=embed)
+    async def send_command_help(self, command: commands.Command):
+        self.embed.title = arabot.utils.mono(command.name)
+        self.embed.description = command.help or command.description or command.short_doc
+        if command.aliases:
+            self.embed.add_field(
+                "Aliases", " ".join(map(arabot.utils.mono, sorted(command.aliases)))
+            )
+        usage = f"{self.context.clean_prefix}{command.name} {command.signature}".rstrip()
 
-    def get_opening_note(self):
-        command_repr = self.context.clean_prefix + self.invoked_with
-        return (
-            f"Use `{command_repr} [command]` for more info on a command.\n"
-            f"You can also use `{command_repr} [category]` for more info on a category."
+        self.embed.add_field(
+            "Usage",
+            arabot.utils.mono(usage) + "\n" + self.get_usage_explanation(command),
+            inline=False,
         )
 
-    def get_ending_note(self):
-        return f"{self.context.bot.name} v{arabot.__version__}"
+        return await self.get_destination().send(embed=self.embed)
+
+    @staticmethod
+    def get_usage_explanation(command: commands.Command) -> str:
+        explanation = ""
+        required = "\n`<>` - required"
+        optional = "\n`[]` - optional"
+        if command.usage:
+            if "<" in command.usage:
+                explanation += required
+            if "[" in command.usage:
+                explanation += optional
+        else:
+            params = command.clean_params.values()
+            if any(param.default is param.empty for param in params):
+                explanation += required
+            if any(param.default is not param.empty for param in params):
+                explanation += optional
+        if "=" in command.signature:
+            explanation += "\n`=` - default value"
+        if "..." in command.signature:
+            explanation += "\n`...` - supports multiple arguments"
+        return explanation  # and f"*Explanation:*{explanation}"
 
 
 class Meta(Cog, category=Category.META):
@@ -67,8 +100,8 @@ class Meta(Cog, category=Category.META):
 
     def __setup_help_command(self):
         self._orig_help_command = self.ara.help_command
-        self.ara.help_command = AraHelp(
-            aliases=["halp", "h", "commands"], brief="Show this message"
+        self.ara.help_command = EmbedHelpCommand(
+            aliases=["halp", "h", "commands"], brief="Shows bot or command help"
         )
         self.ara.help_command.cog = self
 
@@ -109,12 +142,12 @@ class Meta(Cog, category=Category.META):
 
         return f"{ver_str}+{commit_sha[:7]}{dirty_indicator}" if commit_sha else ver_str
 
-    @command(aliases=["ver", "v"], brief="Show bot's version")
+    @commands.command(aliases=["ver", "v"], brief="Show bot's version")
     async def version(self, ctx: Context):
         await self.ara.wait_until_ready()
-        await ctx.send(utils.codeblock(self._version, "less"))
+        await ctx.send(arabot.utils.codeblock(self._version, lang="less"))
 
-    @command(brief="Show bot's source code line count")
+    @commands.command(brief="Show bot's source code line count")
     async def lines(self, ctx: Context):
         if not self._line_count:
             await ctx.send("Couldn't read files")
@@ -124,15 +157,15 @@ class Meta(Cog, category=Category.META):
             f"of **{self._line_count}** lines of Python code"
         )
 
-    @command(aliases=["github", "gh"], brief="Open bot's code repository")
+    @commands.command(aliases=["github", "gh"], brief="Open bot's code repository")
     async def repo(self, ctx: Context):
         await ctx.send("<https://github.com/tooruu/AraBot>")
 
-    @command(name="invite", brief="Show server's invite link")
+    @commands.command(name="invite", brief="Show server's invite link")
     async def server_invite_link(self, ctx: Context):
         await ctx.send(await ctx.guild.get_unlimited_invite_link() or "Couldn't find invite link")
 
-    @command(name="arabot", brief="Show bot's invite link")  # TODO: dynamically change name
+    @commands.command(name="arabot", brief="Show bot's invite link")  # TODO:dynamically change name
     async def ara_invite_link(self, ctx: Context):
         await self.ara.wait_until_ready()
         await ctx.send(self._bot_invite_link)

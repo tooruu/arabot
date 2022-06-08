@@ -7,7 +7,7 @@ from typing import Any
 import disnake
 from aiohttp import ClientResponseError
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import Codeblocks, codeblock, dsafe
+from arabot.utils import Codeblocks, codeblock
 from disnake.ext import commands
 
 from . import errors
@@ -19,7 +19,7 @@ class Eval(Cog, category=Category.GENERAL):
     @commands.command(
         aliases=["exec", "eval", "code", "py"],
         brief="Evaluate a Python script",
-        usage=dsafe("`<code>` [`<input>`] OR ```<code>``` [```<input>```]"),
+        usage="<codeblock> [input block]",
     )
     async def python(self, ctx: Context, *, codeblocks: Codeblocks):
         if not codeblocks:
