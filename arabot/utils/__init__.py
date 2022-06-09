@@ -10,6 +10,7 @@ import disnake
 from .checks import *
 from .converters import *
 from .formatting import *
+from .pagination import EmbedPaginator
 
 
 def system_info() -> str:

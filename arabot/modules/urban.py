@@ -1,8 +1,9 @@
 import re
-from urllib.parse import quote_plus
+from datetime import datetime
+from typing import Any
 
 from arabot.core import Ara, Category, Cog, Context, pfxless
-from arabot.utils import bold, dsafe
+from arabot.utils import EmbedPaginator, bold, delchars, dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 
@@ -45,51 +46,44 @@ class Urban(Cog, category=Category.LOOKUP):
 
     @command(aliases=["ud"], brief="Search term in Urban Dictionary")
     async def urban(self, ctx: Context, *, term: str):
-        if term.lower() == ctx.ara.owner.name.lower():
-            invite = (
-                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite_link()
-                or Embed.Empty
-            )
-            await ctx.send(
-                embed=Embed(description="An awesome guy").set_author(
-                    name=ctx.ara.owner.name.lower(), url=invite
-                )
-            )
-            return
+        for predefined, definition in self.definitions.items():
+            if term.lower() == predefined.lower():
+                await ctx.send(embed=Embed(title=predefined, description=definition))
+                return
 
-        if term.lower() == ctx.ara.name.lower():
-            invite = (
-                await ctx.ara.get_guild(676889696302792774).get_unlimited_invite_link()
-                or Embed.Empty
-            )
-            await ctx.send(
-                embed=Embed(description="An awesome bot written by an awesome guy").set_author(
-                    name=ctx.ara.name, url=invite
-                )
-            )
-            return
-
-        data = await ctx.ara.session.fetch_json(self.BASE_URL, params={"term": quote_plus(term)})
-        if not (ud := data.get("list")):
-            if ctx.prefix:
+        if not (definitions := await self.fetch_definitions(term)):
+            if ctx.prefix:  # if command was invoked directly by user, not by urban_listener
                 await ctx.send(f"Definition for {bold(term)} not found")
             return
 
-        embed = Embed().set_author(
-            name=term,
-            url=f"https://www.urbandictionary.com/define.php?term={quote_plus(term)}",
-        )
+        embeds = [
+            Embed(
+                description=dsafe(delchars(definition["definition"], "[]"))[:4096],
+                title=dsafe(definition["word"])[:256],
+                url=definition["permalink"],
+                timestamp=datetime.fromisoformat(definition["written_on"][:-1]),
+            ).add_field("Example", dsafe(delchars(definition["example"], "[]"))[:1024])
+            for definition in definitions
+        ]
 
-        for result in ud[:3]:
-            definition = result["definition"].replace("[", "").replace("]", "")
-            embed.add_field(result["word"], dsafe(definition)[:1024], inline=False)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embeds[0], view=EmbedPaginator(embeds, author=ctx.author))
+
+    async def fetch_definitions(self, query: str) -> list[dict[str, Any]] | None:
+        data = await self.ara.session.fetch_json(self.BASE_URL, params={"term": query})
+        return data.get("list")
 
     @pfxless(regex=rf"{QUERY_PREFIX}((?:(?!{WORDS_IGNORE}).)*?)\??$")
     async def urban_listener(self, msg):
         if self.urban.enabled:
             term = re.search(rf"{self.QUERY_PREFIX}(.*?)\??$", msg.content, re.IGNORECASE)[1]
             await self.urban(await self.ara.get_context(msg), term=term)
+
+    async def cog_load(self):
+        await self.ara.wait_until_ready()
+        self.definitions = {
+            self.ara.name: "An awesome bot written by an awesome guy",
+            self.ara.owner.name: "An awesome guy",
+        }
 
 
 def setup(ara: Ara):
