@@ -66,7 +66,7 @@ class Urban(Cog, category=Category.LOOKUP):
             for definition in definitions
         ]
 
-        await ctx.send(embed=embeds[0], view=EmbedPaginator(embeds))
+        await ctx.send(embed=embeds[0], view=EmbedPaginator(embeds, author=ctx.author))
 
     async def fetch_definitions(self, query: str) -> list[dict[str, Any]] | None:
         data = await self.ara.session.fetch_json(self.BASE_URL, params={"term": query})

@@ -9,6 +9,7 @@ class EmbedPaginator(disnake.ui.View):
         page: int = 0,
         timeout: float | None = 180.0,
         buttons: str = "pn",
+        author: disnake.abc.User | None = None,
     ):
         if not embeds:
             raise ValueError("Must have at least 1 embed")
@@ -24,6 +25,7 @@ class EmbedPaginator(disnake.ui.View):
 
         self.embeds = embeds
         self.page = page
+        self.author = author
         for p, embed in enumerate(self.embeds, 1):
             embed.set_footer(text=f"Page {p} of {len(self.embeds)}")
 
@@ -36,6 +38,12 @@ class EmbedPaginator(disnake.ui.View):
         }.items():
             if char not in buttons:
                 self.remove_item(item)
+
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
+        if self.author is None or interaction.author == self.author:
+            return True
+        await interaction.response.send_message("You can't interact with this menu", ephemeral=True)
+        return False
 
     @disnake.ui.button(emoji="⏪", style=disnake.ButtonStyle.blurple)
     async def first_page(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
