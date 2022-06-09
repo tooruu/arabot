@@ -48,9 +48,9 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await (await inter.original_message()).edit("I don't have permission to add reactions")
+            await inter.edit_original_message("I don't have permission to add reactions")
         else:
-            await (await inter.original_message()).edit("Reactions added")
+            await inter.edit_original_message("Reactions added")
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who cares?", usage="[message or reply]", hidden=True)
@@ -73,9 +73,9 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await (await inter.original_message()).edit("I don't have permission to add reactions")
+            await inter.edit_original_message("I don't have permission to add reactions")
         else:
-            await (await inter.original_message()).edit("Reactions added")
+            await inter.edit_original_message("Reactions added")
 
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):
