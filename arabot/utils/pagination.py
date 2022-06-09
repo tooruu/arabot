@@ -11,9 +11,9 @@ class EmbedPaginator(disnake.ui.View):
         buttons: str = "pn",
     ):
         if not embeds:
-            raise ValueError("must have at least 1 embed")
+            raise ValueError("Must have at least 1 embed")
         if page > len(embeds) - 1:
-            raise IndexError("embed page out of range")
+            raise IndexError("Embed page out of range")
 
         super().__init__(timeout=timeout)
 
