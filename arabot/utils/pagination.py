@@ -26,9 +26,13 @@ class EmbedPaginator(disnake.ui.View):
         for p, embed in enumerate(self.embeds, 1):
             embed.set_footer(text=f"Page {p} of {len(self.embeds)}")
 
-        for char, item in zip(
-            "fpnld", (self.first_page, self.prev_page, self.next_page, self.last_page, self.delete)
-        ):
+        for char, item in {
+            "f": self.first_page,
+            "p": self.prev_page,
+            "n": self.next_page,
+            "l": self.last_page,
+            "d": self.delete,
+        }.items():
             if char not in buttons:
                 self.remove_item(item)
 
