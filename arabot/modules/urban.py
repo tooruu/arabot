@@ -48,7 +48,7 @@ class Urban(Cog, category=Category.LOOKUP):
     async def urban(self, ctx: Context, *, term: str):
         for predefined, definition in self.definitions.items():
             if term.lower() == predefined.lower():
-                await ctx.send(embed=Embed(description=definition).set_author(name=predefined))
+                await ctx.send(embed=Embed(title=predefined, description=definition))
                 return
 
         if not (definitions := await self.fetch_definitions(term)):
