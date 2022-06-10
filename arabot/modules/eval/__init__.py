@@ -82,6 +82,9 @@ class Eval(Cog, category=Category.GENERAL):
 
             if return_value is not None:
                 append_codeblock("Return value", repr(return_value))
+            elif not result.fields:
+                await ctx.tick()
+                return
 
         await ctx.reply(embed=result)
 
