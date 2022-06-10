@@ -13,11 +13,11 @@ class GlobalOrGuildUserVariant(disnake.ui.View):
         self.embeds = embeds
 
     @disnake.ui.button(label="Global", style=disnake.ButtonStyle.blurple)
-    async def global_variant(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def global_variant(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         await inter.response.edit_message(embed=self.embeds[0])
 
     @disnake.ui.button(label="Server", style=disnake.ButtonStyle.blurple)
-    async def guild_variant(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def guild_variant(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         await inter.response.edit_message(embed=self.embeds[1])
 
 

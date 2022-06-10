@@ -18,6 +18,7 @@ pylint:
     - protected-access
     - too-few-public-methods
     - too-many-public-methods
+    - unused-argument
     - wrong-import-order
 
 pycodestyle:

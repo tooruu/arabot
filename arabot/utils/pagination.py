@@ -54,43 +54,43 @@ class EmbedPaginator(disnake.ui.View):
             await self.message.edit(view=None)
 
     @disnake.ui.button(emoji="⏪", style=disnake.ButtonStyle.blurple)
-    async def first_page(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def first_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         self.page = 0
         self.first_page.disabled = True
         self.prev_page.disabled = True
         self.next_page.disabled = False
         self.last_page.disabled = False
-        await inter.response.edit_message(embed=self.embeds[self.page], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary)
-    async def prev_page(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def prev_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         self.page -= 1
         self.next_page.disabled = False
         self.last_page.disabled = False
         if self.page == 0:
             self.first_page.disabled = True
             self.prev_page.disabled = True
-        await inter.response.edit_message(embed=self.embeds[self.page], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
 
     @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.secondary)
-    async def next_page(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def next_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         self.page += 1
         self.first_page.disabled = False
         self.prev_page.disabled = False
         if self.page == len(self.embeds) - 1:
             self.next_page.disabled = True
             self.last_page.disabled = True
-        await inter.response.edit_message(embed=self.embeds[self.page], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
 
     @disnake.ui.button(emoji="⏩", style=disnake.ButtonStyle.blurple)
-    async def last_page(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def last_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         self.page = len(self.embeds) - 1
         self.first_page.disabled = False
         self.prev_page.disabled = False
         self.next_page.disabled = True
         self.last_page.disabled = True
-        await inter.response.edit_message(embed=self.embeds[self.page], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
 
     @disnake.ui.button(emoji="❌", style=disnake.ButtonStyle.red)
-    async def delete(self, _button: disnake.ui.Button, _inter: disnake.MessageInteraction):
+    async def delete(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.on_timeout()
