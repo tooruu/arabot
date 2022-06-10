@@ -2,6 +2,8 @@ import disnake
 
 
 class EmbedPaginator(disnake.ui.View):
+    message: disnake.Message | None = None
+
     def __init__(
         self,
         embeds: list[disnake.Embed],
@@ -40,10 +42,16 @@ class EmbedPaginator(disnake.ui.View):
                 self.remove_item(item)
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
+        if not self.message:
+            self.message = interaction.message
         if self.author is None or interaction.author == self.author:
             return True
         await interaction.response.send_message("You can't interact with this menu", ephemeral=True)
         return False
+
+    async def on_timeout(self):
+        if self.message:
+            await self.message.edit(view=None)
 
     @disnake.ui.button(emoji="⏪", style=disnake.ButtonStyle.blurple)
     async def first_page(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
@@ -84,5 +92,5 @@ class EmbedPaginator(disnake.ui.View):
         await inter.response.edit_message(embed=self.embeds[self.page], view=self)
 
     @disnake.ui.button(emoji="❌", style=disnake.ButtonStyle.red)
-    async def delete(self, _button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        await inter.response.edit_message(view=None)
+    async def delete(self, _button: disnake.ui.Button, _inter: disnake.MessageInteraction):
+        await self.on_timeout()
