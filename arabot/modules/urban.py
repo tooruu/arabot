@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from arabot.core import Ara, Category, Cog, Context, pfxless
-from arabot.utils import EmbedPaginator, bold, delchars, dsafe
+from arabot.utils import EmbedPaginator, bold, repchars, dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 
@@ -58,11 +58,11 @@ class Urban(Cog, category=Category.LOOKUP):
 
         embeds = [
             Embed(
-                description=dsafe(delchars(definition["definition"], "[]"))[:4096],
+                description=dsafe(repchars(definition["definition"], "[]"))[:4096],
                 title=dsafe(definition["word"])[:256],
                 url=definition["permalink"],
                 timestamp=datetime.fromisoformat(definition["written_on"][:-1]),
-            ).add_field("Example", dsafe(delchars(definition["example"], "[]"))[:1024])
+            ).add_field("Example", dsafe(repchars(definition["example"], "[]"))[:1024])
             for definition in definitions
         ]
 

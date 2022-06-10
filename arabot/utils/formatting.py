@@ -38,8 +38,8 @@ def unping(s: _Any) -> str:
     return str(s).replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
 
 
-def delchars(s: str, chars: str) -> str:
-    return _re.sub(f"[{_re.escape(chars)}]", "", s)
+def repchars(s: str, chars: str, rep: str = "") -> str:
+    return _re.sub(f"[{_re.escape(chars)}]", rep, s)
 
 
 cb = code = codeblock
