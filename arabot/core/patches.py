@@ -6,7 +6,7 @@ from asyncio import sleep
 from collections.abc import Iterable
 from contextlib import suppress
 from functools import partial, partialmethod
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Literal
 
 import aiohttp
 import disnake
@@ -36,7 +36,7 @@ class Context(commands.Context):
             content = content.removeprefix(p).lstrip()
         return content
 
-    async def rsearch(self, target: str) -> str | None:
+    async def rsearch(self, target: Literal["content", "image_url"]) -> str | None:
         if target == "content":
             self.message.content = ""  # We don't need current message's content
         return await self._rsearch(target)
