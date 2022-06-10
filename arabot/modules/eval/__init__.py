@@ -22,11 +22,8 @@ class Eval(Cog, category=Category.GENERAL):
         usage="<codeblock> [input block]",
     )
     async def python(self, ctx: Context, *, codeblocks: Codeblocks):
-        if not codeblocks and not (codeblocks := [("", ctx.argument_only)]):
-            await ctx.reply("Send a Python codeblock to evaluate it")
-            return
-
         await ctx.trigger_typing()
+        codeblocks = codeblocks or [("", ctx.argument_only)]
         _lang, code = codeblocks.pop(0)
         inputlines = codeblocks[0][1] if codeblocks else None
         result = disnake.Embed(color=0xFFCD3C, description="").set_author(
