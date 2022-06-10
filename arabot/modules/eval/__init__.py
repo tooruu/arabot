@@ -17,7 +17,7 @@ from .client import LocalEval, RemoteEval
 class Eval(Cog, category=Category.GENERAL):
     @commands.cooldown(5, 1)
     @commands.command(
-        aliases=["exec", "eval", "code", "py"],
+        aliases=["exec", "eval", "code", "py", "run"],
         brief="Evaluate a Python script",
         usage="<codeblock> [input block]",
     )
