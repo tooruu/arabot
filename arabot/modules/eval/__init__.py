@@ -22,7 +22,7 @@ class Eval(Cog, category=Category.GENERAL):
         usage="<codeblock> [input block]",
     )
     async def python(self, ctx: Context, *, codeblocks: Codeblocks):
-        if not codeblocks:
+        if not codeblocks and not (codeblocks := [("", ctx.argument_only)]):
             await ctx.reply("Send a Python codeblock to evaluate it")
             return
 
