@@ -26,17 +26,17 @@ class General(Cog, category=Category.GENERAL):
 
     @commands.command(aliases=["r"], brief="React to a message", usage="<emoji>")
     async def react(self, ctx: Context, emoji: AnyEmoji = False):
-        await ctx.message.delete()
         if not (ref_msg := await ctx.getch_reference_message()):
-            await ctx.send("Reply to the message to react to")
+            await ctx.reply("Reply to the message to react to")
             return
         if emoji is False:
             await ctx.reply("Specify an emoji to react with")
             return
         if not emoji:
-            await ctx.send("Emoji not found")
+            await ctx.reply("Emoji not found")
             return
 
+        await ctx.message.delete()
         try:
             await ref_msg.add_reaction(emoji)
         except disnake.Forbidden:
