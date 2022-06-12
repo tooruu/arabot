@@ -13,7 +13,7 @@ class General(Cog, category=Category.GENERAL):
 
     @commands.command(
         aliases=["emote", "e", "sticker"],
-        brief="Show full-sized versions of emoji(s)",
+        brief="Show links to full-sized versions of emojis and stickers",
         usage="<emojis or stickers...>",
     )
     async def emoji(self, ctx: Context, *, emojis: AnyEmojis = None):
