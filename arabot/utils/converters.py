@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from string import whitespace
+from types import UnionType
 
 import disnake
 from aiohttp import ClientSession
@@ -11,6 +12,7 @@ from disnake.utils import find
 __all__ = [
     "AnyChl",
     "AnyEmoji",
+    "AnyEmojis",
     "AnyMember",
     "AnyMemberOrUser",
     "AnyRole",
@@ -137,3 +139,20 @@ AnyTChl = disnake.TextChannel | CITextChl | Empty
 AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
 AnyChl = AnyTChl | AnyVChl | Empty
 AnyRole = disnake.Role | CIRole | Empty
+
+
+async def convert_union(ctx: commands.Context, argument: str, union: UnionType):
+    converters: tuple[commands.Converter] = union.__args__
+    parameter = ctx.current_parameter
+    for converter in converters:
+        try:
+            return await commands.converter._actual_conversion(ctx, converter, argument, parameter)
+        except commands.CommandError:
+            pass
+    return None
+
+
+class AnyEmojis(commands.Converter):
+    async def convert(self, ctx: commands.Context, argument: str) -> list[AnyEmoji]:
+        arguments = argument.replace("<", " <").replace(">", "> ").split()
+        return [await convert_union(ctx, arg, AnyEmoji) for arg in arguments]

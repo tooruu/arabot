@@ -3,7 +3,7 @@ import re
 
 import disnake
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import AnyEmoji, AnyMember, AnyMemberOrUser, bold
+from arabot.utils import CUSTOM_EMOJI_RE, AnyEmoji, AnyEmojis, AnyMember, AnyMemberOrUser, bold
 from disnake.ext import commands
 
 
@@ -12,17 +12,34 @@ class General(Cog, category=Category.GENERAL):
         self.ara = ara
 
     @commands.command(
-        aliases=["emote", "e"], brief="Show full-sized versions of emoji(s)", usage="<emojis...>"
+        aliases=["emote", "e", "sticker"],
+        brief="Show full-sized versions of emoji(s)",
+        usage="<emojis or stickers...>",
     )
-    async def emoji(self, ctx: Context, *emojis: AnyEmoji):
-        emojis = list(dict.fromkeys(e for e in emojis if e))[:10]
-        if not emojis:
-            await ctx.send("No emojis found")
+    async def emoji(self, ctx: Context, *, emojis: AnyEmojis = None):
+        if not (stickers := ctx.message.stickers) and emojis is None:
+            ref_msg = await ctx.getch_reference_message()
+            custom_emojis = ref_msg and CUSTOM_EMOJI_RE.findall(ref_msg.content)
+            stickers = getattr(ref_msg, "stickers", stickers)
+            if not custom_emojis and not stickers:
+                await ctx.reply("You must provide emojis/stickers")
+                return
+            converter = commands.PartialEmojiConverter()
+            emojis = [await converter.convert(ctx, ce) for ce in custom_emojis]
+
+        filtered_emojis = list(dict.fromkeys(e for e in emojis if e)) if emojis else []
+        if not filtered_emojis and not stickers:
+            await ctx.reply("No emojis found")
             return
-        embed = disnake.Embed()
-        for emoji in emojis:
-            embed.add_field(emoji, f"[{emoji.name}]({emoji.url})", inline=False)
-        await ctx.reply(embed=embed)
+
+        await ctx.reply(
+            embed=disnake.Embed(
+                description="\n".join(
+                    f"{item} - [Link]({item.url}?quality=lossless&size=4096)"
+                    for item in filtered_emojis + stickers
+                )
+            )
+        )
 
     @commands.command(aliases=["r"], brief="React to a message", usage="<emoji>")
     async def react(self, ctx: Context, emoji: AnyEmoji = False):

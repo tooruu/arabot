@@ -11,6 +11,7 @@ from .checks import *
 from .converters import *
 from .formatting import *
 from .pagination import EmbedPaginator
+from .regexes import *
 
 
 def system_info() -> str:
