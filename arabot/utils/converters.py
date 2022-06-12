@@ -154,5 +154,6 @@ async def convert_union(ctx: commands.Context, argument: str, union: UnionType):
 
 class AnyEmojis(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> list[AnyEmoji]:
-        arguments = argument.replace("<", " <").replace(">", "> ").split()
-        return [await convert_union(ctx, arg, AnyEmoji) for arg in arguments]
+        argument = argument.replace("<", " <").replace(">", "> ")
+        argument = re.sub(r"(?<!<a)(?<!<):(?!\d{17,20}>)", " ", argument, flags=re.ASCII)
+        return [await convert_union(ctx, arg, AnyEmoji) for arg in argument.split()]
