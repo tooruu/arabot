@@ -63,7 +63,7 @@ class Context(commands.Context):
         if result:
             return result
 
-        if ref_msg := await self.getch_reference_message():
+        if ref_msg := await self.get_or_fetch_reference_message():
             ref_ctx = await self.bot.get_context(ref_msg)
             return await ref_ctx._rsearch(target)
 
@@ -91,8 +91,10 @@ class Context(commands.Context):
 
     temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
 
-    async def getch_reference_message(self) -> disnake.Message | False | None:
-        return await self.message.getch_reference_message()
+    async def get_or_fetch_reference_message(self) -> disnake.Message | False | None:
+        return await self.message.get_or_fetch_reference_message()
+
+    getch_reference_message = get_or_fetch_reference_message
 
 
 class Cog(commands.Cog):
@@ -171,11 +173,12 @@ async def connect_play_disconnect(
     vc.play(audio, after=disconnect)
 
 
-async def getch_reference_message(self: disnake.Message) -> disnake.Message | False | None:
+async def get_or_fetch_reference_message(self: disnake.Message) -> disnake.Message | False | None:
     if not (ref := self.reference):
         return False
-    ref_msg = ref.cached_message or ref.resolved or await self.channel.fetch_message(ref.message_id)
-    return ref_msg if isinstance(ref_msg, disnake.Message) else None
+    with suppress(disnake.HTTPException):
+        return ref.cached_message or await self.channel.fetch_message(ref.message_id)
+    return None
 
 
 def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Embed:
@@ -202,7 +205,8 @@ disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link
 disnake.Member.top_perm_role = property(top_perm_role)
-disnake.Message.getch_reference_message = getch_reference_message
+disnake.Message.get_or_fetch_reference_message = get_or_fetch_reference_message
+disnake.Message.getch_reference_message = get_or_fetch_reference_message
 disnake.Message.reply = partialmethod(disnake.Message.reply, fail_if_not_exists=False)
 disnake.Message.reply_mention = partialmethod(
     disnake.Message.reply, allowed_mentions=disnake.AllowedMentions.all()
