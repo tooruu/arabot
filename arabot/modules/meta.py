@@ -55,6 +55,8 @@ class EmbedHelpCommand(commands.HelpCommand):
     async def send_command_help(self, command: commands.Command):
         self.embed.title = arabot.utils.mono(command.name)
         self.embed.description = command.help or command.description or command.short_doc
+        if warning := command.extras.get("warning"):
+            self.embed.description += f"\n_**Warning:** {warning}_"
         if command.aliases:
             self.embed.add_field(
                 "Aliases", " ".join(map(arabot.utils.mono, sorted(command.aliases)))
