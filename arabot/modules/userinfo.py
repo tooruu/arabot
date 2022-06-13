@@ -4,7 +4,7 @@ import disnake
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import AnyMember, AnyMemberOrUser
 from disnake.ext import commands
-from disnake.utils import format_dt
+from disnake.utils import format_dt, utcnow
 
 
 class GlobalOrGuildUserVariant(disnake.ui.View):
@@ -60,7 +60,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed()
-            .set_image(url=banner.compat.with_size(4096).url)
+            .set_image(url=banner.maxres.compat.url)
             .set_footer(text=f"{member.display_name}'s banner")
         )
 
@@ -76,7 +76,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             disnake.Embed(
                 title=member,
                 url=f"https://discord.com/users/{member.id}",
-                timestamp=disnake.utils.utcnow(),
+                timestamp=utcnow(),
             )
             .set_author(
                 name=member.id,

@@ -202,6 +202,7 @@ disnake.abc.Messageable.send_mention = disnake.Webhook.send_mention = property(
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.as_icon = property(lambda self: self.with_size(32))
 disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
+disnake.Asset.maxres = property(lambda self: self.with_size(4096))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link
 disnake.Member.top_perm_role = property(top_perm_role)
