@@ -195,6 +195,13 @@ def top_perm_role(self: disnake.Member) -> disnake.Role:
     return next(filter(is_perm_role, reversed(self.roles)), self.guild.default_role)
 
 
+@property
+def presence_count(self: disnake.Guild) -> int:
+    if self.approximate_presence_count is not None:
+        return self.approximate_presence_count
+    return sum(m.status is not disnake.Status.offline for m in self.members)
+
+
 aiohttp.ClientSession.fetch_json = fetch_json
 disnake.abc.Messageable.send_mention = disnake.Webhook.send_mention = property(
     lambda self: partial(self.send, allowed_mentions=disnake.AllowedMentions.all())
@@ -205,6 +212,7 @@ disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Asset.maxres = property(lambda self: self.with_size(4096))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link
+disnake.Guild.presence_count = presence_count
 disnake.Member.top_perm_role = property(top_perm_role)
 disnake.Message.get_or_fetch_reference_message = get_or_fetch_reference_message
 disnake.Message.getch_reference_message = get_or_fetch_reference_message

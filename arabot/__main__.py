@@ -31,6 +31,7 @@ def create_ara(*args, **kwargs) -> Ara:
         guilds=True,
         members=True,
         message_content=True,
+        presences=True,
         voice_states=True,
     )
     default_kwargs = dict(

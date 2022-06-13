@@ -13,6 +13,7 @@ __all__ = [
     "AnyChl",
     "AnyEmoji",
     "AnyEmojis",
+    "AnyGuild",
     "AnyMember",
     "AnyMemberOrUser",
     "AnyRole",
@@ -20,6 +21,7 @@ __all__ = [
     "AnyUser",
     "AnyVChl",
     "CIEmoji",
+    "CIGuild",
     "CIMember",
     "CIRole",
     "CITextChl",
@@ -131,6 +133,14 @@ class Codeblocks(commands.Converter):
         ]
 
 
+class CIGuild(commands.Converter):
+    async def convert(self, ctx: commands.Context, argument: str) -> disnake.Guild:
+        guild_search = arg_ci_re_search(argument)
+        if found := find(lambda guild: guild_search(guild.name), ctx.bot.guilds):
+            return found
+        raise commands.GuildNotFound(argument)
+
+
 AnyMember = disnake.Member | CIMember | Empty
 AnyUser = disnake.User | UserFromCIMember | Empty
 AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
@@ -139,6 +149,7 @@ AnyTChl = disnake.TextChannel | CITextChl | Empty
 AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
 AnyChl = AnyTChl | AnyVChl | Empty
 AnyRole = disnake.Role | CIRole | Empty
+AnyGuild = disnake.Guild | CIGuild | Empty
 
 
 async def convert_union(ctx: commands.Context, argument: str, union: UnionType):
