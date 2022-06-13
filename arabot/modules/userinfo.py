@@ -47,7 +47,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         aliases=["b"],
         brief="Show user's global banner",
         usage="[member]",
-        extras={"warning": "Due to Discord's limitation server banners are irretrievable"},
+        extras={"note": "Due to a Discord limitation, server banners are irretrievable"},
     )
     async def banner(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
@@ -84,7 +84,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                 url=f"https://discord.com/users/{member.id}",
             )
             .set_thumbnail(url=(member.avatar or member.default_avatar).compat)
-            .add_field("Created at", format_dt(member.created_at, "D"))
+            .add_field("Created on", format_dt(member.created_at, "D"))
         )
         description = defaultdict(list)
         if member.bot:
@@ -100,7 +100,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                 description[0].append("Pending verification")
 
             if member.joined_at:
-                embed.add_field("Joined at", format_dt(member.joined_at, "D"))
+                embed.add_field("Joined on", format_dt(member.joined_at, "D"))
             if member.nick:
                 embed.add_field("Nickname", member.nick)
             if member.activity:
