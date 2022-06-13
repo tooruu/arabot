@@ -30,10 +30,10 @@ class Userinfo(Cog, category=Category.GENERAL):
         member = member or ctx.author
         avatars = (
             disnake.Embed()
-            .set_image(url=(member.avatar or member.default_avatar).compat.url)
+            .set_image(url=(member.avatar or member.default_avatar).compat)
             .set_footer(text=f"{member.display_name}'s global avatar"),
             disnake.Embed()
-            .set_image(url=member.display_avatar.compat.url)
+            .set_image(url=member.display_avatar.compat)
             .set_footer(text=f"{member.display_name}'s server avatar"),
         )
 
@@ -60,7 +60,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed()
-            .set_image(url=banner.maxres.compat.url)
+            .set_image(url=banner.maxres.compat)
             .set_footer(text=f"{member.display_name}'s banner")
         )
 
@@ -83,7 +83,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                 icon_url="https://twemoji.maxcdn.com/v/latest/72x72/1f194.png",
                 url=f"https://discord.com/users/{member.id}",
             )
-            .set_thumbnail(url=(member.avatar or member.default_avatar).compat.url)
+            .set_thumbnail(url=(member.avatar or member.default_avatar).compat)
             .add_field("Created at", format_dt(member.created_at, "D"))
         )
         description = defaultdict(list)
@@ -93,9 +93,9 @@ class Userinfo(Cog, category=Category.GENERAL):
             description[0].append("**Marked as spammer**")
 
         if isinstance(member, disnake.Member):
-            embed.set_footer(text=member.guild.name, icon_url=ctx.guild.icon.as_icon.compat.url)
+            embed.set_footer(text=member.guild.name, icon_url=ctx.guild.icon.as_icon.compat)
             if member.guild_avatar:
-                description[1].append(f"[Server avatar]({member.guild_avatar.url})")
+                description[1].append(f"[Server avatar]({member.guild_avatar})")
             if member.pending:
                 description[0].append("Pending verification")
 
@@ -119,7 +119,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         if member.accent_color:
             embed.color = member.accent_color
         if member.banner:
-            embed.set_image(url=member.banner.with_size(512).compat.url)
+            embed.set_image(url=member.banner.with_size(512).compat)
 
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
         await ctx.send(embed=embed)

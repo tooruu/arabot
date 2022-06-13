@@ -21,10 +21,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         bot: commands.Bot = ctx.bot
         self.embed = (
             disnake.Embed(timestamp=utcnow())
-            .set_author(
-                name=f"{bot.name} Help Menu",
-                icon_url=ctx.me.display_avatar.as_icon.compat.url,
-            )
+            .set_author(name=f"{bot.name} Help Menu", icon_url=ctx.me.display_avatar.as_icon.compat)
             .set_footer(text=f"{bot.name} v{arabot.__version__}")
         )
 
@@ -33,7 +30,7 @@ class EmbedHelpCommand(commands.HelpCommand):
 
         help_command_repr = self.context.clean_prefix + self.invoked_with
         self.embed.description = f"Use `{help_command_repr} [command]` for more info on a command"
-        self.embed.set_thumbnail(url=bot.user.avatar.compat.url)
+        self.embed.set_thumbnail(url=bot.user.avatar.compat)
 
         get_category = lambda command: getattr(command.cog, "category", self.no_category)
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
