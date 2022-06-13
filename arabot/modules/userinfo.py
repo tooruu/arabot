@@ -43,7 +43,12 @@ class Userinfo(Cog, category=Category.GENERAL):
 
         await ctx.send(embed=avatars[1], view=GlobalOrGuildUserVariant(avatars))
 
-    @commands.command(aliases=["b"], brief="Show user's banner", usage="[member]")
+    @commands.command(
+        aliases=["b"],
+        brief="Show user's global banner",
+        usage="[member]",
+        extras={"warning": "Due to Discord's limitation server banners are irretrievable"},
+    )
     async def banner(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
             await ctx.send("User not found")
