@@ -93,4 +93,4 @@ def strfdelta(delta: timedelta) -> str:
         time_left += f"{hours}h"
     if not days:
         time_left += f" {minutes}m"
-    return time_left
+    return time_left.strip()

@@ -151,7 +151,7 @@ class Ara(commands.Bot):
                             f"Sorry, I've exceeded today's quota for {mono(context.invoked_with)}"
                         )
             case commands.MissingRequiredArgument():
-                await context.reply("Missing required argument")
+                await context.send_help(context.command)
             case commands.UserInputError():
                 await context.reply("Invalid argument")
             case (
