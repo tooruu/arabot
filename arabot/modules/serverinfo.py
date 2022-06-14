@@ -142,8 +142,6 @@ class Serverinfo(Cog, category=Category.GENERAL):
             field_values.append(f"Stage: {len(guild.stage_channels)}")
         if guild.forum_channels:
             field_values.append(f"Forum: {len(guild.forum_channels)}")
-        # if guild.rules_channel:
-        #     field_values.append(f"Rules: {guild.rules_channel.mention}")
 
     def _set_field_members(self, field_values: list, guild: disnake.Guild) -> None:
         if not isinstance(guild, disnake.Guild):
