@@ -82,12 +82,10 @@ class Context(commands.Context):
         self.command.reset_cooldown(self)
         return True
 
-    reply_mention = partialmethod(
+    reply_ping = partialmethod(
         commands.Context.reply, allowed_mentions=disnake.AllowedMentions.all()
     )
-    send_mention = partialmethod(
-        commands.Context.send, allowed_mentions=disnake.AllowedMentions.all()
-    )
+    send_ping = partialmethod(commands.Context.send, allowed_mentions=disnake.AllowedMentions.all())
 
     temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
 
@@ -134,19 +132,19 @@ async def temp_mute_channel_member(
         await self.set_permissions(member, overwrite=temp_perms, reason=reason)
         if success_msg:
             if isinstance(success_msg, str):
-                success_msg = partial(self.send, success_msg)
+                success_msg = partial(self.send_ping, success_msg)
             elif success_msg is True:
                 success_msg = partial(
-                    self.send, f"{member.mention} has been muted for {duration:.0f} seconds"
+                    self.send_ping, f"{member.mention} has been muted for {duration:.0f} seconds"
                 )
             await success_msg()
         await sleep(duration)
     except disnake.Forbidden:
         if failure_msg:
             if isinstance(failure_msg, str):
-                failure_msg = partial(self.send, failure_msg)
+                failure_msg = partial(self.send_ping, failure_msg)
             elif failure_msg is True:
-                failure_msg = partial(self.send, f"I lack permission to mute {member.mention}")
+                failure_msg = partial(self.send_ping, f"I lack permission to mute {member.mention}")
             await failure_msg()
     finally:
         with suppress(disnake.Forbidden):
@@ -203,7 +201,7 @@ def presence_count(self: disnake.Guild) -> int:
 
 
 aiohttp.ClientSession.fetch_json = fetch_json
-disnake.abc.Messageable.send_mention = disnake.Webhook.send_mention = property(
+disnake.abc.Messageable.send_ping = disnake.Webhook.send_ping = property(
     lambda self: partial(self.send, allowed_mentions=disnake.AllowedMentions.all())
 )
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
@@ -217,7 +215,7 @@ disnake.Member.top_perm_role = property(top_perm_role)
 disnake.Message.get_or_fetch_reference_message = get_or_fetch_reference_message
 disnake.Message.getch_reference_message = get_or_fetch_reference_message
 disnake.Message.reply = partialmethod(disnake.Message.reply, fail_if_not_exists=False)
-disnake.Message.reply_mention = partialmethod(
+disnake.Message.reply_ping = partialmethod(
     disnake.Message.reply, allowed_mentions=disnake.AllowedMentions.all()
 )
 disnake.Message.temp_channel_mute_author = property(

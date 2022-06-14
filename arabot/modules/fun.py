@@ -89,7 +89,7 @@ class Fun(Cog, category=Category.FUN):
             return
         invis_bug = "||\u200b||" * 198 + "_ _"
         if len(message := text + invis_bug + member.mention) <= 2000:
-            await ctx.send_mention(message)
+            await ctx.send_ping(message)
 
     @commands.cooldown(1, 60 * 60 * 24 * 1.75, commands.BucketType.member)
     @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
@@ -153,7 +153,7 @@ class Fun(Cog, category=Category.FUN):
             await msg_x.add_reaction(CustomEmoji.Doubt)
         except disnake.Forbidden:
             ctx.reset_cooldown()
-            await ctx.reply(f"Cannot react to {msg_x.author.mention}'s messages")
+            await ctx.reply_ping(f"Cannot react to {msg_x.author.mention}'s messages")
             return
 
         await sleep(20)

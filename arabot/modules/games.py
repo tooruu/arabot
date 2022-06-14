@@ -181,7 +181,7 @@ class Connect4(Cog, category=Category.GAMES):
         message: disnake.Message,
     ):
         await message.clear_reactions()
-        notification = await message.channel.send(
+        notification = await message.channel.send_ping(
             f"Hey {player1.mention} - {player2.display_name} has joined your game!"
         )
         await message.edit("Loading ....")
@@ -321,12 +321,14 @@ class TicTacToeButton(disnake.ui.Button):
 
             view.stop()
 
-        await inter.response.edit_message(content, view=view)
+        await inter.response.edit_message(
+            content, view=view, allowed_mentions=disnake.AllowedMentions.all()
+        )
         if loser:
             await inter.channel.temp_mute_member(
                 loser,
                 reason="Tic Tac Toe loser",
-                success_msg=lambda: inter.followup.send(
+                success_msg=lambda: inter.followup.send_ping(
                     f"{loser.mention} loser has been muted for 1 minute!"
                 ),
             )
@@ -540,7 +542,7 @@ class Games(Cog, category=Category.GAMES):
             await ctx.send("No one was ejected")
             return
         await imposter.move_to(None, reason="Imposter")
-        await ctx.send(f"{imposter.mention} was ejected")
+        await ctx.send_ping(f"{imposter.mention} was ejected")
 
     @commands.command(brief="Start a game of Tic-Tac-Toe", usage="[opponent]")
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
@@ -559,7 +561,7 @@ class Games(Cog, category=Category.GAMES):
         players = [ctx.author, opponent or None]
         random.shuffle(players)
         first = players[0]
-        await ctx.send(
+        await ctx.send_ping(
             f"Tic Tac Toe: {getattr(first, 'mention', 'X')} goes first", view=TicTacToe(*players)
         )
 

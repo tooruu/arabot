@@ -25,7 +25,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
     async def csay(self, ctx: Context, channel: AnyTChl, *, text: str):
         await ctx.message.delete()
         if channel:
-            await channel.send(text)
+            await channel.send_ping(text)
 
     @command()
     @has_permissions(manage_channels=True)
@@ -47,7 +47,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             with suppress(disnake.Forbidden):
                 await bad_msg.add_reaction("🤫")
             await bad_msg.temp_channel_mute_author(
-                success_msg=lambda: bad_msg.reply(
+                success_msg=lambda: bad_msg.reply_ping(
                     f"{bad_msg.author.mention} has been muted for 1 minute"
                 ),
                 failure_msg=True,

@@ -60,7 +60,7 @@ class General(Cog, category=Category.GENERAL):
             try:
                 await ctx.message.add_reaction("⛔")
             except disnake.Forbidden:
-                await ctx.reply(f"Cannot add reactions to {ref_msg.author.mention}'s messages")
+                await ctx.reply_ping(f"Cannot add reactions to {ref_msg.author.mention}'s messages")
 
     @commands.cooldown(1, 60, commands.BucketType.member)
     @commands.command(brief="DM user to summon them", usage="<member> [text]")
@@ -79,7 +79,7 @@ class General(Cog, category=Category.GENERAL):
             return
         if member not in ctx.channel.members:
             ctx.reset_cooldown()
-            await ctx.send(f"{member.mention} doesn't have access to this channel")
+            await ctx.send_ping(f"{member.mention} doesn't have access to this channel")
             return
         invite = await ctx.guild.get_unlimited_invite_link() or disnake.Embed.Empty
         embed = disnake.Embed(
@@ -95,9 +95,9 @@ class General(Cog, category=Category.GENERAL):
             await member.send(embed=embed)
         except disnake.Forbidden:
             ctx.reset_cooldown()
-            await ctx.send_mention(f"Cannot send messages to {member.mention}")
+            await ctx.send_ping(f"Cannot send messages to {member.mention}")
         else:
-            await ctx.send_mention(f"Summoning {member.mention}")
+            await ctx.send_ping(f"Summoning {member.mention}")
 
     @commands.command(brief="Suggest server emoji", usage="<server emoji> <new emoji>", hidden=True)
     async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after=None):
@@ -144,7 +144,7 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(brief="Make Ara say something")
     async def say(self, ctx: Context, *, text):
         await ctx.message.delete()
-        await ctx.send(text)
+        await ctx.send_ping(text)
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context):
@@ -214,7 +214,7 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.message.delete()
         webhook = await ctx.channel.create_webhook(name=user)
-        await webhook.send_mention(
+        await webhook.send_ping(
             text, username=user.display_name, avatar_url=user.display_avatar.url
         )
         await webhook.delete()
