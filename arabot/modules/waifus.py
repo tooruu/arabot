@@ -10,7 +10,7 @@ from waifu import WaifuAioClient
 from waifu.utils import ImageCategories, ImageTypes
 
 
-class Waifus(Cog, category=Category.COMMUNITY):
+class Waifus(Cog, category=Category.WAIFUS):
     def __init__(self, waifu_client: WaifuAioClient):
         self.wclient = waifu_client
 

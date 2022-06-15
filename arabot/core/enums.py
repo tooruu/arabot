@@ -33,3 +33,4 @@ class Category:
     COMMUNITY = "Community"
     MODERATION = "Moderation"
     GAMES = "Games"
+    WAIFUS = "Reaction pictures"
