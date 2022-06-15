@@ -139,7 +139,7 @@ class Ara(commands.Bot):
                     await context.reply("Missing permissions")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
-            ) if "Google" in context.cog.qualified_name or "Youtube" in context.cog.qualified_name:
+            ) if context.cog.qualified_name.startswith(("Google", "Youtube")):
                 match status:
                     case 403:
                         await context.reply(
