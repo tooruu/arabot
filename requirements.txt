@@ -11,3 +11,4 @@ git+https://github.com/rexor12/gacha.py.git
 python-dotenv
 tzdata
 git+https://github.com/aio-libs/async-lru.git@3574af7691371015c47faf77e0abf8c7b06a3cdc
+waifu-py

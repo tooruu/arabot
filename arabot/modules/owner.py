@@ -25,7 +25,6 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         aliases=[
             "exit",
             "quit",
-            "kill",
             "shine",
             "shineo",
             "die",
