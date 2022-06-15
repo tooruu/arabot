@@ -12,6 +12,7 @@ pylint:
   disable:
     - arguments-differ
     - attribute-defined-outside-init
+    - bad-mcs-classmethod-argument
     - broad-except
     - invalid-name
     - no-self-use
@@ -24,6 +25,7 @@ pylint:
 pycodestyle:
   disable:
     - E731 # do not assign a lambda expression, use a def
+    - N804 # first argument of a classmethod should be named 'cls' (I use 'mcls' for metaclasses)
 
 pyflakes:
   disable:

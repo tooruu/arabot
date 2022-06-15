@@ -6,7 +6,7 @@ from itertools import chain
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import AnyMember, humanjoin
 from disnake import Embed
-from disnake.ext.commands import Command
+from disnake.ext.commands import CogMeta, Command
 from waifu import WaifuAioClient
 from waifu.utils import ImageCategories, ImageTypes
 
@@ -41,18 +41,19 @@ REACTION_MAPPING: dict[str, tuple[str, str]] = {
 }
 
 
-class Waifus(Cog, category=Category.WAIFUS):
-    def __new__(cls, *args, **kwargs):
+class WaifuCommandsMeta(CogMeta):
+    def __new__(mcls, name, bases, attrs, *args, **kwargs):
+        command_callback = attrs[f"_{name}__callback"]
         for reaction_type in set(chain(*ImageCategories.values())):
-            command = Command(
-                cls.__reaction,
+            attrs[reaction_type] = Command(
+                command_callback,
                 name=reaction_type,
                 usage="[members...]" if reaction_type in REACTION_MAPPING else "",
             )
-            setattr(cls, reaction_type, command)
+        return super().__new__(mcls, name, bases, attrs, *args, **kwargs)
 
-        return super().__new__(cls, *args, **kwargs)
 
+class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
     def __init__(self, waifu_client: WaifuAioClient):
         self.wclient = waifu_client
 
@@ -69,7 +70,8 @@ class Waifus(Cog, category=Category.WAIFUS):
 
         return await category(reaction)
 
-    async def __reaction(self, ctx: Context, *targets: AnyMember):
+    # pylint: disable=unused-private-member
+    async def __callback(self, ctx: Context, *targets: AnyMember):
         targets = [t for t in targets if t]
         reaction_type = ctx.command.name
         image_url = await self._get_category_image(reaction_type, ctx.channel.is_nsfw())
