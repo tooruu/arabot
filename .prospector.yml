@@ -19,6 +19,7 @@ pylint:
     - protected-access
     - too-few-public-methods
     - too-many-public-methods
+    - unnecessary-lambda-assignment
     - unused-argument
     - wrong-import-order
 

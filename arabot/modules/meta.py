@@ -32,7 +32,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         self.embed.description = f"Use `{help_command_repr} [command]` for more info on a command"
         self.embed.set_thumbnail(url=bot.user.avatar.compat)
 
-        get_category = lambda command: getattr(command.cog, "category", self.no_category)
+        get_category = lambda command: getattr(command.cog, "category") or self.no_category
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
         grouped = {cat: list(cmds) for cat, cmds in groupby(filtered, key=get_category)}
         sorted_ = sorted(grouped.items(), key=lambda group: sum(len(c.name) for c in group[1]))
@@ -75,7 +75,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         explanation = ""
         required = "\n`<>` - required"
         optional = "\n`[]` - optional"
-        if command.usage:
+        if command.usage is not None:
             if "<" in command.usage:
                 explanation += required
             if "[" in command.usage:
