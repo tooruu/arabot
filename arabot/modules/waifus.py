@@ -3,12 +3,12 @@ from __future__ import annotations
 import random
 from itertools import chain
 
+from aiohttp import ClientResponseError
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import AnyMember, humanjoin
 from disnake import Embed
 from disnake.ext.commands import CogMeta, Command
-from waifu import WaifuAioClient
-from waifu.utils import ImageCategories, ImageTypes
+from waifu import APIException, ImageCategories, WaifuAioClient
 
 REACTION_MAPPING: dict[str, tuple[str, str]] = {
     "bite": ("{author} wants to bite someone...", "{author} bites {target}"),
@@ -63,7 +63,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
                 category = random.choice((self.wclient.sfw, self.wclient.nsfw))
             else:
                 category = self.wclient.sfw
-        elif reaction in ImageCategories[ImageTypes.nsfw]:
+        elif reaction in ImageCategories["nsfw"]:
             category = self.wclient.nsfw
         else:
             category = self.wclient.sfw
@@ -74,8 +74,14 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
     async def __callback(self, ctx: Context, *targets: AnyMember):
         targets = [t for t in targets if t]
         reaction_type = ctx.command.name
-        image_url = await self._get_category_image(reaction_type, ctx.channel.is_nsfw())
-        embed = Embed(title=reaction_type.title()).set_image(url=image_url)
+        embed = Embed(title=reaction_type.title())
+        try:
+            image_url = await self._get_category_image(reaction_type, ctx.channel.is_nsfw())
+        except (APIException, ClientResponseError):
+            embed.set_footer(text="Failed to get image")
+        else:
+            embed.set_footer(text="Powered by waifu.pics")
+            embed.set_image(url=image_url)
         if reaction_type in REACTION_MAPPING:
             embed.description = REACTION_MAPPING[reaction_type][len(targets) > 0].format(
                 author=ctx.author.mention,
