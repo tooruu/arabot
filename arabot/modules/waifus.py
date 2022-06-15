@@ -35,7 +35,7 @@ REACTION_MAPPING: dict[str, tuple[str, str]] = {
     "slap": ("{author} wants to slap someone...", "{author} slaps {target}"),
     "smile": ("{author} is smiling", "{author} smiles at {target}"),
     "smug": ("( ͡° ͜ʖ ͡°)", "( ͡° ͜ʖ ͡°)"),
-    "wave": ("{author} waves at someone...", "{author} waves at {author}"),
+    "wave": ("{author} waves at someone...", "{author} waves at {target}"),
     "wink": ("{author} is winking", "{author} winks at {target}"),
     "yeet": ("{author} wants to yeet someone...", "{author} yeets {target}"),
 }
