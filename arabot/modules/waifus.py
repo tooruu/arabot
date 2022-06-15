@@ -42,7 +42,7 @@ REACTION_MAPPING: dict[str, tuple[str, str]] = {
 
 
 class WaifuCommandsMeta(CogMeta):
-    def __new__(mcls, name, bases, attrs, *args, **kwargs):
+    def __new__(cls, name, bases, attrs, *args, **kwargs):
         command_callback = attrs[f"_{name}__callback"]
         for reaction_type in set(chain(*ImageCategories.values())):
             attrs[reaction_type] = Command(
@@ -50,7 +50,7 @@ class WaifuCommandsMeta(CogMeta):
                 name=reaction_type,
                 usage="[members...]" if reaction_type in REACTION_MAPPING else "",
             )
-        return super().__new__(mcls, name, bases, attrs, *args, **kwargs)
+        return super().__new__(cls, name, bases, attrs, *args, **kwargs)
 
 
 class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
