@@ -1,5 +1,6 @@
 import re as _re
 from typing import Any as _Any
+from typing import Iterable as _Iterable
 
 
 def bold(s: _Any) -> str:
@@ -40,6 +41,10 @@ def unping(s: _Any) -> str:
 
 def repchars(s: str, chars: str, rep: str = "") -> str:
     return _re.sub(f"[{_re.escape(chars)}]", rep, s)
+
+
+def humanjoin(s: _Iterable[str], /):
+    return " and ".join(", ".join(s).rsplit(", ", 1))
 
 
 cb = code = codeblock
