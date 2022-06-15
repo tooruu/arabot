@@ -43,7 +43,7 @@ def repchars(s: str, chars: str, rep: str = "") -> str:
     return _re.sub(f"[{_re.escape(chars)}]", rep, s)
 
 
-def humanjoin(s: _Iterable[str], /):
+def humanjoin(s: _Iterable[str], /) -> str:
     return " and ".join(", ".join(s).rsplit(", ", 1))
 
 
