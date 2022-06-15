@@ -89,7 +89,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
                 s="s" if len(targets) == 1 else "",
                 ve="s" if len(targets) == 1 else "ve",
             )
-        await ctx.send(embed=embed)
+        await ctx.send_ping(embed=embed)
 
 
 def setup(ara: Ara):
