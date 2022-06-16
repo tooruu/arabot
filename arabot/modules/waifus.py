@@ -1,13 +1,8 @@
-from __future__ import annotations
-
-import random
-from itertools import chain
-
 from aiohttp import ClientResponseError
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import AnyMember, humanjoin
 from disnake import Embed
-from disnake.ext.commands import CogMeta, Command
+from disnake.ext import commands
 from waifu import APIException, ImageCategories, WaifuAioClient
 
 REACTION_MAPPING: dict[str, tuple[str, str]] = {
@@ -41,15 +36,21 @@ REACTION_MAPPING: dict[str, tuple[str, str]] = {
 }
 
 
-class WaifuCommandsMeta(CogMeta):
+class WaifuCommandsMeta(commands.CogMeta):
     def __new__(mcls, name, bases, attrs, *args, **kwargs):
         command_callback = attrs[f"_{name}__callback"]
-        for reaction_type in set(chain(*ImageCategories.values())):
-            attrs[reaction_type] = Command(
-                command_callback,
+        for reaction_type in ImageCategories["sfw"]:
+            attrs[reaction_type] = commands.command(
                 name=reaction_type,
                 usage="[members...]" if reaction_type in REACTION_MAPPING else "",
-            )
+            )(command_callback)
+        nsfw_group = attrs["nsfw"]
+        for reaction_type in ImageCategories["nsfw"]:
+            attrs[f"nsfw_{reaction_type}"] = nsfw_group.command(
+                name=reaction_type,
+                usage="[members...]" if reaction_type in REACTION_MAPPING else "",
+            )(command_callback)
+
         return super().__new__(mcls, name, bases, attrs, *args, **kwargs)
 
 
@@ -57,26 +58,26 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
     def __init__(self, waifu_client: WaifuAioClient):
         self.wclient = waifu_client
 
-    async def _get_category_image(self, reaction: str, is_nsfw_channel: bool) -> str:
-        if all(reaction in category for category in ImageCategories.values()):
-            if is_nsfw_channel:
-                category = random.choice((self.wclient.sfw, self.wclient.nsfw))
-            else:
-                category = self.wclient.sfw
-        elif reaction in ImageCategories["nsfw"]:
-            category = self.wclient.nsfw
-        else:
-            category = self.wclient.sfw
-
-        return await category(reaction)
+    @commands.group(invoke_without_command=True)
+    async def nsfw(self, ctx: Context):
+        if ctx.subcommand_passed:
+            await ctx.reply("This category does not exist")
+            return
+        await ctx.send(
+            embed=Embed().add_field(
+                "Available categories",
+                "\n".join(c.name for c in self.nsfw.walk_commands()),
+            )
+        )
 
     # pylint: disable=unused-private-member
     async def __callback(self, ctx: Context, *targets: AnyMember):
         targets = [t for t in targets if t]
         reaction_type = ctx.command.name
         embed = Embed(title=reaction_type.title())
+        method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
         try:
-            image_url = await self._get_category_image(reaction_type, ctx.channel.is_nsfw())
+            image_url = await method(reaction_type)
         except (APIException, ClientResponseError):
             embed.set_footer(text="Failed to get image")
         else:
