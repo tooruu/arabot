@@ -79,7 +79,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
                 )
                 embed.add_field(name, value)
 
-        await ctx.send(embed=embed)
+        await ctx.send_ping(embed=embed)
 
     @staticmethod
     def _set_description(embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview) -> None:
@@ -110,9 +110,10 @@ class Serverinfo(Cog, category=Category.GENERAL):
         if not isinstance(guild, disnake.Guild):
             return
 
-        owner = f"<@{guild.owner_id}>"
-        if guild != current_guild and guild.owner:
-            owner = mono(guild.owner)
+        if guild == current_guild or guild.owner in current_guild.members:
+            owner = f"<@{guild.owner_id}>"
+        else:
+            owner = mono(guild.owner or guild.owner_id)
         field_values.append(f"Owner: {owner}")
         field_values.append(f"Created on {format_dt(guild.created_at, 'D')}")
         field_values.append(f"Locale: {str(guild.preferred_locale).upper()}")
