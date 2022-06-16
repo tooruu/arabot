@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 import arabot
 import disnake
 from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import bold, codeblock, mono
 from disnake.ext import commands
 from disnake.utils import utcnow
 
@@ -17,7 +18,7 @@ class EmbedHelpCommand(commands.HelpCommand):
     def __init__(self, **command_attrs):
         super().__init__(command_attrs=command_attrs)
 
-    async def prepare_help_command(self, ctx: commands.Context, command: str | None = None):
+    async def prepare_help_command(self, ctx: commands.Context, command: str | None = None) -> None:
         bot: commands.Bot = ctx.bot
         self.embed = (
             disnake.Embed(timestamp=utcnow())
@@ -25,7 +26,9 @@ class EmbedHelpCommand(commands.HelpCommand):
             .set_footer(text=f"{bot.name} v{arabot.__version__}")
         )
 
-    async def send_bot_help(self, mapping: dict[commands.Cog | None, list[commands.Command]]):
+    async def send_bot_help(
+        self, mapping: dict[commands.Cog | None, list[commands.Command]]
+    ) -> None:
         bot: Ara = self.context.bot
 
         help_command_repr = self.context.clean_prefix + self.invoked_with
@@ -39,36 +42,38 @@ class EmbedHelpCommand(commands.HelpCommand):
         for category, cmds in sorted_:
             commands_field = ""
             for command in sorted(cmds, key=lambda c: c.name):
-                command_repr = arabot.utils.mono(command.name)
+                command_repr = mono(command)
                 if command.brief:
                     command_repr = f"[{command_repr}](http://. '{command.short_doc}')"
                 if len(commands_field + command_repr) > 1024:
                     break
                 commands_field += f"{command_repr} "
-            self.embed.add_field(arabot.utils.bold(category), commands_field[:-1] or "No commands")
-
+            self.embed.add_field(bold(category), commands_field[:-1] or "No commands")
         await self.get_destination().send(embed=self.embed)
 
-    async def send_command_help(self, command: commands.Command):
-        self.embed.title = arabot.utils.mono(command.name)
+    async def send_command_help(self, command: commands.Command) -> None:
+        self.fill_command_data(command)
+        await self.get_destination().send(embed=self.embed)
+
+    async def send_group_help(self, group: commands.Group) -> None:
+        self.fill_command_data(group)
+        if subcmds := await self.filter_commands(group.commands, sort=True):
+            self.embed.add_field("Sub-commands", " ".join(mono(s.name) for s in subcmds))
+        await self.get_destination().send(embed=self.embed)
+
+    def fill_command_data(self, command: commands.Command) -> None:
+        self.embed.title = mono(command)
         self.embed.description = command.help or command.description or command.short_doc
         if note := command.extras.get("note"):
             self.embed.description += f"\n_Note: {note}_"
         if warning := command.extras.get("warning"):
             self.embed.description += f"\n_**Warning:** {warning}_"
         if command.aliases:
-            self.embed.add_field(
-                "Aliases", " ".join(map(arabot.utils.mono, sorted(command.aliases)))
-            )
-        usage = f"{self.context.clean_prefix}{command.name} {command.signature}".rstrip()
-
+            self.embed.add_field("Aliases", " ".join(map(mono, sorted(command.aliases))))
+        usage = f"{self.context.clean_prefix}{command} {command.signature}".rstrip()
         self.embed.add_field(
-            "Usage",
-            arabot.utils.mono(usage) + "\n" + self.get_usage_explanation(command),
-            inline=False,
+            "Usage", mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
         )
-
-        return await self.get_destination().send(embed=self.embed)
 
     @staticmethod
     def get_usage_explanation(command: commands.Command) -> str:
@@ -146,7 +151,7 @@ class Meta(Cog, category=Category.META):
     @commands.command(aliases=["ver", "v"], brief="Show bot's version")
     async def version(self, ctx: Context):
         await self.ara.wait_until_ready()
-        await ctx.send(arabot.utils.codeblock(self._version, lang="less"))
+        await ctx.send(codeblock(self._version, lang="less"))
 
     @commands.command(brief="Show bot's source code line count")
     async def lines(self, ctx: Context):
