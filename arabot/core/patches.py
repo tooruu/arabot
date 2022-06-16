@@ -97,7 +97,7 @@ class Context(commands.Context):
 
 class Cog(commands.Cog):
     def __init_subclass__(
-        cls, category: Category | None = None, keys: Iterable[str] = (), **kwargs
+        cls, category: Category = Category.NO_CATEGORY, keys: Iterable[str] = (), **kwargs
     ):
         cls.category = category
         for key_name, key in zip(keys, getkeys(*keys)):

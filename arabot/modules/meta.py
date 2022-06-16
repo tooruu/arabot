@@ -13,8 +13,6 @@ from disnake.utils import utcnow
 
 
 class EmbedHelpCommand(commands.HelpCommand):
-    no_category = "No Category"
-
     def __init__(self, **command_attrs):
         super().__init__(command_attrs=command_attrs)
 
@@ -35,7 +33,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         self.embed.description = f"Use `{help_command_repr} [command]` for more info on a command"
         self.embed.set_thumbnail(url=bot.user.avatar.compat)
 
-        get_category = lambda command: getattr(command.cog, "category") or self.no_category
+        get_category = self.get_command_category
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
         grouped = {cat: list(cmds) for cat, cmds in groupby(filtered, key=get_category)}
         sorted_ = sorted(grouped.items(), key=lambda group: sum(len(c.name) for c in group[1]))
@@ -73,6 +71,13 @@ class EmbedHelpCommand(commands.HelpCommand):
         usage = f"{self.context.clean_prefix}{command} {command.signature}".rstrip()
         self.embed.add_field(
             "Usage", mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
+        )
+
+    def get_command_category(self, command: commands.Command) -> Category:
+        return (
+            command.extras.get("category")
+            or getattr(command.cog, "category")
+            or Category.NO_CATEGORY
         )
 
     @staticmethod

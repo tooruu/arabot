@@ -1,7 +1,9 @@
+from enum import Enum
+
 import disnake
 
 
-class Color:
+class Color(int, Enum):
     # red = Color.from_rgb(218, 76, 82)
     # yellow = Color.from_rgb(254, 163, 42)
     # green = Color.from_rgb(39, 159, 109)
@@ -25,7 +27,8 @@ class CustomEmoji:
     Doubt = "<:doubt:978288495489613854>"
 
 
-class Category:
+class Category(str, Enum):
+    NO_CATEGORY = "No category"
     GENERAL = "General"
     FUN = "Fun"
     META = "Meta"
@@ -34,3 +37,6 @@ class Category:
     MODERATION = "Moderation"
     GAMES = "Games"
     WAIFUS = "Reaction pictures"
+
+    def __str__(self) -> str:
+        return self.value
