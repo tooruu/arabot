@@ -60,9 +60,6 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
 
     @commands.group(invoke_without_command=True)
     async def nsfw(self, ctx: Context):
-        if ctx.subcommand_passed:
-            await ctx.reply("This category does not exist")
-            return
         await ctx.send(
             embed=Embed().add_field(
                 "Available categories",
