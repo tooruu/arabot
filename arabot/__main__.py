@@ -44,7 +44,7 @@ def create_ara(*args, **kwargs) -> Ara:
         max_messages=10_000,
     )
     if TESTING:
-        default_kwargs |= dict(
+        default_kwargs.update(
             reload=True,
             test_guilds=[954134299119091772, 676889696302792774],
         )
