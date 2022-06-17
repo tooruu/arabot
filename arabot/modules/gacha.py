@@ -87,7 +87,7 @@ class Gacha(Cog, category=Category.GAMES):
     @gacha.error
     async def on_error(self, ctx: Context, error: DiscordException):
         if isinstance(error, CommandOnCooldown):
-            return True
+            return False
         if isinstance(error, MissingRequiredArgument):
             pools = [
                 f"{bold(pool_code)} - {self._pull_provider.get_pool_name(pool_code)}"

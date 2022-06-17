@@ -116,9 +116,6 @@ class Ara(commands.Bot):
                 logging.info("Loaded %s", short)
 
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
-        if hasattr(context.command, "on_error"):
-            return
-
         match exception:
             case commands.CommandOnCooldown():
                 if exception.retry_after > 60:
