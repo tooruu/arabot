@@ -60,7 +60,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         await self.get_destination().send(embed=self.embed)
 
     def fill_command_data(self, command: commands.Command) -> None:
-        self.embed.title = mono(command)
+        self.embed.title = mono(command.name)
         self.embed.description = command.help or command.description or command.short_doc
         if note := command.extras.get("note"):
             self.embed.description += f"\n_Note: {note}_"
