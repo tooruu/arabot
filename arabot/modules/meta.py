@@ -2,7 +2,6 @@ from glob import glob
 from itertools import groupby
 from os import getenv
 from subprocess import SubprocessError, check_output
-from urllib.parse import urlencode
 
 import arabot
 import disnake
@@ -116,16 +115,6 @@ class Meta(Cog, category=Category.META):
         )
         self.ara.help_command.cog = self
 
-    def __get_ara_invite_link(self):
-        params = urlencode(
-            dict(
-                client_id=self.ara.application_id,
-                permissions=8 or 385088,
-                scope=" ".join(["bot", "applications.commands"]),
-            )
-        )
-        return f"https://discord.com/oauth2/authorize?{params}"
-
     def __get_line_count(self):
         count = 0
         try:
@@ -179,12 +168,11 @@ class Meta(Cog, category=Category.META):
     @commands.command(name="arabot", brief="Show bot's invite link")  # TODO:dynamically change name
     async def ara_invite_link(self, ctx: Context):
         await self.ara.wait_until_ready()
-        await ctx.send(self._bot_invite_link)
+        await ctx.send(self.ara.invite_url)
 
     async def cog_load(self):
         await self.ara.wait_until_ready()
         self._version = self.__get_version()
-        self._bot_invite_link = self.__get_ara_invite_link()
 
     def cog_unload(self):
         self.ara.help_command = self._orig_help_command

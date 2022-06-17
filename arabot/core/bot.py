@@ -11,6 +11,7 @@ from pkgutil import iter_modules
 import aiohttp
 import disnake
 from disnake.ext import commands
+from disnake.utils import oauth_url
 
 from ..utils import MissingEnvVar, getkeys, mono, strfdelta, system_info
 from .errors import StopCommand
@@ -71,6 +72,16 @@ class Ara(commands.Bot):
 
         app = await self.application_info()
         self.name = app.name
+
+        if app.install_params:
+            self.invite_url = app.install_params.to_url()
+        else:
+            self.invite_url = oauth_url(
+                app.id,
+                permissions=disnake.Permissions.all(),
+                scopes=("bot", "application.commands"),
+            )
+
         if app.team:
             self.owners = set(app.team.members)
             self.owner_ids = {m.id for m in app.team.members}
