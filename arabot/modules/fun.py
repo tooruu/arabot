@@ -53,6 +53,31 @@ class Fun(Cog, category=Category.FUN):
             await inter.edit_original_message("Reactions added")
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
+    @commands.command(brief="I asked!", usage="[message or reply]", hidden=True)
+    async def ia(self, ctx: Context, message: disnake.Message = None):
+        with suppress(disnake.Forbidden):
+            await ctx.message.delete()
+            if not message and not (message := await ctx.getch_reference_message()):
+                async for message in ctx.history(limit=4):
+                    if message.webhook_id or not message.author.bot:
+                        break
+                else:
+                    return
+            for i in "🇮", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.MeiStare:
+                await message.add_reaction(i)
+
+    @commands.message_command(name="I asked!")
+    async def iasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
+        await inter.response.send_message("Adding reactions", ephemeral=True)
+        try:
+            for i in "🇮", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.MeiStare:
+                await msg.add_reaction(i)
+        except disnake.Forbidden:
+            await inter.edit_original_message("I don't have permission to add reactions")
+        else:
+            await inter.edit_original_message("Reactions added")
+
+    @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who cares?", usage="[message or reply]", hidden=True)
     async def wc(self, ctx: Context, message: disnake.Message = None):
         with suppress(disnake.Forbidden):
@@ -71,6 +96,31 @@ class Fun(Cog, category=Category.FUN):
         await inter.response.send_message("Adding reactions", ephemeral=True)
         try:
             for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
+                await msg.add_reaction(i)
+        except disnake.Forbidden:
+            await inter.edit_original_message("I don't have permission to add reactions")
+        else:
+            await inter.edit_original_message("Reactions added")
+
+    @commands.cooldown(1, 10, commands.BucketType.channel)
+    @commands.command(brief="I care!", usage="[message or reply]", hidden=True)
+    async def ic(self, ctx: Context, message: disnake.Message = None):
+        with suppress(disnake.Forbidden):
+            await ctx.message.delete()
+            if not message and not (message := await ctx.getch_reference_message()):
+                async for message in ctx.history(limit=4):
+                    if message.webhook_id or not message.author.bot:
+                        break
+                else:
+                    return
+            for i in "🇮", "🇨", "🇦", "🇷", "🇪", CustomEmoji.MeiStare:
+                await message.add_reaction(i)
+
+    @commands.message_command(name="I care!")
+    async def icare(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
+        await inter.response.send_message("Adding reactions", ephemeral=True)
+        try:
+            for i in "🇮", "🇨", "🇦", "🇷", "🇪", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
             await inter.edit_original_message("I don't have permission to add reactions")
