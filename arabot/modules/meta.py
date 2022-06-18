@@ -167,8 +167,14 @@ class Meta(Cog, category=Category.META):
 
     @commands.command(name="arabot", brief="Show bot's invite link")  # TODO:dynamically change name
     async def ara_invite_link(self, ctx: Context):
-        await self.ara.wait_until_ready()
-        await ctx.send(self.ara.invite_url)
+        await ctx.ara.wait_until_ready()
+        await ctx.send(
+            embed=disnake.Embed(title="Click to invite me", url=self.ara.invite_url).set_author(
+                name=ctx.ara.name,
+                icon_url=ctx.ara.user.display_avatar.as_icon.compat.url,
+                url=self.ara.invite_url,
+            )
+        )
 
     async def cog_load(self):
         await self.ara.wait_until_ready()
