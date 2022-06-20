@@ -172,13 +172,11 @@ class Fun(Cog, category=Category.FUN):
     @commands.command(aliases=["x"], brief="Doubt someone", usage="[member or reply]")
     async def doubt(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            ctx.reset_cooldown()
             await ctx.send("User not found")
             return
 
         if member:
             if member == ctx.author:
-                ctx.reset_cooldown()
                 await ctx.send("Never doubt yourself!")
                 return
 
@@ -186,7 +184,6 @@ class Fun(Cog, category=Category.FUN):
                 if msg_x.author == member:
                     break
             else:
-                ctx.reset_cooldown()
                 await ctx.reply("Message not found")
                 return
 
@@ -195,14 +192,12 @@ class Fun(Cog, category=Category.FUN):
                 if history := await ctx.history(before=ctx.message, limit=1).flatten():
                     msg_x = history[0]
             if not msg_x:
-                ctx.reset_cooldown()
                 await ctx.reply("Message not found")
                 return
 
         try:
             await msg_x.add_reaction(CustomEmoji.Doubt)
         except disnake.Forbidden:
-            ctx.reset_cooldown()
             await ctx.reply_ping(f"Cannot react to {msg_x.author.mention}'s messages")
             return
 
