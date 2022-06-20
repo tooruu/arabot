@@ -24,15 +24,18 @@ REACTION_MAPPING: dict[str, dict] = {
     "bonk": {
         "no_mentions": "{author} wants to bonk someone...",
         "mentions": "{author} bonks {target}",
+        "protect_bot": True,
     },
     "bully": {
         "no_mentions": "{author} wants to bully someone...",
         "mentions": "{author} bullies {target}",
+        "protect_bot": True,
     },
     "cringe": {
         "brief": "Cringe at someone",
         "no_mentions": "{author} is cringing",
         "mentions": "{author} cringes at {target}",
+        "protect_bot": True,
     },
     "cry": {
         "brief": "Cry on someone's shoulders",
@@ -77,10 +80,12 @@ REACTION_MAPPING: dict[str, dict] = {
     "kick": {
         "no_mentions": "{author} wants to kick someone...",
         "mentions": "{author} kicks {target}",
+        "protect_bot": True,
     },
     "kill": {
         "no_mentions": "{author} wants to kill someone...",
         "mentions": "{author} kills {target}",
+        "protect_bot": True,
     },
     "kiss": {
         "no_mentions": "{author} wants to kiss someone...",
@@ -106,6 +111,7 @@ REACTION_MAPPING: dict[str, dict] = {
     "slap": {
         "no_mentions": "{author} wants to slap someone...",
         "mentions": "{author} slaps {target}",
+        "protect_bot": True,
     },
     "smile": {
         "brief": "Smile at someone",
@@ -132,6 +138,7 @@ REACTION_MAPPING: dict[str, dict] = {
     "yeet": {
         "no_mentions": "{author} wants to yeet someone...",
         "mentions": "{author} yeets {target}",
+        "protect_bot": True,
     },
 }
 
@@ -206,6 +213,12 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
                             description = menstr.replace("{author}", "themselves").replace(
                                 "{target}", "{author}"
                             )
+                case _ if reaction_data.get("protect_bot") and ctx.me in targets:
+                    description = (
+                        reaction_data["mentions"]
+                        .replace("{author}", ctx.me.mention)
+                        .replace("{target}", "{author}")
+                    )
                 case _:
                     if ctx.author in targets:
                         targets.remove(ctx.author)
