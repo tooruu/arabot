@@ -19,13 +19,14 @@ class Fun(Cog, category=Category.FUN):
     async def inspire(self, ctx: Context):
         async with self.session.get("https://inspirobot.me/api?generate=true") as r:
             image_link = await r.text()
-        await ctx.send(image_link)
+        await ctx.send(embed=disnake.Embed().set_image(url=image_link))
 
     @commands.command(aliases=["person"], brief="Get a randomly generated face")
     async def face(self, ctx: Context):
         async with self.session.get("https://thispersondoesnotexist.com/image") as r:
             image = BytesIO(await r.read())
-            await ctx.send(file=disnake.File(image, "face.png"))
+        embed = disnake.Embed().set_image(file=disnake.File(image, "face.png"))
+        await ctx.send(embed=embed)
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who asked?", usage="[message or reply]", hidden=True)
