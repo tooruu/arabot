@@ -4,7 +4,11 @@ from random import choice
 
 import disnake
 from arabot.core import Ara, Cog, pfxless
-from disnake.ext.commands import check
+from arabot.utils import (
+    author_in_voice_channel,
+    bot_not_speaking_in_guild,
+    can_someone_hear_in_author_channel,
+)
 
 
 class Voice(Cog):
@@ -16,26 +20,18 @@ class Voice(Cog):
     GACHI_OGG_DIR = "resources/ogg/gachi"
     GACHI_OGG_FILES = listdir(GACHI_OGG_DIR)
 
-    @check(
-        lambda msg: not all(
-            m.bot or m.voice.deaf or m.voice.self_deaf for m in msg.author.voice.channel.members
-        )
-    )
-    @check(lambda msg: getattr(msg.author.voice, "channel", None))
-    @check(lambda msg: not msg.guild.voice_client)
+    @can_someone_hear_in_author_channel
+    @author_in_voice_channel
+    @bot_not_speaking_in_guild
     @pfxless(regex=MISC_OGG_REGEX)
     async def misc_voice(self, msg: disnake.Message):
         filename = re.search(self.MISC_OGG_REGEX, msg.content, re.IGNORECASE)[0] + ".ogg"
         audio = disnake.FFmpegOpusAudio(f"{self.MISC_OGG_DIR}/{filename.lower()}")
         await msg.author.voice.channel.connect_play_disconnect(audio)
 
-    @check(
-        lambda msg: not all(
-            m.bot or m.voice.deaf or m.voice.self_deaf for m in msg.author.voice.channel.members
-        )
-    )
-    @check(lambda msg: getattr(msg.author.voice, "channel", None))
-    @check(lambda msg: not msg.guild.voice_client)
+    @can_someone_hear_in_author_channel
+    @author_in_voice_channel
+    @bot_not_speaking_in_guild
     @pfxless()
     async def gachi(self, msg: disnake.Message):
         filename = choice(self.GACHI_OGG_FILES)
