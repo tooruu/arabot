@@ -11,9 +11,9 @@ from pkgutil import iter_modules
 import aiohttp
 import disnake
 from disnake.ext import commands
-from disnake.utils import oauth_url
+from disnake.utils import format_dt, oauth_url, utcnow
 
-from ..utils import MissingEnvVar, getkeys, mono, strfdelta, system_info
+from ..utils import MissingEnvVar, getkeys, mono, system_info
 from .errors import StopCommand
 from .patches import Context
 
@@ -129,11 +129,9 @@ class Ara(commands.Bot):
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
         match exception:
             case commands.CommandOnCooldown():
-                if exception.retry_after > 60:
-                    remaining = strfdelta(timedelta(seconds=exception.retry_after))
-                else:
-                    remaining = f"{exception.retry_after:.0f} seconds"
-                await context.reply(f"Cooldown expires in {remaining}")
+                expires_at = utcnow() + timedelta(seconds=exception.retry_after)
+                remaining = format_dt(expires_at, "R")
+                await context.reply(f"Cooldown expires {remaining}")
             case commands.DisabledCommand():
                 await context.reply("This command is disabled!")
             case commands.MaxConcurrencyReached(number=n):
