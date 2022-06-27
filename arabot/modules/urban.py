@@ -56,15 +56,17 @@ class Urban(Cog, category=Category.LOOKUP):
                 await ctx.send(f"Definition for {bold(term)} not found")
             return
 
-        embeds = [
-            Embed(
+        embeds = []
+        for definition in definitions:
+            embed = Embed(
                 description=dsafe(repchars(definition["definition"], "[]"))[:4096],
                 title=dsafe(definition["word"])[:256],
                 url=definition["permalink"],
                 timestamp=datetime.fromisoformat(definition["written_on"][:-1]),
-            ).add_field("Example", dsafe(repchars(definition["example"], "[]"))[:1024])
-            for definition in definitions
-        ]
+            )
+            if definition["example"]:
+                embed.add_field("Example", dsafe(repchars(definition["example"], "[]"))[:1024])
+            embeds.append(embed)
 
         await ctx.send(embed=embeds[0], view=EmbedPaginator(embeds, author=ctx.author))
 
