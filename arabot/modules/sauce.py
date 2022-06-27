@@ -79,9 +79,9 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             },
         )
         if nao_json["header"]["status"]:
-            error = nao_json["header"]["message"]
-            logging.error(error)
-            await ctx.reply(f"Failed to fetch results.\n{error}")
+            error = nao_json["header"].get("message")
+            logging.error(f"Sauce failed for {image_url}" + (f"\n{error}" if error else ""))
+            await ctx.reply(f"Failed to fetch results.\n{error or ''}")
             return
         if not nao_json["header"]["results_returned"]:
             await ctx.reply("No results found")
