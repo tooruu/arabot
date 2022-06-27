@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from arabot.core import Ara, Category, Cog, Context, pfxless
-from arabot.utils import EmbedPaginator, bold, repchars, dsafe
+from arabot.utils import EmbedPaginator, bold, dsafe, repchars
 from disnake import Embed
 from disnake.ext.commands import command
 
@@ -44,7 +44,7 @@ class Urban(Cog, category=Category.LOOKUP):
         )
     )
 
-    @command(aliases=["ud"], brief="Search term in Urban Dictionary")
+    @command(aliases=["ud", "define", "whats"], brief="Search term in Urban Dictionary")
     async def urban(self, ctx: Context, *, term: str):
         for predefined, definition in self.definitions.items():
             if term.lower() == predefined.lower():
