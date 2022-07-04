@@ -29,7 +29,7 @@ class General(Cog, category=Category.GENERAL):
 
         filtered_emojis = list(dict.fromkeys(e for e in emojis if e)) if emojis else []
         if not filtered_emojis and not stickers:
-            await ctx.reply("No emojis found")
+            await ctx.reply("No emojis/stickers found")
             return
 
         await ctx.reply(
