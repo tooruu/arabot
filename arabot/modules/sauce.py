@@ -110,7 +110,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     if episode := data.get("part"):
                         embed.description += f"Episode {episode}"
                         if timecode := data.get("est_time"):
-                            embed.description += f" | {timecode}"
+                            embed.description += f" - {timecode.lstrip('0:')}"
                         embed.description += "\n"
                     embed.description += f"Similarity: {header['similarity']}%"
                     if mal_json:
