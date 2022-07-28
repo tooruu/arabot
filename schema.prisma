@@ -1,0 +1,9 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("database_uri")
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = -1
+}

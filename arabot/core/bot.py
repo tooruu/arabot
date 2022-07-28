@@ -12,8 +12,9 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 from disnake.utils import format_dt, oauth_url, utcnow
+from prisma import Prisma
 
-from ..utils import MissingEnvVar, getkeys, mono, system_info
+from ..utils import mono, system_info
 from .errors import StopCommand
 from .patches import Context
 
@@ -51,12 +52,12 @@ class Ara(commands.Bot):
         super().__init__(*args, **kwargs)
 
     async def login(self) -> None:
-        try:
-            token = getkeys("token")[0]
-            await super().login(token)
-        except MissingEnvVar:
+        if not (token := os.getenv("token")):
             logging.critical("Missing environment variable 'token'")
             sys.exit(69)
+
+        try:
+            await super().login(token)
         except (disnake.LoginFailure, TypeError):
             logging.critical("Invalid token %r", token)
             sys.exit(69)
@@ -90,7 +91,10 @@ class Ara(commands.Bot):
             self.owner_id = app.owner.id
 
     async def start(self) -> None:
-        async with aiohttp.ClientSession() as self.session:
+        async with (
+            aiohttp.ClientSession() as self.session,
+            Prisma() as self.db,
+        ):
             await self.login()
             self.load_extensions()
             await self.connect()
