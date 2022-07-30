@@ -144,7 +144,12 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(brief="Make Ara say something")
     async def say(self, ctx: Context, *, text):
         await ctx.message.delete()
-        await ctx.send_ping(text)
+        await ctx.send(
+            text,
+            allowed_mentions=disnake.AllowedMentions(
+                everyone=False, users=True, roles=False, replied_user=True
+            ),
+        )
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context):

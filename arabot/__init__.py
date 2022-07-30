@@ -4,7 +4,7 @@ from dotenv import load_dotenv as _load_dotenv
 
 from .core import Ara
 
-__version__ = "7.7.8"
+__version__ = "7.7.9"
 
 _load_dotenv()
 TESTING = bool(_getenv("testing"))
