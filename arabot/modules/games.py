@@ -2,6 +2,7 @@ import asyncio
 import random
 import re
 from collections import defaultdict, deque
+from contextlib import suppress
 from functools import partial
 from itertools import product
 
@@ -325,13 +326,8 @@ class TicTacToeButton(disnake.ui.Button):
             content, view=view, allowed_mentions=disnake.AllowedMentions.all()
         )
         if loser:
-            await inter.channel.temp_mute_member(
-                loser,
-                reason="Tic Tac Toe loser",
-                success_msg=lambda: inter.followup.send_ping(
-                    f"{loser.mention} loser has been muted for 1 minute!"
-                ),
-            )
+            await loser.timeout(duration=60, reason="Tic Tac Toe loser")
+            await inter.followup.send_ping(f"{loser.mention} loser has been muted for 1 minute!")
 
 
 class TicTacToe(disnake.ui.View):
@@ -411,9 +407,7 @@ class Games(Cog, category=Category.GAMES):
             last_deaths.append(ctx.author.id)
             await ctx.reply("***BOOM***")  # TODO: Make it look better, maybe with an emoji or a gif
             await ctx.send("Cooling down and reloading barrel...")
-            await ctx.temp_channel_mute_author(
-                reason="Russian Roulette", success_msg=False, failure_msg=True
-            )
+            await ctx.author.timeout(duration=60, reason="Russian Roulette")
             return
 
         # Same user loses 3 times in a row
@@ -422,9 +416,7 @@ class Games(Cog, category=Category.GAMES):
         try:
             await ctx.author.kick(reason="Russian Roulette")
         except disnake.Forbidden:
-            await ctx.temp_channel_mute_author(
-                180, reason="Russian Roulette", success_msg=False, failure_msg=True
-            )
+            await ctx.author.timeout(duration=180, reason="Russian Roulette")
 
     @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number", usage="[max=20]")
@@ -438,33 +430,28 @@ class Games(Cog, category=Category.GAMES):
         await ctx.send(f"🎲 Guess a number between 1-{ceiling}")
 
         # Voting phase
-        guesses = {}
+        guesses: dict[disnake.Member, int] = {}
 
-        def is_valid_guess(vote):
+        def is_valid_guess(vote: disnake.Message) -> bool:
             if vote.channel == ctx.channel and vote.author not in guesses:
-                try:
+                with suppress(ValueError):
                     return (
                         int(vote.content) not in guesses.values()
                         and 1 <= int(vote.content) <= ceiling
                     )
-                except ValueError:
-                    return False
             return False
 
         async def voting():
             while True:
-                vote = await ctx.ara.wait_for("message", check=is_valid_guess)
-                try:
-                    await vote.add_reaction("☑️")
-                except disnake.Forbidden:
-                    pass
+                vote: disnake.Message = await ctx.ara.wait_for("message", check=is_valid_guess)
+                await vote.blue_tick()
                 guess = int(vote.content)
                 guesses[vote.author] = guess
                 if guess == number:
                     return True
 
         try:
-            exact_guess = await asyncio.wait_for(voting(), timeout=20)
+            exact_guess: disnake.Message = await asyncio.wait_for(voting(), timeout=20)
         except asyncio.TimeoutError:
             exact_guess = False
 
@@ -474,13 +461,11 @@ class Games(Cog, category=Category.GAMES):
             await ctx.send("No one has won")
             return
         winner = min(guesses, key=lambda m: abs(guesses[m] - number))
-        await ctx.channel.temp_mute_member(
-            winner,
-            reason="Guessed the number",
-            success_msg=f"{winner.mention} "
+        await winner.timeout(duration=60, reason="Guessed the number")
+        await ctx.send(
+            f"{winner.mention} "
             + ("guessed" if exact_guess else "was the closest to")
-            + f" number {number}\n"
-            f"Enjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}",
+            + f" number {number}\nEnjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}"
         )
 
     @commands.check(
@@ -501,8 +486,8 @@ class Games(Cog, category=Category.GAMES):
         )
 
         # Voting phase
-        voted: list[disnake.abc.User] = []
-        votes: dict[disnake.abc.User, int] = defaultdict(int)
+        voted: list[disnake.Member] = []
+        votes: dict[disnake.Member, int] = defaultdict(int)
 
         def is_valid_vote(vote):
             return (
@@ -517,19 +502,17 @@ class Games(Cog, category=Category.GAMES):
 
         async def voting():
             while True:
-                vote = await ctx.ara.wait_for("message", check=is_valid_vote)
+                vote: disnake.Message = await ctx.ara.wait_for("message", check=is_valid_vote)
                 await vote.delete()
                 mentioned = vote.mentions[0]
-                # Punish who voted for a streamer
+                # Punish whoever voted for a streamer
                 if mentioned.voice.self_stream:
                     mentioned = vote.author
                 votes[mentioned] += 1
                 voted.append(vote.author)
 
-        try:
+        with suppress(asyncio.TimeoutError):
             await asyncio.wait_for(voting(), timeout=vote_timeout)
-        except asyncio.TimeoutError:
-            pass
 
         # Ejection phase
         if (

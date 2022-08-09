@@ -40,18 +40,16 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             )
 
         try:
-            bad_msg = await ctx.ara.wait_for("message", check=bad_msg_check, timeout=timeout)
+            bad_msg: disnake.Message = await ctx.ara.wait_for(
+                "message", check=bad_msg_check, timeout=timeout
+            )
         except asyncio.TimeoutError:
             return
         else:
             with suppress(disnake.Forbidden):
                 await bad_msg.add_reaction("🤫")
-            await bad_msg.temp_channel_mute_author(
-                success_msg=lambda: bad_msg.reply_ping(
-                    f"{bad_msg.author.mention} has been muted for 1 minute"
-                ),
-                failure_msg=True,
-            )
+            await bad_msg.author.timeout(duration=60)
+            await bad_msg.reply_ping(f"{bad_msg.author.mention} has been muted for 1 minute")
         finally:
             with suppress(disnake.NotFound):
                 await ctx.message.remove_reaction(CustomEmoji.KannaStare, ctx.me)

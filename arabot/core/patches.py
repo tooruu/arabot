@@ -69,12 +69,8 @@ class Context(commands.Context):
 
         return None
 
-    async def tick(self) -> bool:
-        try:
-            await self.message.add_reaction("✅")
-        except (disnake.HTTPException, disnake.Forbidden):
-            return False
-        return True
+    tick = property(lambda self: self.message.tick)
+    blue_tick = property(lambda self: self.message.blue_tick)
 
     def reset_cooldown(self) -> bool:
         if not self.command:
@@ -200,6 +196,22 @@ def presence_count(self: disnake.Guild) -> int:
     return sum(m.status is not disnake.Status.offline for m in self.members)
 
 
+async def message_green_tick(self: disnake.Message) -> bool:
+    try:
+        await self.add_reaction("✅")
+    except (disnake.HTTPException, disnake.Forbidden):
+        return False
+    return True
+
+
+async def message_blue_tick(self: disnake.Message) -> bool:
+    try:
+        await self.add_reaction("☑️")
+    except (disnake.HTTPException, disnake.Forbidden):
+        return False
+    return True
+
+
 aiohttp.ClientSession.fetch_json = fetch_json
 disnake.abc.Messageable.send_ping = disnake.Webhook.send_ping = property(
     lambda self: partial(self.send, allowed_mentions=disnake.AllowedMentions.all())
@@ -221,4 +233,6 @@ disnake.Message.reply_ping = partialmethod(
 disnake.Message.temp_channel_mute_author = property(
     lambda self: partial(self.channel.temp_mute_member, self.author)
 )
+disnake.Message.blue_tick = message_blue_tick
+disnake.Message.tick = message_green_tick
 disnake.VoiceChannel.connect_play_disconnect = connect_play_disconnect
