@@ -1,27 +1,34 @@
 import disnake
 from arabot.core import Ara, AraDB, Category, Cog, Context
-from arabot.utils import mono
+from arabot.utils import bold, mono
 from disnake.ext import commands
 
 
 class Settings(Cog, category=Category.SETTINGS):
     @commands.group(aliases=["set"], invoke_without_command=True)
     async def settings(self, ctx: Context):
-        pass
+        await ctx.send(
+            embed=disnake.Embed().add_field(
+                "Available settings",
+                "\n".join(c.name for c in self.settings.walk_commands()),
+            )
+        )
 
     @settings.command(brief="Show bot's prefix on this server")
     async def prefix(self, ctx: Context, prefix: str | None = None):
         db: AraDB = ctx.ara.db
-        embed = disnake.Embed(title="Prefix").set_author(name=ctx.guild, icon_url=ctx.guild.icon)
+        embed = disnake.Embed(
+            description="_Additionally you can use **`ara`** or mention me_"
+        ).set_author(name=ctx.guild, icon_url=ctx.guild.icon)
 
         if prefix:
+            prefix = prefix.strip()
             await db.set_guild_prefix(ctx.guild.id, prefix)
             db.get_guild_prefix.invalidate(db, ctx.guild.id)
-            embed.description = mono(prefix)
         else:
-            prefix = await db.get_guild_prefix(ctx.guild.id)
-            embed.description = mono(prefix or ";")
+            prefix = await db.get_guild_prefix(ctx.guild.id) or ";"
 
+        embed.title = f"Prefix: {bold(mono(prefix))}"
         await ctx.send(embed=embed)
 
 
