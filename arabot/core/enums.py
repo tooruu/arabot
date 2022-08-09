@@ -37,6 +37,7 @@ class Category(str, Enum):
     MODERATION = "Moderation"
     GAMES = "Games"
     WAIFUS = "Reaction pictures"
+    SETTINGS = "Settings"
 
     def __str__(self) -> str:
         return self.value

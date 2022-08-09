@@ -12,9 +12,9 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 from disnake.utils import format_dt, oauth_url, utcnow
-from prisma import Prisma
 
 from ..utils import mono, system_info
+from .database import AraDB
 from .errors import StopCommand
 from .patches import Context
 
@@ -44,6 +44,8 @@ def search_directory(path) -> Generator[str, None, None]:
 
 
 class Ara(commands.Bot):
+    db: AraDB
+
     def __init__(self, *args, **kwargs):
         self._cogs_path: str = kwargs.pop("cogs_path", "arabot/modules")
         embed_color: int | disnake.Color | None = kwargs.pop("embed_color", None)
@@ -93,7 +95,7 @@ class Ara(commands.Bot):
     async def start(self) -> None:
         async with (
             aiohttp.ClientSession() as self.session,
-            Prisma() as self.db,
+            AraDB() as self.db,
         ):
             await self.login()
             self.load_extensions()

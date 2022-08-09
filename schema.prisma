@@ -7,3 +7,8 @@ generator client {
   provider             = "prisma-client-py"
   recursive_type_depth = -1
 }
+
+model Prefix {
+  guild_id String @id @map("_id")
+  prefix   String
+}
