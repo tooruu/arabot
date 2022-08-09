@@ -5,7 +5,7 @@ from disnake.ext import commands
 
 
 class Settings(Cog, category=Category.SETTINGS):
-    @commands.group(aliases=["set"], invoke_without_command=True)
+    @commands.group(aliases=["set"], brief="Various bot settings", invoke_without_command=True)
     async def settings(self, ctx: Context):
         await ctx.send(
             embed=disnake.Embed().add_field(
@@ -14,7 +14,8 @@ class Settings(Cog, category=Category.SETTINGS):
             )
         )
 
-    @settings.command(brief="Show bot's prefix on this server")
+    @commands.has_permissions(manage_guild=True)
+    @settings.command(brief="View or set bot's prefix for this server")
     async def prefix(self, ctx: Context, prefix: str | None = None):
         db: AraDB = ctx.ara.db
         embed = disnake.Embed(
