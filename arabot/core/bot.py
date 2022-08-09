@@ -13,7 +13,8 @@ import disnake
 from disnake.ext import commands
 from disnake.utils import format_dt, oauth_url, utcnow
 
-from ..utils import MissingEnvVar, getkeys, mono, system_info
+from ..utils import mono, system_info
+from .database import AraDB
 from .errors import StopCommand
 from .patches import Context
 
@@ -43,6 +44,8 @@ def search_directory(path) -> Generator[str, None, None]:
 
 
 class Ara(commands.Bot):
+    db: AraDB
+
     def __init__(self, *args, **kwargs):
         self._cogs_path: str = kwargs.pop("cogs_path", "arabot/modules")
         embed_color: int | disnake.Color | None = kwargs.pop("embed_color", None)
@@ -51,12 +54,12 @@ class Ara(commands.Bot):
         super().__init__(*args, **kwargs)
 
     async def login(self) -> None:
-        try:
-            token = getkeys("token")[0]
-            await super().login(token)
-        except MissingEnvVar:
+        if not (token := os.getenv("token")):
             logging.critical("Missing environment variable 'token'")
             sys.exit(69)
+
+        try:
+            await super().login(token)
         except (disnake.LoginFailure, TypeError):
             logging.critical("Invalid token %r", token)
             sys.exit(69)
@@ -90,7 +93,10 @@ class Ara(commands.Bot):
             self.owner_id = app.owner.id
 
     async def start(self) -> None:
-        async with aiohttp.ClientSession() as self.session:
+        async with (
+            aiohttp.ClientSession() as self.session,
+            AraDB() as self.db,
+        ):
             await self.login()
             self.load_extensions()
             await self.connect()

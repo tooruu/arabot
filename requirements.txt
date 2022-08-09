@@ -1,4 +1,5 @@
 disnake[voice]~=2.5.0
+prisma
 # Speedups
 aiodns
 Brotli

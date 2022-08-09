@@ -18,9 +18,9 @@ def setup_logging() -> None:
 
 
 async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
-    pfx_pattern = r"a; *" if TESTING else rf"; *|ara +|<@!?{ara.user.id}> *"
-    if found := re.match(pfx_pattern, msg.content, re.IGNORECASE):
-        return found[0]
+    custom_prefix = await ara.db.get_guild_prefix(msg.guild.id) or ";"
+    pfx_pattern = rf"{re.escape(custom_prefix)}\s*|ara\s+|<@!?{ara.user.id}>\s*"
+    return found[0] if (found := re.match(pfx_pattern, msg.content, re.IGNORECASE)) else None
 
 
 def create_ara(*args, **kwargs) -> Ara:
