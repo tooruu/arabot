@@ -40,6 +40,7 @@ class Eval(Cog, category=Category.GENERAL):
                 channel=ctx.channel,
                 bot=ctx.bot,
                 ara=ctx.bot,
+                db=ctx.ara.db,
                 disnake=disnake,
                 discord=disnake,
                 commands=commands,
