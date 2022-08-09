@@ -6,11 +6,19 @@ from typing import Any, Awaitable, TypeVar
 
 import disnake
 from arabot.core import Ara, Cog, Color, Context
+from arabot.utils import CIMember, CIRole, CITextChl, Empty, mono
+from disnake.abc import PrivateChannel
 from disnake.ext import commands
 
 _T = TypeVar("_T")
 _T1 = TypeVar("_T1", bound=str)
 _T2 = TypeVar("_T2")
+
+
+class FakeObj:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.values():
+            setattr(self, key, value)
 
 
 class CommandAlreadyEnabled(commands.CommandError):
@@ -58,6 +66,82 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         act = disnake.Activity(type=acts[act_type], name=act_name) if act_type else None
         await ctx.ara.change_presence(activity=act)
         await ctx.tick()
+
+    @commands.command(usage="<command> [bucket item]")
+    async def resetcd(
+        self,
+        ctx: Context,
+        input_cmd,
+        *,
+        bucket_item: disnake.TextChannel
+        | CITextChl
+        | disnake.Member
+        | CIMember
+        | disnake.Guild
+        | disnake.Role
+        | CIRole
+        | disnake.CategoryChannel
+        | Empty = False,
+    ):
+        if not (command := ctx.ara.get_command(input_cmd)):
+            await ctx.send(f"Command {mono(input_cmd)} not found")
+            return
+        buckets = command._buckets
+        if not buckets.valid:
+            await ctx.send(f"Command {mono(command)} has no cooldown")
+            return
+        if not isinstance(buckets.type, commands.BucketType):
+            await ctx.send(f"Only `BucketType` is supported, got `{buckets.type.__name__}`")
+            return
+        if bucket_item is None:
+            argument = ctx.argument_only.removeprefix(input_cmd + " ")
+            await ctx.send(f"Bucket item {mono(argument)} not found")
+            return
+        if (
+            bucket_item
+            and buckets.type.name.lower() not in type(bucket_item).__name__.lower()
+            and not (
+                buckets.type is commands.BucketType.user and isinstance(bucket_item, disnake.Member)
+            )
+        ):
+            await ctx.send(
+                f"Bucket type `{buckets.type.name}` doesn't match "
+                f"argument type `{type(bucket_item).__name__}`"
+            )
+            return
+
+        fake_msg = FakeObj()
+        match buckets.type:
+            case commands.BucketType.default:
+                bucket_item = "everyone"
+            case commands.BucketType.channel:
+                fake_msg.channel = bucket_item or ctx.channel
+                bucket_item = bucket_item or ctx.channel
+            case commands.BucketType.member | commands.BucketType.user:
+                fake_msg.guild = (bucket_item or ctx).guild
+                fake_msg.author = bucket_item or ctx.author
+                bucket_item = bucket_item or ctx.author
+            case commands.BucketType.guild:
+                fake_msg.guild = bucket_item or ctx.guild
+                fake_msg.author = ctx.author
+                bucket_item = bucket_item or ctx.guild
+            case commands.BucketType.role:
+                fake_msg.channel = ctx.channel
+                fake_msg.author = FakeObj(top_role=bucket_item) if bucket_item else ctx.author
+                bucket_item = bucket_item or (
+                    ctx.channel if isinstance(ctx.channel, PrivateChannel) else ctx.author.top_role
+                )
+            case commands.BucketType.category:
+                fake_msg.channel = (
+                    FakeObj(category=bucket_item) if bucket_item else ctx.channel.category
+                )
+                bucket_item = bucket_item or ctx.channel.category or ctx.channel
+
+        if bucket := buckets.get_bucket(fake_msg):
+            bucket.reset()
+            await ctx.send(f"{mono(command)}'s cooldown has been reset for {mono(bucket_item)}")
+        else:
+            await ctx.send(f"{mono(command)}'s bucket for {mono(bucket_item)} not found")
 
 
 class PluginManager(Cog, command_attrs=dict(hidden=True)):
