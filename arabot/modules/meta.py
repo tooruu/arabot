@@ -99,7 +99,7 @@ class EmbedHelpCommand(commands.HelpCommand):
             explanation += "\n`=` - default value"
         if "..." in command.signature:
             explanation += "\n`...` - supports multiple arguments"
-        return explanation  # and f"*Explanation:*{explanation}"
+        return explanation
 
 
 class Meta(Cog, category=Category.META):
