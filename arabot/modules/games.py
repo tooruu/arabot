@@ -149,7 +149,7 @@ class Connect4Game(Connect4Engine):
         return e
 
 
-class Connect4(Cog, category=Category.GAMES):
+class Connect4(Cog, category=Category.FUN):
     def __init__(self, client):
         self.client = client
         self.waiting_games = {}
@@ -369,7 +369,7 @@ class TicTacToe(disnake.ui.View):
         return False
 
 
-class Games(Cog, category=Category.GAMES):
+class Games(Cog, category=Category.FUN):
     def __init__(self, ara: Ara):
         self.ara = ara
         self.rr_barrel: dict[int, int] = defaultdict(lambda: [1, random.randint(1, 6)])

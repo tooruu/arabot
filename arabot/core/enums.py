@@ -35,7 +35,6 @@ class Category(str, Enum):
     LOOKUP = "Lookup"
     COMMUNITY = "Community"
     MODERATION = "Moderation"
-    GAMES = "Games"
     WAIFUS = "Reaction pictures"
     SETTINGS = "Settings"
 

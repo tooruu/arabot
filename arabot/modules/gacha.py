@@ -64,7 +64,7 @@ class ItemResolver(ItemResolverInterface):
             yield VirtualItem(item.id, item_name)
 
 
-class Gacha(Cog, category=Category.GAMES):
+class Gacha(Cog, category=Category.FUN):
     def __init__(self, ara: Ara):
         self.ara = ara
         self._pull_provider = Gacha._initialize_pull_provider()
