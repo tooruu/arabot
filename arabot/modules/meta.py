@@ -3,12 +3,13 @@ from itertools import groupby
 from os import getenv
 from subprocess import SubprocessError, check_output
 
-import arabot
 import disnake
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import bold, codeblock, mono
 from disnake.ext import commands
 from disnake.utils import utcnow
+
+import arabot
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import bold, codeblock, mono
 
 
 class EmbedHelpCommand(commands.HelpCommand):

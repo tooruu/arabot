@@ -2,9 +2,10 @@ import re
 from asyncio import sleep
 
 import disnake
+from disnake.ext import commands
+
 from arabot.core import Ara, Cog, CustomEmoji, pfxless
 from arabot.utils import is_in_guild
-from disnake.ext import commands
 
 
 class Chat(Cog):

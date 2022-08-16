@@ -1,9 +1,10 @@
 from aiohttp import ClientResponseError
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import AnyMember, humanjoin
 from disnake import Embed
 from disnake.ext import commands
 from waifu import APIException, ImageCategories, WaifuAioClient
+
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import AnyMember, humanjoin
 
 REACTION_MAPPING: dict[str, dict] = {
     "bite": {

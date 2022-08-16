@@ -3,9 +3,10 @@ import re
 from contextlib import suppress
 
 import disnake
+from disnake.ext.commands import command, has_permissions
+
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
 from arabot.utils import AnyTChl
-from disnake.ext.commands import command, has_permissions
 
 
 class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=True)):

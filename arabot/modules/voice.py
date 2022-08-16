@@ -3,6 +3,7 @@ from os import listdir
 from random import choice
 
 import disnake
+
 from arabot.core import Ara, Cog, pfxless
 from arabot.utils import (
     author_in_voice_channel,

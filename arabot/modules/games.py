@@ -7,9 +7,10 @@ from functools import partial
 from itertools import product
 
 import disnake
+from disnake.ext import commands
+
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
 from arabot.utils import AnyMember
-from disnake.ext import commands
 
 COLUMN_EMOJI = "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"
 CANCEL_EMOJI = "🚪"

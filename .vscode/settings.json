@@ -1,5 +1,10 @@
 {
-    "python.linting.prospectorEnabled": true,
-    "python.formatting.blackArgs": ["--line-length=100"],
-    "python.terminal.activateEnvInCurrentTerminal": true
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.linting.prospectorEnabled": true,
+  "python.sortImports.args": [
+    "--profile", "black",
+    "--project", "arabot",
+    "--line-length", "100",
+  ],
+  "python.formatting.blackArgs": ["--line-length=100"]
 }

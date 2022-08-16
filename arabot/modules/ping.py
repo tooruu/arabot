@@ -1,12 +1,13 @@
 from collections import deque
 from io import BytesIO
 
-from arabot.core import Ara, Category, Cog, Context
 from disnake import File
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
+
+from arabot.core import Ara, Category, Cog, Context
 
 
 class Ping(Cog, category=Category.META):

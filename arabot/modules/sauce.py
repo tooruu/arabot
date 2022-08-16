@@ -3,11 +3,12 @@ from enum import IntEnum
 from pprint import pformat
 
 from aiohttp import ClientSession
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import dsafe
 from disnake import Embed
 from disnake.ext.commands import command
 from jikanpy import AioJikan
+
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import dsafe
 
 
 # doujins = 16, 18, 38

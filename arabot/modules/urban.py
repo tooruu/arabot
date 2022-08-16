@@ -2,10 +2,11 @@ import re
 from datetime import datetime
 from typing import Any
 
-from arabot.core import Ara, Category, Cog, Context, pfxless
-from arabot.utils import EmbedPaginator, bold, dsafe, repchars
 from disnake import Embed
 from disnake.ext.commands import command
+
+from arabot.core import Ara, Category, Cog, Context, pfxless
+from arabot.utils import EmbedPaginator, bold, dsafe, repchars
 
 
 class Urban(Cog, category=Category.LOOKUP):

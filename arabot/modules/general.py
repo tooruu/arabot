@@ -2,9 +2,10 @@ import random
 import re
 
 import disnake
+from disnake.ext import commands
+
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import CUSTOM_EMOJI_RE, AnyEmoji, AnyEmojis, AnyMember, AnyMemberOrUser, bold
-from disnake.ext import commands
 
 
 class General(Cog, category=Category.GENERAL):

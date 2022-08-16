@@ -1,7 +1,8 @@
 import disnake
+from disnake.ext import commands
+
 from arabot.core import Ara, AraDB, Category, Cog, Context
 from arabot.utils import bold, mono
-from disnake.ext import commands
 
 
 class Settings(Cog, category=Category.SETTINGS):

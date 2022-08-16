@@ -4,8 +4,9 @@ import sys
 from contextlib import _RedirectStream, contextmanager
 from datetime import timedelta
 
-import arabot
 import disnake
+
+import arabot
 
 from .checks import *
 from .converters import *

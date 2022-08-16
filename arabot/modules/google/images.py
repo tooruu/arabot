@@ -5,8 +5,9 @@ from pathlib import Path
 
 import disnake
 from aiohttp import ClientResponse, ClientSession
-from arabot.core import Category, Cog, Context
 from disnake.ext.commands import command
+
+from arabot.core import Category, Cog, Context
 
 SVG_MIME = "image/svg+xml"
 

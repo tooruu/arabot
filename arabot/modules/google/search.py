@@ -1,10 +1,11 @@
 from urllib.parse import quote_plus
 
 from aiohttp import ClientSession
-from arabot.core import Category, Cog, Context
-from arabot.utils import bold
 from disnake import Embed
 from disnake.ext.commands import command
+
+from arabot.core import Category, Cog, Context
+from arabot.utils import bold
 
 
 class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}):

@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import Any, Awaitable, TypeVar
 
 import disnake
-from arabot.core import Ara, Cog, Color, Context
-from arabot.utils import CIMember, CIRole, CITextChl, Empty, mono
 from disnake.abc import PrivateChannel
 from disnake.ext import commands
+
+from arabot.core import Ara, Cog, Color, Context
+from arabot.utils import CIMember, CIRole, CITextChl, Empty, mono
 
 _T = TypeVar("_T")
 _T1 = TypeVar("_T1", bound=str)

@@ -1,6 +1,7 @@
 from aiohttp import ClientSession
-from arabot.core import Category, Cog, Context
 from disnake.ext.commands import command
+
+from arabot.core import Category, Cog, Context
 
 
 class Youtube(Cog, category=Category.LOOKUP, keys={"g_yt_key"}):

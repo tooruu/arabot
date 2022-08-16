@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from aiohttp import ClientSession
-from arabot.core import Ara, Category, Cog, Context
 from disnake import Embed
 from disnake.ext.commands import command
+
+from arabot.core import Ara, Category, Cog, Context
 
 
 class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
