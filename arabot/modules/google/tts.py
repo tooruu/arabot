@@ -38,6 +38,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         async with ctx.typing():
             if pcm := await self.parse_check_detect_synthesize(ctx):
                 await ctx.author.voice.channel.connect_play_disconnect(PCMAudio(pcm))
+                await ctx.tick()
 
     async def parse_check_detect_synthesize(self, ctx: Context) -> BytesIO | None:
         langs = await self.voices()
