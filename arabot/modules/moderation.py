@@ -38,6 +38,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             return (
                 msg.channel == ctx.channel
                 and not msg.author.bot
+                and ctx.author.top_perm_role > msg.author.top_perm_role
                 and re.search(pattern, msg.content, re.IGNORECASE)
             )
 
