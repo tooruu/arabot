@@ -143,6 +143,7 @@ class Fun(Cog, category=Category.FUN):
         if len(message := text + invis_bug + member.mention) <= 2000:
             await ctx.send_ping(message)
 
+    @commands.bot_has_permissions(manage_nicknames=True)
     @commands.cooldown(1, 60 * 60 * 24 * 1.75, commands.BucketType.member)
     @commands.command(aliases=["ren"], brief="Rename a person", cooldown_after_parsing=True)
     async def rename(self, ctx: Context, member: AnyMember, *, nick: str | None = None):

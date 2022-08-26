@@ -3,7 +3,7 @@ import re
 from contextlib import suppress
 
 import disnake
-from disnake.ext.commands import command, has_permissions
+from disnake.ext.commands import bot_has_permissions, command, has_permissions
 
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
 from arabot.utils import AnyTChl
@@ -14,6 +14,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
         self.ara = ara
 
     @has_permissions(manage_messages=True)
+    @bot_has_permissions(manage_messages=True)
     @command(aliases=["d"])
     async def purge(self, ctx: Context, amount: int | None = None):
         if amount:
@@ -22,6 +23,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             await ctx.message.delete()
 
     @has_permissions(manage_messages=True)
+    @bot_has_permissions(manage_messages=True)
     @command()
     async def csay(self, ctx: Context, channel: AnyTChl, *, text: str):
         await ctx.message.delete()
@@ -29,6 +31,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             await channel.send_ping(text)
 
     @has_permissions(moderate_members=True)
+    @bot_has_permissions(moderate_members=True)
     @command()
     async def waitto(self, ctx: Context, mute_duration: float | None = 60, *, pattern: str):
         with suppress(disnake.Forbidden):

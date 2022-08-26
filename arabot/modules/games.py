@@ -476,6 +476,7 @@ class Games(Cog, category=Category.FUN):
         lambda msg: (vc := getattr(msg.author.voice, "channel", None))
         and [m.bot for m in vc.members].count(False) > 2  # pylint: disable=used-before-assignment
     )
+    @commands.bot_has_permissions(move_members=True)
     @commands.cooldown(1, 120, commands.BucketType.guild)
     @commands.command(aliases=["impostor", "impasta"], brief="Eject imposter from voice chat")
     async def imposter(self, ctx: Context):

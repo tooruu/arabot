@@ -212,6 +212,7 @@ class General(Cog, category=Category.GENERAL):
             else "Invalid HTTP status code"
         )
 
+    @commands.bot_has_permissions(manage_webhooks=True)
     @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
     async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text):
         if user == ctx.me:
