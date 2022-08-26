@@ -406,17 +406,14 @@ class Games(Cog, category=Category.FUN):
         last_deaths = self.rr_last_deaths[ctx.guild.id]
         if last_deaths.count(ctx.author.id) < last_deaths.maxlen:
             last_deaths.append(ctx.author.id)
-            await ctx.reply("***BOOM***")  # TODO: Make it look better, maybe with an emoji or a gif
-            await ctx.send("Cooling down and reloading barrel...")
+            await ctx.reply(f"***BANG***💥{CustomEmoji.KannaGun}")
+            await ctx.send("Cooling down and reloading barrel...💨")
             await ctx.author.timeout(duration=60, reason="Russian Roulette")
             return
 
         # Same user loses 3 times in a row
         last_deaths.clear()
-        await ctx.reply("***__KABOOM__***")
-        try:
-            await ctx.author.kick(reason="Russian Roulette")
-        except disnake.Forbidden:
+        await ctx.reply("💥***__KABLAM__***💥")
             await ctx.author.timeout(duration=180, reason="Russian Roulette")
 
     @commands.max_concurrency(1, commands.BucketType.channel)
