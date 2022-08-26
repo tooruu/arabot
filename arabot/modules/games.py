@@ -315,20 +315,21 @@ class TicTacToeButton(disnake.ui.Button):
             if winner is True:
                 content = "It's a tie!"
             else:
-                content = f"{winner.mention} has won!"
                 loser = view.p1 if winner is view.p2 else view.p2
+                content = f"{winner.mention} has won against {loser.mention}!"
 
             for child in view.children:
                 child.disabled = True
-
             view.stop()
 
         await inter.response.edit_message(
             content, view=view, allowed_mentions=disnake.AllowedMentions.all()
         )
+
         if loser:
-            await loser.timeout(duration=60, reason="Tic Tac Toe loser")
-            await inter.followup.send_ping(f"{loser.mention} loser has been muted for 1 minute!")
+            with suppress(disnake.Forbidden):
+                await loser.timeout(duration=60, reason="Tic Tac Toe loser")
+                await inter.message.reply_ping(f"{loser.mention} has been muted for 1 minute")
 
 
 class TicTacToe(disnake.ui.View):
@@ -408,12 +409,14 @@ class Games(Cog, category=Category.FUN):
             last_deaths.append(ctx.author.id)
             await ctx.reply(f"***BANG***💥{CustomEmoji.KannaGun}")
             await ctx.send("Cooling down and reloading barrel...💨")
-            await ctx.author.timeout(duration=60, reason="Russian Roulette")
+            with suppress(disnake.Forbidden):
+                await ctx.author.timeout(duration=60, reason="Russian Roulette")
             return
 
         # Same user loses 3 times in a row
         last_deaths.clear()
         await ctx.reply("💥***__KABLAM__***💥")
+        with suppress(disnake.Forbidden):
             await ctx.author.timeout(duration=180, reason="Russian Roulette")
 
     @commands.max_concurrency(1, commands.BucketType.channel)
@@ -443,9 +446,8 @@ class Games(Cog, category=Category.FUN):
             while True:
                 vote: disnake.Message = await ctx.ara.wait_for("message", check=is_valid_guess)
                 await vote.blue_tick()
-                guess = int(vote.content)
-                guesses[vote.author] = guess
-                if guess == number:
+                guesses[vote.author] = int(vote.content)
+                if guesses[vote.author] == number:
                     return True
 
         try:
@@ -459,12 +461,16 @@ class Games(Cog, category=Category.FUN):
             await ctx.send("No one has won")
             return
         winner = min(guesses, key=lambda m: abs(guesses[m] - number))
-        await winner.timeout(duration=60, reason="Guessed the number")
-        await ctx.send(
-            f"{winner.mention} "
-            + ("guessed" if exact_guess else "was the closest to")
-            + f" number {number}\nEnjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}"
+        message = (
+            f"{winner.mention} {'guessed' if exact_guess else 'was the closest to'} number {number}"
         )
+        try:
+            await winner.timeout(duration=60, reason="Guessed the number")
+        except disnake.Forbidden:
+            pass
+        else:
+            message += f"\nEnjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}"
+        await ctx.send(message)
 
     @commands.check(
         lambda msg: (vc := getattr(msg.author.voice, "channel", None))

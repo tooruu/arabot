@@ -56,8 +56,14 @@ class Chat(Cog):
     @pfxless(regex=BAD_GAMES)
     async def badgames(self, msg: disnake.Message):
         game_name = self.BAD_GAMES.search(msg.content)[0]
-        await msg.author.timeout(duration=20, reason="геюга ебаная")
-        await msg.channel.send(f"{game_name}? Ебать ты гей 🤡, иди в мут нахуй")
+        message = f"{game_name}? ебать ты гей 🤡"
+        try:
+            await msg.author.timeout(duration=20, reason="геюга ебаная")
+        except disnake.Forbidden:
+            pass
+        else:
+            message += ", иди в мут нахуй"
+        await msg.channel.send(message)
 
     @commands.cooldown(1, 60, commands.BucketType.channel)
     @pfxless(regex=r"\b(communis[mt]|gulag)\b")

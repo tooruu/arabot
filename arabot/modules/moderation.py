@@ -29,9 +29,10 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             await channel.send_ping(text)
 
     @command()
-    @has_permissions(manage_channels=True)
-    async def mutenext(self, ctx: Context, timeout: int | None = 60, *, pattern: str):
-        await ctx.message.add_reaction(CustomEmoji.KannaStare)
+    @has_permissions(moderate_members=True)
+    async def waitto(self, ctx: Context, mute_duration: float = 60, *, pattern: str):
+        with suppress(disnake.Forbidden):
+            await ctx.message.add_reaction(CustomEmoji.KannaStare)
 
         def bad_msg_check(msg: disnake.Message):
             return (
@@ -42,15 +43,15 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
 
         try:
             bad_msg: disnake.Message = await ctx.ara.wait_for(
-                "message", check=bad_msg_check, timeout=timeout
+                "message", check=bad_msg_check, timeout=300
             )
         except asyncio.TimeoutError:
             return
         else:
             with suppress(disnake.Forbidden):
+                await bad_msg.author.timeout(duration=mute_duration)
+                await bad_msg.reply_ping(f"{bad_msg.author.mention} has been muted for 1 minute")
                 await bad_msg.add_reaction("🤫")
-            await bad_msg.author.timeout(duration=60)
-            await bad_msg.reply_ping(f"{bad_msg.author.mention} has been muted for 1 minute")
         finally:
             with suppress(disnake.NotFound):
                 await ctx.message.remove_reaction(CustomEmoji.KannaStare, ctx.me)
