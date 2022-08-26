@@ -13,23 +13,23 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
     def __init__(self, ara: Ara):
         self.ara = ara
 
-    @command(aliases=["d"])
     @has_permissions(manage_messages=True)
+    @command(aliases=["d"])
     async def purge(self, ctx: Context, amount: int | None = None):
         if amount:
             await ctx.channel.purge(limit=amount + 1)
         else:
             await ctx.message.delete()
 
-    @command()
     @has_permissions(manage_messages=True)
+    @command()
     async def csay(self, ctx: Context, channel: AnyTChl, *, text: str):
         await ctx.message.delete()
         if channel:
             await channel.send_ping(text)
 
-    @command()
     @has_permissions(moderate_members=True)
+    @command()
     async def waitto(self, ctx: Context, mute_duration: float | None = 60, *, pattern: str):
         with suppress(disnake.Forbidden):
             await ctx.message.add_reaction(CustomEmoji.KannaStare)
