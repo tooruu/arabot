@@ -140,15 +140,6 @@ class Ara(commands.Bot):
                 await context.reply(f"Cooldown expires {remaining}")
             case commands.DisabledCommand():
                 await context.reply("This command is disabled!")
-            case commands.MaxConcurrencyReached(number=n):
-                await context.reply(
-                    "Another instance of this command is already running"
-                    if n == 1
-                    else f"{n} instances of this command are already running"
-                )
-            case commands.MissingPermissions():
-                if not context.command.hidden:
-                    await context.reply("Missing permissions")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
             ) if context.cog.qualified_name.startswith(("Google", "Youtube")):
@@ -168,14 +159,21 @@ class Ara(commands.Bot):
                 await context.reply("Invalid argument")
             case (
                 StopCommand()
-                | commands.CommandNotFound()
+                | commands.BotMissingPermissions()
                 | commands.CheckFailure()
+                | commands.CommandNotFound()
                 | commands.ExpectedClosingQuoteError()
+                | commands.MaxConcurrencyReached()
+                | commands.MissingPermissions()
             ):
-                pass
+                if exception.args:
+                    await context.reply(exception.args[0])
             case _:
                 logging.error("Unhandled exception", exc_info=exception)
-                await context.reply("An error occurred")
+                args = exception.args
+                await context.reply(
+                    args[0] if len(args) == 1 and isinstance(args[0], str) else "An error occurred"
+                )
 
     async def on_ready(self) -> None:
         logging.info(system_info())
