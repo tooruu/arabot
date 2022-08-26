@@ -30,7 +30,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
 
     @command()
     @has_permissions(moderate_members=True)
-    async def waitto(self, ctx: Context, mute_duration: float = 60, *, pattern: str):
+    async def waitto(self, ctx: Context, mute_duration: float | None = 60, *, pattern: str):
         with suppress(disnake.Forbidden):
             await ctx.message.add_reaction(CustomEmoji.KannaStare)
 
