@@ -161,13 +161,14 @@ class Ara(commands.Bot):
                 StopCommand()
                 | commands.BotMissingPermissions()
                 | commands.CheckFailure()
-                | commands.CommandNotFound()
                 | commands.ExpectedClosingQuoteError()
                 | commands.MaxConcurrencyReached()
                 | commands.MissingPermissions()
             ):
                 if exception.args:
                     await context.reply(exception.args[0])
+            case commands.CommandNotFound():
+                pass
             case _:
                 logging.error("Unhandled exception", exc_info=exception)
                 args = exception.args
