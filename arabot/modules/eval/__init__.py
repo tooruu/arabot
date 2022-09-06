@@ -52,7 +52,7 @@ class Eval(Cog, category=Category.GENERAL):
             )
             evaluator = LocalEval(env=local_eval_env, stdin=StringIO(inputlines))
             result.set_footer(
-                text="Powered by myself 😌", icon_url=ctx.me.display_avatar.as_icon.compat.url
+                text="Powered by myself 😌", icon_url=ctx.me.display_avatar.as_icon.compat
             )
         else:
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)

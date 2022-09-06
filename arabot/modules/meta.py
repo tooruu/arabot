@@ -172,7 +172,7 @@ class Meta(Cog, category=Category.META):
         await ctx.send(
             embed=disnake.Embed(title="Click to invite me", url=self.ara.invite_url).set_author(
                 name=ctx.ara.name,
-                icon_url=ctx.ara.user.display_avatar.as_icon.compat.url,
+                icon_url=ctx.ara.user.display_avatar.as_icon.compat,
                 url=self.ara.invite_url,
             )
         )

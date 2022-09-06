@@ -178,7 +178,7 @@ async def get_or_fetch_reference_message(self: disnake.Message) -> disnake.Messa
 def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Embed:
     return self.set_author(
         name=user.display_name,
-        icon_url=user.display_avatar.as_icon.compat.url,
+        icon_url=user.display_avatar.as_icon.compat,
         url=f"https://discord.com/users/{user.id}",
     )
 

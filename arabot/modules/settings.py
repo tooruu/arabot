@@ -21,7 +21,10 @@ class Settings(Cog, category=Category.SETTINGS):
         db: AraDB = ctx.ara.db
         embed = disnake.Embed(
             description="_Additionally you can use **`ara`** or mention me_"
-        ).set_author(name=ctx.guild, icon_url=ctx.guild.icon)
+        ).set_author(
+            name=ctx.guild,
+            icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
+        )
 
         if prefix:
             prefix = prefix.strip()

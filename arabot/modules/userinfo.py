@@ -94,7 +94,10 @@ class Userinfo(Cog, category=Category.GENERAL):
             description[0].append("**Marked as spammer**")
 
         if isinstance(member, disnake.Member):
-            embed.set_footer(text=member.guild.name, icon_url=ctx.guild.icon.as_icon.compat)
+            embed.set_footer(
+                text=member.guild.name,
+                icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
+            )
             if member.guild_avatar:
                 description[1].append(f"[Server avatar]({member.guild_avatar})")
             if member.pending:

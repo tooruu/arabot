@@ -90,7 +90,7 @@ class General(Cog, category=Category.GENERAL):
         ).set_author(
             name=ctx.guild.name,
             url=invite,
-            icon_url=ctx.guild.icon.as_icon.compat.url if ctx.guild.icon else disnake.Embed.Empty,
+            icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
         )
         try:
             await member.send(embed=embed)
