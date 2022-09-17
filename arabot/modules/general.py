@@ -145,12 +145,7 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(brief="Make Ara say something")
     async def say(self, ctx: Context, *, text):
         await ctx.message.delete()
-        await ctx.send(
-            text,
-            allowed_mentions=disnake.AllowedMentions(
-                everyone=False, users=True, roles=False, replied_user=True
-            ),
-        )
+        await ctx.send(text, allowed_mentions=disnake.AllowedMentions(users=True))
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context):
@@ -227,7 +222,11 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.message.delete()
         webhook = await ctx.channel.create_webhook(name=user, avatar=user.display_avatar)
-        await webhook.send_ping(text, username=user.display_name)
+        await webhook.send(
+            text,
+            username=user.display_name,
+            allowed_mentions=disnake.AllowedMentions(users=True),
+        )
         await webhook.delete()
 
 
