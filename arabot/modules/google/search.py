@@ -14,7 +14,7 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(aliases=["g"], brief="Top Google Search result")
+    @command(aliases=["g"], brief="Show top Google Search result")
     async def google(self, ctx: Context, *, query):
         json = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
@@ -27,7 +27,7 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
         )
         await ctx.reply(json["items"][0]["link"] if json.get("items") else "No results found")
 
-    @command(aliases=["g3"], brief="Top 3 Google Search results")
+    @command(aliases=["g3"], brief="Show top 3 Google Search results")
     async def google3(self, ctx: Context, *, query):
         data = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,

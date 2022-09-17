@@ -134,7 +134,12 @@ class Fun(Cog, category=Category.FUN):
         member = random.choice(ctx.channel.members)
         await ctx.reply(embed=disnake.Embed().with_author(member))
 
-    @commands.command(aliases=["gp"], brief="Secretly ping a person", hidden=True)
+    @commands.command(
+        aliases=["gp"],
+        brief="Secretly ping a person",
+        hidden=True,
+        extras={"note": "This is a bug that only works on PC"},
+    )
     async def ghostping(self, ctx: Context, member: AnyMember, *, text):
         await ctx.message.delete()
         if not member:

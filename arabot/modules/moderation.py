@@ -32,7 +32,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
 
     @has_permissions(moderate_members=True)
     @bot_has_permissions(moderate_members=True)
-    @command()
+    @command(brief="Timeout next user who sends message that matches regular expression")
     async def waitto(self, ctx: Context, mute_duration: float | None = 60, *, pattern: str):
         with suppress(disnake.Forbidden):
             await ctx.message.add_reaction(CustomEmoji.KannaStare)

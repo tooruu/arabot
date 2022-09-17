@@ -10,7 +10,7 @@ class Youtube(Cog, category=Category.LOOKUP, keys={"g_yt_key"}):
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(aliases=["yt"], brief="Top search result from YouTube")
+    @command(aliases=["yt"], brief="Show top search result from YouTube")
     async def youtube(self, ctx: Context, *, query):
         data = await self.session.fetch_json(
             self.YT_BASE_URL,

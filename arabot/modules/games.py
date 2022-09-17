@@ -478,7 +478,11 @@ class Games(Cog, category=Category.FUN):
     )
     @commands.bot_has_permissions(move_members=True)
     @commands.cooldown(1, 120, commands.BucketType.guild)
-    @commands.command(aliases=["impostor", "impasta"], brief="Eject imposter from voice chat")
+    @commands.command(
+        aliases=["impostor", "impasta"],
+        brief="Eject imposter from voice chat",
+        extras={"note": "You have to be in voice chat with other people to use this command"},
+    )
     async def imposter(self, ctx: Context):
         vote_timeout = 20
 

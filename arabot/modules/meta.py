@@ -158,9 +158,9 @@ class Meta(Cog, category=Category.META):
             f"of **{self._line_count}** lines of Python code"
         )
 
-    @commands.command(aliases=["github", "gh"], brief="Open bot's code repository")
+    @commands.command(aliases=["github", "gh"], brief="Link bot's code repository")
     async def repo(self, ctx: Context):
-        await ctx.send("<https://github.com/tooruu/AraBot>")
+        await ctx.send("<https://github.com/tooruu/arabot>")
 
     @commands.command(name="invite", brief="Show server's invite link")
     async def server_invite_link(self, ctx: Context):

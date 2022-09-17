@@ -142,7 +142,7 @@ class General(Cog, category=Category.GENERAL):
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 
-    @commands.command(brief="Make Ara say something")
+    @commands.command(brief="Make Ara say something", extras={"note": "Cannot ping roles"})
     async def say(self, ctx: Context, *, text):
         await ctx.message.delete()
         await ctx.send(text, allowed_mentions=disnake.AllowedMentions(users=True))
@@ -190,7 +190,7 @@ class General(Cog, category=Category.GENERAL):
         for i in indices[: len(options)]:
             await poll.add_reaction(i)
 
-    @commands.command(brief="HTTP Status Cats")
+    @commands.command(brief="Show HTTP status code cat picture")
     async def http(self, ctx: Context, http_status_code: int):
         await ctx.send(
             f"https://http.cat/{http_status_code}"
@@ -208,7 +208,11 @@ class General(Cog, category=Category.GENERAL):
         )
 
     @commands.bot_has_permissions(manage_webhooks=True)
-    @commands.command(aliases=["imp"], brief="Pretend to be somebody else")  # (c) 2022 by Kriz#0385
+    @commands.command(
+        aliases=["imp"],
+        brief="Pretend to be somebody else",
+        extras={"note": "Cannot ping roles"},
+    )  # (c) 2022 by Kriz#0385
     async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text):
         if user == ctx.me:
             await self.say(ctx, text=text)

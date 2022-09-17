@@ -13,7 +13,7 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(aliases=["calc"], brief="Answer a question")
+    @command(aliases=["calc"], brief="Answer a question (works mostly with mathematics)")
     async def wolfram(self, ctx: Context, *, question: str):
         await ctx.trigger_typing()
         question = question.strip("`")
