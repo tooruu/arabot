@@ -36,7 +36,9 @@ class Snipe(Cog, category=Category.FUN):
             and msg.content
             and not (
                 (pfx := await self.ara.command_prefix(self.ara, msg))
-                and re.match(rf"{pfx}({self.IGNORED_COMMANDS_PATTERN})", msg.content, re.IGNORECASE)
+                and re.match(
+                    rf"{re.escape(pfx)}({self.IGNORED_COMMANDS_PATTERN})", msg.content, re.I
+                )
             )
         ):
             self._cache.setdefault(msg.channel.id, []).append(RawDeletedMessage(msg))
