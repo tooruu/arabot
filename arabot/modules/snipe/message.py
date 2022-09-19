@@ -1,3 +1,5 @@
+import re
+
 from disnake import Embed, Message
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
@@ -20,6 +22,7 @@ class RawDeletedMessage:
 class Snipe(Cog, category=Category.FUN):
     GROUP_AGE_THRESHOLD = 300  # seconds since last message to end group
     EMPTY_SNIPE_MSG = "Nothing to snipe here 👀"
+    IGNORED_COMMANDS_PATTERN = r"imp(?:ersonate)?|gp|ghostping|[wi][ca]|c?say"
 
     def __init__(self, ara: Ara):
         self.ara = ara
@@ -28,7 +31,16 @@ class Snipe(Cog, category=Category.FUN):
 
     @Cog.listener()
     async def on_message_delete(self, msg: Message):
-        if not msg.author.bot and msg.content:
+        if (
+            not msg.author.bot
+            and msg.content
+            and not (
+                (pfx := await self.ara.command_prefix(self.ara, msg))
+                and re.match(
+                    rf"{re.escape(pfx)}(?:{self.IGNORED_COMMANDS_PATTERN})[$\s]", msg.content, re.I
+                )
+            )
+        ):
             self._cache.setdefault(msg.channel.id, []).append(RawDeletedMessage(msg))
 
     @loop(minutes=1)
