@@ -146,7 +146,7 @@ class Fun(Cog, category=Category.FUN):
             return
         invis_bug = "||\u200b||" * 198 + "_ _"
         if len(message := text + invis_bug + member.mention) <= 2000:
-            await ctx.send_ping(message)
+            await ctx.send(message, allowed_mentions=disnake.AllowedMentions(users=True))
 
     @commands.bot_has_permissions(manage_nicknames=True)
     @commands.cooldown(1, 60 * 60 * 24 * 1.75, commands.BucketType.member)
