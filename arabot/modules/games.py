@@ -277,21 +277,24 @@ class TicTacToeButton(disnake.ui.Button):
         if view.board[self.y][self.x] is not None:
             return
 
+        notify_wrong_turn = partial(
+            await inter.response.send_message, "It's not your turn!", ephemeral=True
+        )
         if view.current_player is None:
             if view.p1 is None:
                 if inter.author == view.p2:
-                    await inter.response.send_message("It's not your turn!", ephemeral=True)
+                    await notify_wrong_turn()
                     return
                 view.p1 = view.current_player = inter.author
             else:
                 if inter.author == view.p1:
-                    await inter.response.send_message("It's not your turn!", ephemeral=True)
+                    await notify_wrong_turn()
                     return
                 view.p2 = view.current_player = inter.author
 
         if view.current_player != inter.author:
             if inter.author in {view.p1, view.p2}:
-                await inter.response.send_message("It's not your turn!", ephemeral=True)
+                await notify_wrong_turn()
             else:
                 await inter.response.send_message("You are not part of this game!", ephemeral=True)
             return

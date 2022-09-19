@@ -11,6 +11,10 @@ from numpy.random import default_rng
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
 from arabot.utils import AnyMember
 
+ADDING_REACTIONS = "Adding reactions"
+NO_REACTION_PERMS = "I don't have permission to add reactions"
+REACTIONS_ADDED = "Reactions added"
+
 
 class Fun(Cog, category=Category.FUN):
     def __init__(self, session: ClientSession):
@@ -45,14 +49,14 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="Who asked?")
     async def whoasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message("Adding reactions", ephemeral=True)
+        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
         try:
             for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message("I don't have permission to add reactions")
+            await inter.edit_original_message(NO_REACTION_PERMS)
         else:
-            await inter.edit_original_message("Reactions added")
+            await inter.edit_original_message(REACTIONS_ADDED)
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I asked!", usage="[message or reply]", hidden=True)
@@ -70,14 +74,14 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="I asked!")
     async def iasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message("Adding reactions", ephemeral=True)
+        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
         try:
             for i in "🇮", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message("I don't have permission to add reactions")
+            await inter.edit_original_message(NO_REACTION_PERMS)
         else:
-            await inter.edit_original_message("Reactions added")
+            await inter.edit_original_message(REACTIONS_ADDED)
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who cares?", usage="[message or reply]", hidden=True)
@@ -95,14 +99,14 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="Who cares?")
     async def whocares(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message("Adding reactions", ephemeral=True)
+        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
         try:
             for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message("I don't have permission to add reactions")
+            await inter.edit_original_message(NO_REACTION_PERMS)
         else:
-            await inter.edit_original_message("Reactions added")
+            await inter.edit_original_message(REACTIONS_ADDED)
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I care!", usage="[message or reply]", hidden=True)
@@ -120,14 +124,14 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="I care!")
     async def icare(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message("Adding reactions", ephemeral=True)
+        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
         try:
             for i in "🇮", "🇨", "🇦", "🇷", "🇪", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message("I don't have permission to add reactions")
+            await inter.edit_original_message(NO_REACTION_PERMS)
         else:
-            await inter.edit_original_message("Reactions added")
+            await inter.edit_original_message(REACTIONS_ADDED)
 
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):

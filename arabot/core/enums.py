@@ -4,9 +4,6 @@ import disnake
 
 
 class Color(int, Enum):
-    # red = Color.from_rgb(218, 76, 82)
-    # yellow = Color.from_rgb(254, 163, 42)
-    # green = Color.from_rgb(39, 159, 109)
     blurple = disnake.Color.from_rgb(88, 101, 242)
     green = disnake.Color.from_rgb(87, 242, 135)
     yellow = disnake.Color.from_rgb(254, 231, 92)

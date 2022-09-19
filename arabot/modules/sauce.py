@@ -11,7 +11,6 @@ from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import dsafe
 
 
-# doujins = 16, 18, 38
 class Source(IntEnum):
     hmags = 0
     hanime = 1
@@ -88,7 +87,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             await ctx.reply("No results found")
             return
         data = nao_json["results"][0]["data"]
-        header = nao_json["results"][0]["header"]  # TODO: Hide low similarity results
+        header = nao_json["results"][0]["header"]
         embed = Embed()
         try:
             match header["index_id"]:

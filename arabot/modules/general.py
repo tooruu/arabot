@@ -7,6 +7,16 @@ from disnake.ext import commands
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import CUSTOM_EMOJI_RE, AnyEmoji, AnyEmojis, AnyMember, AnyMemberOrUser, bold
 
+HTTP_CATS_VALID_CODES = {
+    # fmt: off
+    100, 101, 102,
+    200, 201, 202, 203, 204, 206, 207,
+    300, 301, 302, 303, 304, 305, 307, 308,
+    400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416,
+    417, 418, 420, 421, 422, 423, 424, 425, 426, 429, 431, 444, 450, 451, 497, 498, 499,
+    500, 501, 502, 503, 504, 506, 507, 508, 509, 510, 511, 521, 523, 525, 599,
+}
+
 
 class General(Cog, category=Category.GENERAL):
     def __init__(self, ara: Ara):
@@ -194,16 +204,7 @@ class General(Cog, category=Category.GENERAL):
     async def http(self, ctx: Context, http_status_code: int):
         await ctx.send(
             f"https://http.cat/{http_status_code}"
-            # fmt: off
-            if http_status_code in {
-                100, 101, 102,
-                200, 201, 202, 203, 204, 206, 207,
-                300, 301, 302, 303, 304, 305, 307, 308,
-                400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416,
-                417, 418, 420, 421, 422, 423, 424, 425, 426, 429, 431, 444, 450, 451, 497, 498, 499,
-                500, 501, 502, 503, 504, 506, 507, 508, 509, 510, 511, 521, 523, 525, 599
-            }
-            # fmt: on
+            if http_status_code in HTTP_CATS_VALID_CODES
             else "Invalid HTTP status code"
         )
 

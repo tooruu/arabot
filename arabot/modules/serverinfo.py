@@ -11,7 +11,7 @@ from arabot.utils import AnyGuild, mono
 
 class Serverinfo(Cog, category=Category.GENERAL):
     def __init__(self, presences_intent: bool):
-        self.presences_intent = presences_intent = presences_intent
+        self.presences_intent = presences_intent
 
     @commands.command(aliases=["sa", "spfp"], brief="Show server's icon")
     async def serveravatar(self, ctx: Context):
@@ -76,7 +76,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
         for name, values in fields.items():
             if values:
                 value = re.sub(
-                    r"^(?!Created)(.*?:)(.+)$", r"\1**\2**", "\n".join(values), flags=re.MULTILINE
+                    r"^(?!Created)([^:]:)(.+)$", r"\1**\2**", "\n".join(values), flags=re.MULTILINE
                 )
                 embed.add_field(name, value)
 
