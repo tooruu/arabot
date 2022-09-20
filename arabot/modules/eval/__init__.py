@@ -59,7 +59,7 @@ class Eval(Cog, category=Category.GENERAL):
             result.set_footer(
                 text="Powered by Piston",
                 icon_url="https://raw.githubusercontent.com"
-                "/tooruu/AraBot/master/resources/piston.png",
+                "/tooruu/arabot/master/resources/piston.png",
             )
 
         append_codeblock = partial(self.embed_add_codeblock_with_warnings, result, lang="py")
