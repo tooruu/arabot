@@ -212,11 +212,16 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(
         aliases=["imp"],
         brief="Pretend to be somebody else",
-        extras={"note": "Cannot ping roles"},
+        extras={
+            "note": "Cannot ping roles,\nthreads are not supported due to a Discord limitation"
+        },
     )  # (c) 2022 by Kriz#0385
     async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text):
         if user == ctx.me:
             await self.say(ctx, text=text)
+            return
+        if isinstance(ctx.channel, disnake.Thread):
+            await ctx.send("Threads are not supported due to a Discord limitation")
             return
         if not ctx.channel.permissions_for(ctx.me).manage_webhooks:
             await ctx.send("I lack permission to manage webhooks")

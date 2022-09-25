@@ -135,7 +135,7 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):
-        member = random.choice(ctx.channel.members)
+        member = ctx.guild.get_member(random.choice(ctx.channel.members).id)  # Thread support
         await ctx.reply(embed=disnake.Embed().with_author(member))
 
     @commands.command(
