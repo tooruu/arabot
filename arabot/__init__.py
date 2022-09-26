@@ -4,7 +4,7 @@ from subprocess import run as _run
 
 from dotenv import load_dotenv as _load_dotenv
 
-__version__ = "8.1.13"
+__version__ = "8.1.14"
 
 _load_dotenv()
 TESTING = bool(_getenv("testing"))

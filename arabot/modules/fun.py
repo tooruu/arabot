@@ -14,6 +14,7 @@ from arabot.utils import AnyMember
 ADDING_REACTIONS = "Adding reactions"
 NO_REACTION_PERMS = "I don't have permission to add reactions"
 REACTIONS_ADDED = "Reactions added"
+NO_GUILD_MEMBERS_INTENT = "I lack `GUILD_MEMBERS` Priviliged Intent to run this command"
 
 
 class Fun(Cog, category=Category.FUN):
@@ -135,7 +136,17 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):
-        member = ctx.guild.get_member(random.choice(ctx.channel.members).id)  # Thread support
+        if isinstance(channel := ctx.channel, disnake.Thread):
+            if len(members := await channel.fetch_members()) <= 1:
+                await ctx.send(NO_GUILD_MEMBERS_INTENT)
+                return
+            member = ctx.guild.get_member(random.choice(members).id)
+        else:
+            if len(members := channel.members) <= 1:
+                await ctx.send(NO_GUILD_MEMBERS_INTENT)
+                return
+            member = random.choice(channel.members)
+
         await ctx.reply(embed=disnake.Embed().with_author(member))
 
     @commands.command(
