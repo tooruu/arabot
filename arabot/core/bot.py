@@ -48,6 +48,7 @@ class Ara(commands.Bot):
 
     def __init__(self, *args, **kwargs):
         self._cogs_path: str | os.PathLike = kwargs.pop("cogs_path", "arabot/modules")
+        self._l10n_path: str | os.PathLike = kwargs.pop("l10n_path", "resources/locales")
         disnake.Embed.set_default_color(kwargs.pop("embed_color", None))
 
         super().__init__(*args, **kwargs)
@@ -97,6 +98,7 @@ class Ara(commands.Bot):
             aiohttp.ClientSession() as self.session,
             AraDB() as self.db,
         ):
+            self.i18n.load(self._l10n_path)
             await self.login()
             self.load_extensions()
             await self.connect()

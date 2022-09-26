@@ -18,6 +18,7 @@ from .enums import Category
 __all__ = [
     "Context",
     "Cog",
+    "LocalizationStore",
 ]
 
 
@@ -92,6 +93,20 @@ class Context(commands.Context):
 
     getch_reference_message = get_or_fetch_reference_message
 
+    _ = property(lambda self: partial(self.ara.i18n.getl, locale=self.guild.preferred_locale))
+
+    async def send_(self, content: str, **kwargs) -> disnake.Message:
+        return await self.send(self._(content), **kwargs)
+
+    async def reply_(self, content: str, **kwargs) -> disnake.Message:
+        return await self.reply(self._(content), **kwargs)
+
+    async def send_ping_(self, content: str, **kwargs) -> disnake.Message:
+        return await self.send_ping(self._(content), **kwargs)
+
+    async def reply_ping_(self, content: str, **kwargs) -> disnake.Message:
+        return await self.reply_ping(self._(content), **kwargs)
+
 
 class Cog(commands.Cog):
     def __init_subclass__(
@@ -101,6 +116,22 @@ class Cog(commands.Cog):
         for key_name, key in zip(keys, getkeys(*keys)):
             setattr(cls, key_name, key)
         super().__init_subclass__(**kwargs)
+
+
+class LocalizationStore(disnake.LocalizationStore):
+    def __init__(self, *, strict: bool, fallback: disnake.Locale | None = None):
+        self.fallback = fallback
+        super().__init__(strict=strict)
+
+    def getl(self, key: str, locale: disnake.Locale) -> str | None:
+        l10n_data = self._loc.get(key, {})
+        localized = l10n_data.get(locale.value)
+        if localized is None:
+            if self.fallback:
+                localized = l10n_data.get(self.fallback.value)
+            if self.strict:
+                raise disnake.LocalizationKeyError(key)
+        return localized
 
 
 async def get_unlimited_invite_link(self: disnake.Guild) -> str | False | None:
