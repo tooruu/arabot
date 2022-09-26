@@ -47,15 +47,15 @@ class Ara(commands.Bot):
     db: AraDB
 
     def __init__(self, *args, **kwargs):
-        self._cogs_path: str = kwargs.pop("cogs_path", "arabot/modules")
-        embed_color: int | disnake.Color | None = kwargs.pop("embed_color", None)
+        self._cogs_path: str | os.PathLike = kwargs.pop("cogs_path", "arabot/modules")
+        disnake.Embed.set_default_color(kwargs.pop("embed_color", None))
 
-        disnake.Embed.set_default_color(embed_color)
         super().__init__(*args, **kwargs)
+        self.http.token = kwargs.pop("token", None)
 
     async def login(self) -> None:
-        if not (token := os.getenv("token")):
-            logging.critical("Missing environment variable 'token'")
+        if not (token := self.http.token or os.getenv("token")):
+            logging.critical("Missing initializer argument or environment variable 'token'")
             sys.exit(69)
 
         try:

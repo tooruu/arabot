@@ -8,6 +8,7 @@ pylint:
     allow-wildcard-with-all: yes
     check-quote-consistency: yes
     max-args: 6
+    max-attributes: 15
     max-branches: 20
   disable:
     - arguments-differ
