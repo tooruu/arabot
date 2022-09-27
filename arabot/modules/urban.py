@@ -53,8 +53,8 @@ class Urban(Cog, category=Category.LOOKUP):
                 return
 
         if not (definitions := await self.fetch_definitions(term)):
-            if ctx.prefix:  # if command was invoked directly by user, not by urban_listener
-                await ctx.send(f"Definition for {bold(term)} not found")
+            if ctx.prefix:  # send if command was invoked directly by user, not by urban_listener
+                await ctx.send(ctx._("Definition for {} not found").format(bold(term)))
             return
 
         embeds = []

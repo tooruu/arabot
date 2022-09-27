@@ -16,7 +16,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
     @commands.command(aliases=["sa", "spfp"], brief="Show server's icon")
     async def serveravatar(self, ctx: Context):
         if not ctx.guild.icon:
-            await ctx.send("Server has no icon")
+            await ctx.send_("Server has no icon")
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
@@ -27,7 +27,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
     @commands.command(aliases=["sb"], brief="Show server's banner")
     async def serverbanner(self, ctx: Context):
         if not ctx.guild.banner:
-            await ctx.send("Server has no banner")
+            await ctx.send_("Server has no banner")
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
@@ -43,10 +43,10 @@ class Serverinfo(Cog, category=Category.GENERAL):
             try:
                 guild = await ctx.bot.fetch_guild_preview(int(ctx.argument_only))
             except (ValueError, disnake.NotFound):
-                await ctx.send("Server not found or is not discoverable")
+                await ctx.send_("Server not found or is not discoverable")
                 return
         elif guild.unavailable:
-            await ctx.send("Server is unavailable")
+            await ctx.send_("Server is unavailable")
             return
 
         embed = (
@@ -64,14 +64,14 @@ class Serverinfo(Cog, category=Category.GENERAL):
         self._set_footer(embed, guild)
 
         fields: dict[str, list[str]] = defaultdict(list)
-        self._set_field_channels(fields["Channels"], guild)
-        self._set_field_members(fields["Members"], guild)
+        self._set_field_channels(fields[ctx._("Channels")], guild)
+        self._set_field_members(fields[ctx._("Members")], guild)
         if guild.emojis:
-            self._set_field_emojis_stickers(fields["Emojis"], guild)
+            self._set_field_emojis_stickers(fields[ctx._("Emojis")], guild)
         elif guild.stickers:
-            self._set_field_emojis_stickers(fields["Stickers"], guild)
-        self._set_field_general_info(fields["General info"], guild, ctx.guild)
-        self._set_field_moderation(fields["Moderation"], guild)
+            self._set_field_emojis_stickers(fields[ctx._("Stickers")], guild)
+        self._set_field_general_info(fields[ctx._("General info")], guild, ctx.guild)
+        self._set_field_moderation(fields[ctx._("Moderation")], guild)
 
         for name, values in fields.items():
             if values:

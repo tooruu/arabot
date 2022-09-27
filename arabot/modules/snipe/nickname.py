@@ -11,7 +11,7 @@ from arabot.utils import AnyMember
 
 
 class NicknameSnipe(Cog, category=Category.FUN):
-    EMPTY_SNIPE_MSG = "No nicknames found for {user}"
+    EMPTY_SNIPE_MSG = "No nicknames found for {}"
     MAX_NICKS = 6
     PURGE_AFTER_DAYS = 7
 
@@ -62,12 +62,12 @@ class NicknameSnipe(Cog, category=Category.FUN):
     @command(aliases=["sn", "ns"], brief="View recent nick history of a user")
     async def nicksnipe(self, ctx: Context, *, member: AnyMember):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("User not found")
             return
 
         history = self._cache.get(ctx.guild.id, {}).get(member.id, [])[:]
         if not history:
-            await ctx.send(self.EMPTY_SNIPE_MSG.format(user=member.display_name))
+            await ctx.send(ctx._(self.EMPTY_SNIPE_MSG).format(member.display_name))
             return
 
         if history[0][1] == history[1][1]:
@@ -75,8 +75,8 @@ class NicknameSnipe(Cog, category=Category.FUN):
 
         embed = Embed()
         for nick, changed_at in history[-self.MAX_NICKS :]:  # noqa: E203
-            when_changed = format_dt(changed_at, "R") if changed_at else "Sometime in the past"
-            embed.add_field(when_changed, nick, inline=False)
+            when = format_dt(changed_at, "R") if changed_at else ctx._("Sometime in the past")
+            embed.add_field(when, nick, inline=False)
 
         await ctx.send(embed=embed)
 

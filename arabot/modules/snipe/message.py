@@ -56,10 +56,10 @@ class Snipe(Cog, category=Category.FUN):
     @command(brief="View deleted messages within the last hour", usage="[member]")
     async def snipe(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("User not found")
             return
         if ctx.channel.id not in self._cache:
-            await ctx.send(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(self.EMPTY_SNIPE_MSG)
             return
         msg_pool = list(
             filter(
@@ -68,7 +68,7 @@ class Snipe(Cog, category=Category.FUN):
             )
         )
         if not msg_pool:
-            await ctx.send(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
         msg_group = []
@@ -99,10 +99,10 @@ class Snipe(Cog, category=Category.FUN):
     @command(brief="View the last deleted message", usage="[member]")
     async def last(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("User not found")
             return
         if ctx.channel.id not in self._cache:
-            await ctx.send(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(self.EMPTY_SNIPE_MSG)
             return
         try:
             last_msg = next(
@@ -112,7 +112,7 @@ class Snipe(Cog, category=Category.FUN):
                 )
             )
         except StopIteration:
-            await ctx.send(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(self.EMPTY_SNIPE_MSG)
             return
         embed = Embed(color=0x87011D)
         field_name = f"{last_msg.author.display_name}, {format_dt(last_msg.created_at, 'R')}:"

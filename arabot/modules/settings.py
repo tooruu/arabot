@@ -10,7 +10,7 @@ class Settings(Cog, category=Category.SETTINGS):
     async def settings(self, ctx: Context):
         await ctx.send(
             embed=disnake.Embed().add_field(
-                "Available settings",
+                ctx._("Available settings"),
                 "\n".join(c.name for c in self.settings.walk_commands()),
             )
         )
@@ -33,7 +33,7 @@ class Settings(Cog, category=Category.SETTINGS):
         else:
             prefix = await db.get_guild_prefix(ctx.guild.id) or ";"
 
-        embed.title = f"Prefix: {bold(mono(prefix))}"
+        embed.title = f"{ctx._('Prefix')}: {bold(mono(prefix))}"
         await ctx.send(embed=embed)
 
 

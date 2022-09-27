@@ -16,7 +16,7 @@ from disnake.utils import format_dt, oauth_url, utcnow
 from ..utils import mono, system_info
 from .database import AraDB
 from .errors import StopCommand
-from .patches import Context
+from .patches import Context, LocalizationStore
 
 
 def search_directory(path) -> Generator[str, None, None]:
@@ -45,6 +45,7 @@ def search_directory(path) -> Generator[str, None, None]:
 
 class Ara(commands.Bot):
     db: AraDB
+    i18n: LocalizationStore
 
     def __init__(self, *args, **kwargs):
         self._cogs_path: str | os.PathLike = kwargs.pop("cogs_path", "arabot/modules")
@@ -139,26 +140,29 @@ class Ara(commands.Bot):
             case commands.CommandOnCooldown():
                 expires_at = utcnow() + timedelta(seconds=exception.retry_after)
                 remaining = format_dt(expires_at, "R")
-                await context.reply(f"Cooldown expires {remaining}")
+                await context.reply(context._("Cooldown expires {}").format(remaining))
             case commands.DisabledCommand():
-                await context.reply("This command is disabled!")
+                await context.reply_("This command is disabled!")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
             ) if context.cog.qualified_name.startswith(("Google", "Youtube")):
                 match status:
                     case 403:
                         await context.reply(
-                            f"{mono(context.invoked_with)} doesn't work without "
-                            f"cloud-billing,\nask `{mono(self.owner)}` to enable it."
+                            context._(
+                                "{} doesn't work without cloud-billing,\nask `{}` to enable it."
+                            ).format(mono(context.invoked_with), mono(self.owner))
                         )
                     case 429:
                         await context.send(
-                            f"Sorry, I've exceeded today's quota for {mono(context.invoked_with)}"
+                            context._("Sorry, I've exceeded today's quota for {}").format(
+                                mono(context.invoked_with)
+                            )
                         )
             case commands.MissingRequiredArgument():
                 await context.send_help(context.command)
             case commands.UserInputError():
-                await context.reply("Invalid argument")
+                await context.reply_("Invalid argument")
             case (
                 StopCommand()
                 | commands.BotMissingPermissions()
@@ -175,7 +179,9 @@ class Ara(commands.Bot):
                 logging.error("Unhandled exception", exc_info=exception)
                 args = exception.args
                 await context.reply(
-                    args[0] if len(args) == 1 and isinstance(args[0], str) else "An error occurred"
+                    args[0]
+                    if len(args) == 1 and isinstance(args[0], str)
+                    else context._("An error occurred")
                 )
 
     async def on_ready(self) -> None:

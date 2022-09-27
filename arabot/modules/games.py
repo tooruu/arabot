@@ -151,16 +151,18 @@ class Connect4Game(Connect4Engine):
 
 
 class Connect4(Cog, category=Category.FUN):
-    def __init__(self, client):
+    def __init__(self, client: Ara):
         self.client = client
+        self._ = client.i18n.getl
         self.waiting_games = {}
         self.active_games = {}
 
     async def start_invite(self, ctx: Context):
         await ctx.message.delete()
         message = await ctx.send(
-            f"{ctx.author.display_name} wants to start a game of Connect 4\n"
-            f"Waiting for {ctx.author.display_name} to pick a color!"
+            ctx._(
+                "{0} wants to start a game of Connect 4\nWaiting for {0} to pick a color!"
+            ).format(ctx.author.display_name)
         )
         self.waiting_games[message.id] = (message, ctx.author, None)
         for emoji in TOKENS:
@@ -172,7 +174,11 @@ class Connect4(Cog, category=Category.FUN):
         self.waiting_games[message.id] = (message, player1, token)
         await message.clear_reaction(token)
         content = message.content.split("\n")[0]
-        await message.edit(f"{content} - They have chosen {token}\nPick a color to join")
+        await message.edit(
+            self._(
+                "{} - They have chosen {}\nPick a color to join", message.guild.preferred_locale
+            ).format(content, token)
+        )
 
     async def start_game(
         self,
@@ -184,9 +190,11 @@ class Connect4(Cog, category=Category.FUN):
     ):
         await message.clear_reactions()
         notification = await message.channel.send_ping(
-            f"Hey {player1.mention} - {player2.display_name} has joined your game!"
+            self._("Hey {} - {} has joined your game!", message.guild.preferred_locale).format(
+                player1.mention, player2.display_name
+            )
         )
-        await message.edit("Loading ....")
+        await message.edit(self._("Loading ....", message.guild.preferred_locale))
         for emoji in COLUMN_EMOJI:
             await message.add_reaction(emoji)
         await message.add_reaction(CANCEL_EMOJI)
@@ -198,13 +206,20 @@ class Connect4(Cog, category=Category.FUN):
     async def finish_game(self, game, message: disnake.Message, result):
         await message.clear_reactions()
         if result == game.DRAW:
+            winner = None
             footer = "The game was a draw!!"
         elif result == game.PLAYER1_WINNER:
-            footer = f"{game.player1.display_name} has won the game"
+            winner = game.player1.display_name
+            footer = "{} has won the game"
         elif result == game.PLAYER2_WINNER:
-            footer = f"{game.player2.display_name} has won the game"
+            winner = game.player2.display_name
+            footer = "{} has won the game"
 
-        await message.edit(embed=game.get_embed(custom_footer=footer))
+        await message.edit(
+            embed=game.get_embed(
+                custom_footer=self._(footer, message.guild.preferred_locale).format(winner)
+            )
+        )
         del self.active_games[message.id]
 
     async def cancel_invite(self, message: disnake.Message):
@@ -213,8 +228,8 @@ class Connect4(Cog, category=Category.FUN):
 
     async def cancel_game(self, game, message: disnake.Message, user):
         await message.clear_reactions()
-        footer = f"The game has been cancelled by {user.display_name}"
-        await message.edit(embed=game.get_embed(custom_footer=footer))
+        footer = self._("The game has been cancelled by {}", message.guild.preferred_locale)
+        await message.edit(embed=game.get_embed(custom_footer=footer.format(user.display_name)))
         del self.active_games[message.id]
 
     @commands.command(aliases=["c4"], brief="Start a game of Connect 4")
@@ -296,7 +311,9 @@ class TicTacToeButton(disnake.ui.Button):
             if inter.author in {view.p1, view.p2}:
                 await notify_wrong_turn()
             else:
-                await inter.response.send_message("You are not part of this game!", ephemeral=True)
+                await inter.response.send_message(
+                    inter._("You are not part of this game!"), ephemeral=True
+                )
             return
 
         if view.current_player is view.p1:
@@ -319,20 +336,24 @@ class TicTacToeButton(disnake.ui.Button):
                 content = "It's a tie!"
             else:
                 loser = view.p1 if winner is view.p2 else view.p2
-                content = f"{winner.mention} has won against {loser.mention}!"
+                content = "{} has won against {}!"
 
             for child in view.children:
                 child.disabled = True
             view.stop()
 
         await inter.response.edit_message(
-            content, view=view, allowed_mentions=disnake.AllowedMentions.all()
+            inter._(content).format(winner.mention, loser.mention),
+            view=view,
+            allowed_mentions=disnake.AllowedMentions.all(),
         )
 
         if loser:
             with suppress(disnake.Forbidden):
-                await loser.timeout(duration=60, reason="Tic Tac Toe loser")
-                await inter.message.reply_ping(f"{loser.mention} has been muted for 1 minute")
+                await loser.timeout(duration=60, reason=inter._("Tic Tac Toe loser"))
+                await inter.message.reply_ping(
+                    inter._("{} has been muted for 1 minute").format(loser.mention)
+                )
 
 
 class TicTacToe(disnake.ui.View):
@@ -394,14 +415,14 @@ class Games(Cog, category=Category.FUN):
     @commands.command(name="rr", brief="Russian Roulette")
     async def russian_roulette(self, ctx: Context):
         if self.rr_last_user.get(ctx.guild.id) == ctx.author.id:
-            await ctx.reply("You have to pass the gun to someone else")
+            await ctx.reply_("You have to pass the gun to someone else")
             return
 
         self.rr_last_user[ctx.guild.id] = ctx.author.id
         barrel = self.rr_barrel[ctx.guild.id]
         if barrel[0] != barrel[1]:
             barrel[0] += 1
-            await ctx.reply("_\\*click*_")
+            await ctx.reply(f"_\\*{ctx._('click')}*_")
             return
 
         del self.rr_barrel[ctx.guild.id]
@@ -410,17 +431,17 @@ class Games(Cog, category=Category.FUN):
         last_deaths = self.rr_last_deaths[ctx.guild.id]
         if last_deaths.count(ctx.author.id) < last_deaths.maxlen:
             last_deaths.append(ctx.author.id)
-            await ctx.reply(f"***BANG***💥{CustomEmoji.KannaGun}")
-            await ctx.send("Cooling down and reloading barrel...💨")
+            await ctx.reply(f"***{ctx._('BANG')}***💥{CustomEmoji.KannaGun}")
+            await ctx.send_("Cooling down and reloading barrel...💨")
             with suppress(disnake.Forbidden):
-                await ctx.author.timeout(duration=60, reason="Russian Roulette")
+                await ctx.author.timeout(duration=60, reason=ctx._("Russian Roulette"))
             return
 
         # Same user loses 3 times in a row
         last_deaths.clear()
-        await ctx.reply("💥***__KABLAM__***💥")
+        await ctx.reply(f"💥***__{ctx._('KABLAM')}__***💥")
         with suppress(disnake.Forbidden):
-            await ctx.author.timeout(duration=180, reason="Russian Roulette")
+            await ctx.author.timeout(duration=180, reason=ctx._("Russian Roulette"))
 
     @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number", usage="[max=20]")
@@ -431,7 +452,7 @@ class Games(Cog, category=Category.FUN):
         except (ValueError, IndexError):
             ceiling = 20
         number = random.randint(1, ceiling)
-        await ctx.send(f"🎲 Guess a number between 1-{ceiling}")
+        await ctx.send(ctx._("🎲 Guess a number between 1-{}").format(ceiling))
 
         # Voting phase
         guesses: dict[disnake.Member, int] = {}
@@ -461,18 +482,18 @@ class Games(Cog, category=Category.FUN):
         # Winner phase
         if not exact_guess and len(guesses) < 2:
             ctx.reset_cooldown()
-            await ctx.send("No one has won")
+            await ctx.send_("No one has won")
             return
         winner = min(guesses, key=lambda m: abs(guesses[m] - number))
         message = (
             f"{winner.mention} {'guessed' if exact_guess else 'was the closest to'} number {number}"
         )
         try:
-            await winner.timeout(duration=60, reason="Guessed the number")
+            await winner.timeout(duration=60, reason=ctx._("Guessed the number"))
         except disnake.Forbidden:
             pass
         else:
-            message += f"\nEnjoy your 1 minute mute! {CustomEmoji.TeriCelebrate}"
+            message += f"\n{ctx._('Enjoy your 1 minute mute!')} {CustomEmoji.TeriCelebrate}"
         await ctx.send(message)
 
     @commands.check(
@@ -487,13 +508,11 @@ class Games(Cog, category=Category.FUN):
         extras={"note": "You have to be in voice chat with other people to use this command"},
     )
     async def imposter(self, ctx: Context):
-        vote_timeout = 20
-
         # Initializing
         vc = ctx.author.voice.channel
         await ctx.send(CustomEmoji.KonoDioDa)
-        await ctx.send(
-            f"You have {vote_timeout} seconds to find the imposter!\n"
+        await ctx.send_(
+            "You have 20 seconds to find the imposter!\n"
             "*Ping the person you think the imposter is to vote*"
         )
 
@@ -524,7 +543,7 @@ class Games(Cog, category=Category.FUN):
                 voted.append(vote.author)
 
         with suppress(asyncio.TimeoutError):
-            await asyncio.wait_for(voting(), timeout=vote_timeout)
+            await asyncio.wait_for(voting(), timeout=20)
 
         # Ejection phase
         if (
@@ -534,30 +553,31 @@ class Games(Cog, category=Category.FUN):
             # Check if only one person has the highest amount of votes
             or list(votes.values()).count(votes[imposter]) != 1
         ):
-            await ctx.send("No one was ejected")
+            await ctx.send_("No one was ejected")
             return
-        await imposter.move_to(None, reason="Imposter")
-        await ctx.send_ping(f"{imposter.mention} was ejected")
+        await imposter.move_to(None, reason=ctx._("Imposter"))
+        await ctx.send_ping(ctx._("{} was ejected").format(imposter.mention))
 
     @commands.command(brief="Start a game of Tic-Tac-Toe", usage="[opponent]")
     async def ttt(self, ctx: Context, *, opponent: AnyMember = False):
         if opponent is None:
             ctx.reset_cooldown()
-            await ctx.reply("User not found")
+            await ctx.reply_("User not found")
             return
         if ctx.author == opponent:
             ctx.reset_cooldown()
-            await ctx.reply("Can't play against yourself")
+            await ctx.reply_("Can't play against yourself")
             return
         if opponent and opponent.bot:
             ctx.reset_cooldown()
-            await ctx.reply("Can't play against bots")
+            await ctx.reply_("Can't play against bots")
             return
         players = [ctx.author, opponent or None]
         random.shuffle(players)
         first = players[0]
         await ctx.send_ping(
-            f"Tic Tac Toe: {getattr(first, 'mention', 'X')} goes first", view=TicTacToe(*players)
+            ctx._("Tic Tac Toe: {} goes first").format(getattr(first, "mention", "X")),
+            view=TicTacToe(*players),
         )
 
 

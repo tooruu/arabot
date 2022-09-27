@@ -52,7 +52,8 @@ class Eval(Cog, category=Category.GENERAL):
             )
             evaluator = LocalEval(env=local_eval_env, stdin=StringIO(inputlines))
             result.set_footer(
-                text="Powered by myself 😌", icon_url=ctx.me.display_avatar.as_icon.compat
+                text=ctx._("Powered by {}").format("myself 😌"),
+                icon_url=ctx.me.display_avatar.as_icon.compat,
             )
         else:
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)
@@ -67,25 +68,25 @@ class Eval(Cog, category=Category.GENERAL):
             stdout, return_value = await evaluator.run(code)
         except (ClientResponseError, errors.RemoteEvalBadResponse) as e:
             logging.error(e.message)
-            self.embed_add_codeblock_with_warnings(result, "Connection error ⚠️", e.message)
+            self.embed_add_codeblock_with_warnings(result, ctx._("Connection error ⚠️"), e.message)
         except Exception as e:
             logging.info(e)
             result.title = "Run failed ❌"
 
             if isinstance(e, errors.EvalException) and getattr(e, "stdout", None):
-                append_codeblock("Output", e.stdout)
+                append_codeblock(ctx._("Output"), e.stdout)
 
             if isinstance(e, errors.LocalEvalException):
-                append_codeblock("Error", e.format(source=code))
+                append_codeblock(ctx._("Error"), e.format(source=code))
             elif isinstance(e, errors.RemoteEvalException):
-                append_codeblock("Error", e.format())
-                result.description += f"Exit code: {e.exit_code}\n"
+                append_codeblock(ctx._("Error"), e.format())
+                result.description += f"{ctx._('Exit code')}: {e.exit_code}\n"
         else:
-            result.title = "Run finished ✅"
-            append_codeblock("Output", stdout)
+            result.title = ctx._("Run finished ✅")
+            append_codeblock(ctx._("Output"), stdout)
 
             if return_value is not None:
-                append_codeblock("Return value", repr(return_value))
+                append_codeblock(ctx._("Return value"), repr(return_value))
             elif not result.fields:
                 await ctx.tick()
                 return

@@ -7,15 +7,41 @@ from disnake.ext import commands
 from arabot.core import Ara, Cog, CustomEmoji, pfxless
 from arabot.utils import is_in_guild
 
+GULAG = (
+    (
+        """
+bbbbbbbbbbbbbbb
+bbbbbbbbcbbbbbb
+bbbbbccbccbbbbb
+bbbbcccbbccbbbb
+bbbccccbbbccbbb
+bccccccbbbbccbb
+bbccbcccbbbcccb
+
+bbbbbbcccbbbccb
+bbbbbbbcccbcccb
+bbbbcbbbcccccbb
+bbbcccbbbcccbbb
+bcccbccccccccbb
+bccbbbcccbbccbb
+bbbbbbbbbbbbbbb
+"""
+    )
+    .replace("b", "🅱️")
+    .replace("c", CustomEmoji.CommuThink)
+    .split("\n\n")
+)
+
 
 class Chat(Cog):
     def __init__(self, ara: Ara):
         self.ara = ara
+        self._ = ara.i18n.getl
 
     @commands.check(lambda msg: len(msg.content) < 15)
     @pfxless(chance=0.5)
     async def who(self, msg: disnake.Message):
-        await msg.channel.send("ur mom")
+        await msg.channel.send(self._("ur mom", msg.guild.preferred_locale))
 
     @commands.check(lambda msg: len(msg.content) < 20)
     @pfxless(regex=r"^([ıi](['’]?m|\sam)\s)+((an?|the)\s)?\w+$", chance=0.5)
@@ -24,8 +50,10 @@ class Chat(Cog):
         await msg.channel.send(f"hi {regex[1]}")
 
     @pfxless(regex=";-;")
-    async def cry(self, msg):
-        await msg.reply(f"don't cry {CustomEmoji.KannaPat}")
+    async def cry(self, msg: disnake.Message):
+        await msg.reply(
+            self._("don't cry", msg.guild.preferred_locale) + f" {CustomEmoji.KannaPat}"
+        )
 
     @commands.cooldown(1, 60, commands.BucketType.channel)
     @pfxless()
@@ -44,6 +72,8 @@ class Chat(Cog):
             msgs.append(await msg.channel.send("Toki wa ugoki dasu"))
             await sleep(1)
             await msg.channel.delete_messages(msgs)
+        except disnake.Forbidden:
+            return
         finally:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
 
@@ -68,25 +98,7 @@ class Chat(Cog):
     @commands.cooldown(1, 60, commands.BucketType.channel)
     @pfxless(regex=r"\b(communis[mt]|gulag)\b")
     async def communism(self, msg: disnake.Message):
-        gulag = """
-bbbbbbbbbbbbbbb
-bbbbbbbbcbbbbbb
-bbbbbccbccbbbbb
-bbbbcccbbccbbbb
-bbbccccbbbccbbb
-bccccccbbbbccbb
-bbccbcccbbbcccb
-
-bbbbbbcccbbbccb
-bbbbbbbcccbcccb
-bbbbcbbbcccccbb
-bbbcccbbbcccbbb
-bcccbccccccccbb
-bccbbbcccbbccbb
-bbbbbbbbbbbbbbb
-"""
-        for camp in gulag.split("\n\n"):
-            camp = camp.replace("b", "🅱️").replace("c", CustomEmoji.CommuThink)
+        for camp in GULAG:
             await msg.channel.send(camp)
 
 

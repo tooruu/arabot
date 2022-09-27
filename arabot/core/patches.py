@@ -256,6 +256,9 @@ disnake.Asset.maxres = property(lambda self: self.with_size(4096))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link
 disnake.Guild.presence_count = presence_count
+disnake.Interaction._ = property(
+    lambda self: partial(self.bot.i18n.getl, locale=self.guild.preferred_locale)
+)
 disnake.Member.top_perm_role = property(top_perm_role)
 disnake.Message.get_or_fetch_reference_message = get_or_fetch_reference_message
 disnake.Message.getch_reference_message = get_or_fetch_reference_message

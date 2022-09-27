@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Generator
+from datetime import timedelta
 
 from disnake import DiscordException
 from disnake.ext.commands import (
@@ -10,6 +11,8 @@ from disnake.ext.commands import (
     command,
     cooldown,
 )
+from disnake.utils import format_dt, utcnow
+
 from gacha.logging import LogBase, LogLevel
 from gacha.models import VirtualItem
 from gacha.models.pulls import Pull
@@ -74,14 +77,14 @@ class Gacha(Cog, category=Category.FUN):
     async def gacha(self, ctx: Context, supply_type: str, pull_count: int = 10):
         supply_type = supply_type.casefold()
         if not self._pull_provider.has_pool(supply_type):
-            await ctx.reply("The supply type you specified doesn't exist")
+            await ctx.reply_("The supply type you specified doesn't exist")
             ctx.reset_cooldown()
             return
         pulls = self._pull_provider.pull(supply_type, pull_count)
         formatted_pulls = self._format_pulls(pulls)
 
         supply_name = bold(self._pull_provider.get_pool_name(supply_type))
-        header = underline(supply_name + " supply drops:\n")
+        header = underline(ctx._("{} supply drops").format(supply_name) + ":\n")
         await ctx.reply(header + "\n".join(formatted_pulls))
 
     @gacha.error
@@ -93,7 +96,7 @@ class Gacha(Cog, category=Category.FUN):
                 f"{bold(pool_code)} - {self._pull_provider.get_pool_name(pool_code)}"
                 for pool_code in self._pull_provider.get_pool_codes()
             ]
-            await ctx.send("Currently available supplies:\n" + "\n".join(pools))
+            await ctx.send(ctx._("Currently available supplies") + ":\n" + "\n".join(pools))
             return True
         last_param = ctx.command.clean_params.popitem()[1]
         if (
@@ -101,11 +104,12 @@ class Gacha(Cog, category=Category.FUN):
             and last_param.name in str(error)
             and last_param.annotation.__name__ in str(error)
         ):
-            await ctx.reply(
-                f"Cooldown expires in {self.gacha.get_cooldown_retry_after(ctx):.0f} seconds"
-                if self.gacha.is_on_cooldown(ctx)
-                else "You specified an invalid amount"
-            )
+            if self.gacha.is_on_cooldown(ctx):
+                expires_at = utcnow() + timedelta(seconds=self.gacha.get_cooldown_retry_after(ctx))
+                remaining = format_dt(expires_at, "R")
+                await ctx.reply(ctx._("Cooldown expires {}").format(remaining))
+            else:
+                await ctx.reply_("You specified an invalid amount")
             return True
         ctx.reset_cooldown()
         return False

@@ -14,6 +14,7 @@ class ReactionSnipe(Cog):
 
     def __init__(self, ara: Ara):
         self.ara = ara
+        self._ = ara.i18n.getl
         self._cache: dict[int, dict[int, dict[int, tuple[bool, datetime]]]] = {}
         self.purge_cache.start()
 
@@ -51,7 +52,7 @@ class ReactionSnipe(Cog):
                 if isinstance(reaction.emoji, str)
                 else f"{reaction.emoji.url}?size=64"
             )
-            .set_footer(text="Sniped reaction")
+            .set_footer(text=self._("Sniped reaction", reaction.message.guild.preferred_locale))
             .with_author(user)
         )
 
