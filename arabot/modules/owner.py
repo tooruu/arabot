@@ -14,6 +14,9 @@ from arabot.utils import CIMember, CIRole, CITextChl, Empty, mono
 _T = TypeVar("_T")
 _T1 = TypeVar("_T1", bound=str)
 _T2 = TypeVar("_T2")
+INVALID = "Invalid"
+NO_EXTENSIONS_PROVIDED = "No extensions provided"
+NOT_FOUND = "Not found"
 
 
 class FakeObj:
@@ -173,16 +176,16 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     @ext.command(name="load", aliases=["enable"], usage="<extensions>")
     async def ext_load(self, ctx: Context, *extensions):
         if not extensions:
-            await ctx.send_("No extensions provided")
+            await ctx.send_(NO_EXTENSIONS_PROVIDED)
             return
 
         statuses = {
             None: ctx._("Loaded"),
-            commands.ExtensionNotFound: ctx._("Not found"),
-            ModuleNotFoundError: ctx._("Not found"),
+            commands.ExtensionNotFound: ctx._(NOT_FOUND),
+            ModuleNotFoundError: ctx._(NOT_FOUND),
             commands.ExtensionAlreadyLoaded: ctx._("Already loaded"),
-            commands.ExtensionFailed: ctx._("Invalid"),
-            commands.NoEntryPointError: ctx._("Invalid"),
+            commands.ExtensionFailed: ctx._(INVALID),
+            commands.NoEntryPointError: ctx._(INVALID),
         }
         load = lambda ext: ctx.ara.load_extension(f"{self.COGS_PATH_DOTTED}.{ext}")
 
@@ -191,7 +194,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     @ext.command(name="unload", aliases=["disable"], usage="<extensions>")
     async def ext_unload(self, ctx: Context, *extensions):
         if not extensions:
-            await ctx.send_("No extensions provided")
+            await ctx.send_(NO_EXTENSIONS_PROVIDED)
             return
 
         statuses = {
@@ -204,16 +207,16 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     @ext.command(name="reload", usage="<extensions>")
     async def ext_reload(self, ctx: Context, *extensions):
         if not extensions:
-            await ctx.send_("No extensions provided")
+            await ctx.send_(NO_EXTENSIONS_PROVIDED)
             return
 
         statuses = {
             None: ctx._("Reloaded"),
-            commands.ExtensionNotFound: ctx._("Not found"),
-            ModuleNotFoundError: ctx._("Not found"),
+            commands.ExtensionNotFound: ctx._(NOT_FOUND),
+            ModuleNotFoundError: ctx._(NOT_FOUND),
             commands.ExtensionNotLoaded: ctx._("Not loaded"),
-            commands.ExtensionFailed: ctx._("Invalid"),
-            commands.NoEntryPointError: ctx._("Invalid"),
+            commands.ExtensionFailed: ctx._(INVALID),
+            commands.NoEntryPointError: ctx._(INVALID),
         }
         reload = lambda ext: ctx.ara.reload_extension(f"{self.COGS_PATH_DOTTED}.{ext}")
         await self.do_action_group_format_embed_send(reload, extensions, statuses, ctx.send)
@@ -230,7 +233,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
 
         statuses = {
             None: "Enabled",
-            commands.CommandNotFound: "Not found",
+            commands.CommandNotFound: NOT_FOUND,
             CommandAlreadyEnabled: "Already enabled",
         }
 
@@ -252,7 +255,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
 
         statuses = {
             None: "Disabled",
-            commands.CommandNotFound: "Not found",
+            commands.CommandNotFound: NOT_FOUND,
             commands.DisabledCommand: "Already disabled",
         }
 

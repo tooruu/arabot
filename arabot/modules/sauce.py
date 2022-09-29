@@ -178,7 +178,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             data["similarity"] = header["similarity"]
             raw_data = "\n".join(f"{k}: {v}" for k, v in data.items())
             embed.description = (
-                f"{ctx._('Could not parse result, dumping raw data')}:" f"```yaml\n{raw_data}\n```"
+                f"{ctx._('Could not parse result, dumping raw data')}:```yaml\n{raw_data}\n```"
             )
         embed.set_footer(
             text=ctx._("Powered by {}").format("SauceNAO"),
