@@ -47,7 +47,7 @@ class EmbedPaginator(disnake.ui.View):
         if self.author is None or interaction.author == self.author:
             return True
         await interaction.response.send_message(
-            interaction._("You can't interact with this menu"), ephemeral=True
+            interaction._("interaction_not_allowed"), ephemeral=True
         )
         return False
 

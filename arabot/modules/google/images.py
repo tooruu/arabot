@@ -26,7 +26,7 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"
                 await ctx.reply(file=image_file)
                 break
             else:
-                await ctx.reply_("No images found")
+                await ctx.reply_("no_images_found")
 
     async def fetch_images(self, query) -> list:
         data = await self.session.fetch_json(

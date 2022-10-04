@@ -29,10 +29,10 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     )
     async def speak(self, ctx: Context):
         if ctx.guild.voice_client:
-            await ctx.send_("I'm already speaking")
+            await ctx.send_("busy")
             return
         if not getattr(ctx.author.voice, "channel", None):
-            await ctx.send_("You're not connected to a voice channel")
+            await ctx.send_("not_connected")
             return
 
         async with ctx.typing():
@@ -45,7 +45,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         lang, text = self.parse_query(ctx.argument_only, langs)
 
         if not text and not (text := await ctx.rsearch("content")):
-            await ctx.send_("I need text to pronounce")
+            await ctx.send_("provide_text")
             return
         text = await clean_content(fix_channel_mentions=True, remove_markdown=True).convert(
             ctx, text
@@ -54,7 +54,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         if not lang:
             lang = await self.detect_language(text)
             if not self.find_lang(lang, langs):
-                await ctx.send_("Couldn't detect language")
+                await ctx.send_("unknown_language")
                 return
 
         audio = await self.synthesize(text, lang, "LINEAR16")

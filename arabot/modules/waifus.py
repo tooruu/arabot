@@ -183,7 +183,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
     async def nsfw(self, ctx: Context):
         await ctx.send(
             embed=Embed().add_field(
-                ctx._("Available categories"),
+                ctx._("available_categories"),
                 "\n".join(c.name for c in self.nsfw.walk_commands()),
             )
         )
@@ -197,9 +197,9 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
         try:
             image_url = await method(reaction_type)
         except (APIException, ClientResponseError):
-            embed.set_footer(text=ctx._("Failed to get image"))
+            embed.set_footer(text=ctx._("image_failed"))
         else:
-            embed.set_footer(text=ctx._("Powered by {}").format("waifu.pics"))
+            embed.set_footer(text=ctx._("powered_by", False).format("waifu.pics"))
             embed.set_image(url=image_url)
         if reaction_data := REACTION_MAPPING.get(reaction_type):
             match targets:

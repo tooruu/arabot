@@ -54,7 +54,7 @@ class Urban(Cog, category=Category.LOOKUP):
 
         if not (definitions := await self.fetch_definitions(term)):
             if ctx.prefix:  # send if command was invoked directly by user, not by urban_listener
-                await ctx.send(ctx._("Definition for {} not found").format(bold(term)))
+                await ctx.send(ctx._("definition_not_found").format(bold(term)))
             return
 
         embeds = []
@@ -66,7 +66,9 @@ class Urban(Cog, category=Category.LOOKUP):
                 timestamp=datetime.fromisoformat(definition["written_on"][:-1]),
             )
             if definition["example"]:
-                embed.add_field("Example", dsafe(repchars(definition["example"], "[]"))[:1024])
+                embed.add_field(
+                    ctx._("example", False), dsafe(repchars(definition["example"], "[]"))[:1024]
+                )
             embeds.append(embed)
 
         await ctx.send(embed=embeds[0], view=EmbedPaginator(embeds, author=ctx.author))

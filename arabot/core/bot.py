@@ -47,13 +47,21 @@ class Ara(commands.Bot):
     db: AraDB
     i18n: LocalizationStore
 
-    def __init__(self, *args, **kwargs):
-        self._cogs_path: str | os.PathLike = kwargs.pop("cogs_path", "arabot/modules")
-        self._l10n_path: str | os.PathLike = kwargs.pop("l10n_path", "resources/locales")
-        disnake.Embed.set_default_color(kwargs.pop("embed_color", None))
+    def __init__(
+        self,
+        *args,
+        embed_color: int | disnake.Color | None = disnake.utils.MISSING,
+        cogs_path: str | os.PathLike = "arabot/modules",
+        l10n_path: str | os.PathLike = "resources/locales",
+        token: str | None = None,
+        **kwargs,
+    ):
+        self._cogs_path = cogs_path
+        self._l10n_path = l10n_path
+        disnake.Embed.set_default_color(embed_color)
 
         super().__init__(*args, **kwargs)
-        self.http.token = kwargs.pop("token", None)
+        self.http.token = token
 
     async def login(self) -> None:
         if not (token := self.http.token or os.getenv("token")):
@@ -140,29 +148,27 @@ class Ara(commands.Bot):
             case commands.CommandOnCooldown():
                 expires_at = utcnow() + timedelta(seconds=exception.retry_after)
                 remaining = format_dt(expires_at, "R")
-                await context.reply(context._("Cooldown expires {}").format(remaining))
+                await context.reply(context._("cooldown_expires", False).format(remaining))
             case commands.DisabledCommand():
-                await context.reply_("This command is disabled!")
+                await context.reply_("command_disabled")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
             ) if context.cog.qualified_name.startswith(("Google", "Youtube")):
                 match status:
                     case 403:
                         await context.reply(
-                            context._(
-                                "{} doesn't work without cloud-billing,\nask `{}` to enable it."
-                            ).format(mono(context.invoked_with), mono(self.owner))
+                            context._("cloud_billing_disabled").format(
+                                mono(context.invoked_with), mono(self.owner)
+                            )
                         )
                     case 429:
                         await context.send(
-                            context._("Sorry, I've exceeded today's quota for {}").format(
-                                mono(context.invoked_with)
-                            )
+                            context._("today_quota_exceeded").format(mono(context.invoked_with))
                         )
             case commands.MissingRequiredArgument():
                 await context.send_help(context.command)
             case commands.UserInputError():
-                await context.reply_("Invalid argument")
+                await context.reply_("invalid_argument")
             case (
                 StopCommand()
                 | commands.BotMissingPermissions()
@@ -181,7 +187,7 @@ class Ara(commands.Bot):
                 await context.reply(
                     args[0]
                     if len(args) == 1 and isinstance(args[0], str)
-                    else context._("An error occurred")
+                    else context._("unknown_error")
                 )
 
     async def on_ready(self) -> None:

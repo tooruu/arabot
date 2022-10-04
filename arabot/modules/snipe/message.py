@@ -21,7 +21,7 @@ class RawDeletedMessage:
 
 class Snipe(Cog, category=Category.FUN):
     GROUP_AGE_THRESHOLD = 300  # seconds since last message to end group
-    EMPTY_SNIPE_MSG = "Nothing to snipe here 👀"
+    EMPTY = f"{__module__}.{__qualname__}.empty"
     IGNORED_COMMANDS_PATTERN = r"imp(?:ersonate)?|gp|ghostping|[wi][ca]|c?say"
 
     def __init__(self, ara: Ara):
@@ -56,10 +56,10 @@ class Snipe(Cog, category=Category.FUN):
     @command(brief="View deleted messages within the last hour", usage="[member]")
     async def snipe(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send_("User not found")
+            await ctx.send_("user_not_found", False)
             return
         if ctx.channel.id not in self._cache:
-            await ctx.send_(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(Snipe.EMPTY, False)
             return
         msg_pool = list(
             filter(
@@ -68,7 +68,7 @@ class Snipe(Cog, category=Category.FUN):
             )
         )
         if not msg_pool:
-            await ctx.send_(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(Snipe.EMPTY, False)
             return
         embed = Embed(color=0x87011D)
         msg_group = []
@@ -99,10 +99,10 @@ class Snipe(Cog, category=Category.FUN):
     @command(brief="View the last deleted message", usage="[member]")
     async def last(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send_("User not found")
+            await ctx.send_("user_not_found", False)
             return
         if ctx.channel.id not in self._cache:
-            await ctx.send_(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(Snipe.EMPTY, False)
             return
         try:
             last_msg = next(
@@ -112,7 +112,7 @@ class Snipe(Cog, category=Category.FUN):
                 )
             )
         except StopIteration:
-            await ctx.send_(self.EMPTY_SNIPE_MSG)
+            await ctx.send_(Snipe.EMPTY, False)
             return
         embed = Embed(color=0x87011D)
         field_name = f"{last_msg.author.display_name}, {format_dt(last_msg.created_at, 'R')}:"

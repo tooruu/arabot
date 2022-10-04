@@ -22,7 +22,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         self.embed = (
             disnake.Embed(timestamp=utcnow())
             .set_author(
-                name=ctx._("{} Help Menu").format(bot.name),
+                name=ctx._("help_menu").format(bot.name),
                 icon_url=ctx.me.display_avatar.as_icon.compat,
             )
             .set_footer(text=f"{bot.name} v{arabot.__version__}")
@@ -35,9 +35,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         _: Callable[[str], str | None] = self.context._
 
         help_command_repr = self.context.clean_prefix + self.invoked_with
-        self.embed.description = _("Use `{} [command]` for more info on a command").format(
-            help_command_repr
-        )
+        self.embed.description = _("embed_description").format(help_command_repr)
         self.embed.set_thumbnail(url=bot.user.avatar.compat)
 
         get_category = self.get_command_category
@@ -53,7 +51,9 @@ class EmbedHelpCommand(commands.HelpCommand):
                 if len(commands_field + command_repr) > 1024:
                     break
                 commands_field += f"{command_repr} "
-            self.embed.add_field(bold(_(category)), commands_field[:-1] or _("No commands"))
+            self.embed.add_field(
+                bold(_(category.name.lower())), commands_field[:-1] or _("no_commands")
+            )
         await self.get_destination().send(embed=self.embed)
 
     async def send_command_help(self, command: commands.Command) -> None:
@@ -64,7 +64,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         _ = self.context._
         self.fill_command_data(group)
         if subcmds := await self.filter_commands(group.commands, sort=True):
-            self.embed.add_field(_("Sub-commands"), " ".join(mono(s.name) for s in subcmds))
+            self.embed.add_field(_("subcommands"), " ".join(mono(s.name) for s in subcmds))
         await self.get_destination().send(embed=self.embed)
 
     def fill_command_data(self, command: commands.Command) -> None:
@@ -72,14 +72,14 @@ class EmbedHelpCommand(commands.HelpCommand):
         self.embed.title = mono(command.name)
         self.embed.description = command.help or command.description or command.short_doc
         if note := command.extras.get("note"):
-            self.embed.description += f"\n_{_('Note')}: {note}_"
+            self.embed.description += f"\n_{_('note')}: {note}_"
         if warning := command.extras.get("warning"):
-            self.embed.description += f"\n_**{_('Warning')}:** {warning}_"
+            self.embed.description += f"\n_**{_('warning')}:** {warning}_"
         if command.aliases:
-            self.embed.add_field(_("Aliases"), " ".join(map(mono, sorted(command.aliases))))
+            self.embed.add_field(_("aliases"), " ".join(map(mono, sorted(command.aliases))))
         usage = f"{self.context.clean_prefix}{command} {command.signature}".rstrip()
         self.embed.add_field(
-            _("Usage"), mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
+            _("usage"), mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
         )
 
     def get_command_category(self, command: commands.Command) -> Category:
@@ -106,9 +106,9 @@ class EmbedHelpCommand(commands.HelpCommand):
             if any(param.default is not param.empty for param in params):
                 explanation += optional
         if "=" in command.signature:
-            explanation += f"\n`=` - {_('default value')}"
+            explanation += f"\n`=` - {_('default')}"
         if "..." in command.signature:
-            explanation += f"\n`...` - {_('supports multiple arguments')}"
+            explanation += f"\n`...` - {_('variadic')}"
         return explanation
 
 
@@ -160,12 +160,10 @@ class Meta(Cog, category=Category.META):
     @commands.command(brief="Show bot's source code line count")
     async def lines(self, ctx: Context):
         if not self._line_count:
-            await ctx.send_("Couldn't read files")
+            await ctx.send_("couldnt_read")
             return
         await ctx.send(
-            ctx._("{} consists of **{}** lines of Python code").format(
-                f"{ctx.ara.name} v{arabot.__version__}", self._line_count
-            )
+            ctx._("consists_of").format(f"{ctx.ara.name} v{arabot.__version__}", self._line_count)
         )
 
     @commands.command(aliases=["github", "gh"], brief="Link bot's code repository")
@@ -174,17 +172,13 @@ class Meta(Cog, category=Category.META):
 
     @commands.command(name="invite", brief="Show server's invite link")
     async def server_invite_link(self, ctx: Context):
-        await ctx.send(
-            await ctx.guild.get_unlimited_invite_link() or ctx._("Couldn't find invite link")
-        )
+        await ctx.send(await ctx.guild.get_unlimited_invite_link() or ctx._("not_found"))
 
     @commands.command(name="arabot", brief="Show bot's invite link")  # TODO:dynamically change name
     async def ara_invite_link(self, ctx: Context):
         await ctx.ara.wait_until_ready()
         await ctx.send(
-            embed=disnake.Embed(
-                title=ctx._("Click to invite me"), url=self.ara.invite_url
-            ).set_author(
+            embed=disnake.Embed(title=ctx._("click_here"), url=self.ara.invite_url).set_author(
                 name=ctx.ara.name,
                 icon_url=ctx.ara.user.display_avatar.as_icon.compat,
                 url=self.ara.invite_url,

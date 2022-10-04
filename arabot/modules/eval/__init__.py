@@ -52,13 +52,13 @@ class Eval(Cog, category=Category.GENERAL):
             )
             evaluator = LocalEval(env=local_eval_env, stdin=StringIO(inputlines))
             result.set_footer(
-                text=ctx._("Powered by {}").format("myself 😌"),
+                text=ctx._("powered_by", False).format("myself 😌"),
                 icon_url=ctx.me.display_avatar.as_icon.compat,
             )
         else:
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)
             result.set_footer(
-                text="Powered by Piston",
+                text=ctx._("powered_by", False).format("Piston"),
                 icon_url="https://raw.githubusercontent.com"
                 "/tooruu/arabot/master/resources/piston.png",
             )
@@ -68,25 +68,25 @@ class Eval(Cog, category=Category.GENERAL):
             stdout, return_value = await evaluator.run(code)
         except (ClientResponseError, errors.RemoteEvalBadResponse) as e:
             logging.error(e.message)
-            self.embed_add_codeblock_with_warnings(result, ctx._("Connection error ⚠️"), e.message)
+            self.embed_add_codeblock_with_warnings(result, ctx._("connection_error"), e.message)
         except Exception as e:
             logging.info(e)
-            result.title = "Run failed ❌"
+            result.title = ctx._("run_failed")
 
             if isinstance(e, errors.EvalException) and getattr(e, "stdout", None):
-                append_codeblock(ctx._("Output"), e.stdout)
+                append_codeblock(ctx._("output", False), e.stdout)
 
             if isinstance(e, errors.LocalEvalException):
-                append_codeblock(ctx._("Error"), e.format(source=code))
+                append_codeblock(ctx._("error", False), e.format(source=code))
             elif isinstance(e, errors.RemoteEvalException):
-                append_codeblock(ctx._("Error"), e.format())
-                result.description += f"{ctx._('Exit code')}: {e.exit_code}\n"
+                append_codeblock(ctx._("error", False), e.format())
+                result.description += f"{ctx._('exit_code')}: {e.exit_code}\n"
         else:
-            result.title = ctx._("Run finished ✅")
-            append_codeblock(ctx._("Output"), stdout)
+            result.title = ctx._("run_finished")
+            append_codeblock(ctx._("output", False), stdout)
 
             if return_value is not None:
-                append_codeblock(ctx._("Return value"), repr(return_value))
+                append_codeblock(ctx._("return_value"), repr(return_value))
             elif not result.fields:
                 await ctx.tick()
                 return

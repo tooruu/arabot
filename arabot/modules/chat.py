@@ -36,12 +36,14 @@ bbbbbbbbbbbbbbb
 class Chat(Cog):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self._ = ara.i18n.getl
+        self._ = lambda key, msg, scope_depth=1: ara.i18n.getl(
+            self.ara.i18n.getl(key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0))
+        )
 
     @commands.check(lambda msg: len(msg.content) < 15)
     @pfxless(chance=0.5)
     async def who(self, msg: disnake.Message):
-        await msg.channel.send(self._("ur mom", msg.guild.preferred_locale))
+        await msg.channel.send(self._("ur_mom", msg))
 
     @commands.check(lambda msg: len(msg.content) < 20)
     @pfxless(regex=r"^([ıi](['’]?m|\sam)\s)+((an?|the)\s)?\w+$", chance=0.5)
@@ -51,9 +53,7 @@ class Chat(Cog):
 
     @pfxless(regex=";-;")
     async def cry(self, msg: disnake.Message):
-        await msg.reply(
-            self._("don't cry", msg.guild.preferred_locale) + f" {CustomEmoji.KannaPat}"
-        )
+        await msg.reply(self._("uncry", msg) + f" {CustomEmoji.KannaPat}")
 
     @commands.cooldown(1, 60, commands.BucketType.channel)
     @pfxless()

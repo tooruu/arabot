@@ -13,6 +13,8 @@ from disnake.ext.commands import (
 )
 from disnake.utils import format_dt, utcnow
 
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import bold, underline
 from gacha.logging import LogBase, LogLevel
 from gacha.models import VirtualItem
 from gacha.models.pulls import Pull
@@ -26,9 +28,6 @@ from gacha.persistence.json.converters import (
 from gacha.providers import EntityProviderInterface, SimplePullProvider
 from gacha.resolvers import ItemResolverInterface
 from gacha.utils.entity_provider_utils import get_item, get_item_rank, get_item_type
-
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import bold, underline
 
 DATABASE_FILE_PATH = "resources/database.json"
 LOG_LEVEL = LogLevel.WARNING
@@ -77,14 +76,14 @@ class Gacha(Cog, category=Category.FUN):
     async def gacha(self, ctx: Context, supply_type: str, pull_count: int = 10):
         supply_type = supply_type.casefold()
         if not self._pull_provider.has_pool(supply_type):
-            await ctx.reply_("The supply type you specified doesn't exist")
+            await ctx.reply_("supply_not_found")
             ctx.reset_cooldown()
             return
         pulls = self._pull_provider.pull(supply_type, pull_count)
         formatted_pulls = self._format_pulls(pulls)
 
         supply_name = bold(self._pull_provider.get_pool_name(supply_type))
-        header = underline(ctx._("{} supply drops").format(supply_name) + ":\n")
+        header = underline(ctx._("supply_drops").format(supply_name) + ":\n")
         await ctx.reply(header + "\n".join(formatted_pulls))
 
     @gacha.error
@@ -96,7 +95,7 @@ class Gacha(Cog, category=Category.FUN):
                 f"{bold(pool_code)} - {self._pull_provider.get_pool_name(pool_code)}"
                 for pool_code in self._pull_provider.get_pool_codes()
             ]
-            await ctx.send(ctx._("Currently available supplies") + ":\n" + "\n".join(pools))
+            await ctx.send(ctx._("available_supplies") + ":\n" + "\n".join(pools))
             return True
         last_param = ctx.command.clean_params.popitem()[1]
         if (
@@ -107,9 +106,9 @@ class Gacha(Cog, category=Category.FUN):
             if self.gacha.is_on_cooldown(ctx):
                 expires_at = utcnow() + timedelta(seconds=self.gacha.get_cooldown_retry_after(ctx))
                 remaining = format_dt(expires_at, "R")
-                await ctx.reply(ctx._("Cooldown expires {}").format(remaining))
+                await ctx.reply(ctx._("cooldown_expires", False).format(remaining))
             else:
-                await ctx.reply_("You specified an invalid amount")
+                await ctx.reply_("invalid_amount")
             return True
         ctx.reset_cooldown()
         return False

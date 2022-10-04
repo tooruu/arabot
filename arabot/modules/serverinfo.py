@@ -16,7 +16,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
     @commands.command(aliases=["sa", "spfp"], brief="Show server's icon")
     async def serveravatar(self, ctx: Context):
         if not ctx.guild.icon:
-            await ctx.send_("Server has no icon")
+            await ctx.send_("no_icon")
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
@@ -27,12 +27,12 @@ class Serverinfo(Cog, category=Category.GENERAL):
     @commands.command(aliases=["sb"], brief="Show server's banner")
     async def serverbanner(self, ctx: Context):
         if not ctx.guild.banner:
-            await ctx.send_("Server has no banner")
+            await ctx.send_("no_banner")
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
             .set_image(url=ctx.guild.banner.maxres.compat)
-            .set_footer(text=f"{ctx.guild} banner")
+            .set_footer(text=ctx._("their_banner", False).format(ctx.guild))
         )
 
     @commands.command(aliases=["server"], brief="View server's info", usage="[server]")
@@ -43,10 +43,10 @@ class Serverinfo(Cog, category=Category.GENERAL):
             try:
                 guild = await ctx.bot.fetch_guild_preview(int(ctx.argument_only))
             except (ValueError, disnake.NotFound):
-                await ctx.send_("Server not found or is not discoverable")
+                await ctx.send_("guild_not_found")
                 return
         elif guild.unavailable:
-            await ctx.send_("Server is unavailable")
+            await ctx.send_("guild_unavailable")
             return
 
         embed = (
@@ -64,14 +64,14 @@ class Serverinfo(Cog, category=Category.GENERAL):
         self._set_footer(embed, guild)
 
         fields: dict[str, list[str]] = defaultdict(list)
-        self._set_field_channels(fields[ctx._("Channels")], guild)
-        self._set_field_members(fields[ctx._("Members")], guild)
+        self._set_field_channels(fields[ctx._("channels", False)], guild)
+        self._set_field_members(fields[ctx._("members", False)], guild)
         if guild.emojis:
-            self._set_field_emojis_stickers(fields[ctx._("Emojis")], guild)
+            self._set_field_emojis_stickers(fields[ctx._("emojis", False)], guild)
         elif guild.stickers:
-            self._set_field_emojis_stickers(fields[ctx._("Stickers")], guild)
-        self._set_field_general_info(fields[ctx._("General info")], guild, ctx.guild)
-        self._set_field_moderation(fields[ctx._("Moderation")], guild)
+            self._set_field_emojis_stickers(fields[ctx._("stickers", False)], guild)
+        self._set_field_general_info(fields[ctx._("general_info")], guild, ctx.guild)
+        self._set_field_moderation(fields[ctx._("moderation")], guild)
 
         for name, values in fields.items():
             if values:

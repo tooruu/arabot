@@ -26,7 +26,7 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
             },
         )
         await ctx.reply(
-            json["items"][0]["link"] if json.get("items") else ctx._("No results found")
+            json["items"][0]["link"] if json.get("items") else ctx._("no_results", False)
         )
 
     @command(aliases=["g3"], brief="Show top 3 Google Search results")
@@ -42,7 +42,7 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
         )
 
         if not data.get("items"):
-            await ctx.reply_("No results found")
+            await ctx.reply_("no_results", False)
             return
 
         embed = Embed(

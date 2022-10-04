@@ -25,5 +25,5 @@ class Youtube(Cog, category=Category.LOOKUP, keys={"g_yt_key"}):
         await ctx.reply(
             "https://youtu.be/" + data["items"][0]["id"]["videoId"]
             if data.get("items")
-            else ctx._("No videos found")
+            else ctx._("no_videos_found")
         )

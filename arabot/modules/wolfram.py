@@ -40,7 +40,7 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
             if "warnings" in wa:
                 embed.description = wa["warnings"]["text"]
             for pod in wa["pods"]:
-                if pod["id"] == ctx._("Recognized input"):
+                if pod["id"] == ctx._("input"):
                     detected_input = pod["subpods"][0]["plaintext"]
                     embed.add_field(
                         "Input",
@@ -49,7 +49,7 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
                     )
                 if "primary" in pod:
                     embed.add_field(
-                        ctx._("Result"),
+                        ctx._("result", False),
                         "\n".join(dsafe(subpod["plaintext"]) for subpod in pod["subpods"]),
                         inline=False,
                     )
