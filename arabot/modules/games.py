@@ -278,7 +278,7 @@ class TicTacToeButton(disnake.ui.Button):
             return
 
         notify_wrong_turn = partial(
-            await inter.response.send_message, "It's not your turn!", ephemeral=True
+            inter.response.send_message, "It's not your turn!", ephemeral=True
         )
         if view.current_player is None:
             if view.p1 is None:
