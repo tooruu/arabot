@@ -1,6 +1,7 @@
 import logging
 from argparse import ArgumentParser
-from typing import Callable, Dict, Generator, Iterable, TypeVar
+from collections.abc import Callable, Generator, Iterable
+from typing import TypeVar
 
 from gacha.logging import ConsoleLog, LogBase, LogLevel
 from gacha.models import VirtualItem
@@ -114,8 +115,7 @@ class GachaSimulator:
         if sort:
             pulls = sorted(pulls, key=lambda pull: pull.name)
         formatted_pulls = [
-            f'{pull.name} x{pull.count}{" (Rare)" if pull.is_rare else ""}'
-            for pull in pulls
+            f'{pull.name} x{pull.count}{" (Rare)" if pull.is_rare else ""}' for pull in pulls
         ]
 
         logging.info(
@@ -126,7 +126,7 @@ class GachaSimulator:
         )
 
     @staticmethod
-    def _consolidate(dictionary: Dict[str, Pull], pull: Pull) -> Dict[str, Pull]:
+    def _consolidate(dictionary: dict[str, Pull], pull: Pull) -> dict[str, Pull]:
         key = f"{pull.id}/{pull.name}"
         try:
             dictionary[key].value += pull.count

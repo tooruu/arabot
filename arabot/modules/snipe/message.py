@@ -19,9 +19,9 @@ class RawDeletedMessage:
         self.deleted_at = utcnow()
 
 
-class Snipe(Cog, category=Category.FUN):
+class MessageSnipe(Cog, category=Category.FUN):
     GROUP_AGE_THRESHOLD = 300  # seconds since last message to end group
-    EMPTY = f"{__module__}.{__qualname__}.empty"
+    EMPTY = f"{__module__}.empty"
     IGNORED_COMMANDS_PATTERN = r"imp(?:ersonate)?|gp|ghostping|[wi][ca]|c?say"
 
     def __init__(self, ara: Ara):
@@ -59,7 +59,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send_("user_not_found", False)
             return
         if ctx.channel.id not in self._cache:
-            await ctx.send_(Snipe.EMPTY, False)
+            await ctx.send_(MessageSnipe.EMPTY, False)
             return
         msg_pool = list(
             filter(
@@ -68,7 +68,7 @@ class Snipe(Cog, category=Category.FUN):
             )
         )
         if not msg_pool:
-            await ctx.send_(Snipe.EMPTY, False)
+            await ctx.send_(MessageSnipe.EMPTY, False)
             return
         embed = Embed(color=0x87011D)
         msg_group = []
@@ -102,7 +102,7 @@ class Snipe(Cog, category=Category.FUN):
             await ctx.send_("user_not_found", False)
             return
         if ctx.channel.id not in self._cache:
-            await ctx.send_(Snipe.EMPTY, False)
+            await ctx.send_(MessageSnipe.EMPTY, False)
             return
         try:
             last_msg = next(
@@ -112,7 +112,7 @@ class Snipe(Cog, category=Category.FUN):
                 )
             )
         except StopIteration:
-            await ctx.send_(Snipe.EMPTY, False)
+            await ctx.send_(MessageSnipe.EMPTY, False)
             return
         embed = Embed(color=0x87011D)
         field_name = f"{last_msg.author.display_name}, {format_dt(last_msg.created_at, 'R')}:"
@@ -128,4 +128,4 @@ class Snipe(Cog, category=Category.FUN):
 
 
 def setup(ara: Ara):
-    ara.add_cog(Snipe(ara))
+    ara.add_cog(MessageSnipe(ara))

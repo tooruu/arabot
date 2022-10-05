@@ -5,7 +5,7 @@ from disnake.ext.tasks import loop
 from disnake.utils import utcnow
 
 from arabot.core import Ara, Cog
-from arabot.utils import Twemoji, fullqualname
+from arabot.utils import Twemoji
 
 
 class ReactionSnipe(Cog):
@@ -15,7 +15,7 @@ class ReactionSnipe(Cog):
     def __init__(self, ara: Ara):
         self.ara = ara
         self._ = lambda key, msg, scope_depth=1: ara.i18n.getl(
-            self.ara.i18n.getl(key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0))
+            key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0)
         )
         self._cache: dict[int, dict[int, dict[int, tuple[bool, datetime]]]] = {}
         self.purge_cache.start()

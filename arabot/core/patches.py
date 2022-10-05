@@ -145,7 +145,8 @@ class LocalizationStore(disnake.LocalizationStore):
         :return: Localized string. Can be `None` if `self.strict` is `False`.
         :rtype: str, optional
         """
-        key = fullqualname(key, depth=scope_depth + 1) if scope_depth > 0 else f"generic.{key}"
+        if "." not in key:
+            key = fullqualname(key, depth=scope_depth + 1) if scope_depth > 0 else f"generic.{key}"
         l10n_data = self._loc.get(key, {})
         localized = l10n_data.get(locale.value)
         if localized is None:

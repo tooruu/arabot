@@ -19,7 +19,7 @@ HTTP_CATS_VALID_CODES = {
 
 
 class General(Cog, category=Category.GENERAL):
-    NOT_ENOUGH_OPTIONS = f"{__module__}.{__qualname__}.not_enough_options"
+    NOT_ENOUGH_OPTIONS = f"{__module__}.not_enough_options"
 
     def __init__(self, ara: Ara):
         self.ara = ara

@@ -13,8 +13,8 @@ from arabot.utils import AnyMember
 
 
 class Fun(Cog, category=Category.FUN):
-    ADDING_REACTIONS = f"{__module__}.{__qualname__}.adding_reactions"
-    REACTIONS_ADDED = f"{__module__}.{__qualname__}.reactions_added"
+    ADDING_REACTIONS = f"{__module__}.adding_reactions"
+    REACTIONS_ADDED = f"{__module__}.reactions_added"
 
     def __init__(self, session: ClientSession):
         self.session = session

@@ -149,19 +149,19 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
 
 class PluginManager(Cog, command_attrs=dict(hidden=True)):
     # fmt: off
-    ALREADY_DISABLED       = f"{__module__}.{__qualname__}.already_disabled"
-    ALREADY_ENABLED        = f"{__module__}.{__qualname__}.already_enabled"
-    ALREADY_LOADED         = f"{__module__}.{__qualname__}.already_loaded"
-    DISABLED               = f"{__module__}.{__qualname__}.disabled"
-    ENABLED                = f"{__module__}.{__qualname__}.enabled"
-    INVALID                = f"{__module__}.{__qualname__}.invalid"
-    LOADED                 = f"{__module__}.{__qualname__}.loaded"
-    NO_COMMANDS_PROVIDED   = f"{__module__}.{__qualname__}.no_commands_provided"
-    NO_EXTENSIONS_PROVIDED = f"{__module__}.{__qualname__}.no_extensions_provided"
+    ALREADY_DISABLED       = f"{__module__}.already_disabled"
+    ALREADY_ENABLED        = f"{__module__}.already_enabled"
+    ALREADY_LOADED         = f"{__module__}.already_loaded"
+    DISABLED               = f"{__module__}.disabled"
+    ENABLED                = f"{__module__}.enabled"
+    INVALID                = "invalid"
+    LOADED                 = f"{__module__}.loaded"
+    NO_COMMANDS_PROVIDED   = f"{__module__}.no_commands_provided"
+    NO_EXTENSIONS_PROVIDED = f"{__module__}.no_extensions_provided"
     NOT_FOUND              = "not_found"
-    NOT_LOADED             = f"{__module__}.{__qualname__}.not_loaded"
-    RELOADED               = f"{__module__}.{__qualname__}.reloaded"
-    UNLOADED               = f"{__module__}.{__qualname__}.unloaded"
+    NOT_LOADED             = f"{__module__}.not_loaded"
+    RELOADED               = f"{__module__}.reloaded"
+    UNLOADED               = f"{__module__}.unloaded"
     # fmt: on
 
     def __init__(self, cogs_path: str | PathLike):
@@ -290,7 +290,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             try:
                 action(arg)
             except Exception as e:
-                logging.info("%s raised for %s", type(e), arg)
+                logging.debug("%s raised for %s", type(e), arg)
                 mapping[type(e)].append(arg)
             else:
                 mapping[None].append(arg)
