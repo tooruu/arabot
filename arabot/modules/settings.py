@@ -10,7 +10,7 @@ class Settings(Cog, category=Category.SETTINGS):
     async def settings(self, ctx: Context):
         await ctx.send(
             embed=disnake.Embed().add_field(
-                "Available settings",
+                ctx._("available_settings"),
                 "\n".join(c.name for c in self.settings.walk_commands()),
             )
         )
@@ -19,9 +19,7 @@ class Settings(Cog, category=Category.SETTINGS):
     @settings.command(brief="View or set bot's prefix for this server")
     async def prefix(self, ctx: Context, prefix: str | None = None):
         db: AraDB = ctx.ara.db
-        embed = disnake.Embed(
-            description="_Additionally you can use **`ara`** or mention me_"
-        ).set_author(
+        embed = disnake.Embed(description=ctx._("additional_prefix")).set_author(
             name=ctx.guild,
             icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
         )
@@ -33,7 +31,7 @@ class Settings(Cog, category=Category.SETTINGS):
         else:
             prefix = await db.get_guild_prefix(ctx.guild.id) or ";"
 
-        embed.title = f"Prefix: {bold(mono(prefix))}"
+        embed.title = f"{ctx._('prefix')}: {bold(mono(prefix))}"
         await ctx.send(embed=embed)
 
 

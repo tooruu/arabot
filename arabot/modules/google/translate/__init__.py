@@ -28,7 +28,7 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         translation = await self.handle_translation(ctx, *user_args, langs)
         (source, text), (target, translated_text) = translation
         if source[0] == target[0]:
-            await ctx.reply("Cannot translate to the same language")
+            await ctx.reply_("same_language")
             return
         await ctx.send(
             embed=Embed()
@@ -50,12 +50,12 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         langs: list[LangCodeAndOrName],
     ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]]:
         if not text and not (text := await ctx.rsearch("content")):
-            await ctx.reply("I need text to translate")
+            await ctx.reply_("provide_text")
             raise StopCommand()
         if not source:
             detected = await self.gtrans.detect(text)
             if not (source := self.find_lang(detected, langs)):
-                await ctx.reply("Couldn't detect language")
+                await ctx.reply_("unknown_language")
                 raise StopCommand()
         target = target or self.DEFAULT_TARGET
         if source[0] == target[0]:

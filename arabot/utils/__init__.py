@@ -15,6 +15,20 @@ from .pagination import EmbedPaginator
 from .regexes import *
 
 
+def fullqualname(suffix: str | None = None, *, depth: int = 1) -> str:
+    "Returns fully qualified name for nth call stack frame scope"
+    cf = sys._getframe(depth)
+    qp = []
+    if cm := cf.f_globals["__name__"]:
+        qp.append(cm)
+    # Cannot retrieve class name without mentioning `__class__` inside the method
+    if (cn := cf.f_code.co_name) != "<module>":
+        qp.append(cn)
+    if suffix:
+        qp.append(suffix)
+    return ".".join(qp)
+
+
 def system_info() -> str:
     match platform.system():
         case "Windows":

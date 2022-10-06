@@ -16,7 +16,7 @@ from disnake.utils import format_dt, oauth_url, utcnow
 from ..utils import mono, system_info
 from .database import AraDB
 from .errors import StopCommand
-from .patches import Context
+from .patches import Context, LocalizationStore
 
 
 def search_directory(path) -> Generator[str, None, None]:
@@ -45,13 +45,23 @@ def search_directory(path) -> Generator[str, None, None]:
 
 class Ara(commands.Bot):
     db: AraDB
+    i18n: LocalizationStore
 
-    def __init__(self, *args, **kwargs):
-        self._cogs_path: str | os.PathLike = kwargs.pop("cogs_path", "arabot/modules")
-        disnake.Embed.set_default_color(kwargs.pop("embed_color", None))
+    def __init__(
+        self,
+        *args,
+        embed_color: int | disnake.Color | None = disnake.utils.MISSING,
+        cogs_path: str | os.PathLike = "arabot/modules",
+        l10n_path: str | os.PathLike = "resources/locales",
+        token: str | None = None,
+        **kwargs,
+    ):
+        self._cogs_path = cogs_path
+        self._l10n_path = l10n_path
+        disnake.Embed.set_default_color(embed_color)
 
         super().__init__(*args, **kwargs)
-        self.http.token = kwargs.pop("token", None)
+        self.http.token = token
 
     async def login(self) -> None:
         if not (token := self.http.token or os.getenv("token")):
@@ -97,6 +107,7 @@ class Ara(commands.Bot):
             aiohttp.ClientSession() as self.session,
             AraDB() as self.db,
         ):
+            self.i18n.load(self._l10n_path)
             await self.login()
             self.load_extensions()
             await self.connect()
@@ -137,26 +148,27 @@ class Ara(commands.Bot):
             case commands.CommandOnCooldown():
                 expires_at = utcnow() + timedelta(seconds=exception.retry_after)
                 remaining = format_dt(expires_at, "R")
-                await context.reply(f"Cooldown expires {remaining}")
+                await context.reply(context._("cooldown_expires", False).format(remaining))
             case commands.DisabledCommand():
-                await context.reply("This command is disabled!")
+                await context.reply_("command_disabled")
             case commands.CommandInvokeError(
                 original=aiohttp.ClientResponseError(status=status)
             ) if context.cog.qualified_name.startswith(("Google", "Youtube")):
                 match status:
                     case 403:
                         await context.reply(
-                            f"{mono(context.invoked_with)} doesn't work without "
-                            f"cloud-billing,\nask `{mono(self.owner)}` to enable it."
+                            context._("cloud_billing_disabled").format(
+                                mono(context.invoked_with), mono(self.owner)
+                            )
                         )
                     case 429:
                         await context.send(
-                            f"Sorry, I've exceeded today's quota for {mono(context.invoked_with)}"
+                            context._("today_quota_exceeded").format(mono(context.invoked_with))
                         )
             case commands.MissingRequiredArgument():
                 await context.send_help(context.command)
             case commands.UserInputError():
-                await context.reply("Invalid argument")
+                await context.reply_("invalid_argument")
             case (
                 StopCommand()
                 | commands.BotMissingPermissions()
@@ -173,7 +185,9 @@ class Ara(commands.Bot):
                 logging.error("Unhandled exception", exc_info=exception)
                 args = exception.args
                 await context.reply(
-                    args[0] if len(args) == 1 and isinstance(args[0], str) else "An error occurred"
+                    args[0]
+                    if len(args) == 1 and isinstance(args[0], str)
+                    else context._("unknown_error")
                 )
 
     async def on_ready(self) -> None:

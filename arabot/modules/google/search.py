@@ -25,7 +25,9 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
                 "num": 1,
             },
         )
-        await ctx.reply(json["items"][0]["link"] if json.get("items") else "No results found")
+        await ctx.reply(
+            json["items"][0]["link"] if json.get("items") else ctx._("no_results", False)
+        )
 
     @command(aliases=["g3"], brief="Show top 3 Google Search results")
     async def google3(self, ctx: Context, *, query):
@@ -40,7 +42,7 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
         )
 
         if not data.get("items"):
-            await ctx.reply("No results found")
+            await ctx.reply_("no_results", False)
             return
 
         embed = Embed(
