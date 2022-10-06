@@ -62,7 +62,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         await ctx.send(
             embed=disnake.Embed()
             .set_image(url=banner.maxres.compat)
-            .set_footer(text=ctx._("their_banner").format(member.display_name))
+            .set_footer(text=ctx._("their_banner", False).format(member.display_name))
         )
 
     @commands.command(

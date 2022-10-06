@@ -42,7 +42,7 @@ class General(Cog, category=Category.GENERAL):
 
         filtered_emojis = list(dict.fromkeys(e for e in emojis if e)) if emojis else []
         if not filtered_emojis and not stickers:
-            await ctx.reply_("not_found")
+            await ctx.reply_("not_found", False)
             return
 
         await ctx.reply(
@@ -229,7 +229,7 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send_("threads_not_supported")
             return
         if not ctx.channel.permissions_for(ctx.me).manage_webhooks:
-            await ctx.send(ctx._("no_perms_to").format("manage webhooks"))
+            await ctx.send(ctx._("no_perms_to", False).format("manage webhooks"))
             return
         if not user:
             await ctx.reply_("user_not_found", False)

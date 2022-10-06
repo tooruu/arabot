@@ -341,7 +341,9 @@ class TicTacToeButton(disnake.ui.Button):
         if loser:
             with suppress(disnake.Forbidden):
                 await loser.timeout(duration=60, reason=inter._("loser"))
-                await inter.message.reply_ping(inter._("user_muted_1m").format(loser.mention))
+                await inter.message.reply_ping(
+                    inter._("user_muted_1m", False).format(loser.mention)
+                )
 
 
 class TicTacToe(disnake.ui.View):
