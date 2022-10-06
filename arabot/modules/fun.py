@@ -157,7 +157,7 @@ class Fun(Cog, category=Category.FUN):
         await ctx.message.delete()
         if not member:
             return
-        invis_bug = "||\u200b||" * 198 + "_ _"
+        invis_bug = "||\u200b||" * 250
         if len(message := text + invis_bug + member.mention) <= 2000:
             await ctx.send(message, allowed_mentions=disnake.AllowedMentions(users=True))
 
