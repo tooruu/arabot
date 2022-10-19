@@ -1,3 +1,4 @@
+import random
 import re
 from asyncio import sleep
 
@@ -31,6 +32,11 @@ bbbbbbbbbbbbbbb
     .replace("c", CustomEmoji.CommuThink)
     .split("\n\n")
 )
+BAD_GAMES = re.compile(
+    r"\b(кс|cs|мм|mm|ра[фс]т|r(af|us)t|фортнайт|fortnite|осу|osu|дест[еи]ни|destiny)\b",
+    re.IGNORECASE,
+)
+AT_SOMEONE = re.compile(r"@some(?:one|body)", re.IGNORECASE)
 
 
 class Chat(Cog):
@@ -77,15 +83,10 @@ class Chat(Cog):
         finally:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
 
-    BAD_GAMES = re.compile(
-        r"\b(кс|cs|мм|mm|ра[фс]т|r(af|us)t|фортнайт|fortnite|осу|osu|дест[еи]ни|destiny)\b",
-        re.IGNORECASE,
-    )
-
     @is_in_guild(433298614564159488)
     @pfxless(regex=BAD_GAMES)
     async def badgames(self, msg: disnake.Message):
-        game_name = self.BAD_GAMES.search(msg.content)[0]
+        game_name = BAD_GAMES.search(msg.content)[0]
         message = f"{game_name}? ебать ты гей 🤡"
         try:
             await msg.author.timeout(duration=20, reason="геюга ебаная")
@@ -100,6 +101,25 @@ class Chat(Cog):
     async def communism(self, msg: disnake.Message):
         for camp in GULAG:
             await msg.channel.send(camp)
+
+    @pfxless(regex=AT_SOMEONE, plain_text_only=False)
+    async def somebody(self, msg: disnake.Message):
+        if (
+            isinstance(msg.channel, disnake.Thread)
+            or len(msg.channel.members) <= 1
+            or not msg.channel.permissions_for(msg.guild.me).manage_webhooks
+        ):
+            return
+
+        await msg.delete()
+        someone = random.choice(msg.channel.members)
+        sender = await msg.channel.create_webhook(name=msg.author, avatar=msg.author.display_avatar)
+        await sender.send(
+            AT_SOMEONE.sub(someone.mention, msg.content),
+            username=msg.author.display_name,
+            allowed_mentions=disnake.AllowedMentions(users=True),
+        )
+        await sender.delete()
 
 
 def setup(ara: Ara):
