@@ -33,8 +33,8 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
             title=dsafe(question),
             url=f"https://wolframalpha.com/input/?i={quote_plus(question)}",
         ).set_footer(
-            icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png",
             text="Wolfram|Alpha",
+            icon_url="https://cdn.iconscout.com/icon/free/png-512/wolfram-alpha-2-569293.png",
         )
         if wa["success"]:
             if "warnings" in wa:

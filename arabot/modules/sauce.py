@@ -155,13 +155,14 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     | _
                 ):
                     embed.color = 0x9E2720
-                    embed.url = data.get("ext_urls", [Embed.Empty])[0]
+                    embed.url = data.get("ext_urls", [None])[0]
                     embed.title = (
                         data.get("title")
                         or data.get("eng_name")
                         or data.get("source")
                         or data.get("jp_name")
-                        or (ctx._("post") if embed.url else Embed.Empty)
+                        or embed.url
+                        and ctx._("post")
                     )
                     embed.description = f"{ctx._('similarity')}: {header['similarity']}%"
                     match data.get("creator"):

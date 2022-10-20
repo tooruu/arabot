@@ -96,7 +96,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         if isinstance(member, disnake.Member):
             embed.set_footer(
                 text=member.guild.name,
-                icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
+                icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
             )
             if member.guild_avatar:
                 description[1].append(f"[{ctx._('guild_avatar')}]({member.guild_avatar})")

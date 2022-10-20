@@ -21,8 +21,7 @@ class EmbedPaginator(disnake.ui.View):
         super().__init__(timeout=timeout)
 
         if len(embeds) == 1:
-            self.clear_items()
-            self.stop()
+            self.clear_items().stop()
             return
 
         self.embeds = embeds

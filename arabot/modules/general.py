@@ -94,7 +94,7 @@ class General(Cog, category=Category.GENERAL):
             ctx.reset_cooldown()
             await ctx.send_ping(ctx._("user_no_channel_access", False).format(member.mention))
             return
-        invite = await ctx.guild.get_unlimited_invite_link() or disnake.Embed.Empty
+
         embed = disnake.Embed(
             description=ctx._("summon_message").format(
                 ctx.author.mention,
@@ -103,9 +103,9 @@ class General(Cog, category=Category.GENERAL):
                 ctx.message.jump_url,
             )
         ).set_author(
-            name=ctx.guild.name,
-            url=invite,
-            icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
+            name=ctx.guild,
+            url=await ctx.guild.get_unlimited_invite_link(),
+            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
         )
         try:
             await member.send(embed=embed)

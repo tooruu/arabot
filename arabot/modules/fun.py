@@ -53,9 +53,11 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(inter._("no_perms_to", False).format("add reactions"))
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
         else:
-            await inter.edit_original_message(inter._(Fun.REACTIONS_ADDED, False))
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I asked!", usage="[message or reply]", hidden=True)
@@ -78,9 +80,11 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇮", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(inter._("no_perms_to", False).format("add reactions"))
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
         else:
-            await inter.edit_original_message(inter._(Fun.REACTIONS_ADDED, False))
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who cares?", usage="[message or reply]", hidden=True)
@@ -103,9 +107,11 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(inter._("no_perms_to", False).format("add reactions"))
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
         else:
-            await inter.edit_original_message(inter._(Fun.REACTIONS_ADDED, False))
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I care!", usage="[message or reply]", hidden=True)
@@ -128,9 +134,11 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇮", "🇨", "🇦", "🇷", "🇪", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(inter._("no_perms_to", False).format("add reactions"))
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
         else:
-            await inter.edit_original_message(inter._(Fun.REACTIONS_ADDED))
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED))
 
     @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
     async def who(self, ctx: Context):

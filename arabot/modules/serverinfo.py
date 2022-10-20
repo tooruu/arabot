@@ -60,7 +60,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
                 icon_url="https://twemoji.maxcdn.com/v/latest/72x72/1f194.png",
                 url=f"https://discord.com/channels/{guild.id}",
             )
-            .set_thumbnail(url=guild.icon.compat if guild.icon else disnake.Embed.Empty)
+            .set_thumbnail(url=guild.icon and guild.icon.compat)
         )
         self._set_description(embed, guild, _)
         self._set_footer(embed, guild)
