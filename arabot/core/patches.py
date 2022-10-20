@@ -12,6 +12,8 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 
+from arabot.core import bot
+
 from ..utils import fullqualname, getkeys
 from .enums import Category
 
@@ -23,11 +25,11 @@ __all__ = [
 
 
 class Context(commands.Context):
-    bot: commands.Bot
+    bot: bot.Ara
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ara: commands.Bot = self.bot
+        self.ara = self.bot
 
     @property
     def argument_only(self) -> str:
