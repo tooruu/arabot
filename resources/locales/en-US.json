@@ -204,7 +204,7 @@
     "arabot.modules.urban.urban.definition_not_found": "Definition for {} not found",
     "arabot.modules.userinfo.avatar.global_avatar": "{}'s global avatar",
     "arabot.modules.userinfo.avatar.guild_avatar": "{}'s server avatar",
-    "arabot.modules.userinfo.no_banner": "User has no banner",
+    "arabot.modules.userinfo.banner.no_banner": "User has no banner",
     "arabot.modules.userinfo.userinfo.boosting_since": "Boosting since",
     "arabot.modules.userinfo.userinfo.created_on": "Created on",
     "arabot.modules.userinfo.userinfo.guild_avatar": "Server avatar",
