@@ -96,6 +96,7 @@
     "arabot.modules.google.tts.speak.provide_text": "I need text to pronounce",
     "arabot.modules.google.youtube.youtube.no_videos_found": "No videos found",
     "arabot.modules.meta.ara_invite_link.click_here": "Click to invite me",
+    "arabot.modules.meta.bug.contact_directly": "Failed to file the report. Please contact `{}` directly.",
     "arabot.modules.meta.fill_command_data.aliases": "Aliases",
     "arabot.modules.meta.fill_command_data.note": "Note",
     "arabot.modules.meta.fill_command_data.usage": "Usage",

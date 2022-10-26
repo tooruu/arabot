@@ -185,6 +185,24 @@ class Meta(Cog, category=Category.META):
             )
         )
 
+    @commands.command(brief="Report a bug")
+    async def bug(self, ctx: Context, *, description: str):
+        reporter = ctx.author
+        try:
+            await ctx.ara.owner.send(
+                embed=disnake.Embed(
+                    title="Bug report", description=description, timestamp=utcnow()
+                ).set_author(
+                    name=reporter,
+                    icon_url=reporter.avatar and reporter.avatar.as_icon.compat,
+                    url=f"https://discord.com/users/{reporter.id}",
+                )
+            )
+        except disnake.HTTPException:
+            await ctx.reply(ctx._("contact_directly").format(ctx.ara.owner))
+        else:
+            await ctx.tick()
+
     async def cog_load(self):
         await self.ara.wait_until_ready()
         self._version = self.__get_version()
