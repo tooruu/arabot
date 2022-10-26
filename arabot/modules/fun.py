@@ -14,6 +14,7 @@ from arabot.utils import AnyMember
 
 class Fun(Cog, category=Category.FUN):
     ADDING_REACTIONS = f"{__module__}.adding_reactions"
+    MESSAGE_DELETED = f"{__module__}.message_deleted"
     REACTIONS_ADDED = f"{__module__}.reactions_added"
 
     def __init__(self, session: ClientSession):
@@ -35,7 +36,7 @@ class Fun(Cog, category=Category.FUN):
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who asked?", usage="[message or reply]", hidden=True)
     async def wa(self, ctx: Context, message: disnake.Message = None):
-        with suppress(disnake.Forbidden):
+        with suppress(disnake.Forbidden, disnake.NotFound):
             await ctx.message.delete()
             if not message and not (message := await ctx.getch_reference_message()):
                 async for message in ctx.history(limit=4):
@@ -56,13 +57,15 @@ class Fun(Cog, category=Category.FUN):
             await inter.edit_original_response(
                 inter._("no_perms_to", False).format("add reactions")
             )
+        except disnake.NotFound:
+            await inter.edit_original_response(inter._(Fun.MESSAGE_DELETED, False))
         else:
             await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I asked!", usage="[message or reply]", hidden=True)
     async def ia(self, ctx: Context, message: disnake.Message = None):
-        with suppress(disnake.Forbidden):
+        with suppress(disnake.Forbidden, disnake.NotFound):
             await ctx.message.delete()
             if not message and not (message := await ctx.getch_reference_message()):
                 async for message in ctx.history(limit=4):
@@ -83,6 +86,8 @@ class Fun(Cog, category=Category.FUN):
             await inter.edit_original_response(
                 inter._("no_perms_to", False).format("add reactions")
             )
+        except disnake.NotFound:
+            await inter.edit_original_response(inter._(Fun.MESSAGE_DELETED, False))
         else:
             await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 

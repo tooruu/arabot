@@ -19,6 +19,7 @@
     "arabot.modules.fun.doubt.message_deleted": "Message was deleted",
     "arabot.modules.fun.doubt.never_doubt_yourself": "Never doubt yourself!",
     "arabot.modules.fun.doubt.people_doubted": "{} people have doubted {}",
+    "arabot.modules.fun.message_deleted": "Message was deleted",
     "arabot.modules.fun.pp.pp": "{}'s pp size is **{} cm**\n{}",
     "arabot.modules.fun.reactions_added": "Reactions added",
     "arabot.modules.fun.rename.rank_too_low": "Cannot rename users ranked higher than you",
