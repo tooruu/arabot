@@ -155,9 +155,9 @@ class Connect4Game(Connect4Engine):
 
 
 class Connect4(Cog, category=Category.FUN):
-    def __init__(self, client: Ara):
-        self.client = client
-        self._ = lambda key, msg, scope_depth=1: client.i18n.getl(
+    def __init__(self, ara: Ara):
+        self.ara = ara
+        self._ = lambda key, msg, scope_depth=1: ara.i18n.getl(
             self.ara.i18n.getl(key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0))
         )
         self.waiting_games = {}
@@ -232,7 +232,7 @@ class Connect4(Cog, category=Category.FUN):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: disnake.Reaction, user: disnake.abc.User):
-        if user.id == self.client.user.id:
+        if user.id == self.ara.user.id:
             return
         if reaction.message.id in self.waiting_games:
             message, player1, p1_token = self.waiting_games[reaction.message.id]
