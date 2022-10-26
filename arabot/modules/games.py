@@ -158,7 +158,7 @@ class Connect4(Cog, category=Category.FUN):
     def __init__(self, ara: Ara):
         self.ara = ara
         self._ = lambda key, msg, scope_depth=1: ara.i18n.getl(
-            self.ara.i18n.getl(key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0))
+            key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0)
         )
         self.waiting_games = {}
         self.active_games = {}
