@@ -71,15 +71,9 @@ timers: dict[int, tuple[str, Timer]] = {
         Timer(
             {
                 1: [(time(hour=15), "Preparing")],
-                3: [
-                    (time(hour=22), "Ongoing"),
-                    (time(hour=22, minute=30), "Finalizing"),
-                ],
+                3: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
                 5: [(time(hour=15), "Preparing")],
-                7: [
-                    (time(hour=22), "Ongoing"),
-                    (time(hour=22, minute=30), "Finalizing"),
-                ],
+                7: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
             },
             MHYEUTZ,
         ),
@@ -90,6 +84,15 @@ timers: dict[int, tuple[str, Timer]] = {
             {
                 1: [(time(hour=4), "Ongoing")],
                 2: [(time(hour=4), "Calculating")],
+            },
+            MHYEUTZ,
+        ),
+    ),
+    1036564782091866193: (
+        "ER🔮{} {}",
+        Timer(
+            {
+                1: [(time(hour=4), "Open"), (time(hour=10), "Closed")],
             },
             MHYEUTZ,
         ),
