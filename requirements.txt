@@ -1,4 +1,4 @@
-disnake[voice,speed]~=2.6.0
+disnake[voice,speed]~=2.7.0
 prisma
 jikanpy
 matplotlib
