@@ -185,6 +185,7 @@ class Meta(Cog, category=Category.META):
             )
         )
 
+    @commands.cooldown(1, 86400, commands.BucketType.user)
     @commands.command(brief="Report a bug")
     async def bug(self, ctx: Context, *, description: str):
         reporter = ctx.author
