@@ -5,7 +5,15 @@ import disnake
 from disnake.ext import commands
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import CUSTOM_EMOJI_RE, AnyEmoji, AnyEmojis, AnyMember, AnyMemberOrUser, bold
+from arabot.utils import (
+    CUSTOM_EMOJI_RE,
+    AnyEmoji,
+    AnyEmojis,
+    AnyMember,
+    AnyMemberOrUser,
+    Twemoji,
+    bold,
+)
 
 HTTP_CATS_VALID_CODES = {
     # fmt: off
@@ -67,13 +75,12 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
+        if isinstance(emoji, Twemoji):
+            emoji = emoji.emoji
         try:
             await ref_msg.add_reaction(emoji)
         except disnake.Forbidden:
-            try:
-                await ctx.message.add_reaction("⛔")
-            except disnake.Forbidden:
-                await ctx.reply_ping_(ctx._("cant_add_reactions_to").format(ref_msg.author.mention))
+            await ctx.reply_ping_(ctx._("cant_add_reactions_to").format(ref_msg.author.mention))
 
     @commands.cooldown(1, 60, commands.BucketType.member)
     @commands.command(brief="DM user to summon them", usage="<member> [text]")
