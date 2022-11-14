@@ -164,7 +164,7 @@ class Fun(Cog, category=Category.FUN):
         aliases=["gp"],
         brief="Secretly ping a person",
         hidden=True,
-        extras={"note": "This is a bug that only works on PC"},
+        extras={"note": "This is a Discord bug that may be fixed in the future"},
     )
     async def ghostping(self, ctx: Context, member: AnyMember, *, text):
         await ctx.message.delete()

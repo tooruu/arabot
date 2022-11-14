@@ -486,11 +486,6 @@ class Games(Cog, category=Category.FUN):
             message += f"\n{ctx._('enjoy_1m_mute')} {CustomEmoji.TeriCelebrate}"
         await ctx.send(message)
 
-    @commands.check(
-        lambda msg: (vc := getattr(msg.author.voice, "channel", None))
-        and [m.bot for m in vc.members].count(False) > 2  # pylint: disable=used-before-assignment
-    )
-    @commands.bot_has_permissions(move_members=True)
     @commands.cooldown(1, 120, commands.BucketType.guild)
     @commands.command(
         aliases=["impostor", "impasta"],
@@ -498,8 +493,20 @@ class Games(Cog, category=Category.FUN):
         extras={"note": "You have to be in voice chat with other people to use this command"},
     )
     async def imposter(self, ctx: Context):
+        if not (vc := getattr(ctx.author.voice, "channel", None)):
+            ctx.reset_cooldown()
+            await ctx.send_("no_voice_channel")
+            return
+        if [m.bot for m in vc.members].count(False) < 3:
+            ctx.reset_cooldown()
+            await ctx.send_("too_few_members")
+            return
+        if not ctx.author.voice.channel.permissions_for(ctx.me).move_members:
+            ctx.reset_cooldown()
+            await ctx.send(ctx._("generic.no_perms_to", False).format("move members"))
+            return
+
         # Initializing
-        vc = ctx.author.voice.channel
         await ctx.send(CustomEmoji.KonoDioDa)
         await ctx.send_("start_voting")
 
