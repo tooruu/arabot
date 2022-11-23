@@ -183,12 +183,13 @@ class Ara(commands.Bot):
                 pass
             case _:
                 logging.error("Unhandled exception", exc_info=exception)
-                args = exception.args
-                await context.reply(
-                    args[0]
-                    if len(args) == 1 and isinstance(args[0], str)
-                    else context._("unknown_error")
-                )
+                await context.reply_("unknown_error")
+                # args = exception.args
+                # await context.reply(
+                #     args[0]
+                #     if len(args) == 1 and isinstance(args[0], str)
+                #     else context._("unknown_error")
+                # )
 
     async def on_ready(self) -> None:
         logging.info(system_info())

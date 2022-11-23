@@ -31,7 +31,29 @@ class Settings(Cog, category=Category.SETTINGS):
         else:
             prefix = await db.get_guild_prefix(ctx.guild.id) or ";"
 
-        embed.title = f"{ctx._('prefix')}: {bold(mono(prefix))}"
+        embed.title = f"{ctx._('title')}: {bold(mono(prefix))}"
+        await ctx.send(embed=embed)
+
+    @commands.has_permissions(manage_guild=True)
+    @settings.command(
+        brief="View or toggle russian roulette's kick setting",
+        extras={"note": "Kicks after 3 consecutive losses"},
+    )
+    async def rrkick(self, ctx: Context, enabled: bool | None = None):
+        db: AraDB = ctx.ara.db
+        embed = disnake.Embed().set_author(
+            name=ctx.guild,
+            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
+        )
+
+        if enabled is None:
+            if (enabled := await db.get_guild_prefix(ctx.guild.id)) is None:
+                enabled = False
+        else:
+            await db.set_guild_rr_kick(ctx.guild.id, enabled)
+            db.get_guild_rr_kick.invalidate(db, ctx.guild.id)
+
+        embed.title = f"{ctx._('title')}: {'✅' if enabled else '❌'}"
         await ctx.send(embed=embed)
 
 

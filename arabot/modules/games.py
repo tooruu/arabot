@@ -430,6 +430,11 @@ class Games(Cog, category=Category.FUN):
         # Same user loses 3 times in a row
         last_deaths.clear()
         await ctx.reply(f"💥***__{ctx._('gunshot2')}__***💥")
+        await ctx.send_("cooldown")
+        if await ctx.ara.db.get_guild_rr_kick(ctx.guild.id):
+            with suppress(disnake.Forbidden):
+                await ctx.author.kick(reason=ctx._("russian_roulette"))
+                return
         with suppress(disnake.Forbidden):
             await ctx.author.timeout(duration=180, reason=ctx._("russian_roulette"))
 
