@@ -22,6 +22,7 @@ class AraDB(Prisma):
                 "update": {"prefix": prefix},
             },
         )
+        self.get_guild_prefix.invalidate(self, guild_id)
 
     @alru_cache(cache_exceptions=False)
     async def get_guild_rr_kick(self, guild_id: int) -> bool | None:
@@ -37,3 +38,4 @@ class AraDB(Prisma):
                 "update": {"kick_enabled": enable},
             },
         )
+        self.get_guild_rr_kick.invalidate(self, guild_id)

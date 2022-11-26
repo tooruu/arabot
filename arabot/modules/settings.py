@@ -27,7 +27,6 @@ class Settings(Cog, category=Category.SETTINGS):
         if prefix:
             prefix = prefix.strip()
             await db.set_guild_prefix(ctx.guild.id, prefix)
-            db.get_guild_prefix.invalidate(db, ctx.guild.id)
         else:
             prefix = await db.get_guild_prefix(ctx.guild.id) or ";"
 
@@ -46,12 +45,10 @@ class Settings(Cog, category=Category.SETTINGS):
             icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
         )
 
-        if enabled is None:
-            if (enabled := await db.get_guild_prefix(ctx.guild.id)) is None:
-                enabled = False
-        else:
+        if enabled is not None:
             await db.set_guild_rr_kick(ctx.guild.id, enabled)
-            db.get_guild_rr_kick.invalidate(db, ctx.guild.id)
+        elif (enabled := await db.get_guild_prefix(ctx.guild.id)) is None:
+            enabled = False
 
         embed.title = f"{ctx._('title')}: {'✅' if enabled else '❌'}"
         await ctx.send(embed=embed)
