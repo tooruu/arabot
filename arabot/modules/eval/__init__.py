@@ -1,5 +1,7 @@
 import asyncio
+import datetime
 import logging
+import os
 from functools import partial
 from io import StringIO
 from typing import Any
@@ -33,22 +35,30 @@ class Eval(Cog, category=Category.GENERAL):
 
         if await ctx.ara.is_owner(ctx.author):
             local_eval_env = dict(
+                # Context vars
+                ara=ctx.bot,
+                bot=ctx.bot,
+                channel=ctx.channel,
                 ctx=ctx,
+                db=ctx.ara.db,
+                guild=ctx.guild,
+                me=ctx.author,
                 message=ctx.message,
                 msg=ctx.message,
-                me=ctx.author,
-                guild=ctx.guild,
-                channel=ctx.channel,
-                bot=ctx.bot,
-                ara=ctx.bot,
-                db=ctx.ara.db,
-                disnake=disnake,
-                discord=disnake,
+                server=ctx.guild,
+                # Disnake SDK
                 commands=commands,
-                utils=disnake.utils,
-                Embed=disnake.Embed,
+                discord=disnake,
+                disnake=disnake,
                 E=disnake.Embed,
-                sleep=asyncio.sleep,
+                Embed=disnake.Embed,
+                utils=disnake.utils,
+                # Standard library
+                aio=asyncio,
+                date=datetime.date,
+                datetime=datetime.datetime,
+                os=os,
+                time=datetime.time,
             )
             evaluator = LocalEval(env=local_eval_env, stdin=StringIO(inputlines))
             result.set_footer(
