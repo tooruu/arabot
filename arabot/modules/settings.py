@@ -47,7 +47,7 @@ class Settings(Cog, category=Category.SETTINGS):
 
         if enabled is not None:
             await db.set_guild_rr_kick(ctx.guild.id, enabled)
-        elif (enabled := await db.get_guild_prefix(ctx.guild.id)) is None:
+        elif (enabled := await db.get_guild_rr_kick(ctx.guild.id)) is None:
             enabled = False
 
         embed.title = f"{ctx._('title')}: {'✅' if enabled else '❌'}"
