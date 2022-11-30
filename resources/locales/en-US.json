@@ -4,7 +4,7 @@
     "arabot.core.bot.on_command_error.invalid_argument": "Invalid argument",
     "arabot.core.bot.on_command_error.today_quota_exceeded": "Sorry, I've exceeded today's quota for {}",
     "arabot.core.bot.on_command_error.unknown_error": "An error occurred",
-    "arabot.modules.chat.uncry": "don't cry",
+    "arabot.modules.chat.cry.uncry": "don't cry",
     "arabot.modules.chat.who.ur_mom": "ur mom",
     "arabot.modules.eval.python.connection_error": "Connection error ⚠️",
     "arabot.modules.eval.python.exit_code": "Exit code",
