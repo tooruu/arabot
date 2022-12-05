@@ -1,0 +1,6 @@
+[build]
+builder = "heroku"
+
+[deploy]
+startCommand = "python -OOm arabot"
+restartPolicyType = "never"
