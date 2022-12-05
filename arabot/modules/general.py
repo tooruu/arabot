@@ -166,7 +166,8 @@ class General(Cog, category=Category.GENERAL):
 
     @commands.command(brief="Make Ara say something", extras={"note": "Cannot ping roles"})
     async def say(self, ctx: Context, *, text):
-        await ctx.message.delete()
+        if ctx.channel.permissions_for(ctx.me).manage_messages:
+            await ctx.message.delete()
         await ctx.send(text, allowed_mentions=disnake.AllowedMentions(users=True))
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
