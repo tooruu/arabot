@@ -25,6 +25,8 @@ HTTP_CATS_VALID_CODES = {
     500, 501, 502, 503, 504, 506, 507, 508, 509, 510, 511, 521, 523, 525, 599,
 }
 
+WEBHOOK_RESERVED_NAMES = {"everyone": "everyоne", "here": "hеrе"}
+
 
 class General(Cog, category=Category.GENERAL):
     NOT_ENOUGH_OPTIONS = f"{__module__}.not_enough_options"
@@ -247,7 +249,7 @@ class General(Cog, category=Category.GENERAL):
         webhook = await ctx.channel.create_webhook(name=user, avatar=user.display_avatar)
         await webhook.send(
             text,
-            username=user.display_name,
+            username=WEBHOOK_RESERVED_NAMES.get(user.display_name, user.display_name),
             allowed_mentions=disnake.AllowedMentions(users=True),
         )
         await webhook.delete()
