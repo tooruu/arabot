@@ -82,7 +82,7 @@ class General(Cog, category=Category.GENERAL):
         try:
             await ref_msg.add_reaction(emoji)
         except disnake.Forbidden:
-            await ctx.reply_ping_(ctx._("cant_add_reactions_to").format(ref_msg.author.mention))
+            await ctx.reply_ping_(ctx._("cant_react_to", False).format(ref_msg.author.mention))
 
     @commands.cooldown(1, 60, commands.BucketType.member)
     @commands.command(brief="DM user to summon them", usage="<member> [text]")
