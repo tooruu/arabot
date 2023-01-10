@@ -265,7 +265,8 @@ class Fun(Cog, category=Category.FUN):
         resp = await self.session.fetch_json(
             "https://www.thiswebsitewillselfdestruct.com/api/get_letter"
         )
-        letter = resp["body"].removeprefix("Dear Website,").replace("\r", "").strip()
+        letter: str = resp["body"]
+        letter = letter.removeprefix("Dear Website").removeprefix(",").replace("\r", "").strip()
         if len(letter) > 2000:
             letter = f"{letter[:1997]}..."
         await ctx.send(letter)
