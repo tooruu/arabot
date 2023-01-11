@@ -145,7 +145,9 @@ class Fun(Cog, category=Category.FUN):
         else:
             await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED))
 
-    @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
+    @commands.command(
+        aliases=["whom", "whose", "who's", "who’s", "whos"], brief="Shows a random person"
+    )
     async def who(self, ctx: Context):
         if isinstance(channel := ctx.channel, disnake.Thread):
             if len(members := await channel.fetch_members()) <= 1:
