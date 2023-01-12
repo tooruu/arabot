@@ -270,7 +270,10 @@ class Fun(Cog, category=Category.FUN):
             "https://www.thiswebsitewillselfdestruct.com/api/get_letter"
         )
         letter = re.sub(
-            r"^Dear\s*Website\s*,?\s*|\r|\s+$", "", html.unescape(resp["body"]), flags=re.IGNORECASE
+            r"^Dear\s*Website\s*[,.]*\s*|\r|\s+$",
+            "",
+            html.unescape(resp["body"]),
+            flags=re.IGNORECASE,
         )
         if len(letter) > 2000:
             letter = f"{letter[:1997]}..."
