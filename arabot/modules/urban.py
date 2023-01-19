@@ -43,6 +43,7 @@ class Urban(Cog, category=Category.LOOKUP):
             "worse",
             "tho",
             "mine",
+            "stopp",
         )
     )
 
