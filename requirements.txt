@@ -6,5 +6,5 @@ numpy
 git+https://github.com/rexor12/gacha.py.git
 python-dotenv
 tzdata
-async-lru
+async-lru~=1.0.0
 waifu-py
