@@ -8,7 +8,7 @@ def ulong_to_long(uint64: int) -> int:
 
 
 class AraDB(Prisma):
-    @alru_cache(cache_exceptions=False)
+    @alru_cache
     async def get_guild_prefix(self, guild_id: int) -> str | None:
         guild = {"guild_id": ulong_to_long(guild_id)}
         return row.prefix if (row := await self.prefix.find_unique(guild)) else None
@@ -22,9 +22,9 @@ class AraDB(Prisma):
                 "update": {"prefix": prefix},
             },
         )
-        self.get_guild_prefix.invalidate(self, guild_id)
+        self.get_guild_prefix.cache_invalidate(guild_id)
 
-    @alru_cache(cache_exceptions=False)
+    @alru_cache
     async def get_guild_rr_kick(self, guild_id: int) -> bool | None:
         guild = {"guild_id": ulong_to_long(guild_id)}
         return row.kick_enabled if (row := await self.rrkick.find_unique(guild)) else None
@@ -38,4 +38,4 @@ class AraDB(Prisma):
                 "update": {"kick_enabled": enable},
             },
         )
-        self.get_guild_rr_kick.invalidate(self, guild_id)
+        self.get_guild_rr_kick.cache_invalidate(guild_id)

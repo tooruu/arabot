@@ -95,7 +95,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         )
         return b64decode(data["audioContent"])
 
-    @alru_cache(cache_exceptions=False)
+    @alru_cache
     async def voices(self, language_code: str | None = None) -> list[dict]:
         data: dict[str, list[dict]] = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/voices",
