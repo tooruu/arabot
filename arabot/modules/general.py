@@ -188,6 +188,7 @@ class General(Cog, category=Category.GENERAL):
         pick = random.choice(options).strip()
         await ctx.reply(ctx._("i_pick").format(pick))
 
+    @commands.bot_has_permissions(add_reactions=True)
     @commands.command(
         aliases=["vote", "survey"],
         brief="Create a poll",
