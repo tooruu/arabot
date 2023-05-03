@@ -1,4 +1,6 @@
+import html
 import random
+import re
 from asyncio import sleep
 from contextlib import suppress
 from io import BytesIO
@@ -11,13 +13,12 @@ from numpy.random import default_rng
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
 from arabot.utils import AnyMember
 
-ADDING_REACTIONS = "Adding reactions"
-NO_REACTION_PERMS = "I don't have permission to add reactions"
-REACTIONS_ADDED = "Reactions added"
-NO_GUILD_MEMBERS_INTENT = "I lack `GUILD_MEMBERS` Priviliged Intent to run this command"
-
 
 class Fun(Cog, category=Category.FUN):
+    ADDING_REACTIONS = f"{__module__}.adding_reactions"
+    MESSAGE_DELETED = f"{__module__}.message_deleted"
+    REACTIONS_ADDED = f"{__module__}.reactions_added"
+
     def __init__(self, session: ClientSession):
         self.session = session
 
@@ -37,7 +38,7 @@ class Fun(Cog, category=Category.FUN):
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who asked?", usage="[message or reply]", hidden=True)
     async def wa(self, ctx: Context, message: disnake.Message = None):
-        with suppress(disnake.Forbidden):
+        with suppress(disnake.Forbidden, disnake.NotFound):
             await ctx.message.delete()
             if not message and not (message := await ctx.getch_reference_message()):
                 async for message in ctx.history(limit=4):
@@ -50,19 +51,23 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="Who asked?")
     async def whoasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
+        await inter.response.send_message(inter._(Fun.ADDING_REACTIONS, False), ephemeral=True)
         try:
             for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(NO_REACTION_PERMS)
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
+        except disnake.NotFound:
+            await inter.edit_original_response(inter._(Fun.MESSAGE_DELETED, False))
         else:
-            await inter.edit_original_message(REACTIONS_ADDED)
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I asked!", usage="[message or reply]", hidden=True)
     async def ia(self, ctx: Context, message: disnake.Message = None):
-        with suppress(disnake.Forbidden):
+        with suppress(disnake.Forbidden, disnake.NotFound):
             await ctx.message.delete()
             if not message and not (message := await ctx.getch_reference_message()):
                 async for message in ctx.history(limit=4):
@@ -75,14 +80,18 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="I asked!")
     async def iasked(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
+        await inter.response.send_message(inter._(Fun.ADDING_REACTIONS, False), ephemeral=True)
         try:
             for i in "🇮", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(NO_REACTION_PERMS)
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
+        except disnake.NotFound:
+            await inter.edit_original_response(inter._(Fun.MESSAGE_DELETED, False))
         else:
-            await inter.edit_original_message(REACTIONS_ADDED)
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="Who cares?", usage="[message or reply]", hidden=True)
@@ -100,14 +109,16 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="Who cares?")
     async def whocares(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
+        await inter.response.send_message(inter._(Fun.ADDING_REACTIONS, False), ephemeral=True)
         try:
             for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(NO_REACTION_PERMS)
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
         else:
-            await inter.edit_original_message(REACTIONS_ADDED)
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
     @commands.cooldown(1, 10, commands.BucketType.channel)
     @commands.command(brief="I care!", usage="[message or reply]", hidden=True)
@@ -125,25 +136,29 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.message_command(name="I care!")
     async def icare(self, inter: disnake.ApplicationCommandInteraction, msg: disnake.Message):
-        await inter.response.send_message(ADDING_REACTIONS, ephemeral=True)
+        await inter.response.send_message(inter._(Fun.ADDING_REACTIONS, False), ephemeral=True)
         try:
             for i in "🇮", "🇨", "🇦", "🇷", "🇪", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_message(NO_REACTION_PERMS)
+            await inter.edit_original_response(
+                inter._("no_perms_to", False).format("add reactions")
+            )
         else:
-            await inter.edit_original_message(REACTIONS_ADDED)
+            await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED))
 
-    @commands.command(aliases=["whom", "whose", "who's", "whos"], brief="Pings random person")
+    @commands.command(
+        aliases=["whom", "whose", "who's", "who’s", "whos"], brief="Shows a random person"
+    )
     async def who(self, ctx: Context):
         if isinstance(channel := ctx.channel, disnake.Thread):
             if len(members := await channel.fetch_members()) <= 1:
-                await ctx.send(NO_GUILD_MEMBERS_INTENT)
+                await ctx.send(ctx._("no_priviliged_intent", False).format("GUILD_MEMBERS"))
                 return
             member = ctx.guild.get_member(random.choice(members).id)
         else:
             if len(members := channel.members) <= 1:
-                await ctx.send(NO_GUILD_MEMBERS_INTENT)
+                await ctx.send(ctx._("no_priviliged_intent", False).format("GUILD_MEMBERS"))
                 return
             member = random.choice(channel.members)
 
@@ -153,13 +168,13 @@ class Fun(Cog, category=Category.FUN):
         aliases=["gp"],
         brief="Secretly ping a person",
         hidden=True,
-        extras={"note": "This is a bug that only works on PC"},
+        extras={"note": "This is a Discord bug that may be fixed in the future"},
     )
     async def ghostping(self, ctx: Context, member: AnyMember, *, text):
         await ctx.message.delete()
         if not member:
             return
-        invis_bug = "||\u200b||" * 198 + "_ _"
+        invis_bug = "||\u200b||" * 250
         if len(message := text + invis_bug + member.mention) <= 2000:
             await ctx.send(message, allowed_mentions=disnake.AllowedMentions(users=True))
 
@@ -169,24 +184,24 @@ class Fun(Cog, category=Category.FUN):
     async def rename(self, ctx: Context, member: AnyMember, *, nick: str | None = None):
         if not member:
             ctx.reset_cooldown()
-            await ctx.send("User not found")
+            await ctx.send_("user_not_found", False)
             return
         if nick and len(nick) > 32:
             ctx.reset_cooldown()
-            await ctx.send("Nickname cannot exceed 32 characters")
+            await ctx.send_("too_long")
             return
         if member == ctx.author:
             ctx.reset_cooldown()
         elif ctx.author.top_perm_role < member.top_perm_role:
             ctx.reset_cooldown()
-            await ctx.send("Cannot rename users ranked higher than you")
+            await ctx.send_("rank_too_low")
             return
 
         try:
             await member.edit(nick=nick)
         except disnake.Forbidden:
             ctx.reset_cooldown()
-            await ctx.send("I don't have permission to rename this user")
+            await ctx.send(ctx._("no_perms_to", False).format("rename this user"))
             return
 
         await ctx.tick()
@@ -195,19 +210,19 @@ class Fun(Cog, category=Category.FUN):
     @commands.command(aliases=["x"], brief="Doubt someone", usage="[member or reply]")
     async def doubt(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("user_not_found", False)
             return
 
         if member:
             if member == ctx.author:
-                await ctx.send("Never doubt yourself!")
+                await ctx.send_("never_doubt_yourself")
                 return
 
             async for msg_x in ctx.history(limit=20):
                 if msg_x.author == member:
                     break
             else:
-                await ctx.reply("Message not found")
+                await ctx.reply_("message_not_found", False)
                 return
 
         elif not (msg_x := await ctx.getch_reference_message()):
@@ -215,37 +230,54 @@ class Fun(Cog, category=Category.FUN):
                 if history := await ctx.history(before=ctx.message, limit=1).flatten():
                     msg_x = history[0]
             if not msg_x:
-                await ctx.reply("Message not found")
+                await ctx.reply_("message_not_found", False)
                 return
 
         try:
             await msg_x.add_reaction(CustomEmoji.Doubt)
         except disnake.Forbidden:
-            await ctx.reply_ping(f"Cannot react to {msg_x.author.mention}'s messages")
+            await ctx.reply_ping(ctx._("cant_react_to", False).format(msg_x.author.mention))
             return
 
         await sleep(20)
         try:
             msg_x = await ctx.fetch_message(msg_x.id)
         except disnake.NotFound:
-            await ctx.reply(f"Message was deleted {CustomEmoji.TooruWeary}")
+            await ctx.reply(f"{ctx._('message_deleted')} {CustomEmoji.TooruWeary}")
             return
 
         if reaction := disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, msg_x.reactions):
-            await msg_x.reply(f"{reaction.count - 1} people have doubted {msg_x.author.mention}")
+            await msg_x.reply(
+                ctx._("people_doubted").format(reaction.count - 1, msg_x.author.mention)
+            )
         else:
-            await msg_x.reply("Someone cleared all doubts 👀")
+            await msg_x.reply(ctx._("doubts_cleared"))
 
     @commands.cooldown(1, 1800, commands.BucketType.member)
     @commands.command(brief="Find out someone's pp size", usage="[member]")
     async def pp(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
         size = round(default_rng().triangular(1, 15, 25))
         pp = f"3{'='*(size-1)}D"
-        await ctx.send(f"{member.mention}'s pp size is **{size} cm**\n{pp}")
+        await ctx.send(ctx._("pp").format(member.mention, size, pp))
+
+    @commands.command(brief="Send a random letter")
+    async def letter(self, ctx: Context):
+        resp = await self.session.fetch_json(
+            "https://www.thiswebsitewillselfdestruct.com/api/get_letter"
+        )
+        letter = re.sub(
+            r"^Dear\s*Website\s*[,.]*\s*|\r|\s+$",
+            "",
+            html.unescape(resp["body"]),
+            flags=re.IGNORECASE,
+        )
+        if len(letter) > 2000:
+            letter = f"{letter[:1997]}..."
+        await ctx.send(letter)
 
 
 def setup(ara: Ara):

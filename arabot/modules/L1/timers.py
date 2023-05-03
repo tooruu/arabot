@@ -23,21 +23,22 @@ class Timer:
 
     @property
     def next_phase(self) -> datetime:
-        cur_time = self.tznow()
-        cur_wkday = cur_time.isoweekday()
-        today = cur_time.date()
-        wkdays = list(self.sched.keys())
-        times = list(self.sched.values())
-        if cur_wkday in wkdays:
-            for tup in self.sched[cur_wkday]:
-                if cur_time.timetz() < tup[0]:
-                    return datetime.combine(today, tup[0])
-        for w in wkdays:
-            if cur_wkday < w:
-                next_wkday_date = today + timedelta(days=w - cur_wkday)
-                return datetime.combine(next_wkday_date, self.sched[w][0][0])
-        first_wkday_date = today + timedelta(days=(wkdays[0] - cur_wkday) % 7)
-        return datetime.combine(first_wkday_date, times[0][0][0])
+        cur_datetime = self.tznow()
+        cur_weekday = cur_datetime.isoweekday()
+        cur_date = cur_datetime.date()
+        event_weekdays = list(self.sched.keys())
+        if cur_weekday in event_weekdays:
+            cur_time = cur_datetime.timetz()
+            for event_time, _ in self.sched[cur_weekday]:
+                if cur_time < event_time:
+                    return datetime.combine(cur_date, event_time)
+        for event_weekday in event_weekdays:
+            if cur_weekday < event_weekday:
+                next_weekday_date = cur_date + timedelta(days=event_weekday - cur_weekday)
+                return datetime.combine(next_weekday_date, self.sched[event_weekday][0][0])
+        first_event_date = cur_date + timedelta(days=(event_weekdays[0] - cur_weekday) % 7 or 7)
+        first_event_time = next(iter(self.sched.values()))[0][0]
+        return datetime.combine(first_event_date, first_event_time)
 
     @property
     def till_next_phase(self) -> timedelta:
@@ -71,15 +72,9 @@ timers: dict[int, tuple[str, Timer]] = {
         Timer(
             {
                 1: [(time(hour=15), "Preparing")],
-                3: [
-                    (time(hour=22), "Ongoing"),
-                    (time(hour=22, minute=30), "Finalizing"),
-                ],
+                3: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
                 5: [(time(hour=15), "Preparing")],
-                7: [
-                    (time(hour=22), "Ongoing"),
-                    (time(hour=22, minute=30), "Finalizing"),
-                ],
+                7: [(time(hour=22), "Ongoing"), (time(hour=22, minute=30), "Finalizing")],
             },
             MHYEUTZ,
         ),
@@ -94,11 +89,12 @@ timers: dict[int, tuple[str, Timer]] = {
             MHYEUTZ,
         ),
     ),
-    940719703825993738: ("Bosses🥵{1}", Timer({1: [(time(hour=4), None)]}, MHYEUTZ)),
-    904642451887783956: (
-        "HoYoLAB🌟{1}",
-        Timer({w: [(time(), None)] for w in range(1, 8)}, HYLTZ),
+    1036564782091866193: (
+        "ER🔮{} {}",
+        Timer({1: [(time(hour=4), "Open"), (time(hour=10), "Closed")]}, MHYEUTZ),
     ),
+    940719703825993738: ("Bosses🥵{1}", Timer({1: [(time(hour=4), None)]}, MHYEUTZ)),
+    904642451887783956: ("HoYoLAB🌟{1}", Timer({w: [(time(), None)] for w in range(1, 8)}, HYLTZ)),
     779019769755861004: (
         "Waifus reset💖{1}",
         Timer({w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}),

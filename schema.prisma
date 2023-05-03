@@ -9,6 +9,11 @@ generator client {
 }
 
 model Prefix {
-  guild_id String @id @map("_id")
+  guild_id BigInt @id @map("_id")
   prefix   String
+}
+
+model RrKick {
+  guild_id     BigInt  @id @map("_id")
+  kick_enabled Boolean
 }

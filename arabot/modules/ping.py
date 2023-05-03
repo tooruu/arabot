@@ -1,4 +1,5 @@
 from collections import deque
+from collections.abc import Callable
 from io import BytesIO
 
 from disnake import File
@@ -26,11 +27,11 @@ class Ping(Cog, category=Category.META):
 
     @command(brief="View Discord server's connectivity")
     async def ping(self, ctx: Context):
-        self.plot_graph()
+        self.plot_graph(ctx._)
         image = self.plt_to_file()
-        await ctx.send(f"🏓 Pong - {ctx.ara.latency * 1000:.0f}ms", file=image)
+        await ctx.send(ctx._("pong").format(f"{ctx.ara.latency * 1000:.0f}"), file=image)
 
-    def plot_graph(self):
+    def plot_graph(self, _: Callable[[str], str]):
         y_padding = 5
         x, y = range(self.log.maxlen), self.log
         ax = plt.subplots(figsize=(3, 1))[1]
@@ -38,8 +39,8 @@ class Ping(Cog, category=Category.META):
         plt.subplots_adjust(bottom=0.2, right=0.97)
         plt.tick_params(axis="x", direction="in", labelbottom=False)
         plt.tick_params(labelsize=4, length=3, width=0.5, pad=0.3)
-        plt.ylabel("Ping (ms)", fontsize=7)
-        plt.xlabel("The last hour", fontsize=8)
+        plt.ylabel(_("y_label"), fontsize=7)
+        plt.xlabel(_("x_label"), fontsize=8)
         ax.set_xlim(x[0], x[-1])
         ax.set_ylim(min(set(y) - {0} or [y_padding]) - y_padding, max(y) + y_padding)
         ax.get_yaxis().set_major_locator(MaxNLocator(integer=True, nbins=5))

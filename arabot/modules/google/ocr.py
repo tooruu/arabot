@@ -57,7 +57,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
 
     async def handle_annotation(self, ctx: Context, image_url: str | None) -> str:
         if not image_url and not (image_url := await ctx.rsearch("image_url")):
-            await ctx.send("No image or link provided")
+            await ctx.send_("no_image_or_link_provided")
             raise StopCommand()
 
         try:
@@ -66,18 +66,18 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
             async with ctx.ara.session.get(image_url) as resp:
                 if not resp.ok:
                     logging.warning("OCR: Couldn't download image %s", image_url)
-                    await ctx.reply("Couldn't read image")
+                    await ctx.reply_("couldnt_read_image")
                     raise StopCommand() from None
                 image_data = await resp.read()
             try:
                 text = await self.annotate(image_data)
             except OCRException:
                 logging.warning("OCR: Image failed %s", image_url)
-                await ctx.reply("Couldn't read image")
+                await ctx.reply_("couldnt_read_image")
                 raise StopCommand() from None
 
         if not text:
-            await ctx.reply("No text found")
+            await ctx.reply_("no_text")
             raise StopCommand()
 
         return text

@@ -1,3 +1,4 @@
+import random
 import re
 from asyncio import sleep
 
@@ -7,15 +8,48 @@ from disnake.ext import commands
 from arabot.core import Ara, Cog, CustomEmoji, pfxless
 from arabot.utils import is_in_guild
 
+GULAG = (
+    (
+        """
+bbbbbbbbbbbbbbb
+bbbbbbbbcbbbbbb
+bbbbbccbccbbbbb
+bbbbcccbbccbbbb
+bbbccccbbbccbbb
+bccccccbbbbccbb
+bbccbcccbbbcccb
+
+bbbbbbcccbbbccb
+bbbbbbbcccbcccb
+bbbbcbbbcccccbb
+bbbcccbbbcccbbb
+bcccbccccccccbb
+bccbbbcccbbccbb
+bbbbbbbbbbbbbbb
+"""
+    )
+    .replace("b", "🅱️")
+    .replace("c", CustomEmoji.CommuThink)
+    .split("\n\n")
+)
+BAD_GAMES = re.compile(
+    r"\b(кс|cs|мм|mm|ра[фс]т|r(af|us)t|фортнайт|fortnite|осу|osu|дест[еи]ни|destiny)\b",
+    re.IGNORECASE,
+)
+AT_SOMEONE = re.compile(r"@some(?:one|body)", re.IGNORECASE)
+
 
 class Chat(Cog):
     def __init__(self, ara: Ara):
         self.ara = ara
+        self._ = lambda key, msg, scope_depth=1: ara.i18n.getl(
+            key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0)
+        )
 
     @commands.check(lambda msg: len(msg.content) < 15)
     @pfxless(chance=0.5)
     async def who(self, msg: disnake.Message):
-        await msg.channel.send("ur mom")
+        await msg.channel.send(self._("ur_mom", msg))
 
     @commands.check(lambda msg: len(msg.content) < 20)
     @pfxless(regex=r"^([ıi](['’]?m|\sam)\s)+((an?|the)\s)?\w+$", chance=0.5)
@@ -24,8 +58,8 @@ class Chat(Cog):
         await msg.channel.send(f"hi {regex[1]}")
 
     @pfxless(regex=";-;")
-    async def cry(self, msg):
-        await msg.reply(f"don't cry {CustomEmoji.KannaPat}")
+    async def cry(self, msg: disnake.Message):
+        await msg.reply(self._("uncry", msg) + f" {CustomEmoji.KannaPat}")
 
     @commands.cooldown(1, 60, commands.BucketType.channel)
     @pfxless()
@@ -44,18 +78,15 @@ class Chat(Cog):
             msgs.append(await msg.channel.send("Toki wa ugoki dasu"))
             await sleep(1)
             await msg.channel.delete_messages(msgs)
+        except disnake.Forbidden:
+            return
         finally:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=old_perms)
-
-    BAD_GAMES = re.compile(
-        r"\b(кс|cs|мм|mm|ра[фс]т|r(af|us)t|фортнайт|fortnite|осу|osu|дест[еи]ни|destiny)\b",
-        re.IGNORECASE,
-    )
 
     @is_in_guild(433298614564159488)
     @pfxless(regex=BAD_GAMES)
     async def badgames(self, msg: disnake.Message):
-        game_name = self.BAD_GAMES.search(msg.content)[0]
+        game_name = BAD_GAMES.search(msg.content)[0]
         message = f"{game_name}? ебать ты гей 🤡"
         try:
             await msg.author.timeout(duration=20, reason="геюга ебаная")
@@ -68,26 +99,27 @@ class Chat(Cog):
     @commands.cooldown(1, 60, commands.BucketType.channel)
     @pfxless(regex=r"\b(communis[mt]|gulag)\b")
     async def communism(self, msg: disnake.Message):
-        gulag = """
-bbbbbbbbbbbbbbb
-bbbbbbbbcbbbbbb
-bbbbbccbccbbbbb
-bbbbcccbbccbbbb
-bbbccccbbbccbbb
-bccccccbbbbccbb
-bbccbcccbbbcccb
-
-bbbbbbcccbbbccb
-bbbbbbbcccbcccb
-bbbbcbbbcccccbb
-bbbcccbbbcccbbb
-bcccbccccccccbb
-bccbbbcccbbccbb
-bbbbbbbbbbbbbbb
-"""
-        for camp in gulag.split("\n\n"):
-            camp = camp.replace("b", "🅱️").replace("c", CustomEmoji.CommuThink)
+        for camp in GULAG:
             await msg.channel.send(camp)
+
+    @pfxless(regex=AT_SOMEONE, plain_text_only=False)
+    async def somebody(self, msg: disnake.Message):
+        if (
+            isinstance(msg.channel, disnake.Thread)
+            or len(msg.channel.members) <= 1
+            or not msg.channel.permissions_for(msg.guild.me).manage_webhooks
+        ):
+            return
+
+        await msg.delete()
+        someone = random.choice(msg.channel.members)
+        sender = await msg.channel.create_webhook(name=msg.author, avatar=msg.author.display_avatar)
+        await sender.send(
+            AT_SOMEONE.sub(someone.mention, msg.content),
+            username=msg.author.display_name,
+            allowed_mentions=disnake.AllowedMentions(users=True),
+        )
+        await sender.delete()
 
 
 def setup(ara: Ara):

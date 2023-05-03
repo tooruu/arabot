@@ -1,13 +1,8 @@
-disnake[voice]~=2.5.0
+disnake[voice,speed]~=2.8.0
 prisma
-# Speedups
-aiodns
-Brotli
-orjson
-
-# Libraries
 jikanpy
 matplotlib
+numpy
 git+https://github.com/rexor12/gacha.py.git
 python-dotenv
 tzdata

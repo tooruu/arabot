@@ -26,16 +26,16 @@ class Userinfo(Cog, category=Category.GENERAL):
     @commands.command(aliases=["a", "pfp"], brief="Show user's avatar", usage="[member]")
     async def avatar(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
         avatars = (
             disnake.Embed()
             .set_image(url=(member.avatar or member.default_avatar).compat)
-            .set_footer(text=f"{member.display_name}'s global avatar"),
+            .set_footer(text=ctx._("global_avatar").format(member.display_name)),
             disnake.Embed()
             .set_image(url=member.display_avatar.compat)
-            .set_footer(text=f"{member.display_name}'s server avatar"),
+            .set_footer(text=ctx._("guild_avatar").format(member.display_name)),
         )
 
         if not member.guild_avatar:
@@ -52,17 +52,17 @@ class Userinfo(Cog, category=Category.GENERAL):
     )
     async def banner(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
         banner = (await ctx.ara.fetch_user(member.id)).banner
         if not banner:
-            await ctx.send("User has no banner")
+            await ctx.send_("no_banner")
             return
         await ctx.send(
             embed=disnake.Embed()
             .set_image(url=banner.maxres.compat)
-            .set_footer(text=f"{member.display_name}'s banner")
+            .set_footer(text=ctx._("their_banner", False).format(member.display_name))
         )
 
     @commands.command(
@@ -70,7 +70,7 @@ class Userinfo(Cog, category=Category.GENERAL):
     )
     async def userinfo(self, ctx: Context, *, member: AnyMemberOrUser = False):
         if member is None:
-            await ctx.send("User not found")
+            await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
         embed = (
@@ -85,37 +85,37 @@ class Userinfo(Cog, category=Category.GENERAL):
                 url=f"https://discord.com/users/{member.id}",
             )
             .set_thumbnail(url=(member.avatar or member.default_avatar).compat)
-            .add_field("Created on", format_dt(member.created_at, "D"))
+            .add_field(ctx._("created_on"), format_dt(member.created_at, "D"))
         )
         description = defaultdict(list)
         if member.bot:
-            description[0].append("Bot")
+            description[0].append(ctx._("bot", False))
         if member.public_flags.spammer:
-            description[0].append("**Marked as spammer**")
+            description[0].append(f"**{ctx._('spammer')}**")
 
         if isinstance(member, disnake.Member):
             embed.set_footer(
                 text=member.guild.name,
-                icon_url=ctx.guild.icon.as_icon.compat if ctx.guild.icon else disnake.Embed.Empty,
+                icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
             )
             if member.guild_avatar:
-                description[1].append(f"[Server avatar]({member.guild_avatar})")
+                description[1].append(f"[{ctx._('guild_avatar')}]({member.guild_avatar})")
             if member.pending:
-                description[0].append("Pending verification")
+                description[0].append(ctx._("pending"))
 
             if member.joined_at:
-                embed.add_field("Joined on", format_dt(member.joined_at, "D"))
+                embed.add_field(ctx._("joined_on"), format_dt(member.joined_at, "D"))
             if member.nick:
-                embed.add_field("Nickname", member.nick)
+                embed.add_field(ctx._("nickname", False), member.nick)
             if member.activity:
-                embed.add_field("Activity", member.activity.name)
+                embed.add_field(ctx._("discord_activity", False), member.activity.name)
             if member.premium_since:
-                embed.add_field("Boosting since", format_dt(member.premium_since, "R"))
+                embed.add_field(ctx._("boosting_since"), format_dt(member.premium_since, "R"))
             if member.current_timeout:
-                embed.add_field("Muted until", format_dt(member.current_timeout, "D"))
+                embed.add_field(ctx._("muted_until"), format_dt(member.current_timeout, "D"))
             elif member.voice and member.voice.channel:
-                embed.add_field("Talking in", member.voice.channel.mention)
-            embed.add_field("Highest non-dummy role", member.top_perm_role.mention)
+                embed.add_field(ctx._("talking_in"), member.voice.channel.mention)
+            embed.add_field(ctx._("top_perm_role"), member.top_perm_role.mention)
             member = await ctx.ara.fetch_user(member.id)  # `Member.banner` is always None
         elif not member.accent_color:  # Very unrealiable check if `User` is retrieved from cache
             member = await ctx.ara.fetch_user(member.id)  # Fetching as `User.banner` is not cached

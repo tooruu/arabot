@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from glob import glob
 from itertools import groupby
 from os import getenv
@@ -20,7 +21,10 @@ class EmbedHelpCommand(commands.HelpCommand):
         bot: commands.Bot = ctx.bot
         self.embed = (
             disnake.Embed(timestamp=utcnow())
-            .set_author(name=f"{bot.name} Help Menu", icon_url=ctx.me.display_avatar.as_icon.compat)
+            .set_author(
+                name=ctx._("help_menu").format(bot.name),
+                icon_url=ctx.me.display_avatar.as_icon.compat,
+            )
             .set_footer(text=f"{bot.name} v{arabot.__version__}")
         )
 
@@ -28,9 +32,10 @@ class EmbedHelpCommand(commands.HelpCommand):
         self, mapping: dict[commands.Cog | None, list[commands.Command]]
     ) -> None:
         bot: Ara = self.context.bot
+        _: Callable[[str], str | None] = self.context._
 
         help_command_repr = self.context.clean_prefix + self.invoked_with
-        self.embed.description = f"Use `{help_command_repr} [command]` for more info on a command"
+        self.embed.description = _("embed_description").format(help_command_repr)
         self.embed.set_thumbnail(url=bot.user.avatar.compat)
 
         get_category = self.get_command_category
@@ -46,7 +51,9 @@ class EmbedHelpCommand(commands.HelpCommand):
                 if len(commands_field + command_repr) > 1024:
                     break
                 commands_field += f"{command_repr} "
-            self.embed.add_field(bold(category), commands_field[:-1] or "No commands")
+            self.embed.add_field(
+                bold(_(category.name.lower())), commands_field[:-1] or _("no_commands")
+            )
         await self.get_destination().send(embed=self.embed)
 
     async def send_command_help(self, command: commands.Command) -> None:
@@ -54,23 +61,25 @@ class EmbedHelpCommand(commands.HelpCommand):
         await self.get_destination().send(embed=self.embed)
 
     async def send_group_help(self, group: commands.Group) -> None:
+        _ = self.context._
         self.fill_command_data(group)
         if subcmds := await self.filter_commands(group.commands, sort=True):
-            self.embed.add_field("Sub-commands", " ".join(mono(s.name) for s in subcmds))
+            self.embed.add_field(_("subcommands"), " ".join(mono(s.name) for s in subcmds))
         await self.get_destination().send(embed=self.embed)
 
     def fill_command_data(self, command: commands.Command) -> None:
+        _ = self.context._
         self.embed.title = mono(command.name)
         self.embed.description = command.help or command.description or command.short_doc
         if note := command.extras.get("note"):
-            self.embed.description += f"\n_Note: {note}_"
+            self.embed.description += f"\n_{_('note')}: {note}_"
         if warning := command.extras.get("warning"):
-            self.embed.description += f"\n_**Warning:** {warning}_"
+            self.embed.description += f"\n_**{_('warning')}:** {warning}_"
         if command.aliases:
-            self.embed.add_field("Aliases", " ".join(map(mono, sorted(command.aliases))))
+            self.embed.add_field(_("aliases"), " ".join(map(mono, sorted(command.aliases))))
         usage = f"{self.context.clean_prefix}{command} {command.signature}".rstrip()
         self.embed.add_field(
-            "Usage", mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
+            _("usage"), mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
         )
 
     def get_command_category(self, command: commands.Command) -> Category:
@@ -80,11 +89,11 @@ class EmbedHelpCommand(commands.HelpCommand):
             or Category.NO_CATEGORY
         )
 
-    @staticmethod
-    def get_usage_explanation(command: commands.Command) -> str:
+    def get_usage_explanation(self, command: commands.Command) -> str:
+        _ = self.context._
         explanation = ""
-        required = "\n`<>` - required"
-        optional = "\n`[]` - optional"
+        required = f"\n`<>` - {_('required')}"
+        optional = f"\n`[]` - {_('optional')}"
         if command.usage is not None:
             if "<" in command.usage:
                 explanation += required
@@ -97,9 +106,9 @@ class EmbedHelpCommand(commands.HelpCommand):
             if any(param.default is not param.empty for param in params):
                 explanation += optional
         if "=" in command.signature:
-            explanation += "\n`=` - default value"
+            explanation += f"\n`=` - {_('default')}"
         if "..." in command.signature:
-            explanation += "\n`...` - supports multiple arguments"
+            explanation += f"\n`...` - {_('variadic')}"
         return explanation
 
 
@@ -151,11 +160,10 @@ class Meta(Cog, category=Category.META):
     @commands.command(brief="Show bot's source code line count")
     async def lines(self, ctx: Context):
         if not self._line_count:
-            await ctx.send("Couldn't read files")
+            await ctx.send_("couldnt_read")
             return
         await ctx.send(
-            f"{ctx.ara.name} v{arabot.__version__} consists "
-            f"of **{self._line_count}** lines of Python code"
+            ctx._("consists_of").format(f"{ctx.ara.name} v{arabot.__version__}", self._line_count)
         )
 
     @commands.command(aliases=["github", "gh"], brief="Link bot's code repository")
@@ -164,18 +172,37 @@ class Meta(Cog, category=Category.META):
 
     @commands.command(name="invite", brief="Show server's invite link")
     async def server_invite_link(self, ctx: Context):
-        await ctx.send(await ctx.guild.get_unlimited_invite_link() or "Couldn't find invite link")
+        await ctx.send(await ctx.guild.get_unlimited_invite_link() or ctx._("not_found", False))
 
     @commands.command(name="arabot", brief="Show bot's invite link")  # TODO:dynamically change name
     async def ara_invite_link(self, ctx: Context):
         await ctx.ara.wait_until_ready()
         await ctx.send(
-            embed=disnake.Embed(title="Click to invite me", url=self.ara.invite_url).set_author(
+            embed=disnake.Embed(title=ctx._("click_here"), url=self.ara.invite_url).set_author(
                 name=ctx.ara.name,
                 icon_url=ctx.ara.user.display_avatar.as_icon.compat,
                 url=self.ara.invite_url,
             )
         )
+
+    @commands.cooldown(1, 86400, commands.BucketType.user)
+    @commands.command(brief="Report a bug")
+    async def bug(self, ctx: Context, *, description: str):
+        reporter = ctx.author
+        try:
+            await ctx.ara.owner.send(
+                embed=disnake.Embed(
+                    title="Bug report", description=description, timestamp=utcnow()
+                ).set_author(
+                    name=reporter,
+                    icon_url=reporter.avatar and reporter.avatar.as_icon.compat,
+                    url=f"https://discord.com/users/{reporter.id}",
+                )
+            )
+        except disnake.HTTPException:
+            await ctx.reply(ctx._("contact_directly").format(ctx.ara.owner))
+        else:
+            await ctx.tick()
 
     async def cog_load(self):
         await self.ara.wait_until_ready()

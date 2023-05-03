@@ -2,6 +2,7 @@ import functools
 import random
 import re
 from collections.abc import Awaitable, Callable
+from numbers import Number
 from typing import TypeVar
 
 from disnake import Message
@@ -39,14 +40,24 @@ def copy_dpy_attrs_from(donor):
 
 
 class pfxless:  # noqa: N801
-    def __init__(self, **attrs):
-        regex: str | re.Pattern[str] | None = attrs.get("regex")
-        re_flags: int | re.RegexFlag | None = attrs.get("re_flags")
-        self.enabled: bool = attrs.get("enabled", True)
-        self.chance: float = attrs.get("chance", 1.0)
-        self.allow_prefix: bool = attrs.get("allow_prefix", False)
-        self.allow_bots: bool = attrs.get("allow_bots", False)
-        self.plain_text_only: bool = attrs.get("plain_text_only", True)
+    pattern: str | re.Pattern[str]
+
+    def __init__(
+        self,
+        *,
+        regex: str | re.Pattern[str] | None = None,
+        re_flags: int | re.RegexFlag | None = None,
+        enabled: bool = True,
+        chance: Number = 1,  # percentage to trigger a response
+        allow_prefix: bool = False,  # allow messages starting with bot prefix
+        allow_bots: bool = False,  # allow bot message authors
+        plain_text_only: bool = True,  # excludes matches inside emojis, mentions, etc.
+    ):
+        self.enabled = enabled
+        self.chance = chance
+        self.allow_prefix = allow_prefix
+        self.allow_bots = allow_bots
+        self.plain_text_only = plain_text_only
 
         match regex:
             case str() | None:

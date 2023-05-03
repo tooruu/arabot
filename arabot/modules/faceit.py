@@ -18,14 +18,15 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
             f"https://open.faceit.com/data/v4/search/players?nickname={nickname}&limit=1"
         )
         if not players["items"]:
-            await ctx.send("Player not found")
+            await ctx.send_("player_not_found", False)
             return
         player = await self.session.fetch_json(
             "https://open.faceit.com/data/v4/players/" + players["items"][0]["player_id"]
         )
 
         steam_link = (
-            f"[Steam profile](https://www.steamcommunity.com/profiles/{player['steam_id_64']})"
+            f"[{ctx._('steam_profile', False)}]"
+            f"(https://www.steamcommunity.com/profiles/{player['steam_id_64']})"
         )
         country = player["country"].upper()
         friends = len(player["friends_ids"])
@@ -36,14 +37,14 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
         except (KeyError, ValueError):
             last_infraction = ""
         else:
-            last_infraction = " | Last infraction: " + last_infraction.strftime("%d %b %Y")
+            last_infraction = f" | {ctx._('last_infraction')}: {last_infraction:%d %b %Y}"
 
         embed = (
             Embed(
                 color=0xFF5500,
                 description=f"""{steam_link}
-Country: {country} | Friends: {friends}{last_infraction}
-FACEIT membership type: {player["membership_type"]}""",
+{ctx._('country', False)}: {country} | {ctx._('friends', False)}: {friends}{last_infraction}
+{ctx._('membership_type')}: {player["membership_type"]}""",
             )
             .set_author(name=player["nickname"], url=player["faceit_url"].format(lang="en"))
             .set_thumbnail(url=player["avatar"])
@@ -55,9 +56,9 @@ FACEIT membership type: {player["membership_type"]}""",
             elo = player["games"][game]["faceit_elo"]
             embed.add_field(
                 game.replace("_", " ").upper(),
-                f"Player name: {player_name}\n"
-                f"Region: {region}\n"
-                f"Skill level: {skill_level}\n"
+                f"{ctx._('player_name', False)}: {player_name}\n"
+                f"{ctx._('region', False)}: {region}\n"
+                f"{ctx._('skill_level')}: {skill_level}\n"
                 f"ELO: {elo}",
             )
         await ctx.send(embed=embed)

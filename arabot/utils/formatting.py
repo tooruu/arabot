@@ -1,6 +1,6 @@
 import re as _re
+from collections.abc import Iterable as _Iterable
 from typing import Any as _Any
-from typing import Iterable as _Iterable
 
 
 def bold(s: _Any) -> str:

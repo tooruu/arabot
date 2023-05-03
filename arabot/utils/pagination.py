@@ -1,8 +1,21 @@
+from enum import Flag, auto
+
 import disnake
 
 
+class ButtonFlag(Flag):
+    FIRST = auto()
+    PREV = auto()
+    NEXT = auto()
+    LAST = auto()
+    SHARE = auto()
+    DELETE = auto()
+
+
 class EmbedPaginator(disnake.ui.View):
-    message: disnake.Message | None = None
+    _DEFAULT_ENABLED_BUTTONS = ButtonFlag.PREV | ButtonFlag.NEXT | ButtonFlag.SHARE
+    _DEFAULT_SHARED_BUTTONS = ButtonFlag.FIRST | ButtonFlag.PREV | ButtonFlag.NEXT | ButtonFlag.LAST
+    _message: disnake.Message | None = None
 
     def __init__(
         self,
@@ -10,7 +23,9 @@ class EmbedPaginator(disnake.ui.View):
         *,
         page: int = 0,
         timeout: float | None = 180.0,
-        buttons: str = "pn",
+        shared: bool = False,
+        buttons: ButtonFlag = _DEFAULT_ENABLED_BUTTONS,
+        shared_buttons: ButtonFlag = _DEFAULT_SHARED_BUTTONS,
         author: disnake.abc.User | None = None,
     ):
         if not embeds:
@@ -21,76 +36,94 @@ class EmbedPaginator(disnake.ui.View):
         super().__init__(timeout=timeout)
 
         if len(embeds) == 1:
-            self.clear_items()
-            self.stop()
+            self.clear_items().stop()
             return
 
-        self.embeds = embeds
-        self.page = page
-        self.author = author
-        for p, embed in enumerate(self.embeds, 1):
-            embed.set_footer(text=f"Page {p} of {len(self.embeds)}")
+        button_map = {
+            ButtonFlag.FIRST: self.first_page,
+            ButtonFlag.PREV: self.prev_page,
+            ButtonFlag.NEXT: self.next_page,
+            ButtonFlag.LAST: self.last_page,
+            ButtonFlag.SHARE: self.share,
+            ButtonFlag.DELETE: self.delete,
+        }
 
-        for char, item in {
-            "f": self.first_page,
-            "p": self.prev_page,
-            "n": self.next_page,
-            "l": self.last_page,
-            "d": self.delete,
-        }.items():
-            if char not in buttons:
-                self.remove_item(item)
+        self._embeds = embeds
+        self._page = page
+        self._author = author
+        self._shared = shared
+        self._shared_button_ids = {button_map[b].custom_id for b in shared_buttons}
+
+        for p, embed in enumerate(self._embeds, 1):
+            embed.set_footer(text=f"Page {p}/{len(self._embeds)}")
+
+        for button_to_disable in ~buttons:
+            self.remove_item(button_map[button_to_disable])
+
+        if ButtonFlag.SHARE in buttons and not shared:
+            self._toggle_share()
+
+    def _toggle_share(self) -> None:
+        self._shared = not self._shared
+        if self._shared:
+            self.share.style = disnake.ButtonStyle.red
+            self.share.emoji = "🔒"
+        else:
+            self.share.style = disnake.ButtonStyle.green
+            self.share.emoji = "🔓"
+
+    async def _reflect_changes(self, interaction: disnake.MessageInteraction) -> None:
+        return await interaction.response.edit_message(embed=self._embeds[self._page], view=self)
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
-        if not self.message:
-            self.message = interaction.message
-        if self.author is None or interaction.author == self.author:
+        if not self._message:
+            self._message = interaction.message
+        if (
+            self._author in {None, interaction.author}
+            or not self._shared
+            and interaction.component.custom_id in self._shared_button_ids
+        ):
             return True
-        await interaction.response.send_message("You can't interact with this menu", ephemeral=True)
+        await interaction.response.send_message(
+            interaction._("interaction_not_allowed"), ephemeral=True
+        )
         return False
 
     async def on_timeout(self):
-        if self.message:
-            await self.message.edit(view=None)
+        if self._message:
+            await self._message.edit(view=None)
 
-    @disnake.ui.button(emoji="⏪", style=disnake.ButtonStyle.blurple)
+    @disnake.ui.button(emoji="⏪", style=disnake.ButtonStyle.blurple, custom_id=f"{__qualname__}.f")
     async def first_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
-        self.page = 0
-        self.first_page.disabled = True
-        self.prev_page.disabled = True
-        self.next_page.disabled = False
-        self.last_page.disabled = False
-        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
+        self._page = 0
+        await self._reflect_changes(interaction)
 
-    @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary)
+    @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.blurple, custom_id=f"{__qualname__}.p")
     async def prev_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
-        self.page -= 1
-        self.next_page.disabled = False
-        self.last_page.disabled = False
-        if self.page == 0:
-            self.first_page.disabled = True
-            self.prev_page.disabled = True
-        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
+        if self._page > 0:
+            self._page -= 1
+        else:
+            self._page = len(self._embeds) - 1
+        await self._reflect_changes(interaction)
 
-    @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.secondary)
+    @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.blurple, custom_id=f"{__qualname__}.n")
     async def next_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
-        self.page += 1
-        self.first_page.disabled = False
-        self.prev_page.disabled = False
-        if self.page == len(self.embeds) - 1:
-            self.next_page.disabled = True
-            self.last_page.disabled = True
-        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
+        if self._page < len(self._embeds) - 1:
+            self._page += 1
+        else:
+            self._page = 0
+        await self._reflect_changes(interaction)
 
-    @disnake.ui.button(emoji="⏩", style=disnake.ButtonStyle.blurple)
+    @disnake.ui.button(emoji="⏩", style=disnake.ButtonStyle.blurple, custom_id=f"{__qualname__}.l")
     async def last_page(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
-        self.page = len(self.embeds) - 1
-        self.first_page.disabled = False
-        self.prev_page.disabled = False
-        self.next_page.disabled = True
-        self.last_page.disabled = True
-        await interaction.response.edit_message(embed=self.embeds[self.page], view=self)
+        self._page = len(self._embeds) - 1
+        await self._reflect_changes(interaction)
 
-    @disnake.ui.button(emoji="❌", style=disnake.ButtonStyle.red)
+    @disnake.ui.button(emoji="🔒", style=disnake.ButtonStyle.red, custom_id=f"{__qualname__}.s")
+    async def share(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
+        self._toggle_share()
+        await self._reflect_changes(interaction)
+
+    @disnake.ui.button(emoji="❌", style=disnake.ButtonStyle.gray, custom_id=f"{__qualname__}.d")
     async def delete(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.on_timeout()

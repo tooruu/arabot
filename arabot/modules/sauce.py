@@ -62,10 +62,11 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
 
     @command(aliases=["source"], brief="Find source for an image", usage="<image or reply>")
     async def sauce(self, ctx: Context):
+        _ = ctx._
         await ctx.trigger_typing()
         image_url = await ctx.rsearch("image_url")
         if not image_url:
-            await ctx.send("No image or link provided")
+            await ctx.send_("no_image_or_link_provided")
             return
 
         nao_json = await self.session.fetch_json(
@@ -81,10 +82,10 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
         if nao_json["header"]["status"]:
             error = nao_json["header"].get("message")
             logging.error(f"Sauce failed for {image_url}" + (f"\n{error}" if error else ""))
-            await ctx.reply(f"Failed to fetch results.\n{error or ''}")
+            await ctx.reply(f"{_('fetch_failed')}\n{error or ''}")
             return
         if not nao_json["header"]["results_returned"]:
-            await ctx.reply("No results found")
+            await ctx.reply_("no_results", False)
             return
         data = nao_json["results"][0]["data"]
         header = nao_json["results"][0]["header"]
@@ -108,18 +109,18 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     )
                     embed.description = ""
                     if episode := data.get("part"):
-                        embed.description += f"Episode {episode}"
+                        embed.description += _("episode").format(episode)
                         if timecode := data.get("est_time"):
                             embed.description += f" - {timecode.lstrip('0:')}"
                         embed.description += "\n"
-                    embed.description += f"Similarity: {header['similarity']}%"
+                    embed.description += f"{_('similarity')}: {header['similarity']}%"
                     if mal_json:
-                        embed.description += f" | Score: {mal_json['score']}"
+                        embed.description += f" | {_('score')}: {mal_json['score']}"
                         synopsis = dsafe(mal_json["synopsis"].partition(" [")[0])
                         if len(synopsis) > (maxlen := 600):
                             synopsis = ".".join(synopsis[:maxlen].split(".")[:-1]) + "..."
                         embed.set_image(url=mal_json["image_url"])
-                        embed.add_field("Synopsis", synopsis)
+                        embed.add_field(_("synopsis"), synopsis)
                         embed.set_thumbnail(url=header["thumbnail"])
                     else:
                         embed.set_image(url=header["thumbnail"])
@@ -130,7 +131,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     embed.color = 0x0095F2
                     embed.title = data["title"]
                     embed.url = f"https://www.pixiv.net/artworks/{data['pixiv_id']}"
-                    embed.description = f"Similarity: {header['similarity']}%"
+                    embed.description = f"{_('similarity')}: {header['similarity']}%"
                     embed.set_author(
                         name=data["member_name"],
                         url=f"https://www.pixiv.net/users/{data['member_id']}",
@@ -155,15 +156,16 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     | _
                 ):
                     embed.color = 0x9E2720
-                    embed.url = data.get("ext_urls", [Embed.Empty])[0]
+                    embed.url = data.get("ext_urls", [None])[0]
                     embed.title = (
                         data.get("title")
                         or data.get("eng_name")
                         or data.get("source")
                         or data.get("jp_name")
-                        or ("Post" if embed.url else Embed.Empty)
+                        or embed.url
+                        and _("post")
                     )
-                    embed.description = f"Similarity: {header['similarity']}%"
+                    embed.description = f"{_('similarity')}: {header['similarity']}%"
                     match data.get("creator"):
                         # pylint: disable=used-before-assignment
                         case str() as c if c not in {"", "Unknown"}:
@@ -177,11 +179,9 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             logging.error("Sauce failed: %s", pformat(data))
             data["similarity"] = header["similarity"]
             raw_data = "\n".join(f"{k}: {v}" for k, v in data.items())
-            embed.description = (
-                "Couldn't parse result, dumping raw data:" f"```yaml\n{raw_data}\n```"
-            )
+            embed.description = f"{_('parse_error')}:```yaml\n{raw_data}\n```"
         embed.set_footer(
-            text="Powered by SauceNAO",
+            text=_("powered_by", False).format("SauceNAO"),
             icon_url="https://i.imgur.com/Ynoqpam_d.png",
         )
         await ctx.reply(embed=embed)

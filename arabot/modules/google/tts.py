@@ -29,10 +29,10 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     )
     async def speak(self, ctx: Context):
         if ctx.guild.voice_client:
-            await ctx.send("I'm already speaking")
+            await ctx.send_("busy")
             return
         if not getattr(ctx.author.voice, "channel", None):
-            await ctx.send("You're not connected to a voice channel")
+            await ctx.send_("not_connected")
             return
 
         async with ctx.typing():
@@ -45,7 +45,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         lang, text = self.parse_query(ctx.argument_only, langs)
 
         if not text and not (text := await ctx.rsearch("content")):
-            await ctx.send("I need text to pronounce")
+            await ctx.send_("provide_text")
             return
         text = await clean_content(fix_channel_mentions=True, remove_markdown=True).convert(
             ctx, text
@@ -54,7 +54,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         if not lang:
             lang = await self.detect_language(text)
             if not self.find_lang(lang, langs):
-                await ctx.send("Couldn't detect language")
+                await ctx.send_("unknown_language")
                 return
 
         audio = await self.synthesize(text, lang, "LINEAR16")
@@ -95,7 +95,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         )
         return b64decode(data["audioContent"])
 
-    @alru_cache(cache_exceptions=False)
+    @alru_cache
     async def voices(self, language_code: str | None = None) -> list[dict]:
         data: dict[str, list[dict]] = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/voices",

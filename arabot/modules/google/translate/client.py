@@ -47,7 +47,7 @@ class TranslationClient:
         lang = detections[0][0]["language"]
         return lang if lang != "und" else None
 
-    @alru_cache(cache_exceptions=False)
+    @alru_cache
     async def languages(self, repr_lang: str | None = None) -> list[LangCodeAndOrName]:
         data = await self._api("/languages", target=repr_lang or "")
         languages: list[dict[str, str]] = data["data"]["languages"]

@@ -1,6 +1,7 @@
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 from math import isclose
-from typing import Any, Callable, Dict, Iterable, TypeVar
+from typing import Any, TypeVar
 
 TABLE_ITEMS = "items"
 TABLE_ITEM_TYPES = "item_types"
@@ -14,7 +15,7 @@ _T2 = TypeVar("_T2")
 
 
 class DatabaseEditor:
-    def __init__(self, database: Dict[str, Any]):
+    def __init__(self, database: dict[str, Any]):
         self.database = database
         self.logs_enabled = True
 

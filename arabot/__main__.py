@@ -7,6 +7,7 @@ import signal
 import disnake
 
 from . import TESTING, Ara
+from .core import LocalizationStore
 
 
 def setup_logging() -> None:
@@ -41,6 +42,7 @@ def create_ara(*args, **kwargs) -> Ara:
         command_prefix=prefix_manager,
         embed_color=0xE91E63,
         intents=intents,
+        localization_provider=LocalizationStore(strict=True, fallback=disnake.Locale.en_US),
         max_messages=10_000,
     )
     if TESTING:
