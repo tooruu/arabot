@@ -60,7 +60,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(brief="Find source for an image", usage="<image or reply>")
+    @command(aliases=["source"], brief="Find source for an image", usage="<image or reply>")
     async def sauce(self, ctx: Context):
         _ = ctx._
         await ctx.trigger_typing()
