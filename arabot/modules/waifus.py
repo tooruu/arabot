@@ -190,13 +190,13 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
 
     # pylint: disable=unused-private-member
     async def __callback(self, ctx: Context, *targets: AnyMember):
+        method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
+        if method == self.wclient.nsfw and not ctx.channel.is_nsfw():
+            await ctx.reply_("nsfw_in_sfw_channel")
+            return
         targets = list(dict.fromkeys(t for t in targets if t))
         reaction_type = ctx.command.name
         embed = Embed(title=reaction_type.title())
-        method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
-        if method is self.wclient.nsfw and not ctx.channel.is_nsfw():
-            ctx.reply_("nsfw_in_sfw_channel")
-            return
         try:
             image_url = await method(reaction_type)
         except (APIException, ClientResponseError):
