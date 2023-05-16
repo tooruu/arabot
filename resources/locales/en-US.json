@@ -220,6 +220,7 @@
     "arabot.modules.userinfo.userinfo.talking_in": "Talking in",
     "arabot.modules.userinfo.userinfo.top_perm_role": "Highest non-dummy role",
     "arabot.modules.waifus.__callback.image_failed": "Failed to get image",
+    "arabot.modules.waifus.__callback.nsfw_in_sfw_channel": "NSFW reactions are not allowed in SFW channels",
     "arabot.modules.waifus.nsfw.available_categories": "Available categories",
     "arabot.modules.wolfram.wolfram.input": "Recognized input",
     "arabot.utils.pagination.interaction_check.interaction_not_allowed": "You can't interact with this menu",
