@@ -176,11 +176,16 @@ class WaifuCommandsMeta(commands.CogMeta):
 
 
 class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
+    NSFW_IN_SFW_CHANNEL = f"{__module__}.nsfw_in_sfw_channel"
+
     def __init__(self, waifu_client: WaifuAioClient):
         self.wclient = waifu_client
 
     @commands.group(invoke_without_command=True)
     async def nsfw(self, ctx: Context):
+        if not ctx.channel.is_nsfw():
+            await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)
+            return
         await ctx.send(
             embed=Embed().add_field(
                 ctx._("available_categories"),
@@ -192,7 +197,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
     async def __callback(self, ctx: Context, *targets: AnyMember):
         method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
         if method == self.wclient.nsfw and not ctx.channel.is_nsfw():
-            await ctx.reply_("nsfw_in_sfw_channel")
+            await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)
             return
         targets = list(dict.fromkeys(t for t in targets if t))
         reaction_type = ctx.command.name
