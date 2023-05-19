@@ -1,12 +1,14 @@
+from collections.abc import Awaitable, Callable
+
+import disnake
 from aiohttp import ClientResponseError
-from disnake import Embed
 from disnake.ext import commands
 from waifu import APIException, ImageCategories, WaifuAioClient
 
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import AnyMember, humanjoin
 
-REACTION_MAPPING: dict[str, dict] = {
+REACTION_MAPPING: dict[str, dict[str, str | bool]] = {
     "bite": {
         "no_mentions": "{author} wants to bite someone...",
         "mentions": "{author} bites {target}",
@@ -187,7 +189,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
             await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)
             return
         await ctx.send(
-            embed=Embed().add_field(
+            embed=disnake.Embed().add_field(
                 ctx._("available_categories"),
                 "\n".join(c.name for c in self.nsfw.walk_commands()),
             )
@@ -200,45 +202,62 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
             await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)
             return
         targets = list(dict.fromkeys(t for t in targets if t))
-        reaction_type = ctx.command.name
-        embed = Embed(title=reaction_type.title())
-        try:
-            image_url = await method(reaction_type)
-        except (APIException, ClientResponseError):
-            embed.set_footer(text=ctx._("image_failed"))
-        else:
-            embed.set_footer(text=ctx._("powered_by", False).format("waifu.pics"))
-            embed.set_image(url=image_url)
-        if reaction_data := REACTION_MAPPING.get(reaction_type):
-            match targets:
-                case []:
-                    description = reaction_data["no_mentions"]
-                case [ctx.author]:
-                    if not (description := reaction_data.get("self_mention")):
-                        menstr = reaction_data["mentions"]
-                        if menstr.index("{target}") > menstr.index("{author}"):
-                            description = menstr.replace("{target}", "themselves")
-                        else:
-                            description = menstr.replace("{author}", "themselves").replace(
-                                "{target}", "{author}"
-                            )
-                case _ if reaction_data.get("protect_bot") and ctx.me in targets:
-                    description = (
-                        reaction_data["mentions"]
-                        .replace("{author}", ctx.me.mention)
-                        .replace("{target}", "{author}")
-                    )
-                case _:
-                    if ctx.author in targets:
-                        targets.remove(ctx.author)
-                    description = reaction_data["mentions"]
-            embed.description = description.format(
-                author=ctx.author.mention,
-                target=humanjoin(getattr(t, "mention", t) for t in targets),
-                s="s" if len(targets) == 1 else "",
-                ve="s" if len(targets) == 1 else "ve",
-            )
+        embed = await self.generate_embed(targets, method, ctx)
         await ctx.send_ping(embed=embed)
+
+    async def generate_embed(
+        self,
+        targets: list[disnake.Member],
+        method: Callable[[str], Awaitable[str]],
+        context: Context,
+    ) -> disnake.Embed:
+        reaction_name = context.command.name
+        embed = disnake.Embed(title=reaction_name.title())
+        try:
+            image_url = await method(reaction_name)
+        except (APIException, ClientResponseError):
+            embed.set_footer(text=context._("image_failed"))
+        else:
+            embed.set_footer(text=context._("powered_by", False).format("waifu.pics"))
+            embed.set_image(url=image_url)
+        if reaction_data := REACTION_MAPPING.get(reaction_name):
+            embed.description = self.map_targets(targets, reaction_data, context)
+        return embed
+
+    @staticmethod
+    def map_targets(
+        targets: list[disnake.Member],
+        reaction_data: dict[str, str | bool],
+        context: Context,
+    ) -> str:
+        match targets:
+            case []:
+                description = reaction_data["no_mentions"]
+            case [context.author]:
+                if not (description := reaction_data.get("self_mention")):
+                    menstr = reaction_data["mentions"]
+                    if menstr.index("{target}") > menstr.index("{author}"):
+                        description = menstr.replace("{target}", "themselves")
+                    else:
+                        description = menstr.replace("{author}", "themselves").replace(
+                            "{target}", "{author}"
+                        )
+            case _ if reaction_data.get("protect_bot") and context.me in targets:
+                description = (
+                    reaction_data["mentions"]
+                    .replace("{author}", context.me.mention)
+                    .replace("{target}", "{author}")
+                )
+            case _:
+                if context.author in targets:
+                    targets.remove(context.author)
+                description = reaction_data["mentions"]
+        return description.format(
+            author=context.author.mention,
+            target=humanjoin(getattr(t, "mention", t) for t in targets),
+            s="s" if len(targets) == 1 else "",
+            ve="s" if len(targets) == 1 else "ve",
+        )
 
 
 def setup(ara: Ara):
