@@ -219,6 +219,7 @@
     "arabot.modules.userinfo.userinfo.spammer": "Marked as spammer",
     "arabot.modules.userinfo.userinfo.talking_in": "Talking in",
     "arabot.modules.userinfo.userinfo.top_perm_role": "Highest non-dummy role",
+    "arabot.modules.waifus.__callback.owner_kill_timeout_reason": "Owner assassination attempt",
     "arabot.modules.waifus.generate_embed.image_failed": "Failed to fetch image",
     "arabot.modules.waifus.nsfw_in_sfw_channel": "NSFW reactions are not allowed in SFW channels",
     "arabot.modules.waifus.nsfw.available_categories": "Available categories",
