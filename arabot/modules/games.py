@@ -367,9 +367,9 @@ class TicTacToe(disnake.ui.View):
                 return across[0]
 
         # Check vertical
-        for line in range(3):
-            if self.board[0][line] is self.board[1][line] is self.board[2][line]:
-                return self.board[0][line]
+        for column in range(3):
+            if self.board[0][column] is self.board[1][column] is self.board[2][column] is not None:
+                return self.board[0][column]
 
         # Check diagonal
         if (
