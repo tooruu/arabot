@@ -1,6 +1,6 @@
 disnake[voice,speed]~=2.8.0
 prisma
-jikanpy
+jikanpy-v4
 matplotlib
 numpy
 git+https://github.com/rexor12/gacha.py.git

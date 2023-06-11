@@ -59,6 +59,7 @@ class Source(IntEnum):
 class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
     def __init__(self, session: ClientSession):
         self.session = session
+        self.jikan = AioJikan(session=session)
 
     @command(aliases=["source"], brief="Find source for an image", usage="<image or reply>")
     async def sauce(self, ctx: Context):
@@ -102,11 +103,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                     | Source.anime
                 ):
                     embed.color = 0x2E51A2
-                    mal_json = (
-                        await AioJikan(session=self.session).anime(data["mal_id"])
-                        if "mal_id" in data
-                        else None
-                    )
+                    mal_json = await self.jikan.anime(data["mal_id"]) if "mal_id" in data else None
                     embed.description = ""
                     if episode := data.get("part"):
                         embed.description += _("episode").format(episode)
@@ -114,12 +111,12 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                             embed.description += f" - {timecode.lstrip('0:')}"
                         embed.description += "\n"
                     embed.description += f"{_('similarity')}: {header['similarity']}%"
-                    if mal_json:
+                    if mal_json and (mal_json := mal_json["data"]):
                         embed.description += f" | {_('score')}: {mal_json['score']}"
                         synopsis = dsafe(mal_json["synopsis"].partition(" [")[0])
                         if len(synopsis) > (maxlen := 600):
                             synopsis = ".".join(synopsis[:maxlen].split(".")[:-1]) + "..."
-                        embed.set_image(url=mal_json["image_url"])
+                        embed.set_image(url=mal_json["images"]["webp"]["image_url"])
                         embed.add_field(_("synopsis"), synopsis)
                         embed.set_thumbnail(url=header["thumbnail"])
                     else:
