@@ -7,13 +7,14 @@ from datetime import timedelta
 from glob import glob
 from pathlib import Path
 from pkgutil import iter_modules
+from traceback import format_exception
 
 import aiohttp
 import disnake
 from disnake.ext import commands
 from disnake.utils import format_dt, oauth_url, utcnow
 
-from ..utils import mono, system_info
+from ..utils import codeblock, mono, system_info
 from .database import AraDB
 from .errors import StopCommand
 from .patches import Context, LocalizationStore
@@ -190,6 +191,13 @@ class Ara(commands.Bot):
                 #     if len(args) == 1 and isinstance(args[0], str)
                 #     else context._("unknown_error")
                 # )
+                await self.owner.send(
+                    embed=disnake.Embed(
+                        title=context.command,
+                        description=codeblock("".join(format_exception(exception))),
+                        timestamp=utcnow(),
+                    ).set_author(name="Error", url=context.message.jump_url)
+                )
 
     async def on_ready(self) -> None:
         logging.info(system_info())
