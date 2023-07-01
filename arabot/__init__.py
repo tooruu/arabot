@@ -6,9 +6,8 @@ from dotenv import load_dotenv as _load_dotenv
 
 __version__ = "8.9.3"
 
+_run(("prisma", "db", "push"), check=True)
 _load_dotenv()
 TESTING = bool(_getenv("testing"))
-
-_run(("prisma", "db", "push"), check=True)
 
 from .core import Ara
