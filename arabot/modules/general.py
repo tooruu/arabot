@@ -65,8 +65,8 @@ class General(Cog, category=Category.GENERAL):
             )
         )
 
-    @commands.command(aliases=["r"], brief="React to a message", usage="<emoji>")
-    async def react(self, ctx: Context, emojis: AnyEmojis = False):
+    @commands.command(aliases=["r"], brief="React to replied message", usage="<emojis...>")
+    async def react(self, ctx: Context, *, emojis: AnyEmojis = False):
         if not (ref_msg := await ctx.getch_reference_message()):
             await ctx.reply_("reply_to_message")
             return
