@@ -80,7 +80,7 @@
     "arabot.modules.general.poll.topic_required": "Poll topic is required",
     "arabot.modules.general.react.emoji_not_found": "Emoji not found",
     "arabot.modules.general.react.reply_to_message": "Reply to the message to react to",
-    "arabot.modules.general.react.specify_emoji": "Specify an emoji to react with",
+    "arabot.modules.general.react.specify_emoji": "Specify emojis to react with",
     "arabot.modules.general.summon.cant_summon_bots": "Cannot summon bots",
     "arabot.modules.general.summon.specify_user": "Specify a user to summon",
     "arabot.modules.general.summon.summon_message": "{} is summoning you to {}\n{}\n[Jump to message]({})",

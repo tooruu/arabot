@@ -144,7 +144,7 @@ class CIGuild(commands.Converter):
 AnyMember = disnake.Member | CIMember | Empty
 AnyUser = disnake.User | UserFromCIMember | Empty
 AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
-AnyEmoji = disnake.Emoji | disnake.PartialEmoji | CIEmoji | Twemoji | Empty
+AnyEmoji = disnake.Emoji | CIEmoji | disnake.PartialEmoji | Twemoji | Empty
 AnyTChl = disnake.TextChannel | CITextChl | Empty
 AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
 AnyChl = AnyTChl | AnyVChl | Empty

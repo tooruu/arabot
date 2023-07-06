@@ -1,5 +1,6 @@
 import random
 import re
+from types import NoneType
 
 import disnake
 from disnake.ext import commands
@@ -65,22 +66,24 @@ class General(Cog, category=Category.GENERAL):
         )
 
     @commands.command(aliases=["r"], brief="React to a message", usage="<emoji>")
-    async def react(self, ctx: Context, emoji: AnyEmoji = False):
+    async def react(self, ctx: Context, emojis: AnyEmojis = False):
         if not (ref_msg := await ctx.getch_reference_message()):
             await ctx.reply_("reply_to_message")
             return
-        if emoji is False:
-            await ctx.reply_("specify_emoji")
+        if emojis is False:
+            await ctx.reply_("specify_emojis")
             return
-        if not emoji:
+        emojis = [e for e in emojis if not isinstance(e, (disnake.PartialEmoji, NoneType))]
+        if not emojis:
             await ctx.reply_("emoji_not_found")
             return
 
         await ctx.message.delete()
-        if isinstance(emoji, Twemoji):
-            emoji = emoji.emoji
         try:
-            await ref_msg.add_reaction(emoji)
+            for emoji in emojis:
+                if isinstance(emoji, Twemoji):
+                    emoji = emoji.emoji
+                await ref_msg.add_reaction(emoji)
         except disnake.Forbidden:
             await ctx.reply_ping_(ctx._("cant_react_to", False).format(ref_msg.author.mention))
 
