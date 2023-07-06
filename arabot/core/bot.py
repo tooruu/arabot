@@ -14,6 +14,8 @@ import disnake
 from disnake.ext import commands
 from disnake.utils import format_dt, oauth_url, utcnow
 
+from arabot import TESTING
+
 from ..utils import codeblock, mono, system_info
 from .database import AraDB
 from .errors import StopCommand
@@ -191,13 +193,14 @@ class Ara(commands.Bot):
                 #     if len(args) == 1 and isinstance(args[0], str)
                 #     else context._("unknown_error")
                 # )
-                await self.owner.send(
-                    embed=disnake.Embed(
-                        title=context.command,
-                        description=codeblock("".join(format_exception(exception))),
-                        timestamp=utcnow(),
-                    ).set_author(name="Error", url=context.message.jump_url)
-                )
+                if not TESTING:
+                    await self.owner.send(
+                        embed=disnake.Embed(
+                            title=context.command,
+                            description=codeblock("".join(format_exception(exception))),
+                            timestamp=utcnow(),
+                        ).set_author(name="Error", url=context.message.jump_url)
+                    )
 
     async def on_ready(self) -> None:
         logging.info(system_info())
