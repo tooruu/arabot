@@ -21,7 +21,7 @@ class Eval(Cog, category=Category.GENERAL):
     @commands.cooldown(5, 1)
     @commands.command(
         aliases=["exec", "eval", "code", "py", "run"],
-        brief="Evaluate a Python script",
+        brief="Execute a Python script",
         usage="<codeblock> [input block]",
     )
     async def python(self, ctx: Context, *, codeblocks: Codeblocks):
