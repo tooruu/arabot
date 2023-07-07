@@ -65,11 +65,8 @@ class General(Cog, category=Category.GENERAL):
             )
         )
 
-    @commands.command(aliases=["r"], brief="React to replied message", usage="<emojis...>")
+    @commands.command(aliases=["r"], brief="React to a message", usage="<emojis...>")
     async def react(self, ctx: Context, *, emojis: AnyEmojis = False):
-        if not (ref_msg := await ctx.getch_reference_message()):
-            await ctx.reply_("reply_to_message")
-            return
         if emojis is False:
             await ctx.reply_("specify_emojis")
             return
@@ -79,6 +76,12 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
+
+        if not (ref_msg := await ctx.getch_reference_message()):
+            if not (last_msgs := await ctx.history(before=ctx.message, limit=1).flatten()):
+                return
+            ref_msg = last_msgs[0]
+
         try:
             for emoji in emojis:
                 if isinstance(emoji, Twemoji):
