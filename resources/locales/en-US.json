@@ -74,7 +74,6 @@
     "arabot.modules.general.emoji.no_input": "You must provide emojis/stickers",
     "arabot.modules.general.emoji.not_found": "No emojis/stickers found",
     "arabot.modules.general.http.invalid_http_code": "Invalid HTTP status code",
-    "arabot.modules.general.impetsonate.threads_not_supported": "Threads are not supported due to a Discord limitation",
     "arabot.modules.general.not_enough_options": "Not enough options provided",
     "arabot.modules.general.poll.too_many_options": "More than 10 options provided",
     "arabot.modules.general.poll.topic_required": "Poll topic is required",

@@ -1,9 +1,11 @@
 import random
 import re
+from functools import partial
 from types import NoneType
 
 import disnake
 from disnake.ext import commands
+from disnake.utils import MISSING
 
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import (
@@ -234,16 +236,11 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(
         aliases=["imp"],
         brief="Pretend to be somebody else",
-        extras={
-            "note": "Cannot ping roles,\nthreads are not supported due to a Discord limitation"
-        },
-    )  # (c) 2022 by Kriz#0385
+        extras={"note": "Cannot ping roles"},
+    )
     async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text):
         if user == ctx.me:
             await self.say(ctx, text=text)
-            return
-        if isinstance(ctx.channel, disnake.Thread):
-            await ctx.send_("threads_not_supported")
             return
         if not ctx.channel.permissions_for(ctx.me).manage_webhooks:
             await ctx.send(ctx._("no_perms_to", False).format("manage webhooks"))
@@ -254,7 +251,10 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.message.delete()
         webhook = await ctx.channel.create_webhook(name=user, avatar=user.display_avatar)
-        await webhook.send(
+        send = partial(
+            webhook.send, thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING
+        )
+        await send(
             text,
             username=WEBHOOK_RESERVED_NAMES.get(user.display_name, user.display_name),
             allowed_mentions=disnake.AllowedMentions(users=True),

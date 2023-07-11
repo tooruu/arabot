@@ -295,4 +295,5 @@ disnake.Message.temp_channel_mute_author = property(
 )
 disnake.Message.blue_tick = message_blue_tick
 disnake.Message.tick = message_green_tick
+disnake.Thread.create_webhook = property(lambda self: self.parent.create_webhook)
 disnake.VoiceChannel.connect_play_disconnect = connect_play_disconnect
