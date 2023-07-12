@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+import sys
 from asyncio import sleep
 from collections.abc import Awaitable, Callable, Iterable
 from contextlib import suppress
@@ -10,6 +11,7 @@ from typing import Literal
 
 import aiohttp
 import disnake
+import disnake.gateway
 from disnake.ext import commands
 
 from arabot.core import bot
@@ -297,3 +299,36 @@ disnake.Message.blue_tick = message_blue_tick
 disnake.Message.tick = message_green_tick
 disnake.Thread.create_webhook = property(lambda self: self.parent.create_webhook)
 disnake.VoiceChannel.connect_play_disconnect = connect_play_disconnect
+
+
+async def identify_mobile(self: disnake.gateway.DiscordWebSocket) -> None:
+    state = self._connection
+    payload = {
+        "op": self.IDENTIFY,
+        "d": {
+            "token": self.token,
+            "properties": {
+                "os": sys.platform,
+                "browser": "Discord Android",
+                "device": "disnake",
+            },
+            "large_threshold": 250,
+            "intents": state._intents.value,
+        },
+    }
+    if self.shard_id is not None and self.shard_count is not None:
+        payload["d"]["shard"] = (self.shard_id, self.shard_count)
+    if state._activity is not None or state._status is not None:
+        payload["d"]["presence"] = {
+            "status": state._status or "online",
+            "activities": (state._activity,) if state._activity else (),
+            "since": 0,
+            "afk": False,
+        }
+    await self.call_hooks("before_identify", self.shard_id, initial=self._initial_identify)
+    await self.send_as_json(payload)
+    _log = logging.getLogger(disnake.gateway.__name__)
+    _log.info("Shard ID %s has sent the IDENTIFY payload.", self.shard_id)
+
+
+disnake.gateway.DiscordWebSocket.identify = identify_mobile
