@@ -21,6 +21,7 @@ class Fun(Cog, category=Category.FUN):
 
     def __init__(self, session: ClientSession):
         self.session = session
+        self.rng = default_rng()
 
     @commands.command(brief="Get a random inspirational quote")
     async def inspire(self, ctx: Context):
@@ -260,9 +261,20 @@ class Fun(Cog, category=Category.FUN):
             await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
-        size = round(default_rng().triangular(1, 15, 25))
+        size = round(self.rng.triangular(1, 15, 25))
         pp = f"3{'='*(size-1)}D"
         await ctx.send(ctx._("pp").format(member.mention, size, pp))
+
+    @commands.cooldown(1, 1800, commands.BucketType.member)
+    @commands.command(brief="Find out someone's vg depth", usage="[member]")
+    async def vv(self, ctx: Context, *, member: AnyMember = False):
+        if member is None:
+            await ctx.send_("user_not_found", False)
+            return
+        member = member or ctx.author
+        depth = round(self.rng.triangular(1, 12, 22))
+        vg = f"({{{'ô':^{depth}}}})"
+        await ctx.send(ctx._("vg").format(member.mention, depth, vg))
 
     @commands.command(brief="Send a random letter")
     async def letter(self, ctx: Context):

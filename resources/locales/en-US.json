@@ -24,6 +24,7 @@
     "arabot.modules.fun.reactions_added": "Reactions added",
     "arabot.modules.fun.rename.rank_too_low": "Cannot rename users ranked higher than you",
     "arabot.modules.fun.rename.too_long": "Nickname cannot exceed 32 characters",
+    "arabot.modules.fun.vv.vg": "{}'s vg depth is **{} cm**\n{}",
     "arabot.modules.gacha.gacha.available_supplies": "Currently available supplies",
     "arabot.modules.gacha.gacha.invalid_amount": "You specified an invalid amount",
     "arabot.modules.gacha.gacha.supply_drops": "{} supply drops",
