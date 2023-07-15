@@ -258,6 +258,7 @@ class Fun(Cog, category=Category.FUN):
     @commands.command(brief="Find out someone's pp size", usage="[member]")
     async def pp(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
+            ctx.reset_cooldown()
             await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
@@ -269,6 +270,7 @@ class Fun(Cog, category=Category.FUN):
     @commands.command(brief="Find out someone's vg depth", usage="[member]")
     async def vv(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
+            ctx.reset_cooldown()
             await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
