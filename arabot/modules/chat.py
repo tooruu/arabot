@@ -75,7 +75,7 @@ class Chat(Cog):
                 await sleep(1.5)
                 msgs.append(await msg.channel.send(f"*{i} byou keika*"))
             await sleep(1)
-            msgs.append(await msg.channel.send("Toki wa ugoki dasu"))
+            msgs.append(await msg.channel.send("Toki wa ugokidasu"))
             await sleep(1)
             await msg.channel.delete_messages(msgs)
         except disnake.Forbidden:
