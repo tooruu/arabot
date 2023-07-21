@@ -53,7 +53,7 @@ class Ara(commands.Bot):
     def __init__(
         self,
         *args,
-        embed_color: int | disnake.Color | None = disnake.utils.MISSING,
+        embed_color: int | disnake.Color | None = None,
         cogs_path: str | os.PathLike = "arabot/modules",
         l10n_path: str | os.PathLike = "resources/locales",
         token: str | None = None,
