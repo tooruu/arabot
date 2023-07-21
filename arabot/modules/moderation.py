@@ -4,6 +4,7 @@ from contextlib import suppress
 
 import disnake
 from disnake.ext.commands import bot_has_permissions, command, has_permissions
+from disnake.utils import format_dt
 
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
 from arabot.utils import AnyTChl
@@ -55,7 +56,9 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             with suppress(disnake.Forbidden):
                 await bad_msg.author.timeout(duration=mute_duration)
                 await bad_msg.reply_ping(
-                    ctx._("user_muted_1m", False).format(bad_msg.author.mention)
+                    ctx._("user_muted_until", False).format(
+                        bad_msg.author.mention, format_dt(bad_msg.author.current_timeout, style="F")
+                    )
                 )
                 await bad_msg.add_reaction("🤫")
         finally:

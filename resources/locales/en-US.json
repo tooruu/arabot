@@ -258,6 +258,7 @@
     "generic.stickers": "Stickers",
     "generic.their_banner": "{}'s banner",
     "generic.user_muted_1m": "{} has been muted for 1 minute",
+    "generic.user_muted_until": "{} has been muted until {}",
     "generic.user_no_channel_access": "{} doesn't have access to this channel",
     "generic.user_not_found": "User not found",
     "generic.yes": "Yes"
