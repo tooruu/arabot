@@ -27,7 +27,7 @@ class Fun(Cog, category=Category.FUN):
     async def inspire(self, ctx: Context):
         async with self.session.get("https://inspirobot.me/api?generate=true") as r:
             image_link = await r.text()
-        await ctx.send(embed=disnake.Embed().set_image(url=image_link))
+        await ctx.send(embed=disnake.Embed().set_image(image_link))
 
     @commands.command(aliases=["person"], brief="Get a randomly generated face")
     async def face(self, ctx: Context):

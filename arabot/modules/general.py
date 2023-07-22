@@ -168,7 +168,7 @@ class General(Cog, category=Category.GENERAL):
         message = await ctx.send(
             embed=disnake.Embed(title=ctx._("change_this"), description=ctx._("change_to_that"))
             .set_thumbnail(url=em_before.url)
-            .set_image(url=em_after)
+            .set_image(em_after)
             .with_author(ctx.author)
         )
         await message.add_reaction("👍")

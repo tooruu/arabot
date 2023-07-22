@@ -21,7 +21,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
-            .set_image(url=ctx.guild.icon.maxres.compat)
+            .set_image(ctx.guild.icon.maxres.compat)
             .set_footer(text=ctx.guild)
         )
 
@@ -32,7 +32,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
-            .set_image(url=ctx.guild.banner.maxres.compat)
+            .set_image(ctx.guild.banner.maxres.compat)
             .set_footer(text=ctx._("their_banner", False).format(ctx.guild))
         )
 

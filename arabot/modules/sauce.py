@@ -116,11 +116,11 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                         synopsis = dsafe(mal_json["synopsis"].partition(" [")[0])
                         if len(synopsis) > (maxlen := 600):
                             synopsis = ".".join(synopsis[:maxlen].split(".")[:-1]) + "..."
-                        embed.set_image(url=mal_json["images"]["webp"]["image_url"])
+                        embed.set_image(mal_json["images"]["webp"]["image_url"])
                         embed.add_field(_("synopsis"), synopsis)
                         embed.set_thumbnail(url=header["thumbnail"])
                     else:
-                        embed.set_image(url=header["thumbnail"])
+                        embed.set_image(header["thumbnail"])
                     embed.title = mal_json["title"] if mal_json else data["source"]
                     embed.url = mal_json["url"] if mal_json else data["ext_urls"][0]
 
@@ -133,13 +133,13 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                         name=data["member_name"],
                         url=f"https://www.pixiv.net/users/{data['member_id']}",
                     )
-                    embed.set_image(url=header["thumbnail"])
+                    embed.set_image(header["thumbnail"])
 
                 case Source.dA:
                     embed.title = data["title"]
                     embed.url = data["ext_urls"][0]
                     embed.set_author(name=data["author_name"], url=data["author_url"])
-                    embed.set_image(url=header["thumbnail"])
+                    embed.set_image(header["thumbnail"])
 
                 case (
                     Source.Danbooru
@@ -171,7 +171,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                             embed.set_author(name=", ".join(c))
                     if not (embed.author or embed.title):
                         raise KeyError
-                    embed.set_image(url=header["thumbnail"])
+                    embed.set_image(header["thumbnail"])
         except KeyError:
             logging.error("Sauce failed: %s", pformat(data))
             data["similarity"] = header["similarity"]

@@ -223,7 +223,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
             embed.set_footer(text=context._("image_failed"))
         else:
             embed.set_footer(text=context._("powered_by", False).format("waifu.pics"))
-            embed.set_image(url=image_url)
+            embed.set_image(image_url)
         if reaction_data := REACTION_MAPPING.get(reaction_name):
             embed.description = self.map_targets(targets, reaction_data, context)
         return embed

@@ -31,10 +31,10 @@ class Userinfo(Cog, category=Category.GENERAL):
         member = member or ctx.author
         avatars = (
             disnake.Embed()
-            .set_image(url=(member.avatar or member.default_avatar).compat)
+            .set_image((member.avatar or member.default_avatar).compat)
             .set_footer(text=ctx._("global_avatar").format(member.display_name)),
             disnake.Embed()
-            .set_image(url=member.display_avatar.compat)
+            .set_image(member.display_avatar.compat)
             .set_footer(text=ctx._("guild_avatar").format(member.display_name)),
         )
 
@@ -61,7 +61,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed()
-            .set_image(url=banner.maxres.compat)
+            .set_image(banner.maxres.compat)
             .set_footer(text=ctx._("their_banner", False).format(member.display_name))
         )
 
@@ -123,7 +123,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         if member.accent_color:
             embed.color = member.accent_color
         if member.banner:
-            embed.set_image(url=member.banner.with_size(512).compat)
+            embed.set_image(member.banner.with_size(512).compat)
 
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
         await ctx.send(embed=embed)

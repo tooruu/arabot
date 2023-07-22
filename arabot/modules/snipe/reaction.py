@@ -37,7 +37,7 @@ class ReactionSnipe(Cog):
         on_cd, reacted_at = (
             self._cache.get(user.id, {})
             .get(reaction.message.id, {})
-            .get(hash(reaction), [None] * 2)
+            .get(hash(reaction), [None, None])
         )
         has_bot_reaction = await reaction.users().get(bot=True)
         within_threshold = reacted_at and now - reacted_at <= self.THRESHOLD
@@ -47,16 +47,17 @@ class ReactionSnipe(Cog):
 
         # rate limit the reaction
         self._cache[user.id][reaction.message.id][hash(reaction)] = True, now
-        await reaction.message.reply(
-            embed=Embed()
-            .set_image(
-                url=Twemoji(reaction.emoji).url
-                if isinstance(reaction.emoji, str)
-                else f"{reaction.emoji.url}?size=64"
-            )
-            .set_footer(text=self._("sniped_reaction", reaction.message))
-            .with_author(user)
+        embed: Embed = (
+            Embed().set_footer(text=self._("sniped_reaction", reaction.message)).with_author(user)
         )
+        if isinstance(reaction.emoji, str):
+            twemoji = Twemoji(reaction.emoji)
+            if not await twemoji.read(self.ara.session, ensure_only=True):
+                return
+            embed.set_image(twemoji.url)
+        else:
+            embed.set_image(f"{reaction.emoji.url}?size=64")
+        await reaction.message.reply(embed=embed)
 
     @loop(minutes=1)
     async def purge_cache(self):

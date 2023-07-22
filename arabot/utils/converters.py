@@ -49,17 +49,12 @@ class Twemoji(commands.Converter):
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> Twemoji:
         emoji = cls(argument)
-        if await emoji.read(session=ctx.bot.session, ensure_only=True):
+        if await emoji.read(ctx.bot.session, ensure_only=True):
             return emoji
         raise commands.EmojiNotFound(argument)
 
-    async def read(
-        self,
-        *,
-        session: ClientSession | None = None,
-        ensure_only: bool = False,
-    ) -> bytes | bool:
-        async with (session or ClientSession()).get(self.url) as resp:
+    async def read(self, session: ClientSession, *, ensure_only: bool = False) -> bytes | bool:
+        async with session.get(self.url) as resp:
             if resp.ok:
                 return True if ensure_only else await resp.read()
             return False
