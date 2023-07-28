@@ -54,7 +54,7 @@
     "arabot.modules.games.no_winner": "No one has won",
     "arabot.modules.games.p1_token_pick.pick_color": "{} - They have chosen {}\nPick a color to join",
     "arabot.modules.games.russian_roulette.click": "click",
-    "arabot.modules.games.russian_roulette.cooldown": "Cooling down and reloading barrel...💨",
+    "arabot.modules.games.russian_roulette.cooldown": "Cooling down and reloading cylinder...💨",
     "arabot.modules.games.russian_roulette.gunshot1": "BANG",
     "arabot.modules.games.russian_roulette.gunshot2": "KABLAM",
     "arabot.modules.games.russian_roulette.pass_gun": "You have to pass the gun to someone else",
