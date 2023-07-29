@@ -121,6 +121,10 @@ class Chat(Cog):
         )
         await sender.delete()
 
+    @pfxless(regex="^ok$", allow_bots=True)
+    async def ok(self, msg: disnake.Message):
+        await msg.add_reaction(CustomEmoji.MeiStare)
+
 
 def setup(ara: Ara):
     ara.add_cog(Chat(ara))
