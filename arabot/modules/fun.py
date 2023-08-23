@@ -31,7 +31,7 @@ class Fun(Cog, category=Category.FUN):
 
     @commands.command(aliases=["person"], brief="Get a randomly generated face")
     async def face(self, ctx: Context):
-        async with self.session.get("https://thispersondoesnotexist.com/image") as r:
+        async with self.session.get("https://thispersondoesnotexist.com") as r:
             image = BytesIO(await r.read())
         embed = disnake.Embed().set_image(file=disnake.File(image, "face.png"))
         await ctx.send(embed=embed)
