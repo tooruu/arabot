@@ -121,7 +121,7 @@ class General(Cog, category=Category.GENERAL):
             )
         ).set_author(
             name=ctx.guild,
-            url=await ctx.guild.get_unlimited_invite_link(),
+            url=await ctx.guild.get_unlimited_invite_link() or None,
             icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
         )
         try:
