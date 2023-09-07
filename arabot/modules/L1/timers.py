@@ -1,4 +1,5 @@
 import logging
+from asyncio import sleep
 from datetime import datetime, time, timedelta, timezone, tzinfo
 from functools import partial
 from zoneinfo import ZoneInfo
@@ -100,7 +101,7 @@ timers: dict[int, tuple[str, Timer]] = {
         Timer({w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}),
     ),
     1149235203450097694: (
-        "Waifus reset💖{1}",
+        "Claim reset💖{1}",
         Timer({w: [(time(hour=h, minute=54), None) for h in range(2, 24, 3)] for w in range(1, 8)}),
     ),
 }
@@ -111,7 +112,7 @@ class ChannelTimers(Cog):
         self.ara = ara
         self.update_channels.start()
 
-    @loop(minutes=5)  # Rate limit: 2 updates per 10 mins
+    @loop(minutes=5, seconds=10)  # Rate limit: 2 updates per 10 mins
     async def update_channels(self):
         for chl_id, fmt, timer in [(cid, *timer_info) for cid, timer_info in timers.items()]:
             if not (channel := self.ara.get_channel(chl_id)):
@@ -125,6 +126,7 @@ class ChannelTimers(Cog):
                 await channel.edit(name=updated_channel_name)
             except HTTPException as exc:
                 logging.warning("Failed to update timer channel %r: %s", chl_id, exc)
+            await sleep(1)
 
     @update_channels.before_loop
     async def ensure_ready(self):
