@@ -128,6 +128,66 @@ class Userinfo(Cog, category=Category.GENERAL):
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
         await ctx.send(embed=embed)
 
+    @commands.command(
+        aliases=["s", "st", "activity", "act"], brief="View user's activity", usage="[member]"
+    )
+    async def status(self, ctx: Context, *, member: AnyMember = False):
+        if member is None:
+            await ctx.send_("user_not_found", False)
+            return
+        _ = ctx._
+        member: disnake.Member = member or ctx.author
+        embed: disnake.Embed = disnake.Embed(
+            title=_("activity", False),
+            description=f"{_('status', False)}: {_('offline', False)}"
+            if member.desktop_status
+            is member.web_status
+            is member.mobile_status
+            is disnake.Status.offline
+            else f"""{_("desktop")}: {_(member.desktop_status.name, False)}
+{_("web")}: {_(member.web_status.name, False)}
+{_("mobile")}: {_(member.mobile_status.name, False)}""",
+        ).with_author(member)
+
+        for activity in member.activities:
+            if not embed.thumbnail and activity.type is not disnake.ActivityType.custom:
+                if thumbnail := (
+                    activity.album_cover_url
+                    if activity.type is disnake.ActivityType.listening
+                    else activity.large_image_url
+                ):
+                    embed.set_thumbnail(thumbnail)
+            match activity.type:
+                case disnake.ActivityType.custom:
+                    embed.add_field(_("custom"), activity, inline=False)
+                case disnake.ActivityType.playing:
+                    title = _("playing", False)
+                    if activity.details:
+                        embed.add_field(f"{title} {activity.name}", activity.details, inline=False)
+                    else:
+                        embed.add_field(title, activity.name, inline=False)
+                case disnake.ActivityType.listening:
+                    embed.add_field(
+                        "Spotify",
+                        f"[{', '.join(activity.artists)} – {activity.title}]({activity.track_url})",
+                        inline=False,
+                    )
+                case disnake.ActivityType.streaming:
+                    title = _("streaming", False)
+                    if activity.game and activity.name:
+                        title += f" {activity.game}"
+                        body = f"[{activity.name}]({activity.url})"
+                    elif activity.game:
+                        body = f"[{activity.game}]({activity.url})"
+                    elif activity.name:
+                        body = f"[{activity.name}]({activity.url})"
+                    elif activity.platform:
+                        body = f"[{activity.platform}]({activity.url})"
+                    else:
+                        body = activity.url
+                    embed.add_field(title, body, inline=False)
+        await ctx.send(embed=embed)
+
 
 def setup(ara: Ara):
     ara.add_cog(Userinfo())
