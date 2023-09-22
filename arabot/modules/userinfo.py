@@ -154,7 +154,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                 if thumbnail := (
                     activity.album_cover_url
                     if activity.type is disnake.ActivityType.listening
-                    else activity.large_image_url
+                    else getattr(activity, "large_image_url", None)
                 ):
                     embed.set_thumbnail(thumbnail)
             match activity.type:
