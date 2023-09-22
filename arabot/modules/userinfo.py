@@ -162,7 +162,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                     embed.add_field(_("custom"), activity, inline=False)
                 case disnake.ActivityType.playing:
                     title = _("playing", False)
-                    if activity.details:
+                    if getattr(activity, "details", None):
                         embed.add_field(f"{title} {activity.name}", activity.details, inline=False)
                     else:
                         embed.add_field(title, activity.name, inline=False)
