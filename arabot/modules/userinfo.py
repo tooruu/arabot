@@ -137,45 +137,60 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         _ = ctx._
         member: disnake.Member = member or ctx.author
-        embed: disnake.Embed = disnake.Embed(
-            title=_("activity", False),
-            description=f"{_('status', False)}: {_('offline', False)}"
-            if member.desktop_status
-            is member.web_status
-            is member.mobile_status
-            is disnake.Status.offline
-            else f"""{_("desktop")}: {_(member.desktop_status.name, False)}
-{_("web")}: {_(member.web_status.name, False)}
-{_("mobile")}: {_(member.mobile_status.name, False)}""",
-        ).with_author(member)
+        statuses = {
+            disnake.Status.online: "🟢",
+            disnake.Status.idle: "🟠",
+            disnake.Status.do_not_disturb: "⛔",
+            disnake.Status.offline: "⚫",
+        }
+        embed: disnake.Embed = disnake.Embed(title=_("activity", False)).with_author(member)
+        if member.status is disnake.Status.offline:
+            embed.description = statuses[member.status]
+        else:
+            devices = {"desktop": "💻", "mobile": "📱", "web": "🌐"}
+            device_statuses = {d: [] for d in statuses}
+            for device_name, device_icon in devices.items():
+                device_status: disnake.Status = getattr(member, f"{device_name}_status")
+                if device_status is not disnake.Status.offline:
+                    device_statuses[device_status].append(device_icon)
+            embed.description = " | ".join(
+                f"{''.join(icons)}{statuses[st]}" for st, icons in device_statuses.items() if icons
+            )
 
         for activity in member.activities:
-            if not embed.thumbnail and activity.type is not disnake.ActivityType.custom:
+            if not embed.thumbnail:
                 if thumbnail := (
                     activity.album_cover_url
-                    if activity.type is disnake.ActivityType.listening
+                    if isinstance(activity, disnake.Spotify)
                     else getattr(activity, "large_image_url", None)
                 ):
                     embed.set_thumbnail(thumbnail)
-            match activity.type:
-                case disnake.ActivityType.custom:
-                    embed.add_field(_("custom"), activity, inline=False)
-                case disnake.ActivityType.playing:
-                    title = _("playing", False)
-                    if getattr(activity, "details", None):
-                        embed.add_field(f"{title} {activity.name}", activity.details, inline=False)
-                    else:
-                        embed.add_field(title, activity.name, inline=False)
-                case disnake.ActivityType.listening:
-                    embed.add_field(
-                        "Spotify",
-                        f"[{', '.join(activity.artists)} – {activity.title}]({activity.track_url})",
-                        inline=False,
+            name = None
+            match activity:
+                case disnake.CustomActivity() | disnake.Game():
+                    body = activity
+                case disnake.Spotify():
+                    embed.color = activity.color
+                    name = activity.album
+                    body = (
+                        f"[{', '.join(activity.artists)} – {activity.title}]({activity.track_url})"
                     )
-                case disnake.ActivityType.streaming:
-                    title = _("streaming", False)
+                case disnake.Activity(
+                    type=disnake.ActivityType.playing
+                    | disnake.ActivityType.watching
+                    | disnake.ActivityType.competing
+                ):
+                    if activity.details:
+                        name, body = activity.name, activity.details
+                        if activity.state:
+                            body += f"\n{activity.state}"
+                    elif activity.state:
+                        name, body = activity.name, activity.state
+                    else:
+                        body = activity.name
+                case disnake.Streaming():
                     if activity.game and activity.name:
-                        title += f" {activity.game}"
+                        name = activity.game
                         body = f"[{activity.name}]({activity.url})"
                     elif activity.game:
                         body = f"[{activity.game}]({activity.url})"
@@ -185,7 +200,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                         body = f"[{activity.platform}]({activity.url})"
                     else:
                         body = activity.url
-                    embed.add_field(title, body, inline=False)
+            embed.add_field(_(activity.type.name).format(name or ""), body, inline=False)
         await ctx.send(embed=embed)
 
 
