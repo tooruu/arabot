@@ -10,7 +10,7 @@ from disnake.utils import utcnow
 
 import arabot
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import bold, codeblock, mono
+from arabot.utils import I18N, bold, codeblock, mono
 
 
 class EmbedHelpCommand(commands.HelpCommand):
@@ -32,7 +32,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         self, mapping: dict[commands.Cog | None, list[commands.Command]]
     ) -> None:
         bot: Ara = self.context.bot
-        _: Callable[[str], str | None] = self.context._
+        _: I18N = self.context._
 
         help_command_repr = self.context.clean_prefix + self.invoked_with
         self.embed.description = _("embed_description").format(help_command_repr)

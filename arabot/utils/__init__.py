@@ -3,6 +3,7 @@ import platform
 import sys
 from contextlib import _RedirectStream, contextmanager
 from datetime import timedelta
+from typing import Callable
 
 import disnake
 
@@ -13,6 +14,8 @@ from .converters import *
 from .formatting import *
 from .pagination import EmbedPaginator
 from .regexes import *
+
+I18N = Callable[[str], str] | Callable[[str, int], str]
 
 
 def fullqualname(suffix: str | None = None, *, depth: int = 1) -> str:

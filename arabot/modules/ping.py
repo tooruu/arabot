@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import I18N
 
 
 class Ping(Cog, category=Category.META):
@@ -31,7 +32,7 @@ class Ping(Cog, category=Category.META):
         image = self.plt_to_file()
         await ctx.send(ctx._("pong").format(f"{ctx.ara.latency * 1000:.0f}"), file=image)
 
-    def plot_graph(self, _: Callable[[str], str]):
+    def plot_graph(self, _: I18N):
         y_padding = 5
         x, y = range(self.log.maxlen), self.log
         ax = plt.subplots(figsize=(3, 1))[1]

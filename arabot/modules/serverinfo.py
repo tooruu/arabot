@@ -7,7 +7,7 @@ from disnake.ext import commands
 from disnake.utils import format_dt, utcnow
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import AnyGuild, mono
+from arabot.utils import I18N, AnyGuild, mono
 
 
 class Serverinfo(Cog, category=Category.GENERAL):
@@ -89,7 +89,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
 
     @staticmethod
     def _set_description(
-        embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview, _: Callable[[str], str]
+        embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview, _: I18N
     ) -> None:
         assets = []
         if isinstance(guild, disnake.Guild):
@@ -113,10 +113,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
 
     @staticmethod
     def _set_field_general_info(
-        field_values: list,
-        guild: disnake.Guild,
-        current_guild: disnake.Guild,
-        _: Callable[[str], str],
+        field_values: list, guild: disnake.Guild, current_guild: disnake.Guild, _: I18N
     ) -> None:
         if not isinstance(guild, disnake.Guild):
             return
@@ -134,9 +131,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             field_values.append(_(f"nsfw_level_{guild.nsfw_level}"))
 
     @staticmethod
-    def _set_field_channels(
-        field_values: list, guild: disnake.Guild, _: Callable[[str], str]
-    ) -> None:
+    def _set_field_channels(field_values: list, guild: disnake.Guild, _: I18N) -> None:
         if not isinstance(guild, disnake.Guild):
             return
         if guild.categories:
@@ -152,9 +147,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
         if guild.forum_channels:
             field_values.append(f"{_('forum')}: {len(guild.forum_channels)}")
 
-    def _set_field_members(
-        self, field_values: list, guild: disnake.Guild, _: Callable[[str], str]
-    ) -> None:
+    def _set_field_members(self, field_values: list, guild: disnake.Guild, _: I18N) -> None:
         if not isinstance(guild, disnake.Guild):
             return
         field_values.append(f"{_('total')}: {guild.approximate_member_count or guild.member_count}")
@@ -170,9 +163,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             field_values.append(f"{_('boosters')}: {len(guild.premium_subscribers)}")
 
     @staticmethod
-    def _set_field_moderation(
-        field_values: list, guild: disnake.Guild, _: Callable[[str], str]
-    ) -> None:
+    def _set_field_moderation(field_values: list, guild: disnake.Guild, _: I18N) -> None:
         if not isinstance(guild, disnake.Guild):
             return
         admin_count = sum(not m.bot and m.guild_permissions.administrator for m in guild.members)
@@ -185,7 +176,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
 
     @staticmethod
     def _set_field_emojis_stickers(
-        field_values: list, guild: disnake.Guild | disnake.GuildPreview, _: Callable[[str], str]
+        field_values: list, guild: disnake.Guild | disnake.GuildPreview, _: I18N
     ) -> None:
         if e_count := len(guild.emojis):
             e_animated_count = sum(e.animated for e in guild.emojis)
