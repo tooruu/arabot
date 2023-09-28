@@ -5,7 +5,7 @@ from disnake.ext import commands
 from disnake.utils import format_dt, utcnow
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import AnyMember, AnyMemberOrUser
+from arabot.utils import I18N, AnyMember, AnyMemberOrUser
 
 
 class GlobalOrGuildUserVariant(disnake.ui.View):
@@ -135,15 +135,75 @@ class Userinfo(Cog, category=Category.GENERAL):
         if member is None:
             await ctx.send_("user_not_found", False)
             return
-        _ = ctx._
         member: disnake.Member = member or ctx.author
+        embed: disnake.Embed = disnake.Embed(title=ctx._("activity", False)).with_author(member)
+        self.add_status(embed, member)
+        for activity in member.activities:
+            if not embed.thumbnail:
+                self.set_images_if_any(embed, activity)
+            self.add_activity(embed, activity, ctx._)
+        await ctx.send(embed=embed)
+
+    @staticmethod
+    def add_activity(
+        embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify, _: I18N
+    ) -> None:
+        name = None
+        match activity:
+            case disnake.CustomActivity() | disnake.Game():
+                body = str(activity)
+            case disnake.Spotify():
+                embed.color = activity.color
+                name = activity.album
+                body = f"[{', '.join(activity.artists)} – {activity.title}]({activity.track_url})"
+            case disnake.Activity(
+                type=disnake.ActivityType.playing
+                | disnake.ActivityType.watching
+                | disnake.ActivityType.competing
+            ):
+                party = ""
+                if party_size := activity.party.get("size"):
+                    party = " ({0[0]}/{0[1]})".format(party_size)
+
+                if activity.details:
+                    name, body = activity.name, activity.details
+                    if activity.state:
+                        body += f"\n{activity.state} {party}"
+                elif activity.state:
+                    name, body = activity.name, activity.state + party
+                else:
+                    body = activity.name + party
+            case disnake.Streaming():
+                if activity.game and activity.name:
+                    name = activity.game
+                    body = f"[{activity.name}]({activity.url})"
+                elif activity.game:
+                    body = f"[{activity.game}]({activity.url})"
+                elif activity.name:
+                    body = f"[{activity.name}]({activity.url})"
+                elif activity.platform:
+                    body = f"[{activity.platform}]({activity.url})"
+                else:
+                    body = activity.url
+
+        if activity.start:
+            body += "\n" + _("started").format(format_dt(activity.start, "R"))
+        if activity.end:
+            if activity.start:
+                body += ", " + _("ending_in").lower().format(format_dt(activity.end, "R"))
+            else:
+                body += "\n" + _("ending_in").format(format_dt(activity.end, "R"))
+
+        embed.add_field(_(activity.type.name).format(name or ""), body, inline=False)
+
+    @staticmethod
+    def add_status(embed: disnake.Embed, member: disnake.Member) -> None:
         statuses = {
             disnake.Status.online: "🟢",
             disnake.Status.idle: "🟠",
             disnake.Status.do_not_disturb: "⛔",
             disnake.Status.offline: "⚫",
         }
-        embed: disnake.Embed = disnake.Embed(title=_("activity", False)).with_author(member)
         if member.status is disnake.Status.offline:
             embed.description = statuses[member.status]
         else:
@@ -157,51 +217,25 @@ class Userinfo(Cog, category=Category.GENERAL):
                 f"{''.join(icons)}{statuses[st]}" for st, icons in device_statuses.items() if icons
             )
 
-        for activity in member.activities:
-            if not embed.thumbnail:
-                if thumbnail := (
-                    activity.album_cover_url
-                    if isinstance(activity, disnake.Spotify)
-                    else getattr(activity, "large_image_url", None)
-                ):
-                    embed.set_thumbnail(thumbnail)
-            name = None
-            match activity:
-                case disnake.CustomActivity() | disnake.Game():
-                    body = activity
-                case disnake.Spotify():
-                    embed.color = activity.color
-                    name = activity.album
-                    body = (
-                        f"[{', '.join(activity.artists)} – {activity.title}]({activity.track_url})"
-                    )
-                case disnake.Activity(
-                    type=disnake.ActivityType.playing
-                    | disnake.ActivityType.watching
-                    | disnake.ActivityType.competing
-                ):
-                    if activity.details:
-                        name, body = activity.name, activity.details
-                        if activity.state:
-                            body += f"\n{activity.state}"
-                    elif activity.state:
-                        name, body = activity.name, activity.state
-                    else:
-                        body = activity.name
-                case disnake.Streaming():
-                    if activity.game and activity.name:
-                        name = activity.game
-                        body = f"[{activity.name}]({activity.url})"
-                    elif activity.game:
-                        body = f"[{activity.game}]({activity.url})"
-                    elif activity.name:
-                        body = f"[{activity.name}]({activity.url})"
-                    elif activity.platform:
-                        body = f"[{activity.platform}]({activity.url})"
-                    else:
-                        body = activity.url
-            embed.add_field(_(activity.type.name).format(name or ""), body, inline=False)
-        await ctx.send(embed=embed)
+    @staticmethod
+    def set_images_if_any(
+        embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify
+    ) -> None:
+        if isinstance(activity, disnake.Spotify) and activity.album_cover_url:
+            embed.set_thumbnail(activity.album_cover_url)
+        elif thumbnail := getattr(activity, "large_image_url", None):
+            embed.set_thumbnail(fix_media_proxy_url(thumbnail))
+
+        if embed.thumbnail and (icon := getattr(activity, "small_image_url", None)):
+            embed.set_footer(
+                icon_url=fix_media_proxy_url(icon), text=activity.small_image_text or "\u200b"
+            )
+
+
+def fix_media_proxy_url(asset_url: str) -> str:  # Remove in disnake 2.10
+    if "/mp:" not in asset_url:
+        return asset_url
+    return "https://media.discordapp.net/" + asset_url.partition("/mp:")[2].removesuffix(".png")
 
 
 def setup(ara: Ara):
