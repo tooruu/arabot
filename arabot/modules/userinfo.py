@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 import disnake
@@ -156,6 +157,9 @@ class Userinfo(Cog, category=Category.GENERAL):
                 embed.color = activity.color
                 name = activity.album
                 body = f"[{', '.join(activity.artists)} – {activity.title}]({activity.track_url})"
+            case disnake.Activity(name="Spotify", type=disnake.ActivityType.listening):
+                name = activity.large_image_text
+                body = f"{activity.state} – {activity.details}"
             case disnake.Activity(
                 type=disnake.ActivityType.playing
                 | disnake.ActivityType.watching
@@ -185,6 +189,9 @@ class Userinfo(Cog, category=Category.GENERAL):
                     body = f"[{activity.platform}]({activity.url})"
                 else:
                     body = activity.url
+            case _:
+                logging.warning("Unknown activity type: %s", activity)
+                return
 
         if activity.start:
             body += "\n" + _("started").format(format_dt(activity.start, "R"))
