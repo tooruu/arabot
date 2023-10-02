@@ -6,7 +6,7 @@ from disnake.ext import commands
 from disnake.utils import format_dt, utcnow
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import I18N, AnyMember, AnyMemberOrUser
+from arabot.utils import I18N, AnyMember, AnyMemberOrUser, Twemoji
 
 
 class GlobalOrGuildUserVariant(disnake.ui.View):
@@ -151,7 +151,14 @@ class Userinfo(Cog, category=Category.GENERAL):
     ) -> None:
         name = None
         match activity:
-            case disnake.CustomActivity() | disnake.Game():
+            case disnake.CustomActivity():
+                if activity.emoji:
+                    icon_url = (activity.emoji.url or Twemoji(activity.emoji.name).url) + "?size=32"
+                else:
+                    icon_url = None
+                embed.set_footer(text=activity.name or "\u200b", icon_url=icon_url)
+                return
+            case disnake.Game():
                 body = str(activity)
             case disnake.Spotify():
                 embed.color = activity.color
@@ -232,11 +239,6 @@ class Userinfo(Cog, category=Category.GENERAL):
             embed.set_thumbnail(activity.album_cover_url)
         elif thumbnail := getattr(activity, "large_image_url", None):
             embed.set_thumbnail(fix_media_proxy_url(thumbnail))
-
-        if embed.thumbnail and (icon := getattr(activity, "small_image_url", None)):
-            embed.set_footer(
-                icon_url=fix_media_proxy_url(icon), text=activity.small_image_text or "\u200b"
-            )
 
 
 def fix_media_proxy_url(asset_url: str) -> str:  # Remove in disnake 2.10
