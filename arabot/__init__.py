@@ -4,7 +4,7 @@ from subprocess import run as _run
 
 from dotenv import load_dotenv as _load_dotenv
 
-__version__ = "8.15.6"
+__version__ = "8.16.0"
 
 _run(("prisma", "db", "push"), check=True)
 _load_dotenv()

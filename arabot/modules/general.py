@@ -178,7 +178,13 @@ class General(Cog, category=Category.GENERAL):
     async def say(self, ctx: Context, *, text):
         if ctx.channel.permissions_for(ctx.me).manage_messages:
             await ctx.message.delete()
-        await ctx.send(text, allowed_mentions=disnake.AllowedMentions(users=True))
+        am = disnake.AllowedMentions(users=True)
+        if ref := await ctx.getch_reference_message():
+            if ref.author in ctx.message.mentions:
+                am.replied_user = True
+            await ref.reply(text, allowed_mentions=am)
+        else:
+            await ctx.send(text, allowed_mentions=am)
 
     @commands.command(name="8ball", aliases=["8b"], brief="Ask the magic 8 ball")
     async def eight_ball(self, ctx: Context):
