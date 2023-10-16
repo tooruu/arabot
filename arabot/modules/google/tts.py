@@ -9,6 +9,7 @@ from disnake.ext import tasks
 from disnake.ext.commands import clean_content, command
 
 from arabot.core import Category, Cog, Context
+from arabot.utils import CUSTOM_EMOJI_RE
 
 
 class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
@@ -47,9 +48,8 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send_("provide_text")
             return
-        text = await clean_content(fix_channel_mentions=True, remove_markdown=True).convert(
-            ctx, text
-        )
+        text = await clean_content(fix_channel_mentions=True).convert(ctx, text)
+        text = CUSTOM_EMOJI_RE.sub(r";\g<name>;", text)
 
         if not lang:
             lang = await self.detect_language(text)

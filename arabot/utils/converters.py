@@ -9,6 +9,8 @@ from aiohttp import ClientSession
 from disnake.ext import commands
 from disnake.utils import find
 
+from .regexes import CUSTOM_EMOJI_RE
+
 __all__ = [
     "AnyChl",
     "AnyEmoji",
@@ -26,12 +28,23 @@ __all__ = [
     "CIRole",
     "CITextChl",
     "CIVoiceChl",
+    "clean_content",
     "Codeblocks",
     "Empty",
     "Twemoji",
 ]
 
 arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
+
+
+class clean_content(commands.clean_content):
+    def __init__(self, fix_emojis: bool = True, **kwargs: bool):
+        self.fix_emojis = fix_emojis
+        super().__init__(**kwargs)
+
+    async def convert(self, ctx: commands.Context, argument: str) -> str:
+        argument = await super().convert(ctx, argument)
+        return CUSTOM_EMOJI_RE.sub(r"\g<name>", argument) if self.fix_emojis else argument
 
 
 class Twemoji(commands.Converter):
