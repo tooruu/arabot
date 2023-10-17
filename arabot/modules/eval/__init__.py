@@ -59,6 +59,7 @@ class Eval(Cog, category=Category.GENERAL):
                 datetime=datetime.datetime,
                 os=os,
                 time=datetime.time,
+                timedelta=datetime.timedelta,
             )
             evaluator = LocalEval(env=local_eval_env, stdin=StringIO(inputlines))
             result.set_footer(
