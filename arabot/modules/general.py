@@ -45,7 +45,7 @@ class General(Cog, category=Category.GENERAL):
     async def emoji(self, ctx: Context, *, emojis: AnyEmojis = None):
         if not (stickers := ctx.message.stickers) and emojis is None:
             ref_msg = await ctx.getch_reference_message()
-            custom_emojis = ref_msg and CUSTOM_EMOJI_RE.findall(ref_msg.content)
+            custom_emojis = ref_msg and [m[0] for m in CUSTOM_EMOJI_RE.finditer(ref_msg.content)]
             stickers = getattr(ref_msg, "stickers", stickers)
             if not custom_emojis and not stickers:
                 await ctx.reply_("no_input")
