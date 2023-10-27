@@ -158,8 +158,6 @@ class Userinfo(Cog, category=Category.GENERAL):
                     icon_url = None
                 embed.set_footer(text=activity.name or "\u200b", icon_url=icon_url)
                 return
-            case disnake.Game():
-                body = str(activity)
             case disnake.Spotify():
                 embed.color = activity.color
                 name = activity.album
@@ -167,6 +165,8 @@ class Userinfo(Cog, category=Category.GENERAL):
             case disnake.Activity(name="Spotify", type=disnake.ActivityType.listening):
                 name = activity.large_image_text
                 body = f"{activity.state} – {activity.details}"
+            case disnake.Game() | disnake.Activity(type=disnake.ActivityType.listening):
+                body = activity.name
             case disnake.Activity(
                 type=disnake.ActivityType.playing
                 | disnake.ActivityType.watching
