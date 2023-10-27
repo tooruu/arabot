@@ -149,7 +149,7 @@ class Userinfo(Cog, category=Category.GENERAL):
     def add_activity(
         embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify, _: I18N
     ) -> None:
-        name = None
+        name = body = ""
         match activity:
             case disnake.CustomActivity():
                 if activity.emoji:
@@ -166,7 +166,10 @@ class Userinfo(Cog, category=Category.GENERAL):
                 name = activity.large_image_text
                 body = f"{activity.state} – {activity.details}"
             case disnake.Game() | disnake.Activity(type=disnake.ActivityType.listening):
-                body = activity.name
+                if activity.start or activity.end:
+                    name = activity.name
+                else:
+                    body = activity.name
             case disnake.Activity(
                 type=disnake.ActivityType.playing
                 | disnake.ActivityType.watching
@@ -182,6 +185,8 @@ class Userinfo(Cog, category=Category.GENERAL):
                         body += f"\n{activity.state} {party}"
                 elif activity.state:
                     name, body = activity.name, activity.state + party
+                elif activity.start or activity.end:
+                    name = activity.name + party
                 else:
                     body = activity.name + party
             case disnake.Streaming():
@@ -208,7 +213,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             else:
                 body += "\n" + _("ending_in").format(format_dt(activity.end, "R"))
 
-        embed.add_field(_(activity.type.name).format(name or ""), body, inline=False)
+        embed.add_field(_(activity.type.name).format(name), body, inline=False)
 
     @staticmethod
     def add_status(embed: disnake.Embed, member: disnake.Member) -> None:
