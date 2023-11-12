@@ -108,8 +108,6 @@ class Userinfo(Cog, category=Category.GENERAL):
                 embed.add_field(ctx._("joined_on"), format_dt(member.joined_at, "D"))
             if member.nick:
                 embed.add_field(ctx._("nickname", False), member.nick)
-            if member.activity:
-                embed.add_field(ctx._("discord_activity", False), member.activity.name)
             if member.premium_since:
                 embed.add_field(ctx._("boosting_since"), format_dt(member.premium_since, "R"))
             if member.current_timeout:
