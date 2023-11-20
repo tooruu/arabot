@@ -70,14 +70,14 @@ class Chat(Cog):
         try:
             await msg.channel.set_permissions(msg.guild.default_role, overwrite=temp_perms)
             await msg.channel.send(CustomEmoji.KonoDioDa)
-            msgs = [await msg.channel.send("***Toki yo tomare!***")]
+            msg = await msg.channel.send("***Toki yo tomare!***")
             for i in "Ichi", "Ni", "San", "Yon", "Go":
                 await sleep(1.5)
-                msgs.append(await msg.channel.send(f"*{i} byou keika*"))
+                msg = await msg.edit(f"{msg.content}\n*{i} byou keika*")
             await sleep(1)
-            msgs.append(await msg.channel.send("Toki wa ugokidasu"))
+            await msg.edit(msg.content + "\nToki wa ugokidasu")
             await sleep(1)
-            await msg.channel.delete_messages(msgs)
+            await msg.delete()
         except disnake.Forbidden:
             return
         finally:
