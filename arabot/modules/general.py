@@ -256,12 +256,13 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
-        webhook = await ctx.channel.create_webhook(name=user, avatar=user.display_avatar)
+        webhook = await ctx.channel.create_webhook(name=user)
         send = partial(
             webhook.send, thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING
         )
         await send(
             text,
+            avatar_url=user.display_avatar.compat,
             username=WEBHOOK_RESERVED_NAMES.get(user.display_name, user.display_name),
             allowed_mentions=disnake.AllowedMentions(users=True),
         )
