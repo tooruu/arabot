@@ -278,21 +278,6 @@ class Fun(Cog, category=Category.FUN):
         vg = f"({{{'ô':^{depth}}}})"
         await ctx.send(ctx._("vg").format(member.mention, depth, vg))
 
-    @commands.command(brief="Send a random letter")
-    async def letter(self, ctx: Context):
-        resp = await self.session.fetch_json(
-            "https://www.thiswebsitewillselfdestruct.com/api/get_letter"
-        )
-        letter = re.sub(
-            r"^Dear\s*Website\s*[,.]*\s*|\r|\s+$",
-            "",
-            html.unescape(resp["body"]),
-            flags=re.IGNORECASE,
-        )
-        if len(letter) > 2000:
-            letter = f"{letter[:1997]}..."
-        await ctx.send(letter)
-
 
 def setup(ara: Ara):
     ara.add_cog(Fun(ara.session))
