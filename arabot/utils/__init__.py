@@ -1,9 +1,8 @@
 import os
 import platform
 import sys
-from contextlib import _RedirectStream, contextmanager
 from datetime import timedelta
-from typing import Callable
+from typing import Callable, NewType
 
 import disnake
 
@@ -16,6 +15,7 @@ from .pagination import EmbedPaginator
 from .regexes import *
 
 I18N = Callable[[str], str] | Callable[[str, int], str]
+DiscordDT = NewType("FormattedDT", str)
 
 
 def fullqualname(suffix: str | None = None, *, depth: int = 1) -> str:
@@ -80,26 +80,6 @@ def getkeys(*key_names) -> tuple[str]:
     return tuple(keys)
 
 
-class Lockable:
-    @contextmanager
-    def lock(self, **overwrites):
-        """Sets overwrites on self and then resets to initial state"""
-        backup = self.__dict__.copy()
-        self.__dict__.update(overwrites)
-        try:
-            yield
-        finally:
-            for key in overwrites:
-                if key in backup:
-                    setattr(self, key, backup[key])
-                elif hasattr(self, key):
-                    delattr(self, key)
-
-
-class stdin_from(_RedirectStream):  # noqa: N801
-    _stream = "stdin"
-
-
 def strfdelta(delta: timedelta) -> str:
     days = delta.days
     hours = delta.seconds // 3600
@@ -112,3 +92,7 @@ def strfdelta(delta: timedelta) -> str:
     if not days:
         time_left += f" {minutes}m"
     return time_left.strip()
+
+
+def time_in(seconds: float, fmt: str = "R") -> DiscordDT:
+    return disnake.utils.format_dt(disnake.utils.utcnow() + timedelta(seconds=seconds), fmt)

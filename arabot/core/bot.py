@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 from collections.abc import Generator
-from datetime import timedelta
 from glob import glob
 from pathlib import Path
 from pkgutil import iter_modules
@@ -12,11 +11,11 @@ from traceback import format_exception
 import aiohttp
 import disnake
 from disnake.ext import commands
-from disnake.utils import format_dt, oauth_url, utcnow
+from disnake.utils import oauth_url, utcnow
 
 from arabot import TESTING
 
-from ..utils import codeblock, mono, system_info
+from ..utils import codeblock, mono, system_info, time_in
 from .database import AraDB
 from .errors import StopCommand
 from .patches import Context, LocalizationStore
@@ -148,9 +147,8 @@ class Ara(commands.Bot):
 
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
         match exception:
-            case commands.CommandOnCooldown():
-                expires_at = utcnow() + timedelta(seconds=exception.retry_after)
-                remaining = format_dt(expires_at, "R")
+            case commands.CommandOnCooldown(retry_after=retry_after):
+                remaining = time_in(retry_after)
                 await context.reply(context._("cooldown_expires", False).format(remaining))
             case commands.DisabledCommand():
                 await context.reply_("command_disabled")

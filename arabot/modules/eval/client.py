@@ -1,7 +1,7 @@
 import ast
 import inspect
 import sys
-from contextlib import redirect_stdout
+from contextlib import _RedirectStream, contextmanager, redirect_stdout
 from functools import partial
 from io import StringIO
 from types import CodeType
@@ -9,10 +9,12 @@ from typing import Any
 
 from aiohttp import ClientSession
 
-from arabot.utils import Lockable, stdin_from
-
 from . import errors
 from .abc import Evaluator
+
+
+class stdin_from(_RedirectStream):  # noqa: N801
+    _stream = "stdin"
 
 
 class RemoteEval(Evaluator):
@@ -49,7 +51,7 @@ class RemoteEval(Evaluator):
         return stdout, None
 
 
-class LocalEval(Lockable, Evaluator):
+class LocalEval(Evaluator):
     def __init__(self, *, env: dict | None = None, stdin=None):
         self.env = env or {}
         self.stdin = stdin or sys.stdin
@@ -79,7 +81,23 @@ class LocalEval(Lockable, Evaluator):
             stdout = output_buffer.getvalue()
             return stdout, r
 
-    async def run(self, code: str, *, env: dict | None = None, stdin=None) -> tuple[str, Any]:
-        with self.lock(env=env or self.env, stdin=stdin or self.stdin):
+    async def run(
+        self, code: str, *, env: dict[str, Any] | None = None, stdin=None
+    ) -> tuple[str, Any]:
+        with self._lock(env=env or self.env, stdin=stdin or self.stdin):
             to_run = self.compile(code, ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
             return await self.execute(to_run)
+
+    @contextmanager
+    def _lock(self, **overwrites):
+        """Sets overwrites on self and then resets to initial state"""
+        backup = self.__dict__.copy()
+        self.__dict__ |= overwrites
+        try:
+            yield
+        finally:
+            for key in overwrites:
+                if key in backup:
+                    setattr(self, key, backup[key])
+                elif hasattr(self, key):
+                    delattr(self, key)

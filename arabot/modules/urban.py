@@ -50,7 +50,7 @@ class Urban(Cog, category=Category.LOOKUP):
     @command(aliases=["ud", "define", "whats"], brief="Search term in Urban Dictionary")
     async def urban(self, ctx: Context, *, term: str):
         for predefined, definition in self.definitions.items():
-            if term.lower() == predefined.lower():
+            if term.casefold() == predefined.casefold():
                 await ctx.send(embed=Embed(title=predefined, description=definition))
                 return
 
@@ -59,7 +59,7 @@ class Urban(Cog, category=Category.LOOKUP):
                 await ctx.send(ctx._("definition_not_found").format(bold(term)))
             return
 
-        embeds = []
+        embeds = list[Embed]()
         for definition in definitions:
             embed = Embed(
                 description=dsafe(repchars(definition["definition"], "[]"))[:4096],
@@ -89,7 +89,7 @@ class Urban(Cog, category=Category.LOOKUP):
         await self.ara.wait_until_ready()
         self.definitions = {
             self.ara.name: "An awesome bot written by an awesome guy",
-            self.ara.owner.name: "An awesome guy",
+            self.ara.owner.display_name: "An awesome guy",
         }
 
 

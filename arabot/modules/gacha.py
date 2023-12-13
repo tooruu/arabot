@@ -1,20 +1,8 @@
 import logging
 from collections.abc import Generator
-from datetime import timedelta
 
 from disnake import DiscordException
-from disnake.ext.commands import (
-    BadArgument,
-    BucketType,
-    CommandOnCooldown,
-    MissingRequiredArgument,
-    command,
-    cooldown,
-)
-from disnake.utils import format_dt, utcnow
-
-from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import bold, underline
+from disnake.ext.commands import BadArgument, BucketType, MissingRequiredArgument, command, cooldown
 from gacha.logging import LogBase, LogLevel
 from gacha.models import VirtualItem
 from gacha.models.pulls import Pull
@@ -28,6 +16,9 @@ from gacha.persistence.json.converters import (
 from gacha.providers import EntityProviderInterface, SimplePullProvider
 from gacha.resolvers import ItemResolverInterface
 from gacha.utils.entity_provider_utils import get_item, get_item_rank, get_item_type
+
+from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import bold, time_in, underline
 
 DATABASE_FILE_PATH = "resources/database.json"
 LOG_LEVEL = LogLevel.WARNING
@@ -88,30 +79,27 @@ class Gacha(Cog, category=Category.FUN):
 
     @gacha.error
     async def on_error(self, ctx: Context, error: DiscordException):
-        if isinstance(error, CommandOnCooldown):
-            return False
-        if isinstance(error, MissingRequiredArgument):
-            pools = [
-                f"{bold(pool_code)} - {self._pull_provider.get_pool_name(pool_code)}"
-                for pool_code in self._pull_provider.get_pool_codes()
-            ]
-            await ctx.send(ctx._("available_supplies") + ":\n" + "\n".join(pools))
-            return True
         last_param = ctx.command.clean_params.popitem()[1]
-        if (
-            isinstance(error, BadArgument)
-            and last_param.name in str(error)
-            and last_param.annotation.__name__ in str(error)
-        ):
-            if self.gacha.is_on_cooldown(ctx):
-                expires_at = utcnow() + timedelta(seconds=self.gacha.get_cooldown_retry_after(ctx))
-                remaining = format_dt(expires_at, "R")
-                await ctx.reply(ctx._("cooldown_expires", False).format(remaining))
-            else:
-                await ctx.reply_("invalid_amount")
-            return True
-        ctx.reset_cooldown()
-        return False
+        match error:
+            case MissingRequiredArgument():
+                pools = [
+                    f"{bold(pool_code)} - {self._pull_provider.get_pool_name(pool_code)}"
+                    for pool_code in self._pull_provider.get_pool_codes()
+                ]
+                await ctx.send(ctx._("available_supplies") + ":\n" + "\n".join(pools))
+                return True
+            case BadArgument() if last_param.name in str(
+                error
+            ) and last_param.annotation.__name__ in str(error):
+                if self.gacha.is_on_cooldown(ctx):
+                    remaining = time_in(self.gacha.get_cooldown_retry_after(ctx))
+                    await ctx.reply(ctx._("cooldown_expires", False).format(remaining))
+                else:
+                    await ctx.reply_("invalid_amount")
+                return True
+            case _:
+                ctx.reset_cooldown()
+                return False
 
     @staticmethod
     def _initialize_pull_provider() -> SimplePullProvider:
