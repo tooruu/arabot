@@ -12,7 +12,7 @@ from arabot.core import Category, Cog, Context
 SVG_MIME = "image/svg+xml"
 
 
-class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "G_CSE"}):
+class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"}):
     BASE_URL = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, session: ClientSession):
@@ -32,7 +32,7 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "G_CSE"
         data = await self.session.fetch_json(
             self.BASE_URL,
             params={
-                "key": self.g_isearch_key,
+                "key": self.G_ISEARCH_KEY,
                 "cx": self.G_CSE,
                 "q": f"{query} -filetype:svg",
                 "searchType": "image",
