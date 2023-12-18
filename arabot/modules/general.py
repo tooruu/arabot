@@ -19,14 +19,13 @@ from arabot.utils import (
 )
 
 HTTP_CATS_VALID_CODES = {
-    # fmt: off
     100, 101, 102,
     200, 201, 202, 203, 204, 206, 207,
     300, 301, 302, 303, 304, 305, 307, 308,
     400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416,
     417, 418, 420, 421, 422, 423, 424, 425, 426, 429, 431, 444, 450, 451, 497, 498, 499,
     500, 501, 502, 503, 504, 506, 507, 508, 509, 510, 511, 521, 523, 525, 599,
-}
+}  # fmt: skip
 
 WEBHOOK_RESERVED_NAMES = {"everyone": "everyоne", "here": "hеrе"}
 
@@ -72,23 +71,21 @@ class General(Cog, category=Category.GENERAL):
         if emojis is False:
             await ctx.reply_("specify_emojis")
             return
-        emojis = [e for e in emojis if not isinstance(e, (disnake.PartialEmoji, NoneType))]
+        emojis = [e for e in emojis if not isinstance(e, disnake.PartialEmoji | NoneType)]
         if not emojis:
             await ctx.reply_("emoji_not_found")
             return
 
         await ctx.message.delete()
 
-        if not (ref_msg := await ctx.getch_reference_message()):
-            if not (last_msgs := await ctx.history(before=ctx.message, limit=1).flatten()):
-                return
-            ref_msg = last_msgs[0]
+        if not (ref_msg := await ctx.getch_reference_message()) and not (
+            ref_msg := await anext(ctx.history(before=ctx.message, limit=1), None)
+        ):
+            return
 
         try:
             for emoji in emojis:
-                if isinstance(emoji, Twemoji):
-                    emoji = emoji.emoji
-                await ref_msg.add_reaction(emoji)
+                await ref_msg.add_reaction(emoji.emoji if isinstance(emoji, Twemoji) else emoji)
         except disnake.Forbidden:
             await ctx.reply_ping_(ctx._("cant_react_to", False).format(ref_msg.author.mention))
 
@@ -133,7 +130,7 @@ class General(Cog, category=Category.GENERAL):
             await ctx.send_ping(ctx._("summoning_user").format(member.mention))
 
     @commands.command(brief="Suggest server emoji", usage="<server emoji> <new emoji>", hidden=True)
-    async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after=None):
+    async def chemoji(self, ctx: Context, em_before: AnyEmoji, em_after: str | None = None):
         if em_before not in ctx.guild.emojis:
             await ctx.send_("choose_valid")
             return
@@ -175,7 +172,7 @@ class General(Cog, category=Category.GENERAL):
         await message.add_reaction("👎")
 
     @commands.command(brief="Make Ara say something", extras={"note": "Cannot ping roles"})
-    async def say(self, ctx: Context, *, text):
+    async def say(self, ctx: Context, *, text: str):
         if ctx.channel.permissions_for(ctx.me).manage_messages:
             await ctx.message.delete()
         am = disnake.AllowedMentions(users=True)
@@ -194,7 +191,7 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(
         aliases=["pick"], brief="Make a choice for you", usage="<option 1>|<option 2>|..."
     )
-    async def choose(self, ctx: Context, *, options):
+    async def choose(self, ctx: Context, *, options: str):
         options = options.split("|")
         if len(options) < 2:
             await ctx.send_(General.NOT_ENOUGH_OPTIONS, False)
@@ -208,7 +205,7 @@ class General(Cog, category=Category.GENERAL):
         brief="Create a poll",
         usage="<topic> OR <topic>|<option 1>|<option 2>|...",
     )
-    async def poll(self, ctx: Context, *, options):
+    async def poll(self, ctx: Context, *, options: str):
         options = [opt.strip() for opt in options.split("|")]
         if not options:
             await ctx.send_("topic_required")
@@ -224,7 +221,7 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.message.delete()
         indices = "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"
-        body = "\n".join(f"{n} {option}" for n, option in zip(indices, options))
+        body = "\n".join(f"{n} {option}" for n, option in zip(indices, options, strict=False))
         embed = disnake.Embed(title=topic, description=body).with_author(ctx.author)
         poll = await ctx.send(embed=embed)
         for i in indices[: len(options)]:
@@ -244,7 +241,7 @@ class General(Cog, category=Category.GENERAL):
         brief="Pretend to be somebody else",
         extras={"note": "Cannot ping roles"},
     )
-    async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text):
+    async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text: str):
         if user == ctx.me:
             await self.say(ctx, text=text)
             return

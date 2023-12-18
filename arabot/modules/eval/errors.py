@@ -26,20 +26,6 @@ class LocalEvalException(EvalException):
     def format(self, *, source: str | Sequence = "", filename: str = Evaluator.TB_FILENAME) -> str:
         if isinstance(source, str):
             source = source.strip().splitlines()
-
-        # tb_header = "Traceback (most recent call last):\n"
-        # tb_frames = traceback.extract_tb(self.original.__traceback__)
-        # tb_repl_frames = []
-        # for frame in tb_frames:
-        #     if frame.filename != filename:
-        #         continue
-        #     if sourcelines:
-        #         frame._line = sourcelines[frame.lineno - 1]
-        #     tb_repl_frames.append(frame)
-        # tb_repl_frames = traceback.format_list(tb_repl_frames)
-        # exc_msg = traceback.format_exception_only(self.original)
-        # tb_formatted = tb_header + "".join(tb_repl_frames + exc_msg)
-
         tb = traceback.TracebackException.from_exception(self.original)
         tb_repl_frames = []
         for frame in tb.stack:

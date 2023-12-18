@@ -38,8 +38,8 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
         with suppress(disnake.Forbidden):
             await ctx.message.add_reaction(CustomEmoji.KannaStare)
 
-        def bad_msg_check(msg: disnake.Message):
-            return (
+        def bad_msg_check(msg: disnake.Message) -> bool:
+            return bool(
                 msg.channel == ctx.channel
                 and not msg.author.bot
                 and ctx.author.top_perm_role > msg.author.top_perm_role

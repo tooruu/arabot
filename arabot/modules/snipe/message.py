@@ -37,7 +37,9 @@ class MessageSnipe(Cog, category=Category.FUN):
             and not (
                 (pfx := await self.ara.command_prefix(self.ara, msg))
                 and re.match(
-                    rf"{re.escape(pfx)}(?:{self.IGNORED_COMMANDS_PATTERN})(?:$|\s)", msg.content, re.I
+                    rf"{re.escape(pfx)}(?:{self.IGNORED_COMMANDS_PATTERN})(?:$|\s)",
+                    msg.content,
+                    re.IGNORECASE,
                 )
             )
         ):

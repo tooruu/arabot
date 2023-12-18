@@ -252,7 +252,7 @@
     "generic.message_not_found": "Message not found",
     "generic.nickname": "Nickname",
     "generic.no_perms_to": "I lack permission to {}",
-    "generic.no_privileged_intent": "I lack `{}` Priviliged Intent to run this command",
+    "generic.no_privileged_intent": "I lack `{}` Privileged Intent to run this command",
     "generic.no_results": "No results found",
     "generic.no": "No",
     "generic.not_found": "Not found",

@@ -46,8 +46,8 @@ class NicknameSnipe(Cog, category=Category.FUN):
                     {
                         member_id: [
                             (nick, changed_at)
-                            for nick, changed_at in nicks[-self.MAX_NICKS:]
-                            if (now - changed_at).days < self.PURGE_AFTER_DAYS  # fmt: skip
+                            for nick, changed_at in nicks[-self.MAX_NICKS :]
+                            if (now - changed_at).days < self.PURGE_AFTER_DAYS
                         ]
                         for member_id, nicks in members.items()
                         if nicks
@@ -75,7 +75,7 @@ class NicknameSnipe(Cog, category=Category.FUN):
             history[0] = (history[0][0], None)  # Check the comment in `on_member_update`
 
         embed = Embed()
-        for nick, changed_at in history[-self.MAX_NICKS :]:  # noqa: E203
+        for nick, changed_at in history[-self.MAX_NICKS :]:
             when = format_dt(changed_at, "R") if changed_at else ctx._("unknown_time")
             embed.add_field(when, nick, inline=False)
 

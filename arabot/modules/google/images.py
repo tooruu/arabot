@@ -12,14 +12,14 @@ from arabot.core import Category, Cog, Context
 SVG_MIME = "image/svg+xml"
 
 
-class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"}):
+class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "G_CSE"}):
     BASE_URL = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, session: ClientSession):
         self.session = session
 
     @command(aliases=["i", "img"], brief="Top search result from Google Images", enabled=False)
-    async def image(self, ctx: Context, *, query):
+    async def image(self, ctx: Context, *, query: str):
         async with ctx.typing():
             images = await self.fetch_images(query)
             async for image_file in self.filtered(images):
@@ -28,12 +28,12 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"g_isearch_key", "g_cse"
             else:
                 await ctx.reply_("no_images_found")
 
-    async def fetch_images(self, query) -> list:
+    async def fetch_images(self, query: str) -> list:
         data = await self.session.fetch_json(
             self.BASE_URL,
             params={
                 "key": self.g_isearch_key,
-                "cx": self.g_cse,
+                "cx": self.G_CSE,
                 "q": f"{query} -filetype:svg",
                 "searchType": "image",
             },

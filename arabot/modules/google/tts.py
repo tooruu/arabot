@@ -12,7 +12,7 @@ from arabot.core import Category, Cog, Context
 from arabot.utils import CUSTOM_EMOJI_RE
 
 
-class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
+class GoogleTTS(Cog, category=Category.GENERAL, keys={"G_TTS_KEY"}):
     def __init__(self, session: ClientSession):
         self.session = session
         self._invalidate_voices_cache.start()
@@ -47,7 +47,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
 
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.send_("provide_text")
-            return
+            return None
         text = await clean_content(fix_channel_mentions=True).convert(ctx, text)
         text = CUSTOM_EMOJI_RE.sub(r";\g<name>;", text)
 
@@ -55,7 +55,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
             lang = await self.detect_language(text)
             if not self.find_lang(lang, langs):
                 await ctx.send_("unknown_language")
-                return
+                return None
 
         audio = await self.synthesize(text, lang, "LINEAR16")
         return BytesIO(audio)
@@ -83,7 +83,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
         data = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/text:synthesize",
             method="post",
-            params={"key": self.g_tts_key},
+            params={"key": self.G_TTS_KEY},
             json={
                 "input": {"text": text},
                 "voice": {"languageCode": lang},
@@ -99,18 +99,18 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"g_tts_key"}):
     async def voices(self, language_code: str | None = None) -> list[dict]:
         data: dict[str, list[dict]] = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/voices",
-            params={"key": self.g_tts_key, "languageCode": language_code or ""},
+            params={"key": self.G_TTS_KEY, "languageCode": language_code or ""},
         )
         return data["voices"]
 
     async def detect_language(self, text: str) -> str | None:
         data: dict[str, dict[str, list[list[dict]]]] = await self.session.fetch_json(
             "https://translation.googleapis.com/language/translate/v2/detect",
-            params={"key": self.g_tts_key, "q": text},
+            params={"key": self.G_TTS_KEY, "q": text},
         )
         lang = data["data"]["detections"][0][0]["language"]
         return lang if lang != "und" else None
 
     @tasks.loop(time=datetime.time())
-    async def _invalidate_voices_cache(self):
+    async def _invalidate_voices_cache(self) -> None:
         self.voices.cache_clear()

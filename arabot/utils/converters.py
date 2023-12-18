@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from string import whitespace
 from types import UnionType
+from typing import TypeVar
 
 import disnake
 from aiohttp import ClientSession
@@ -33,11 +35,12 @@ __all__ = [
     "Empty",
     "Twemoji",
 ]
-
+_T = TypeVar("_T")
+_T1 = TypeVar("_T1", bound=str)
 arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
 
 
-class clean_content(commands.clean_content):
+class clean_content(commands.clean_content):  # noqa: N801
     def __init__(self, fix_emojis: bool = True, **kwargs: bool):
         self.fix_emojis = fix_emojis
         super().__init__(**kwargs)
@@ -56,7 +59,7 @@ class Twemoji(commands.Converter):
         self.url = self.base_url.format(self.codepoint)
         self.name = self.codepoint
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.emoji
 
     @classmethod
@@ -87,9 +90,9 @@ class UserFromCIMember(CIMember):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.User:
         try:
             member = await super().convert(ctx, argument)
-            return member._user
         except commands.MemberNotFound:
             raise commands.UserNotFound(argument) from None
+        return member._user
 
 
 class CIEmoji(commands.Converter):
@@ -134,7 +137,9 @@ class Empty(commands.Converter):
 
 class Codeblocks(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> list[tuple[str, str]]:
-        blocks = re.findall(r"```(?:([+\w-]+)\n+|\n*)(.*?)\n*```|`(.*?)`", argument, re.DOTALL)
+        blocks: list[str] = re.findall(
+            r"```(?:([+\w-]+)\n+|\n*)(.*?)\n*```|`(.*?)`", argument, re.DOTALL
+        )
         return [
             (lang, (codeblock or inlineblock).strip(whitespace))
             for lang, codeblock, inlineblock in blocks
@@ -160,8 +165,10 @@ AnyRole = disnake.Role | CIRole | Empty
 AnyGuild = disnake.Guild | CIGuild | Empty
 
 
-async def convert_union(ctx: commands.Context, argument: str, union: UnionType):
-    converters: tuple[commands.Converter] = union.__args__
+async def convert_union(ctx: commands.Context, argument: _T1, union: UnionType) -> _T | None:
+    converters: tuple[
+        type[_T | commands.Converter[_T]] | commands.Converter[_T] | Callable[[_T1], _T], ...
+    ] = union.__args__
     parameter = ctx.current_parameter
     for converter in converters:
         try:

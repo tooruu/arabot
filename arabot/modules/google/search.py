@@ -8,19 +8,19 @@ from arabot.core import Category, Cog, Context
 from arabot.utils import bold
 
 
-class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}):
+class GoogleSearch(Cog, category=Category.LOOKUP, keys={"G_SEARCH_KEY", "G_CSE"}):
     GSEARCH_BASE_URL = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, session: ClientSession):
         self.session = session
 
     @command(aliases=["g"], brief="Show top Google Search result")
-    async def google(self, ctx: Context, *, query):
+    async def google(self, ctx: Context, *, query: str):
         json = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
             params={
-                "key": self.g_search_key,
-                "cx": self.g_cse,
+                "key": self.G_SEARCH_KEY,
+                "cx": self.G_CSE,
                 "q": query,
                 "num": 1,
             },
@@ -30,12 +30,12 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"g_search_key", "g_cse"}
         )
 
     @command(aliases=["g3"], brief="Show top 3 Google Search results")
-    async def google3(self, ctx: Context, *, query):
+    async def google3(self, ctx: Context, *, query: str):
         data = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
             params={
-                "key": self.g_search_key,
-                "cx": self.g_cse,
+                "key": self.G_SEARCH_KEY,
+                "cx": self.G_CSE,
                 "q": query,
                 "num": 3,
             },

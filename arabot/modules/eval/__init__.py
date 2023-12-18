@@ -4,7 +4,6 @@ import logging
 import os
 from functools import partial
 from io import StringIO
-from typing import Any
 
 import disnake
 from aiohttp import ClientResponseError
@@ -108,9 +107,9 @@ class Eval(Cog, category=Category.GENERAL):
     def embed_add_codeblock_with_warnings(
         embed: disnake.Embed,
         name: str,
-        value: Any,
+        value: str,
         lang: str = "",
-    ):
+    ) -> None:
         if not (value := str(value).strip()):
             embed.description += f"No {name}.\n".capitalize()
             return

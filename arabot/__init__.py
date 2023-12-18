@@ -1,13 +1,19 @@
-# pylint: disable=wrong-import-position
-from os import getenv as _getenv
-from subprocess import run as _run
+from os import getenv
+from subprocess import run
 
-from dotenv import load_dotenv as _load_dotenv
+from dotenv import load_dotenv
+
+__all__ = [
+    "__version__",
+    "Ara",
+    "TESTING",
+]
 
 __version__ = "8.17.1"
 
-_run(("prisma", "db", "push"), check=True)
-_load_dotenv()
-TESTING = bool(_getenv("testing"))
+run(("prisma", "db", "push"), check=True)
+load_dotenv()
+TESTING = bool(getenv("TESTING"))
 
-from .core import Ara
+# Load up bot after the code above has been executed
+from .core import Ara  # noqa: E402

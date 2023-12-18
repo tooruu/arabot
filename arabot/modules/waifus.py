@@ -1,4 +1,5 @@
 from collections.abc import Awaitable, Callable
+from typing import Any, Self
 
 import disnake
 from aiohttp import ClientResponseError
@@ -147,7 +148,7 @@ REACTION_MAPPING: dict[str, dict[str, str | bool]] = {
 
 
 class WaifuCommandsMeta(commands.CogMeta):
-    def __new__(cls, name, bases, attrs, *args, **kwargs):
+    def __new__(cls, name: str, bases: tuple, attrs: dict[str, Any], *args, **kwargs) -> Self:
         command_callback = attrs[f"_{name}__callback"]
 
         for reaction_type in ImageCategories["sfw"]:
@@ -195,8 +196,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
             )
         )
 
-    # pylint: disable=unused-private-member
-    async def __callback(self, ctx: Context, *targets: AnyMember):
+    async def __callback(self, ctx: Context, *targets: AnyMember) -> None:
         method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
         if method == self.wclient.nsfw and not ctx.channel.is_nsfw():
             await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)

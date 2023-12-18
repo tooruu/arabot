@@ -18,7 +18,7 @@ _T2 = TypeVar("_T2")
 
 
 class FakeObj:
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         self.__dict__ = kwargs
 
 
@@ -27,7 +27,7 @@ class CommandAlreadyEnabled(commands.CommandError):
 
 
 class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
-    async def cog_check(self, ctx: Context):  # pylint: disable=invalid-overridden-method
+    async def cog_check(self, ctx: Context):
         return await ctx.ara.is_owner(ctx.author)
 
     @commands.command(
@@ -48,7 +48,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         await ctx.ara.close()
 
     @commands.command(usage="[activity]")
-    async def presence(self, ctx: Context, act_type="", *, act_name=""):
+    async def presence(self, ctx: Context, act_type: str = "", *, act_name: str = ""):
         acts = {
             "playing": disnake.ActivityType.playing,
             "listening": disnake.ActivityType.listening,
@@ -72,7 +72,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
     async def resetcd(
         self,
         ctx: Context,
-        input_cmd,
+        input_cmd: str,
         *,
         bucket_item: disnake.TextChannel
         | CITextChl
@@ -168,7 +168,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         self.COGS_PATH = cogs_path
         self.COGS_PATH_DOTTED = ".".join(Path(self.COGS_PATH).parts)
 
-    async def cog_check(self, ctx: Context):  # pylint: disable=invalid-overridden-method
+    async def cog_check(self, ctx: Context) -> bool:
         return await ctx.ara.is_owner(ctx.author)
 
     @commands.group(invoke_without_command=True)
@@ -185,7 +185,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         await ctx.send(embed=embed)
 
     @ext.command(name="load", aliases=["enable"], usage="<extensions>")
-    async def ext_load(self, ctx: Context, *extensions):
+    async def ext_load(self, ctx: Context, *extensions: str):
         if not extensions:
             await ctx.send_(PluginManager.NO_EXTENSIONS_PROVIDED, False)
             return
@@ -200,10 +200,10 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         }
         load = lambda ext: ctx.ara.load_extension(f"{self.COGS_PATH_DOTTED}.{ext}")
 
-        await self.do_action_group_format_embed_send(load, extensions, statuses, ctx)
+        await self._do_action_group_format_embed_send(load, extensions, statuses, ctx)
 
     @ext.command(name="unload", aliases=["disable"], usage="<extensions>")
-    async def ext_unload(self, ctx: Context, *extensions):
+    async def ext_unload(self, ctx: Context, *extensions: str):
         if not extensions:
             await ctx.send_(PluginManager.NO_EXTENSIONS_PROVIDED, False)
             return
@@ -213,10 +213,10 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             commands.ExtensionNotLoaded: ctx._(PluginManager.NOT_LOADED, False),
         }
         unload = lambda ext: ctx.ara.unload_extension(f"{self.COGS_PATH_DOTTED}.{ext}")
-        await self.do_action_group_format_embed_send(unload, extensions, statuses, ctx)
+        await self._do_action_group_format_embed_send(unload, extensions, statuses, ctx)
 
     @ext.command(name="reload", usage="<extensions>")
-    async def ext_reload(self, ctx: Context, *extensions):
+    async def ext_reload(self, ctx: Context, *extensions: str):
         if not extensions:
             await ctx.send_(PluginManager.NO_EXTENSIONS_PROVIDED, False)
             return
@@ -230,14 +230,14 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             commands.NoEntryPointError: ctx._(PluginManager.INVALID, False),
         }
         reload = lambda ext: ctx.ara.reload_extension(f"{self.COGS_PATH_DOTTED}.{ext}")
-        await self.do_action_group_format_embed_send(reload, extensions, statuses, ctx)
+        await self._do_action_group_format_embed_send(reload, extensions, statuses, ctx)
 
     @commands.group(aliases=["command"])
     async def cmd(self, ctx: Context):
         pass
 
     @cmd.command(name="enable", aliases=["load"], usage="<commands>")
-    async def cmd_enable(self, ctx: Context, *cmds):
+    async def cmd_enable(self, ctx: Context, *cmds: str):
         if not cmds:
             await ctx.send_(PluginManager.NO_COMMANDS_PROVIDED, False)
             return
@@ -248,7 +248,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             CommandAlreadyEnabled: ctx._(PluginManager.ALREADY_ENABLED, False),
         }
 
-        def enable(cmd: str):
+        def enable(cmd: str) -> None:
             command = ctx.ara.get_command(cmd)
             if not command:
                 raise commands.CommandNotFound
@@ -256,10 +256,10 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
                 raise CommandAlreadyEnabled
             command.enabled = True
 
-        await self.do_action_group_format_embed_send(enable, cmds, statuses, ctx)
+        await self._do_action_group_format_embed_send(enable, cmds, statuses, ctx)
 
     @cmd.command(name="disable", aliases=["unload"], usage="<commands>")
-    async def cmd_disable(self, ctx: Context, *cmds):
+    async def cmd_disable(self, ctx: Context, *cmds: str):
         if not cmds:
             await ctx.send_(PluginManager.NO_COMMANDS_PROVIDED, False)
             return
@@ -270,7 +270,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
             commands.DisabledCommand: ctx._(PluginManager.ALREADY_DISABLED, False),
         }
 
-        def disable(cmd: str):
+        def disable(cmd: str) -> None:
             command = ctx.ara.get_command(cmd)
             if not command:
                 raise commands.CommandNotFound
@@ -278,7 +278,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
                 raise commands.DisabledCommand
             command.enabled = False
 
-        await self.do_action_group_format_embed_send(disable, cmds, statuses, ctx)
+        await self._do_action_group_format_embed_send(disable, cmds, statuses, ctx)
 
     @staticmethod
     def group_by_exc_raised(
@@ -307,7 +307,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     def merge_dict_values(key_val: dict[_T, _T1], key_repr: dict[_T, _T2]) -> dict[_T2, _T1]:
         return {key_repr[key]: val for key, val in key_val.items() if val}
 
-    async def do_action_group_format_embed_send(
+    async def _do_action_group_format_embed_send(
         self,
         action: Callable[[_T], Any],
         arguments: Iterable[_T],

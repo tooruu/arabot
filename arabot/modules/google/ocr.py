@@ -18,7 +18,7 @@ class OCRException(Exception):
         self.message = message
 
 
-class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
+class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
     def __init__(self, trans: GoogleTranslate):
         self.trans = trans
 
@@ -58,7 +58,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
     async def handle_annotation(self, ctx: Context, image_url: str | None) -> str:
         if not image_url and not (image_url := await ctx.rsearch("image_url")):
             await ctx.send_("no_image_or_link_provided")
-            raise StopCommand()
+            raise StopCommand
 
         try:
             text = await self.annotate(image_url)
@@ -67,24 +67,24 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"g_ocr_key"}):
                 if not resp.ok:
                     logging.warning("OCR: Couldn't download image %s", image_url)
                     await ctx.reply_("couldnt_read_image")
-                    raise StopCommand() from None
+                    raise StopCommand from None
                 image_data = await resp.read()
             try:
                 text = await self.annotate(image_data)
             except OCRException:
                 logging.warning("OCR: Image failed %s", image_url)
                 await ctx.reply_("couldnt_read_image")
-                raise StopCommand() from None
+                raise StopCommand from None
 
         if not text:
             await ctx.reply_("no_text")
-            raise StopCommand()
+            raise StopCommand
 
         return text
 
     async def annotate(self, image: str | bytes) -> str | None:
         data = await self.trans.gtrans.session.fetch_json(  # lol
-            f"https://vision.googleapis.com/v1/images:annotate?key={self.g_ocr_key}",
+            f"https://vision.googleapis.com/v1/images:annotate?key={self.G_OCR_KEY}",
             method="post",
             json={
                 "requests": [

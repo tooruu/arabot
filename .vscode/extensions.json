@@ -2,7 +2,7 @@
   "recommendations": [
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "ms-python.isort",
+    "charliermarsh.ruff",
     "prisma.prisma"
   ]
 }

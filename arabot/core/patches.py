@@ -15,8 +15,8 @@ import disnake.gateway
 from disnake.ext import commands
 
 from arabot.core import bot
+from arabot.utils import fullqualname, getkeys
 
-from ..utils import fullqualname, getkeys
 from .enums import Category
 
 __all__ = [
@@ -29,7 +29,7 @@ __all__ = [
 class Context(commands.Context):
     bot: bot.Ara
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.ara = self.bot
 
@@ -122,9 +122,9 @@ class Context(commands.Context):
 class Cog(commands.Cog):
     def __init_subclass__(
         cls, category: Category = Category.NO_CATEGORY, keys: Iterable[str] = (), **kwargs
-    ):
+    ) -> None:
         cls.category = category
-        for key_name, key in zip(keys, getkeys(*keys)):
+        for key_name, key in zip(keys, getkeys(*keys), strict=True):
             setattr(cls, key_name, key)
         super().__init_subclass__(**kwargs)
 
@@ -135,7 +135,8 @@ class LocalizationStore(disnake.LocalizationStore):
         super().__init__(strict=strict)
 
     def getl(self, key: str, locale: disnake.Locale, scope_depth: int = 1) -> str | None:
-        """Returns localized string for a given locale and key combination.
+        """Return localized string for a given locale and key combination.
+
         Uses `self.fallback` locale if it is set and given :param:`locale` doesn't exist.
 
         :param key: L10n key
@@ -209,7 +210,9 @@ async def temp_mute_channel_member(
             )
 
 
-async def fetch_json(self: aiohttp.ClientSession, url: str, *, method: str = "get", **kwargs):
+async def fetch_json(
+    self: aiohttp.ClientSession, url: str, *, method: str = "get", **kwargs
+) -> dict | list:
     async with self.request(method, url, **{"raise_for_status": True, **kwargs}) as resp:
         return await resp.json()
 
@@ -244,9 +247,11 @@ def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Em
 
 
 def top_perm_role(self: disnake.Member) -> disnake.Role:
-    "Get highest role that has at least one permission to exclude dummy roles e.g. colors"
-    is_perm_role = lambda r: r.permissions.value != 0
-    return next(filter(is_perm_role, reversed(self.roles)), self.guild.default_role)
+    """Get highest role that has at least one permission to exclude dummy roles, e.g. colors."""
+    return next(
+        filter(lambda r: r.permissions.value != 0, reversed(self.roles)),
+        self.guild.default_role,
+    )
 
 
 @property

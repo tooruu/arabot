@@ -56,7 +56,7 @@ class Source(IntEnum):
     FurryNetwork = 42
 
 
-class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
+class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
     def __init__(self, session: ClientSession):
         self.session = session
         self.jikan = AioJikan(session=session)
@@ -74,7 +74,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
             "https://saucenao.com/search.php",
             params={
                 "output_type": 2,
-                "api_key": self.saucenao_key,
+                "api_key": self.SAUCENAO_KEY,
                 "db": 999,
                 "numres": 1,
                 "url": image_url,
@@ -82,7 +82,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
         )
         if nao_json["header"]["status"]:
             error = nao_json["header"].get("message")
-            logging.error(f"Sauce failed for {image_url}" + (f"\n{error}" if error else ""))
+            logging.error("Sauce failed for %s%s", image_url, f"\n{error}" if error else "")
             await ctx.reply(f"{_('fetch_failed')}\n{error or ''}")
             return
         if not nao_json["header"]["results_returned"]:
@@ -163,12 +163,11 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"saucenao_key"}):
                         and _("post")
                     )
                     embed.description = f"{_('similarity')}: {header['similarity']}%"
-                    match data.get("creator"):
-                        # pylint: disable=used-before-assignment
-                        case str() as c if c not in {"", "Unknown"}:
-                            embed.set_author(name=c)
-                        case list() as c if c != ["Unknown"]:
-                            embed.set_author(name=", ".join(c))
+                    match creator := data.get("creator"):
+                        case str() if creator and creator != "Unknown":
+                            embed.set_author(name=creator)
+                        case list() if "Unknown" not in creator:
+                            embed.set_author(name=", ".join(creator))
                     if not (embed.author or embed.title):
                         raise KeyError
                     embed.set_image(header["thumbnail"])

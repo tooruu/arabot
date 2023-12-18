@@ -1,6 +1,3 @@
 {
-  "isort.args": ["--profile", "black", "--project", "arabot", "--line-length", "100"],
-  "python.formatting.blackArgs": ["--line-length=100"],
-  "python.linting.prospectorEnabled": true,
-  "python.terminal.activateEnvInCurrentTerminal": true
+  "python.analysis.typeCheckingMode": "off"
 }

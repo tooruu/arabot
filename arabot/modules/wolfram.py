@@ -1,4 +1,4 @@
-from json import loads
+import json
 from urllib.parse import quote_plus
 
 from aiohttp import ClientSession
@@ -9,7 +9,7 @@ from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import dsafe
 
 
-class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
+class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
     def __init__(self, session: ClientSession):
         self.session = session
 
@@ -23,11 +23,11 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"wolfram_id"}):
                 "input": question,
                 "format": "plaintext",
                 "output": "json",
-                "appid": self.wolfram_id,
+                "appid": self.WOLFRAM_ID,
                 "units": "metric",
             },
-        ) as wa:
-            wa = loads(await wa.text())["queryresult"]
+        ) as r:
+            wa = json.loads(await r.text())["queryresult"]
         embed = Embed(
             color=0xF4684C,
             title=dsafe(question),

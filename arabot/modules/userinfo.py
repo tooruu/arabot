@@ -10,7 +10,7 @@ from arabot.utils import I18N, AnyMember, AnyMemberOrUser, Twemoji
 
 
 class GlobalOrGuildUserVariant(disnake.ui.View):
-    def __init__(self, embeds):
+    def __init__(self, embeds: tuple[disnake.Embed, disnake.Embed]):
         super().__init__(timeout=None)
         self.embeds = embeds
 
@@ -175,7 +175,8 @@ class Userinfo(Cog, category=Category.GENERAL):
             ):
                 party = ""
                 if party_size := activity.party.get("size"):
-                    party = " ({0[0]}/{0[1]})".format(party_size)
+                    current, max_ = party_size
+                    party = f" ({current}/{max_})"
 
                 if activity.details:
                     name, body = activity.name, activity.details

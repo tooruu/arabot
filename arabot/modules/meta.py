@@ -1,7 +1,6 @@
-from collections.abc import Callable
-from glob import glob
 from itertools import groupby
 from os import getenv
+from pathlib import Path
 from subprocess import SubprocessError, check_output
 
 import disnake
@@ -14,7 +13,7 @@ from arabot.utils import I18N, bold, codeblock, mono
 
 
 class EmbedHelpCommand(commands.HelpCommand):
-    def __init__(self, **command_attrs):
+    def __init__(self, **command_attrs) -> None:
         super().__init__(command_attrs=command_attrs)
 
     async def prepare_help_command(self, ctx: commands.Context, command: str | None = None) -> None:
@@ -83,10 +82,8 @@ class EmbedHelpCommand(commands.HelpCommand):
         )
 
     def get_command_category(self, command: commands.Command) -> Category:
-        return (
-            command.extras.get("category")
-            or getattr(command.cog, "category")
-            or Category.NO_CATEGORY
+        return command.extras.get("category") or getattr(
+            command.cog, "category", Category.NO_CATEGORY
         )
 
     def get_usage_explanation(self, command: commands.Command) -> str:
@@ -115,27 +112,28 @@ class EmbedHelpCommand(commands.HelpCommand):
 class Meta(Cog, category=Category.META):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.__setup_help_command()
-        self._line_count = self.__get_line_count()
+        self._setup_help_command()
+        self._line_count = self._count_lines()
 
-    def __setup_help_command(self):
+    def _setup_help_command(self) -> None:
         self._orig_help_command = self.ara.help_command
         self.ara.help_command = EmbedHelpCommand(
             aliases=["halp", "h", "commands"], brief="Shows bot or command help"
         )
         self.ara.help_command.cog = self
 
-    def __get_line_count(self):
+    @staticmethod
+    def _count_lines() -> int:
         count = 0
         try:
-            for g in glob("arabot/**/*.py", recursive=True):
-                with open(g, encoding="utf8") as f:
+            for file in Path("arabot").rglob("*.py"):
+                with file.open(encoding="utf8") as f:
                     count += len(f.readlines())
         except OSError:
             return 0
         return count
 
-    def __get_version(self):
+    def _get_version(self) -> str:
         ver_str = f"{self.ara.name} v{arabot.__version__}"
 
         if not arabot.TESTING:
@@ -174,7 +172,7 @@ class Meta(Cog, category=Category.META):
     async def server_invite_link(self, ctx: Context):
         await ctx.send(await ctx.guild.get_unlimited_invite_link() or ctx._("not_found", False))
 
-    @commands.command(name="arabot", brief="Show bot's invite link")  # TODO:dynamically change name
+    @commands.command(name="arabot", brief="Show bot invite link")  # TODO: dynamically change name
     async def ara_invite_link(self, ctx: Context):
         await ctx.ara.wait_until_ready()
         await ctx.send(
@@ -206,7 +204,7 @@ class Meta(Cog, category=Category.META):
 
     async def cog_load(self):
         await self.ara.wait_until_ready()
-        self._version = self.__get_version()
+        self._version = self._get_version()
 
     def cog_unload(self):
         self.ara.help_command = self._orig_help_command

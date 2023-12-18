@@ -1,10 +1,12 @@
 from collections import deque
-from collections.abc import Callable
 from io import BytesIO
 
 from disnake import File
 from disnake.ext.commands import command
 from disnake.ext.tasks import loop
+from matplotlib import use
+
+use("AGG")
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 

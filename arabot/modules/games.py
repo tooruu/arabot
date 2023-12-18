@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 from contextlib import suppress
 from functools import partial
 from itertools import product
+from typing import Literal, Never
 
 import disnake
 from disnake.ext import commands
@@ -33,16 +34,16 @@ class Connect4Engine:
     WRONG_PLAYER = 4
     DRAW = 5
 
-    def __init__(self, player1, player2):
+    def __init__(self, player1: int, player2: int):
         self._player1 = player1
         self._player2 = player2
-        self._state = [0] * 6 * 7
+        self._state: list[int] = [0] * 6 * 7
 
     @property
-    def _next_up(self):
+    def _next_up(self) -> int:
         return self._player1 if self._state.count(0) % 2 == 0 else self._player2
 
-    def _play_move(self, player, column):
+    def _play_move(self, player: int, column: int) -> int:
         # Wrong player
         if self._next_up != player:
             return self.WRONG_PLAYER
@@ -57,21 +58,21 @@ class Connect4Engine:
 
         return self._apply_move(player, column)
 
-    def _apply_move(self, player, column):
+    def _apply_move(self, player: int, column: int) -> int:
         next_empty = self._find_next_empty(column)
         self._state[next_empty] = 1 if player == self._player1 else 2
         if self._check_4_in_a_row(next_empty):
             return self.PLAYER1_WINNER if player == self._player1 else self.PLAYER2_WINNER
         return self.MOVE_ACCEPTED if 0 in self._state else self.DRAW
 
-    def _check_4_in_a_row(self, last_added):
+    def _check_4_in_a_row(self, last_added: int) -> bool:
         target_value = self._state[last_added]
 
         space_right = 6 - last_added % 7
         space_left = last_added % 7
         space_down = 5 - last_added // 7
         space_up = last_added // 7
-        directions = {
+        directions: dict[int, int] = {
             +1: space_right,
             -1: space_left,
             +7: space_down,
@@ -82,20 +83,19 @@ class Connect4Engine:
             -8: min(space_up, space_left),
         }
 
-        in_a_row = {}
+        in_a_row = dict[int, int]()
         for direction, distance in directions.items():
-            distance = min(distance, 3)
+            d = min(distance, 3)
             current = last_added
-            while distance > 0:
+            while d > 0:
                 current += direction
-                if self._state[current] == target_value:
-                    in_a_row[abs(direction)] = in_a_row.get(abs(direction), 1) + 1
-                    distance -= 1
-                else:
+                if self._state[current] != target_value:
                     break
+                in_a_row[abs(direction)] = in_a_row.get(abs(direction), 1) + 1
+                d -= 1
         return any(x >= 4 for x in in_a_row.values())
 
-    def _find_next_empty(self, column):
+    def _find_next_empty(self, column: int) -> int:
         current = column - 1
         while current <= 34 and not self._state[current + 7]:
             current += 7
@@ -112,19 +112,19 @@ class Connect4Game(Connect4Engine):
         self.last_column = None
         super().__init__(player1.id, player2.id)
 
-    def play_move(self, player, column):
+    def play_move(self, player: disnake.Member, column: int) -> int:
         self.last_column = column
         return self._play_move(player.id, column)
 
     @property
-    def next_up(self):
+    def next_up(self) -> disnake.Member:
         return self.player1 if self._next_up == self.player1.id else self.player2
 
     @property
-    def state(self):
+    def state(self) -> list[int]:
         return self._state
 
-    def get_embed(self, custom_footer=False):
+    def get_embed(self, custom_footer: bool = False) -> disnake.Embed:
         title = (
             f"Connect 4: {self.player1.display_name} ({self.tokens[1]}) "
             f"VS {self.player2.display_name} ({self.tokens[2]})"
@@ -135,16 +135,12 @@ class Connect4Game(Connect4Engine):
             content = ""
 
         for line in range(6):
-            line_state = self.state[line * 7:(line + 1) * 7]  # fmt: skip
+            line_state = self.state[line * 7 : (line + 1) * 7]
             content += "".join(str(self.tokens[x]) for x in line_state) + "\n"
 
         content += "".join(COLUMN_EMOJI)
 
-        e = disnake.Embed(
-            title=title,
-            description=content,
-            color=0x2ECC71,
-        )
+        e = disnake.Embed(title=title, description=content, color=0x2ECC71)
         if custom_footer:
             e.set_footer(text=custom_footer)
         else:
@@ -160,10 +156,10 @@ class Connect4(Cog, category=Category.FUN):
         self._ = lambda key, msg, scope_depth=1: ara.i18n.getl(
             key, msg.guild.preferred_locale, scope_depth + (scope_depth > 0)
         )
-        self.waiting_games = {}
-        self.active_games = {}
+        self.waiting_games = dict[int, tuple[disnake.Message, disnake.Member, str | None]]()
+        self.active_games = dict[int, tuple[Connect4Game, disnake.Message]]()
 
-    async def start_invite(self, ctx: Context):
+    async def start_invite(self, ctx: Context) -> None:
         await ctx.message.delete()
         message = await ctx.send(ctx._("start_game").format(ctx.author.display_name))
         self.waiting_games[message.id] = (message, ctx.author, None)
@@ -171,7 +167,7 @@ class Connect4(Cog, category=Category.FUN):
             await message.add_reaction(emoji)
         await message.add_reaction(CANCEL_EMOJI)
 
-    async def p1_token_pick(self, message: disnake.Message, token):
+    async def p1_token_pick(self, message: disnake.Message, token: str) -> None:
         message, player1, _ = self.waiting_games[message.id]
         self.waiting_games[message.id] = (message, player1, token)
         await message.clear_reaction(token)
@@ -185,9 +181,9 @@ class Connect4(Cog, category=Category.FUN):
         p1_token: str,
         p2_token: str,
         message: disnake.Message,
-    ):
+    ) -> None:
         await message.clear_reactions()
-        notification = await message.channel.send_ping(
+        notification: disnake.Message = await message.channel.send_ping(
             self._("joined_game", message).format(player1.mention, player2.display_name)
         )
         await message.edit(self._("loading", message))
@@ -199,7 +195,7 @@ class Connect4(Cog, category=Category.FUN):
         await message.edit(None, embed=game.get_embed())
         await notification.delete()
 
-    async def finish_game(self, game, message: disnake.Message, result):
+    async def finish_game(self, game: Connect4Game, message: disnake.Message, result: int) -> None:
         await message.clear_reactions()
         if result == game.DRAW:
             winner = None
@@ -216,22 +212,24 @@ class Connect4(Cog, category=Category.FUN):
         )
         del self.active_games[message.id]
 
-    async def cancel_invite(self, message: disnake.Message):
+    async def cancel_invite(self, message: disnake.Message) -> None:
         await message.delete()
         del self.waiting_games[message.id]
 
-    async def cancel_game(self, game, message: disnake.Message, user):
+    async def cancel_game(
+        self, game: Connect4Game, message: disnake.Message, user: disnake.Member
+    ) -> None:
         await message.clear_reactions()
         footer = self._("game_cancelled_by", message)
         await message.edit(embed=game.get_embed(custom_footer=footer.format(user.display_name)))
         del self.active_games[message.id]
 
     @commands.command(aliases=["c4"], brief="Start a game of Connect 4")
-    async def connect4(self, ctx: Context):
+    async def connect4(self, ctx: Context) -> None:
         await self.start_invite(ctx)
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: disnake.Reaction, user: disnake.abc.User):
+    async def on_reaction_add(self, reaction: disnake.Reaction, user: disnake.abc.User) -> None:
         if user.id == self.ara.user.id:
             return
         if reaction.message.id in self.waiting_games:
@@ -281,7 +279,7 @@ class TicTacToeButton(disnake.ui.Button):
         self.x = x
         self.y = y
 
-    async def callback(self, inter: disnake.MessageInteraction):
+    async def callback(self, inter: disnake.MessageInteraction) -> None:
         view: TicTacToe = self.view
         if view.board[self.y][self.x] is not None:
             return
@@ -440,7 +438,7 @@ class Games(Cog, category=Category.FUN):
 
     @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number", usage="[max=20]")
-    async def guess(self, ctx: Context, *ceiling):
+    async def guess(self, ctx: Context, *ceiling: str):
         # Initializing
         try:
             ceiling = max(abs(int(ceiling[-1])), 2)
@@ -461,7 +459,7 @@ class Games(Cog, category=Category.FUN):
                     )
             return False
 
-        async def voting():
+        async def voting() -> Literal[True]:
             while True:
                 vote: disnake.Message = await ctx.ara.wait_for("message", check=is_valid_guess)
                 await vote.blue_tick()
@@ -519,8 +517,8 @@ class Games(Cog, category=Category.FUN):
         voted: list[disnake.Member] = []
         votes: dict[disnake.Member, int] = defaultdict(int)
 
-        def is_valid_vote(vote):
-            return (
+        def is_valid_vote(vote: disnake.Message) -> bool:
+            return bool(
                 vote.author not in voted
                 and vote.mentions
                 and re.fullmatch(r"<@!?\d{15,21}>", vote.content)
@@ -530,7 +528,7 @@ class Games(Cog, category=Category.FUN):
                 and not vote.mentions[0].bot
             )
 
-        async def voting():
+        async def voting() -> Never:
             while True:
                 vote: disnake.Message = await ctx.ara.wait_for("message", check=is_valid_vote)
                 await vote.delete()

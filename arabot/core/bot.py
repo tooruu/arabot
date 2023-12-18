@@ -3,10 +3,10 @@ import logging
 import os
 import sys
 from collections.abc import Generator
-from glob import glob
 from pathlib import Path
 from pkgutil import iter_modules
 from traceback import format_exception
+from typing import TypeVar
 
 import aiohttp
 import disnake
@@ -14,14 +14,16 @@ from disnake.ext import commands
 from disnake.utils import oauth_url, utcnow
 
 from arabot import TESTING
+from arabot.utils import codeblock, mono, system_info, time_in
 
-from ..utils import codeblock, mono, system_info, time_in
 from .database import AraDB
 from .errors import StopCommand
 from .patches import Context, LocalizationStore
 
+_T = TypeVar("_T", bound=commands.Context)
 
-def search_directory(path) -> Generator[str, None, None]:
+
+def search_directory(path: str | Path) -> Generator[str, None, None]:
     path = Path(path)
 
     if ".." in os.path.relpath(path):
@@ -31,13 +33,14 @@ def search_directory(path) -> Generator[str, None, None]:
     if not path.is_dir():
         raise ValueError(f"Provided path '{path.resolve()}' is not a directory")
 
-    with_prefix = lambda f: ".".join((path / f).parts)
+    def with_prefix(f: str) -> str:
+        return ".".join((path / f).parts)
 
-    modules, packages = set(), set()
+    modules, packages = set[str](), set[str]()
     for _, name, ispkg in iter_modules([str(path)]):
         if not name.startswith("_"):
             (packages if ispkg else modules).add(name)
-    dirs = {dir.rstrip(os.sep) for dir in glob("[!_]*/", root_dir=path)} - packages
+    dirs = {p.name for p in Path(path).glob("[!_]*/")} - packages
 
     yield from map(with_prefix, modules)
     yield from map(with_prefix, packages)
@@ -66,8 +69,8 @@ class Ara(commands.Bot):
         self.http.token = token
 
     async def login(self) -> None:
-        if not (token := self.http.token or os.getenv("token")):
-            logging.critical("Missing initializer argument or environment variable 'token'")
+        if not (token := self.http.token or os.getenv("TOKEN")):
+            logging.critical("Missing initializer argument or environment variable 'TOKEN'")
             sys.exit(69)
 
         try:
@@ -127,7 +130,7 @@ class Ara(commands.Bot):
                 task.cancel()
             await asyncio.gather(*pending, return_exceptions=True)
 
-    async def get_context(self, message: disnake.Message, *, cls=Context) -> Context:
+    async def get_context(self, message: disnake.Message, *, cls: type[_T] = Context) -> _T:
         return await super().get_context(message, cls=cls)
 
     def load_extensions(self) -> None:
@@ -185,12 +188,6 @@ class Ara(commands.Bot):
             case _:
                 logging.error("Unhandled exception", exc_info=exception)
                 await context.reply_("unknown_error")
-                # args = exception.args
-                # await context.reply(
-                #     args[0]
-                #     if len(args) == 1 and isinstance(args[0], str)
-                #     else context._("unknown_error")
-                # )
                 if not TESTING:
                     await self.owner.send(
                         embed=disnake.Embed(

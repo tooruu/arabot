@@ -1,6 +1,4 @@
-import html
 import random
-import re
 from asyncio import sleep
 from contextlib import suppress
 from io import BytesIO
@@ -171,7 +169,7 @@ class Fun(Cog, category=Category.FUN):
         hidden=True,
         extras={"note": "This is a Discord bug that may be fixed in the future"},
     )
-    async def ghostping(self, ctx: Context, member: AnyMember, *, text):
+    async def ghostping(self, ctx: Context, member: AnyMember, *, text: str):
         await ctx.message.delete()
         if not member:
             return
@@ -228,8 +226,7 @@ class Fun(Cog, category=Category.FUN):
 
         elif not (msg_x := await ctx.getch_reference_message()):
             if msg_x is False:
-                if history := await ctx.history(before=ctx.message, limit=1).flatten():
-                    msg_x = history[0]
+                msg_x = await anext(ctx.history(before=ctx.message, limit=1), None)
             if not msg_x:
                 await ctx.reply_("message_not_found", False)
                 return

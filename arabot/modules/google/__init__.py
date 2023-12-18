@@ -12,7 +12,7 @@ from .youtube import Youtube
 
 def setup(ara: Ara):
     session = ara.session
-    trans_client = TranslationClient(getenv("g_trans_key"), session)
+    trans_client = TranslationClient(getenv("G_TRANS_KEY"), session)
     trans = GoogleTranslate(trans_client)
     ara.add_cog(trans)
     ara.add_cog(GoogleOCR(trans))

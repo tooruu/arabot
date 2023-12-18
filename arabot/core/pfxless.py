@@ -23,14 +23,14 @@ class PfxlessOnCooldown(commands.CommandOnCooldown):
     pass
 
 
-def copy_dpy_attrs_from(donor):
+def copy_dpy_attrs_from(donor: CogMsgListener) -> Callable[[CogMsgListener], CogMsgListener]:
     organs = {
         "__commands_checks__": [],
         "__commands_max_concurrency__": None,
         "__commands_cooldown__": commands.CooldownMapping(None, commands.BucketType.default),
     }
 
-    def transplantation(patient):
+    def transplantation(patient: CogMsgListener) -> CogMsgListener:
         for organ, default in organs.items():
             replacement = getattr(donor, organ, default)
             setattr(patient, organ, replacement)

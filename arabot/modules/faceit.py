@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from aiohttp import ClientSession
 from disnake import Embed
@@ -7,13 +7,13 @@ from disnake.ext.commands import command
 from arabot.core import Ara, Category, Cog, Context
 
 
-class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
+class Faceit(Cog, category=Category.LOOKUP, keys={"FACEIT_KEY"}):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.session = ClientSession(headers={"Authorization": f"Bearer {self.faceit_key}"})
+        self.session = ClientSession(headers={"Authorization": f"Bearer {self.FACEIT_KEY}"})
 
     @command(brief="View player's FACEIT profile")
-    async def faceit(self, ctx: Context, nickname):
+    async def faceit(self, ctx: Context, nickname: str):
         players = await self.session.fetch_json(
             f"https://open.faceit.com/data/v4/search/players?nickname={nickname}&limit=1"
         )
@@ -32,8 +32,8 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"faceit_key"}):
         friends = len(player["friends_ids"])
         try:
             last_infraction = datetime.strptime(
-                player["last_infraction_date"], "%a %b %d %H:%M:%S UTC %Y"
-            )
+                player["last_infraction_date"], "%a %b %d %H:%M:%S %Z %Y"
+            ).replace(tzinfo=UTC)
         except (KeyError, ValueError):
             last_infraction = ""
         else:

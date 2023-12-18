@@ -1,6 +1,6 @@
 import logging
 from asyncio import sleep
-from datetime import datetime, time, timedelta, timezone, tzinfo
+from datetime import UTC, datetime, time, timedelta, tzinfo
 from functools import partial
 from zoneinfo import ZoneInfo
 
@@ -15,7 +15,7 @@ HYLTZ = ZoneInfo("Etc/GMT-8")
 
 
 class Timer:
-    def __init__(self, schedule: dict[int, list[tuple[time, str]]], tz: tzinfo = timezone.utc):
+    def __init__(self, schedule: dict[int, list[tuple[time, str]]], tz: tzinfo = UTC):
         self.sched = {
             wkday: sorted((t.replace(tzinfo=tz), s) for t, s in times)
             for wkday, times in sorted(schedule.items())

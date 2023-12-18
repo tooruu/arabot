@@ -1,5 +1,4 @@
 -r requirements.txt
 
 # Linting & Formatting
-prospector
-black
+ruff

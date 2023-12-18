@@ -1,42 +1,41 @@
 import re as _re
 from collections.abc import Iterable as _Iterable
-from typing import Any as _Any
 
 
-def bold(s: _Any) -> str:
-    return "**{}**".format(str(s).replace("*", r"\*"))
+def bold(s: str) -> str:
+    return "**{}**".format(s.replace("*", r"\*"))
 
 
-def underline(s: _Any) -> str:
-    return "__{}__".format(str(s).replace("_", r"\_"))
+def underline(s: str) -> str:
+    return "__{}__".format(s.replace("_", r"\_"))
 
 
-def italic(s: _Any) -> str:
-    return "*{}*".format(str(s).replace("*", r"\*"))
+def italic(s: str) -> str:
+    return "*{}*".format(s.replace("*", r"\*"))
 
 
-def strikethrough(s: _Any) -> str:
-    return "~~{}~~".format(str(s).replace("~", r"\~"))
+def strikethrough(s: str) -> str:
+    return "~~{}~~".format(s.replace("~", r"\~"))
 
 
-def dsafe(s: _Any) -> str:
-    return _re.sub(r"([*_~|`])", r"\\\1", str(s))
+def dsafe(s: str) -> str:
+    return _re.sub(r"([*_~|`])", r"\\\1", s)
 
 
-def spoiler(s: _Any) -> str:
-    return "||{}||".format(str(s).replace("|", r"\|"))
+def spoiler(s: str) -> str:
+    return "||{}||".format(s.replace("|", r"\|"))
 
 
-def mono(s: _Any) -> str:
-    return "`{}`".format(str(s).replace("`", r"\`"))
+def mono(s: str) -> str:
+    return "`{}`".format(s.replace("`", r"\`"))
 
 
-def codeblock(s: _Any, lang: str = "") -> str:
-    return "```{}\n{}\n```".format(lang, str(s).replace("```", "``\u200b`"))
+def codeblock(s: str, lang: str = "") -> str:
+    return "```{}\n{}\n```".format(lang, s.replace("```", "``\u200b`"))
 
 
-def unping(s: _Any) -> str:
-    return str(s).replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
+def unping(s: str) -> str:
+    return s.replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
 
 
 def repchars(s: str, chars: str, rep: str = "") -> str:

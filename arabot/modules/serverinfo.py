@@ -1,6 +1,5 @@
 import re
 from collections import defaultdict
-from collections.abc import Callable
 
 import disnake
 from disnake.ext import commands
@@ -106,7 +105,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             embed.description += "\n" + guild.description
 
     @staticmethod
-    def _set_footer(embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview):
+    def _set_footer(embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview) -> None:
         shown_features = {"VERIFIED", "PARTNERED"}
         if features := [feature for feature in guild.features if feature in shown_features]:
             embed.set_footer(text=", ".join(features).capitalize() + " server")

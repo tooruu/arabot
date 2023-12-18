@@ -1,5 +1,6 @@
 import re
 from functools import partial
+from typing import ClassVar
 
 from disnake import Embed
 from disnake.ext.commands import command
@@ -12,7 +13,7 @@ from .client import LangCodeAndOrName, TranslationClient
 
 
 class GoogleTranslate(Cog, category=Category.LOOKUP):
-    DEFAULT_TARGET: list[str] = ["en", "English"]
+    DEFAULT_TARGET: ClassVar[LangCodeAndOrName] = ["en", "English"]
 
     def __init__(self, trans_client: TranslationClient):
         self.gtrans = trans_client
@@ -51,12 +52,12 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
     ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]]:
         if not text and not (text := await ctx.rsearch("content")):
             await ctx.reply_("provide_text")
-            raise StopCommand()
+            raise StopCommand
         if not source:
             detected = await self.gtrans.detect(text)
             if not (source := self.find_lang(detected, langs)):
                 await ctx.reply_("unknown_language")
-                raise StopCommand()
+                raise StopCommand
         target = target or self.DEFAULT_TARGET
         if source[0] == target[0]:
             translated_text = text

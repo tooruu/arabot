@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from typing import Any
 
-from disnake import Embed
+from disnake import Embed, Message
 from disnake.ext.commands import command
 
 from arabot.core import Ara, Category, Cog, Context, pfxless
@@ -15,36 +15,9 @@ class Urban(Cog, category=Category.LOOKUP):
 
     BASE_URL = "https://api.urbandictionary.com/v0/define"
     QUERY_PREFIX = r"^(?:wh?[ao]t(?:['’]?s|\sis)\s)"
-    WORDS_IGNORE = "|".join(
-        (
-            "up",
-            "good",
-            "with",
-            "it",
-            "this",
-            "that",
-            "so",
-            "the",
-            "about",
-            "goin",
-            "happenin",
-            "wrong",
-            "my",
-            "your",
-            "ur",
-            "next",
-            "da",
-            "dis",
-            "dat",
-            "new",
-            "he",
-            "she",
-            "better",
-            "worse",
-            "tho",
-            "mine",
-            "stopp",
-        )
+    WORDS_IGNORE = (
+        r"about|better|da|dat|dis|goin|good|happenin|he|it|mine|my|new|next|she|so|stopp|that|the|"
+        r"this|tho|up|ur|with|worse|wrong|your"
     )
 
     @command(aliases=["ud", "define", "whats"], brief="Search term in Urban Dictionary")
@@ -80,7 +53,7 @@ class Urban(Cog, category=Category.LOOKUP):
         return data.get("list")
 
     @pfxless(regex=rf"{QUERY_PREFIX}((?:(?!{WORDS_IGNORE}).)*?)\??$")
-    async def urban_listener(self, msg):
+    async def urban_listener(self, msg: Message):
         if self.urban.enabled:
             term = re.search(rf"{self.QUERY_PREFIX}(.*?)\??$", msg.content, re.IGNORECASE)[1]
             await self.urban(await self.ara.get_context(msg), term=term)

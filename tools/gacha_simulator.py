@@ -63,7 +63,7 @@ class ItemResolver(ItemResolverInterface):
 
 
 class GachaSimulator:
-    def __init__(self):
+    def __init__(self) -> None:
         self._pull_provider = GachaSimulator._initialize_pull_provider()
 
     @staticmethod
@@ -119,10 +119,9 @@ class GachaSimulator:
         ]
 
         logging.info(
-            "The supply '{}' provided the following items {}".format(
-                self._pull_provider.get_pool_name(supply_type),
-                "\n".join(formatted_pulls),
-            )
+            "The supply '%s' provided the following items %s",
+            self._pull_provider.get_pool_name(supply_type),
+            "\n".join(formatted_pulls),
         )
 
     @staticmethod
@@ -143,5 +142,5 @@ parser.add_argument("count", nargs="?", default=10)
 args = parser.parse_args()
 
 gacha = GachaSimulator()
-print(f"Available pools: {', '.join(gacha.get_pool_codes())}")
+logging.info("Available pools: %s", ", ".join(gacha.get_pool_codes()))
 gacha.pull(args.pool, int(args.count), bool(args.consolidate), bool(args.sort))

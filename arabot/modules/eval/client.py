@@ -1,11 +1,12 @@
 import ast
 import inspect
 import sys
+from collections.abc import Generator
 from contextlib import _RedirectStream, contextmanager, redirect_stdout
 from functools import partial
 from io import StringIO
 from types import CodeType
-from typing import Any
+from typing import Any, TextIO
 
 from aiohttp import ClientSession
 
@@ -52,12 +53,12 @@ class RemoteEval(Evaluator):
 
 
 class LocalEval(Evaluator):
-    def __init__(self, *, env: dict | None = None, stdin=None):
+    def __init__(self, *, env: dict | None = None, stdin: TextIO | None = None):
         self.env = env or {}
         self.stdin = stdin or sys.stdin
 
-    def compile(self, code: str | bytes, flags=None) -> CodeType:
-        compile_for = partial(compile, code, self.TB_FILENAME, flags=flags or 0)
+    def compile(self, code: str | bytes, flags: int = 0) -> CodeType:
+        compile_for = partial(compile, code, self.TB_FILENAME, flags=flags)
         try:
             try:
                 return compile_for("eval")
@@ -71,9 +72,9 @@ class LocalEval(Evaluator):
         try:
             with stdin_from(self.stdin), redirect_stdout(output_buffer):
                 if compiled_code.co_flags & inspect.CO_COROUTINE:
-                    r = await eval(compiled_code, self.env)  # pylint: disable=eval-used
+                    r = await eval(compiled_code, self.env)
                 else:
-                    r = eval(compiled_code, self.env)  # pylint: disable=eval-used
+                    r = eval(compiled_code, self.env)
         except BaseException as exc:
             stdout = output_buffer.getvalue()
             raise errors.LocalEvalExecuteException(exc, stdout) from exc
@@ -82,15 +83,15 @@ class LocalEval(Evaluator):
             return stdout, r
 
     async def run(
-        self, code: str, *, env: dict[str, Any] | None = None, stdin=None
+        self, code: str, *, env: dict[str, Any] | None = None, stdin: TextIO | None = None
     ) -> tuple[str, Any]:
         with self._lock(env=env or self.env, stdin=stdin or self.stdin):
             to_run = self.compile(code, ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
             return await self.execute(to_run)
 
     @contextmanager
-    def _lock(self, **overwrites):
-        """Sets overwrites on self and then resets to initial state"""
+    def _lock(self, **overwrites) -> Generator[None, None, None]:
+        """Set overwrites on self and then resets to initial state."""
         backup = self.__dict__.copy()
         self.__dict__ |= overwrites
         try:
