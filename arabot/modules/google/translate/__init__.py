@@ -4,10 +4,9 @@ from typing import ClassVar
 
 from disnake import Embed
 from disnake.ext.commands import command
-from disnake.utils import find
+from disnake.utils import escape_markdown, find
 
 from arabot.core import Category, Cog, Context, StopCommand
-from arabot.utils import dsafe
 
 from .client import LangCodeAndOrName, TranslationClient
 
@@ -33,8 +32,10 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
             return
         await ctx.send(
             embed=Embed()
-            .add_field(self.format_lang(source), dsafe(text)[:1024])
-            .add_field(self.format_lang(target), dsafe(translated_text)[:1024], inline=False)
+            .add_field(self.format_lang(source), escape_markdown(text)[:1024])
+            .add_field(
+                self.format_lang(target), escape_markdown(translated_text)[:1024], inline=False
+            )
             .set_footer(
                 text="Google Cloud Translation",
                 icon_url="https://gitlab.com/uploads/-/system"

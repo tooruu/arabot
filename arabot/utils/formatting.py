@@ -18,10 +18,6 @@ def strikethrough(s: str) -> str:
     return "~~{}~~".format(s.replace("~", r"\~"))
 
 
-def dsafe(s: str) -> str:
-    return _re.sub(r"([*_~|`])", r"\\\1", s)
-
-
 def spoiler(s: str) -> str:
     return "||{}||".format(s.replace("|", r"\|"))
 
@@ -38,7 +34,7 @@ def unping(s: str) -> str:
     return s.replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
 
 
-def repchars(s: str, chars: str, rep: str = "") -> str:
+def replacechars(s: str, chars: str, rep: str = "") -> str:
     return _re.sub(f"[{_re.escape(chars)}]", rep, s)
 
 

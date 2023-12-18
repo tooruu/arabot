@@ -5,10 +5,10 @@ from pprint import pformat
 from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
+from disnake.utils import escape_markdown
 from jikanpy import AioJikan
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import dsafe
 
 
 class Source(IntEnum):
@@ -113,7 +113,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
                     embed.description += f"{_('similarity')}: {header['similarity']}%"
                     if mal_json and (mal_json := mal_json["data"]):
                         embed.description += f" | {_('score')}: {mal_json['score']}"
-                        synopsis = dsafe(mal_json["synopsis"].partition(" [")[0])
+                        synopsis = escape_markdown(mal_json["synopsis"].partition(" [")[0])
                         if len(synopsis) > (maxlen := 600):
                             synopsis = ".".join(synopsis[:maxlen].split(".")[:-1]) + "..."
                         embed.set_image(mal_json["images"]["webp"]["image_url"])

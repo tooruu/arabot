@@ -3,9 +3,10 @@ from base64 import b64encode
 
 from disnake import Embed
 from disnake.ext.commands import command
+from disnake.utils import escape_markdown
 
 from arabot.core import Category, Cog, Context, StopCommand
-from arabot.utils import codeblock, dsafe
+from arabot.utils import codeblock
 
 from .translate import GoogleTranslate
 
@@ -51,8 +52,10 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
         (source, text), (target, trans_text) = translation
         embed = Embed().set_thumbnail(url=image_url)
         if source[0] != target[0]:
-            embed.add_field(self.trans.format_lang(source), dsafe(text)[:1024])
-        embed.add_field(self.trans.format_lang(target), dsafe(trans_text)[:1024], inline=False)
+            embed.add_field(self.trans.format_lang(source), escape_markdown(text)[:1024])
+        embed.add_field(
+            self.trans.format_lang(target), escape_markdown(trans_text)[:1024], inline=False
+        )
         await ctx.send(embed=embed)
 
     async def handle_annotation(self, ctx: Context, image_url: str | None) -> str:

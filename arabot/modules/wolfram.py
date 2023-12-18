@@ -1,12 +1,12 @@
-import json
 from urllib.parse import quote_plus
 
+import orjson
 from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
+from disnake.utils import escape_markdown
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import dsafe
 
 
 class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
@@ -27,10 +27,10 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
                 "units": "metric",
             },
         ) as r:
-            wa = json.loads(await r.text())["queryresult"]
+            wa = orjson.loads(await r.text())["queryresult"]
         embed = Embed(
             color=0xF4684C,
-            title=dsafe(question),
+            title=escape_markdown(question),
             url=f"https://wolframalpha.com/input/?i={quote_plus(question)}",
         ).set_footer(
             text="Wolfram|Alpha",
@@ -44,13 +44,13 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
                     detected_input = pod["subpods"][0]["plaintext"]
                     embed.add_field(
                         "Input",
-                        f"[{dsafe(detected_input)}]"
+                        f"[{escape_markdown(detected_input)}]"
                         f"(https://wolframalpha.com/input/?i={quote_plus(detected_input)})",
                     )
                 if "primary" in pod:
                     embed.add_field(
                         ctx._("result", False),
-                        "\n".join(dsafe(subpod["plaintext"]) for subpod in pod["subpods"]),
+                        "\n".join(escape_markdown(sub["plaintext"]) for sub in pod["subpods"]),
                         inline=False,
                     )
                     break

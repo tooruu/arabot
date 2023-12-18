@@ -4,9 +4,10 @@ from typing import Any
 
 from disnake import Embed, Message
 from disnake.ext.commands import command
+from disnake.utils import escape_markdown
 
 from arabot.core import Ara, Category, Cog, Context, pfxless
-from arabot.utils import EmbedPaginator, bold, dsafe, repchars
+from arabot.utils import EmbedPaginator, bold, replacechars
 
 
 class Urban(Cog, category=Category.LOOKUP):
@@ -35,14 +36,15 @@ class Urban(Cog, category=Category.LOOKUP):
         embeds = list[Embed]()
         for definition in definitions:
             embed = Embed(
-                description=dsafe(repchars(definition["definition"], "[]"))[:4096],
-                title=dsafe(definition["word"])[:256],
+                description=escape_markdown(replacechars(definition["definition"], "[]"))[:4096],
+                title=escape_markdown(definition["word"])[:256],
                 url=definition["permalink"],
                 timestamp=datetime.fromisoformat(definition["written_on"][:-1]),
             )
             if definition["example"]:
                 embed.add_field(
-                    ctx._("example", False), dsafe(repchars(definition["example"], "[]"))[:1024]
+                    ctx._("example", False),
+                    escape_markdown(replacechars(definition["example"], "[]"))[:1024],
                 )
             embeds.append(embed)
 

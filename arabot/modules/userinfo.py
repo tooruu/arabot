@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import disnake
 from disnake.ext import commands
-from disnake.utils import format_dt, utcnow
+from disnake.utils import escape_markdown, format_dt, utcnow
 
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import I18N, AnyMember, AnyMemberOrUser, Twemoji
@@ -212,7 +212,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             else:
                 body += "\n" + _("ending_in").format(format_dt(activity.end, "R"))
 
-        embed.add_field(_(activity.type.name).format(name), body, inline=False)
+        embed.add_field(_(activity.type.name).format(name), escape_markdown(body), inline=False)
 
     @staticmethod
     def add_status(embed: disnake.Embed, member: disnake.Member) -> None:
