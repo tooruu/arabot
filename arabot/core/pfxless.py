@@ -3,7 +3,6 @@ import random
 import re
 from collections.abc import Awaitable, Callable
 from numbers import Number
-from typing import TypeVar
 
 from disnake import Message
 from disnake.ext import commands
@@ -11,26 +10,26 @@ from disnake.utils import async_all
 
 from .bot import Ara
 
-CogMsgListener = TypeVar("CogMsgListener", bound=Callable[[commands.Cog, Message], Awaitable])
-
 __all__ = [
     "PfxlessOnCooldown",
     "pfxless",
 ]
+
+type CogMsgListener = Callable[[commands.Cog, Message], Awaitable]
 
 
 class PfxlessOnCooldown(commands.CommandOnCooldown):
     pass
 
 
-def copy_dpy_attrs_from(donor: CogMsgListener) -> Callable[[CogMsgListener], CogMsgListener]:
+def copy_dpy_attrs_from[T: CogMsgListener](donor: T) -> Callable[[T], T]:
     organs = {
         "__commands_checks__": [],
         "__commands_max_concurrency__": None,
         "__commands_cooldown__": commands.CooldownMapping(None, commands.BucketType.default),
     }
 
-    def transplantation(patient: CogMsgListener) -> CogMsgListener:
+    def transplantation(patient: T) -> T:
         for organ, default in organs.items():
             replacement = getattr(donor, organ, default)
             setattr(patient, organ, replacement)
@@ -73,7 +72,7 @@ class pfxless:  # noqa: N801
             case _:
                 raise TypeError("pattern argument must be str or re.Pattern[str]")
 
-    def __call__(self, func: CogMsgListener) -> CogMsgListener:
+    def __call__[T: CogMsgListener](self, func: T) -> T:
         if self.pattern is None:
             self.pattern = rf"\b{func.__name__.replace('_', ' ')}\b"
 
@@ -84,7 +83,7 @@ class pfxless:  # noqa: N801
         self.event = self.wrap_callback(func)
         return self.event
 
-    def wrap_callback(self, coro: CogMsgListener) -> CogMsgListener:
+    def wrap_callback[T: CogMsgListener](self, coro: T) -> T:
         @commands.Cog.listener("on_message")
         @functools.wraps(coro)
         @copy_dpy_attrs_from(coro)

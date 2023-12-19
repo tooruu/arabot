@@ -198,14 +198,14 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
 
     async def __callback(self, ctx: Context, *targets: AnyMember) -> None:
         method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
-        if method == self.wclient.nsfw and not ctx.channel.is_nsfw():
+        if method is self.wclient.nsfw and not ctx.channel.is_nsfw():
             await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)
             return
         if ctx.author != ctx.ara.owner and ctx.ara.owner in targets and ctx.command.name == "kill":
             targets = [ctx.author]
             await ctx.author.timeout(duration=60, reason=ctx._("owner_kill_timeout_reason"))
         else:
-            targets: list[disnake.Member] = list(dict.fromkeys(t for t in targets if t))
+            targets = list[disnake.Member](dict.fromkeys(t for t in targets if t))
         embed = await self.generate_embed(targets, method, ctx)
         await ctx.send_ping(embed=embed)
 

@@ -4,7 +4,6 @@ import re
 from collections.abc import Callable
 from string import whitespace
 from types import UnionType
-from typing import TypeVar
 
 import disnake
 from aiohttp import ClientSession
@@ -35,8 +34,18 @@ __all__ = [
     "Empty",
     "Twemoji",
 ]
-_T = TypeVar("_T")
-_T1 = TypeVar("_T1", bound=str)
+
+type AnyMember = disnake.Member | CIMember | Empty
+type AnyUser = disnake.User | UserFromCIMember | Empty
+type AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
+type AnyEmoji = disnake.Emoji | CIEmoji | disnake.PartialEmoji | Twemoji | Empty
+type AnyTChl = disnake.TextChannel | CITextChl | Empty
+type AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
+type AnyChl = AnyTChl | AnyVChl | Empty
+type AnyRole = disnake.Role | CIRole | Empty
+type AnyGuild = disnake.Guild | CIGuild | Empty
+
+
 arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
 
 
@@ -154,20 +163,11 @@ class CIGuild(commands.Converter):
         raise commands.GuildNotFound(argument)
 
 
-AnyMember = disnake.Member | CIMember | Empty
-AnyUser = disnake.User | UserFromCIMember | Empty
-AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
-AnyEmoji = disnake.Emoji | CIEmoji | disnake.PartialEmoji | Twemoji | Empty
-AnyTChl = disnake.TextChannel | CITextChl | Empty
-AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
-AnyChl = AnyTChl | AnyVChl | Empty
-AnyRole = disnake.Role | CIRole | Empty
-AnyGuild = disnake.Guild | CIGuild | Empty
-
-
-async def convert_union(ctx: commands.Context, argument: _T1, union: UnionType) -> _T | None:
+async def convert_union[T, T2: str](
+    ctx: commands.Context, argument: T2, union: UnionType
+) -> T | None:
     converters: tuple[
-        type[_T | commands.Converter[_T]] | commands.Converter[_T] | Callable[[_T1], _T], ...
+        type[T | commands.Converter[T]] | commands.Converter[T] | Callable[[T2], T], ...
     ] = union.__args__
     parameter = ctx.current_parameter
     for converter in converters:

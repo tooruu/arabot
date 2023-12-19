@@ -6,7 +6,6 @@ from collections.abc import Generator
 from pathlib import Path
 from pkgutil import iter_modules
 from traceback import format_exception
-from typing import TypeVar
 
 import aiohttp
 import disnake
@@ -19,8 +18,6 @@ from arabot.utils import codeblock, mono, system_info, time_in
 from .database import AraDB
 from .errors import StopCommand
 from .patches import Context, LocalizationStore
-
-_T = TypeVar("_T", bound=commands.Context)
 
 
 def search_directory(path: str | Path) -> Generator[str, None, None]:
@@ -130,7 +127,9 @@ class Ara(commands.Bot):
                 task.cancel()
             await asyncio.gather(*pending, return_exceptions=True)
 
-    async def get_context(self, message: disnake.Message, *, cls: type[_T] = Context) -> _T:
+    async def get_context[CTX: commands.Context](
+        self, message: disnake.Message, *, cls: type[CTX] = Context
+    ) -> CTX:
         return await super().get_context(message, cls=cls)
 
     def load_extensions(self) -> None:

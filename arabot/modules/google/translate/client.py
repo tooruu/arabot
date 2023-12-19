@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from async_lru import alru_cache
 from disnake.ext import tasks
 
-LangCodeAndOrName = list[str]
+type LangCodeAndOrName = list[str]
 
 
 class TranslationClient:

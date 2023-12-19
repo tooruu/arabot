@@ -63,7 +63,7 @@ class MessageSnipe(Cog, category=Category.FUN):
         if ctx.channel.id not in self._cache:
             await ctx.send_(MessageSnipe.EMPTY, False)
             return
-        msg_pool = list(
+        msg_pool = list[RawDeletedMessage](
             filter(
                 lambda m: not member or m.author == member,
                 sorted(self._cache[ctx.channel.id], key=lambda msg: msg.created_at)[-10:],
