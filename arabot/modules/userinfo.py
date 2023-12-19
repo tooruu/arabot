@@ -1,4 +1,5 @@
 import logging
+import re
 from collections import defaultdict
 
 import disnake
@@ -212,7 +213,8 @@ class Userinfo(Cog, category=Category.GENERAL):
             else:
                 body += "\n" + _("ending_in").format(format_dt(activity.end, "R"))
 
-        embed.add_field(_(activity.type.name).format(name), escape_markdown(body), inline=False)
+        body = re.sub(r"\\(\[.+\]\(.+\))", r"\1", escape_markdown(body))
+        embed.add_field(_(activity.type.name).format(name), body, inline=False)
 
     @staticmethod
     def add_status(embed: disnake.Embed, member: disnake.Member) -> None:

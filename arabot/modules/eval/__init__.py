@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import logging
 import os
+import re
 from functools import partial
 from io import StringIO
 
@@ -57,6 +58,7 @@ class Eval(Cog, category=Category.GENERAL):
                 date=datetime.date,
                 datetime=datetime.datetime,
                 os=os,
+                re=re,
                 time=datetime.time,
                 timedelta=datetime.timedelta,
             )
