@@ -63,6 +63,3 @@ classes = ["clean_content", "pfxless"]
 
 [lint.pep8-naming]
 ignore-names = []
-
-[lint.pycodestyle]
-ignore-overlong-task-comments = false

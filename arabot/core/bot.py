@@ -162,7 +162,7 @@ class Ara(commands.Bot):
                     case 403:
                         await context.reply(
                             context._("cloud_billing_disabled").format(
-                                mono(context.invoked_with), mono(self.owner)
+                                mono(context.invoked_with), mono(str(self.owner))
                             )
                         )
                     case 429:

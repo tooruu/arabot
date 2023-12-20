@@ -258,7 +258,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
                 description = reaction_data["mentions"]
         return description.format(
             author=context.author.mention,
-            target=humanjoin(getattr(t, "mention", t) for t in targets),
+            target=humanjoin(getattr(t, "mention", str(t)) for t in targets),
             s="s" if len(targets) == 1 else "",
             ve="s" if len(targets) == 1 else "ve",
         )
