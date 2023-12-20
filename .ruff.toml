@@ -8,7 +8,7 @@ ignore = [
     "ANN1",    # flake8-annotations Method Annotations
     "ANN201",  # missing-return-type-undocumented-public-function
     "ARG002",  # unused-method-argument
-    "BLE001",  # blind-except
+    "BLE",     # flake8-blind-except
     "C90",     # mccabe
     "COM812",  # missing-trailing-comma
     "D1",      # pydocstyle Missing Docstrings
