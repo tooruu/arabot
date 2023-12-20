@@ -85,7 +85,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
             return
         buckets = command._buckets
         if not buckets.valid:
-            await ctx.send(ctx._("command_no_cooldown").format(mono(command)))
+            await ctx.send(ctx._("command_no_cooldown").format(mono(str(command))))
             return
         if not isinstance(buckets.type, commands.BucketType):
             await ctx.send(ctx._("invalid_bucket_type").format(buckets.type.__name__))
@@ -140,7 +140,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
             response = "cooldown_reset"
         else:
             response = "bucket_not_found"
-        await ctx.send(ctx._(response).format(mono(command), mono(bucket_item)))
+        await ctx.send(ctx._(response).format(mono(str(command)), mono(str(bucket_item))))
 
 
 class PluginManager(Cog, command_attrs=dict(hidden=True)):

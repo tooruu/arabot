@@ -40,6 +40,3 @@ def replacechars(s: str, chars: str, rep: str = "") -> str:
 
 def humanjoin(s: _Iterable[str], /) -> str:
     return " and ".join(", ".join(s).rsplit(", ", 1))
-
-
-cb = code = codeblock

@@ -44,7 +44,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         for category, cmds in sorted_:
             commands_field = ""
             for command in sorted(cmds, key=lambda c: c.name):
-                command_repr = mono(command)
+                command_repr = mono(command.qualified_name)
                 if command.brief:
                     command_repr = f"[{command_repr}](http://. '{command.short_doc}')"
                 if len(commands_field + command_repr) > 1024:

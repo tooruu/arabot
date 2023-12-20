@@ -120,7 +120,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
         if guild == current_guild or guild.owner in current_guild.members:
             owner = f"<@{guild.owner_id}>"
         else:
-            owner = mono(guild.owner or guild.owner_id)
+            owner = mono(str(guild.owner or guild.owner_id))
         field_values.append(f"{_('owner')}: {owner}")
         field_values.append(_("created_on").format(format_dt(guild.created_at, "D")))
         field_values.append(f"{_('locale', False)}: {str(guild.preferred_locale).upper()}")
