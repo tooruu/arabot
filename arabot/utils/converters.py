@@ -1,9 +1,8 @@
-from __future__ import annotations
-
 import re
 from collections.abc import Callable
 from string import whitespace
 from types import UnionType
+from typing import Self
 
 import disnake
 from aiohttp import ClientSession
@@ -35,16 +34,6 @@ __all__ = [
     "Twemoji",
 ]
 
-type AnyMember = disnake.Member | CIMember | Empty
-type AnyUser = disnake.User | UserFromCIMember | Empty
-type AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
-type AnyEmoji = disnake.Emoji | CIEmoji | disnake.PartialEmoji | Twemoji | Empty
-type AnyTChl = disnake.TextChannel | CITextChl | Empty
-type AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
-type AnyChl = AnyTChl | AnyVChl | Empty
-type AnyRole = disnake.Role | CIRole | Empty
-type AnyGuild = disnake.Guild | CIGuild | Empty
-
 
 arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
 
@@ -72,7 +61,7 @@ class Twemoji(commands.Converter):
         return self.emoji
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Twemoji:
+    async def convert(cls, ctx: commands.Context, argument: str) -> Self:
         emoji = cls(argument)
         if await emoji.read(ctx.bot.session, ensure_only=True):
             return emoji
@@ -161,6 +150,17 @@ class CIGuild(commands.Converter):
         if found := find(lambda guild: guild_search(guild.name), ctx.bot.guilds):
             return found
         raise commands.GuildNotFound(argument)
+
+
+AnyMember = disnake.Member | CIMember | Empty
+AnyUser = disnake.User | UserFromCIMember | Empty
+AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
+AnyEmoji = disnake.Emoji | CIEmoji | disnake.PartialEmoji | Twemoji | Empty
+AnyTChl = disnake.TextChannel | CITextChl | Empty
+AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
+AnyChl = AnyTChl | AnyVChl | Empty
+AnyRole = disnake.Role | CIRole | Empty
+AnyGuild = disnake.Guild | CIGuild | Empty
 
 
 async def convert_union[T, T2: str](

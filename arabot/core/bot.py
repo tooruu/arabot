@@ -6,6 +6,7 @@ from collections.abc import Generator
 from pathlib import Path
 from pkgutil import iter_modules
 from traceback import format_exception
+from typing import override
 
 import aiohttp
 import disnake
@@ -65,6 +66,7 @@ class Ara(commands.Bot):
         super().__init__(*args, **kwargs)
         self.http.token = token
 
+    @override
     async def login(self) -> None:
         if not (token := self.http.token or os.getenv("TOKEN")):
             logging.critical("Missing initializer argument or environment variable 'TOKEN'")
@@ -79,6 +81,7 @@ class Ara(commands.Bot):
             logging.critical("No internet connection")
             sys.exit(69)
 
+    @override
     async def _fill_owners(self) -> None:
         if self.owner_id or self.owner_ids:
             return
@@ -104,6 +107,7 @@ class Ara(commands.Bot):
             self.owner = app.owner
             self.owner_id = app.owner.id
 
+    @override
     async def start(self) -> None:
         async with (
             aiohttp.ClientSession() as self.session,
@@ -114,6 +118,7 @@ class Ara(commands.Bot):
             self.load_extensions()
             await self.connect()
 
+    @override
     async def close(self) -> None:
         if self.is_closed():
             return
@@ -127,6 +132,7 @@ class Ara(commands.Bot):
                 task.cancel()
             await asyncio.gather(*pending, return_exceptions=True)
 
+    @override
     async def get_context[CTX: commands.Context](
         self, message: disnake.Message, *, cls: type[CTX] = Context
     ) -> CTX:
@@ -147,6 +153,7 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
+    @override
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
         match exception:
             case commands.CommandOnCooldown(retry_after=retry_after):
