@@ -119,20 +119,6 @@ class Ara(commands.Bot):
             await self.connect()
 
     @override
-    async def close(self) -> None:
-        if self.is_closed():
-            return
-
-        logging.info("Bot is shutting down..")
-        try:
-            await super().close()
-        finally:
-            pending = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-            for task in pending:
-                task.cancel()
-            await asyncio.gather(*pending, return_exceptions=True)
-
-    @override
     async def get_context[CTX: commands.Context](
         self, message: disnake.Message, *, cls: type[CTX] = Context
     ) -> CTX:

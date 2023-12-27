@@ -1,8 +1,5 @@
-import asyncio
 import logging
-import os
 import re
-import signal
 
 import disnake
 
@@ -56,32 +53,7 @@ def create_ara(*args, **kwargs) -> Ara:
 
 def main() -> None:
     setup_logging()
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    ara = create_ara(loop=loop)
-
-    try:
-        for s in signal.SIGINT, signal.SIGTERM:
-            loop.add_signal_handler(s, lambda: loop.create_task(ara.close()))
-    except NotImplementedError:
-        pass
-
-    try:
-        loop.run_until_complete(ara.start())
-    except (KeyboardInterrupt, SystemExit, asyncio.CancelledError):
-        loop.run_until_complete(ara.close())
-    except Exception:
-        logging.critical("Bot has crashed", exc_info=True)
-        loop.run_until_complete(ara.close())
-    finally:
-        loop.run_until_complete(loop.shutdown_asyncgens())
-        if os.name == "nt" and isinstance(loop, asyncio.ProactorEventLoop):
-            loop.run_until_complete(asyncio.sleep(1))  # Fixes RuntimeError on Windows
-        asyncio.set_event_loop(None)
-        loop.stop()
-        loop.close()
+    create_ara().run()
 
 
 if __name__ == "__main__":
