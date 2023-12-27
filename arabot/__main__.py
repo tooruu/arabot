@@ -45,7 +45,7 @@ def create_ara(*args, **kwargs) -> Ara:
     if TESTING:
         default_kwargs.update(
             reload=True,
-            test_guilds=[954134299119091772, 676889696302792774],
+            test_guilds=[954134299119091772],
         )
 
     return Ara(*args, **default_kwargs | kwargs)
