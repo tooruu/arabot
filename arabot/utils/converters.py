@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 import re
 from collections.abc import Callable
 from string import whitespace
 from types import UnionType
-from typing import TypeVar
+from typing import Self
 
 import disnake
 from aiohttp import ClientSession
@@ -35,8 +33,8 @@ __all__ = [
     "Empty",
     "Twemoji",
 ]
-_T = TypeVar("_T")
-_T1 = TypeVar("_T1", bound=str)
+
+
 arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
 
 
@@ -63,7 +61,7 @@ class Twemoji(commands.Converter):
         return self.emoji
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Twemoji:
+    async def convert(cls, ctx: commands.Context, argument: str) -> Self:
         emoji = cls(argument)
         if await emoji.read(ctx.bot.session, ensure_only=True):
             return emoji
@@ -165,9 +163,11 @@ AnyRole = disnake.Role | CIRole | Empty
 AnyGuild = disnake.Guild | CIGuild | Empty
 
 
-async def convert_union(ctx: commands.Context, argument: _T1, union: UnionType) -> _T | None:
+async def convert_union[T, T2: str](
+    ctx: commands.Context, argument: T2, union: UnionType
+) -> T | None:
     converters: tuple[
-        type[_T | commands.Converter[_T]] | commands.Converter[_T] | Callable[[_T1], _T], ...
+        type[T | commands.Converter[T]] | commands.Converter[T] | Callable[[T2], T], ...
     ] = union.__args__
     parameter = ctx.current_parameter
     for converter in converters:

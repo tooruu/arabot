@@ -3,17 +3,15 @@ import logging
 from argparse import ArgumentParser
 from collections.abc import Callable, Iterable, Iterator
 from copy import deepcopy
+from itertools import batched
 from math import isclose
 from pathlib import Path
-from typing import Any, Literal, NamedTuple, TypeVar
+from typing import Any, Literal, NamedTuple
 
 DATABASE_FILE_PATH = "resources/database.json"
 TABLE_ITEMS = "items"
 TABLE_POOLS = "pools"
 DROP_RATE_TOLERANCE = 1e-5
-
-_T = TypeVar("_T")
-_T2 = TypeVar("_T2")
 
 
 class Options(NamedTuple):
@@ -240,9 +238,7 @@ class DatabaseEditor:
             raise ValueError("The specified pool doesn't exist.")
         loot_table = pool.setdefault("loot_table", [])
         has_changed = False
-        for old_item_name, new_item_name in zip(
-            options.names[::2], options.names[1::2], strict=False
-        ):
+        for old_item_name, new_item_name in batched(options.names, 2):
             if not self._replace_pool_item(loot_table, old_item_name, new_item_name):
                 continue
             has_changed = True
@@ -304,7 +300,7 @@ class DatabaseEditor:
         return True
 
     @staticmethod
-    def _aggregate(source: Iterable[_T], seed: _T2, func: Callable[[_T2, _T], _T2]) -> _T2:
+    def _aggregate[T, T2](source: Iterable[T], seed: T2, func: Callable[[T2, T], T2]) -> T2:
         current_value = seed
         for item in source:
             current_value = func(current_value, item)

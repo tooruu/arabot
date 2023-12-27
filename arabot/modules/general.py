@@ -52,7 +52,7 @@ class General(Cog, category=Category.GENERAL):
             converter = commands.PartialEmojiConverter()
             emojis = [await converter.convert(ctx, ce) for ce in custom_emojis]
 
-        filtered_emojis = list(dict.fromkeys(e for e in emojis if e)) if emojis else []
+        filtered_emojis = list[AnyEmoji](dict.fromkeys(e for e in emojis if e)) if emojis else []
         if not filtered_emojis and not stickers:
             await ctx.reply_("not_found", False)
             return

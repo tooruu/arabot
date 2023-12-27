@@ -3,7 +3,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable
 from os import PathLike
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 import disnake
 from disnake.abc import PrivateChannel
@@ -11,10 +11,6 @@ from disnake.ext import commands
 
 from arabot.core import Ara, Cog, Color, Context
 from arabot.utils import CIMember, CIRole, CITextChl, Empty, mono
-
-_T = TypeVar("_T")
-_T1 = TypeVar("_T1", bound=str)
-_T2 = TypeVar("_T2")
 
 
 class FakeObj:
@@ -281,10 +277,9 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         await self._do_action_group_format_embed_send(disable, cmds, statuses, ctx)
 
     @staticmethod
-    def group_by_exc_raised(
-        action: Callable[[_T], Any],
-        arguments: Iterable[_T],
-    ) -> dict[Exception | None, _T]:
+    def group_by_exc_raised[T](
+        action: Callable[[T], Any], arguments: Iterable[T]
+    ) -> dict[Exception | None, T]:
         mapping = defaultdict(list)
         for arg in arguments:
             try:
@@ -304,13 +299,15 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         return embed
 
     @staticmethod
-    def merge_dict_values(key_val: dict[_T, _T1], key_repr: dict[_T, _T2]) -> dict[_T2, _T1]:
+    def merge_dict_values[T, T2: str, T3](
+        key_val: dict[T, T2], key_repr: dict[T, T3]
+    ) -> dict[T3, T2]:
         return {key_repr[key]: val for key, val in key_val.items() if val}
 
-    async def _do_action_group_format_embed_send(
+    async def _do_action_group_format_embed_send[T](
         self,
-        action: Callable[[_T], Any],
-        arguments: Iterable[_T],
+        action: Callable[[T], Any],
+        arguments: Iterable[T],
         exc_repr: dict[Exception | None, str],
         ctx: Context,
     ) -> None:

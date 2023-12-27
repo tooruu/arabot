@@ -8,7 +8,7 @@ import disnake
 
 import arabot
 
-I18N = Callable[[str], str] | Callable[[str, int], str]
+type I18N = Callable[[str], str] | Callable[[str, int], str]
 
 
 def fullqualname(suffix: str | None = None, *, depth: int = 1) -> str:

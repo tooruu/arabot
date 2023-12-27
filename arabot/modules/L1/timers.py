@@ -27,7 +27,7 @@ class Timer:
         cur_datetime = self.tznow()
         cur_weekday = cur_datetime.isoweekday()
         cur_date = cur_datetime.date()
-        event_weekdays = list(self.sched.keys())
+        event_weekdays = list[int](self.sched.keys())
         if cur_weekday in event_weekdays:
             cur_time = cur_datetime.timetz()
             for event_time, _ in self.sched[cur_weekday]:
