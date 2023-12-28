@@ -36,7 +36,6 @@ ignore = [
     "TRY400",  # error-instead-of-exception
 ]
 ignore-init-module-imports = true
-extend-exclude = ["tools/database_editor.py"]
 
 [per-file-ignores]
 "arabot/core/__init__.py" = ["F401", "F403"]
@@ -48,6 +47,9 @@ extend-exclude = ["tools/database_editor.py"]
 
 [format]
 docstring-code-format = true
+
+[lint]
+exclude = ["tools/database_editor.py"]
 
 [lint.flake8-annotations]
 mypy-init-return = true
