@@ -36,6 +36,7 @@ ignore = [
     "TRY400",  # error-instead-of-exception
 ]
 ignore-init-module-imports = true
+extend-exclude = ["tools/database_editor.py"]
 
 [per-file-ignores]
 "arabot/core/__init__.py" = ["F401", "F403"]
