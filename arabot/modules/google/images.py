@@ -1,10 +1,11 @@
 import logging
+from collections.abc import AsyncIterator
 from io import BytesIO
 from mimetypes import guess_extension
 from pathlib import Path
 
 import disnake
-from aiohttp import ClientResponse, ClientSession
+from aiohttp import ClientError, ClientResponse, ClientSession
 from disnake.ext.commands import command
 
 from arabot.core import Category, Cog, Context
@@ -18,7 +19,7 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
     def __init__(self, session: ClientSession):
         self.session = session
 
-    @command(aliases=["i", "img"], brief="Top search result from Google Images", enabled=False)
+    @command(aliases=["i", "img"], brief="Top search result from Google Images")
     async def image(self, ctx: Context, *, query: str):
         async with ctx.typing():
             images = await self.fetch_images(query)
@@ -28,7 +29,7 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
             else:
                 await ctx.reply_("no_images_found")
 
-    async def fetch_images(self, query: str) -> list:
+    async def fetch_images(self, query: str) -> list[dict]:
         data = await self.session.fetch_json(
             self.BASE_URL,
             params={
@@ -37,18 +38,19 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
                 "q": f"{query} -filetype:svg",
                 "searchType": "image",
             },
+            timeout=3,
         )
 
         return data.get("items", [])
 
-    async def filtered(self, images: list[dict]) -> disnake.File:
+    async def filtered(self, images: list[dict]) -> AsyncIterator[disnake.File]:
         for item in images:
             if SVG_MIME in (item.get("mime"), item.get("fileFormat")):
                 continue
 
             image_url = item["link"]
             try:
-                async with self.session.get(image_url) as resp:
+                async with self.session.get(image_url, timeout=1) as resp:
                     if (
                         not resp.ok
                         or resp.content_type == SVG_MIME
@@ -56,8 +58,8 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
                     ):
                         continue
                     image = await resp.read()
-            except Exception as e:
-                logging.error("%s\nFailed image: %s", e, image_url)
+            except ClientError:
+                logging.exception("Failed image: %s", image_url)
             else:
                 image = BytesIO(image)
                 filename = self.extract_filename(resp)

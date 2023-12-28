@@ -26,23 +26,6 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
     async def cog_check(self, ctx: Context):
         return await ctx.ara.is_owner(ctx.author)
 
-    @commands.command(
-        aliases=[
-            "exit",
-            "quit",
-            "shine",
-            "shineo",
-            "die",
-            "kys",
-            "begone",
-            "fuck",
-            "gon",
-        ]
-    )
-    async def stop(self, ctx: Context):
-        await ctx.send_("deathrattle")
-        await ctx.ara.close()
-
     @commands.command(usage="[activity]")
     async def presence(self, ctx: Context, act_type: str = "", *, act_name: str = ""):
         acts = {

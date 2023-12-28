@@ -55,6 +55,7 @@ class Eval(Cog, category=Category.GENERAL):
                 utils=disnake.utils,
                 # Standard library
                 aio=asyncio,
+                asyncio=asyncio,
                 date=datetime.date,
                 datetime=datetime.datetime,
                 os=os,
@@ -79,14 +80,13 @@ class Eval(Cog, category=Category.GENERAL):
         try:
             stdout, return_value = await evaluator.run(code)
         except (ClientResponseError, errors.RemoteEvalBadResponse) as e:
-            logging.error(e.message)
+            logging.exception("Connection error")
             self.embed_add_codeblock_with_warnings(result, ctx._("connection_error"), e.message)
         except Exception as e:
-            logging.info(e)
             result.title = ctx._("run_failed")
 
-            if isinstance(e, errors.EvalException) and getattr(e, "stdout", None):
-                append_codeblock(ctx._("output", False), e.stdout)
+            if isinstance(e, errors.EvalException) and (stdout := getattr(e, "stdout", None)):
+                append_codeblock(ctx._("output", False), stdout)
 
             if isinstance(e, errors.LocalEvalException):
                 append_codeblock(ctx._("error", False), e.format(source=code))
