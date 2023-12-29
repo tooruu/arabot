@@ -76,19 +76,25 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         member = member or ctx.author
         embed = (
-            disnake.Embed(
-                title=member,
-                url=f"https://discord.com/users/{member.id}",
-                timestamp=utcnow(),
-            )
-            .set_author(
-                name=member.id,
-                icon_url="https://twemoji.maxcdn.com/v/latest/72x72/1f194.png",
-                url=f"https://discord.com/users/{member.id}",
-            )
+            disnake.Embed(url=f"https://discord.com/users/{member.id}", timestamp=utcnow())
             .set_thumbnail(url=(member.avatar or member.default_avatar).compat)
             .add_field(ctx._("created_on"), format_dt(member.created_at, "D"))
         )
+        author = ("@" if member.discriminator == "0" else "") + str(member)
+        nickname = getattr(member, "nick", None)
+        if member.global_name and nickname:
+            author += f" | {member.global_name}"
+            embed.title = nickname
+        elif nickname:
+            embed.title = nickname
+        elif member.global_name:
+            embed.title = member.global_name
+        else:
+            author = None
+            embed.title = member.name
+        if author:
+            embed.set_author(name=author, url=f"https://discord.com/users/{member.id}")
+
         description = defaultdict(list)
         if member.bot:
             description[0].append(ctx._("bot", False))
@@ -107,15 +113,13 @@ class Userinfo(Cog, category=Category.GENERAL):
 
             if member.joined_at:
                 embed.add_field(ctx._("joined_on"), format_dt(member.joined_at, "D"))
-            if member.nick:
-                embed.add_field(ctx._("nickname", False), member.nick)
             if member.premium_since:
                 embed.add_field(ctx._("boosting_since"), format_dt(member.premium_since, "R"))
+            embed.add_field(ctx._("top_perm_role"), member.top_perm_role.mention)
             if member.current_timeout:
                 embed.add_field(ctx._("muted_until"), format_dt(member.current_timeout, "D"))
             elif member.voice and member.voice.channel:
                 embed.add_field(ctx._("talking_in"), member.voice.channel.mention)
-            embed.add_field(ctx._("top_perm_role"), member.top_perm_role.mention)
             member = await ctx.ara.fetch_user(member.id)  # `Member.banner` is always None
         elif not member.accent_color:  # Very unrealiable check if `User` is retrieved from cache
             member = await ctx.ara.fetch_user(member.id)  # Fetching as `User.banner` is not cached
