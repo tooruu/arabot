@@ -17,9 +17,9 @@ def setup_logging() -> None:
 
 async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
     custom_prefix = await ara.db.get_guild_prefix(msg.guild.id) or ";"
-    pfx_pattern = (
-        rf"{re.escape(custom_prefix)}\s*|ara\s+|<@(?:!?{ara.user.id}|&{msg.guild.self_role.id})>\s*"
-    )
+    pfx_pattern = rf"{re.escape(custom_prefix)}\s*|ara\s+|<@!?{ara.user.id}>\s*"
+    if msg.guild.self_role:
+        pfx_pattern += rf"|<@&{msg.guild.self_role.id}>\s*"
     return (found := re.match(pfx_pattern, msg.content, re.IGNORECASE)) and found[0]
 
 
