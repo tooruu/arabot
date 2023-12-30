@@ -9,7 +9,7 @@ __all__ = [
     "TESTING",
 ]
 
-__version__ = "8.16.3"
+__version__ = "8.16.4"
 
 run(("prisma", "db", "push"), check=True)
 load_dotenv()
