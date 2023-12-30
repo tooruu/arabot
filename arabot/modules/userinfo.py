@@ -76,61 +76,73 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         member = member or ctx.author
         embed = (
-            disnake.Embed(url=f"https://discord.com/users/{member.id}", timestamp=utcnow())
+            disnake.Embed(
+                title=member.display_name,
+                url=f"https://discord.com/users/{member.id}",
+                timestamp=utcnow(),
+            )
             .set_thumbnail(url=(member.avatar or member.default_avatar).compat)
             .add_field(ctx._("created_on"), format_dt(member.created_at, "D"))
         )
-        author = ("@" if member.discriminator == "0" else "") + str(member)
-        nickname = getattr(member, "nick", None)
-        if member.global_name and nickname:
-            author += f" | {member.global_name}"
-            embed.title = nickname
-        elif nickname:
-            embed.title = nickname
-        elif member.global_name:
-            embed.title = member.global_name
-        else:
-            author = None
-            embed.title = member.name
-        if author:
-            embed.set_author(name=author, url=f"https://discord.com/users/{member.id}")
+        self._set_author(embed, member)
+        await self._set_fields_description_image_color(embed, member, ctx)
+        await ctx.send(embed=embed)
 
-        description = defaultdict(list)
-        if member.bot:
+    @staticmethod
+    def _set_author(embed: disnake.Embed, user: disnake.abc.User | disnake.Member) -> None:
+        username, global_name, nickname = user.name, user.global_name, getattr(user, "nick", None)
+        if (
+            not global_name
+            and not nickname
+            or username == global_name == nickname
+            or username in (global_name, nickname)
+            and None in (global_name, nickname)
+        ):
+            return
+        author_info = ("@" if user.discriminator == "0" else "") + str(user)
+        if global_name and nickname and username != global_name != nickname:
+            author_info += f" | {global_name}"
+        embed.set_author(name=author_info, url=f"https://discord.com/users/{user.id}")
+
+    @staticmethod
+    async def _set_fields_description_image_color(
+        embed: disnake.Embed, user: disnake.User | disnake.Member, ctx: Context
+    ) -> None:
+        description = defaultdict(list[str])
+        if user.bot:
             description[0].append(ctx._("bot", False))
-        if member.public_flags.spammer:
+        if user.public_flags.spammer:
             description[0].append(f"**{ctx._('spammer')}**")
 
-        if isinstance(member, disnake.Member):
+        if isinstance(user, disnake.Member):
             embed.set_footer(
-                text=member.guild.name,
+                text=user.guild.name,
                 icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
             )
-            if member.guild_avatar:
-                description[1].append(f"[{ctx._('guild_avatar')}]({member.guild_avatar})")
-            if member.pending:
+            if user.guild_avatar:
+                description[1].append(f"[{ctx._('guild_avatar')}]({user.guild_avatar})")
+            if user.pending:
                 description[0].append(ctx._("pending"))
 
-            if member.joined_at:
-                embed.add_field(ctx._("joined_on"), format_dt(member.joined_at, "D"))
-            if member.premium_since:
-                embed.add_field(ctx._("boosting_since"), format_dt(member.premium_since, "R"))
-            embed.add_field(ctx._("top_perm_role"), member.top_perm_role.mention)
-            if member.current_timeout:
-                embed.add_field(ctx._("muted_until"), format_dt(member.current_timeout, "D"))
-            elif member.voice and member.voice.channel:
-                embed.add_field(ctx._("talking_in"), member.voice.channel.mention)
-            member = await ctx.ara.fetch_user(member.id)  # `Member.banner` is always None
-        elif not member.accent_color:  # Very unrealiable check if `User` is retrieved from cache
-            member = await ctx.ara.fetch_user(member.id)  # Fetching as `User.banner` is not cached
+            if user.joined_at:
+                embed.add_field(ctx._("joined_on"), format_dt(user.joined_at, "D"))
+            if user.premium_since:
+                embed.add_field(ctx._("boosting_since"), format_dt(user.premium_since, "R"))
+            embed.add_field(ctx._("top_perm_role"), user.top_perm_role.mention)
+            if user.current_timeout:
+                embed.add_field(ctx._("muted_until"), format_dt(user.current_timeout, "D"))
+            elif user.voice and user.voice.channel:
+                embed.add_field(ctx._("talking_in"), user.voice.channel.mention)
+            user = await ctx.ara.fetch_user(user.id)  # `Member.banner` is always None
+        elif not user.accent_color:  # Likely unreliable check if `User` is retrieved from cache
+            user = await ctx.ara.fetch_user(user.id)  # Fetching as `User.banner` is not cached
 
-        if member.accent_color:
-            embed.color = member.accent_color
-        if member.banner:
-            embed.set_image(member.banner.with_size(512).compat)
+        if user.accent_color:
+            embed.color = user.accent_color
+        if user.banner:
+            embed.set_image(user.banner.with_size(512).compat)
 
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
-        await ctx.send(embed=embed)
 
     @commands.command(
         aliases=["s", "st", "activity", "act"], brief="View user's activity", usage="[member]"
@@ -141,15 +153,15 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         member: disnake.Member = member or ctx.author
         embed: disnake.Embed = disnake.Embed(title=ctx._("activity", False)).with_author(member)
-        self.add_status(embed, member)
+        self._add_status(embed, member)
         for activity in member.activities:
             if not embed.thumbnail:
-                self.set_images_if_any(embed, activity)
-            self.add_activity(embed, activity, ctx._)
+                self._set_images_if_any(embed, activity)
+            self._add_activity(embed, activity, ctx._)
         await ctx.send(embed=embed)
 
     @staticmethod
-    def add_activity(
+    def _add_activity(
         embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify, _: I18N
     ) -> None:
         name = body = ""
@@ -221,7 +233,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         embed.add_field(_(activity.type.name).format(name), body, inline=False)
 
     @staticmethod
-    def add_status(embed: disnake.Embed, member: disnake.Member) -> None:
+    def _add_status(embed: disnake.Embed, member: disnake.Member) -> None:
         statuses = {
             disnake.Status.online: "🟢",
             disnake.Status.idle: "🟠",
@@ -242,7 +254,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             )
 
     @staticmethod
-    def set_images_if_any(
+    def _set_images_if_any(
         embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify
     ) -> None:
         if isinstance(activity, disnake.Spotify) and activity.album_cover_url:
