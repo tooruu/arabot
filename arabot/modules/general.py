@@ -119,7 +119,7 @@ class General(Cog, category=Category.GENERAL):
         ).set_author(
             name=ctx.guild,
             url=await ctx.guild.get_unlimited_invite_link() or None,
-            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
+            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon,
         )
         try:
             await member.send(embed=embed)
@@ -259,7 +259,7 @@ class General(Cog, category=Category.GENERAL):
         )
         await send(
             text,
-            avatar_url=user.display_avatar.compat,
+            avatar_url=user.display_avatar,
             username=WEBHOOK_RESERVED_NAMES.get(user.display_name, user.display_name),
             allowed_mentions=disnake.AllowedMentions(users=True),
         )

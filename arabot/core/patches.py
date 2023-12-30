@@ -241,7 +241,7 @@ async def get_or_fetch_reference_message(self: disnake.Message) -> disnake.Messa
 def embed_with_author(self: disnake.Embed, user: disnake.abc.User) -> disnake.Embed:
     return self.set_author(
         name=user.display_name,
-        icon_url=user.display_avatar.as_icon.compat,
+        icon_url=user.display_avatar.as_icon,
         url=f"https://discord.com/users/{user.id}",
     )
 
@@ -283,7 +283,6 @@ disnake.abc.Messageable.send_ping = disnake.Webhook.send_ping = property(
 )
 disnake.abc.Messageable.temp_mute_member = temp_mute_channel_member
 disnake.Asset.as_icon = property(lambda self: self.with_size(32))
-disnake.Asset.compat = property(lambda self: self.with_static_format("png"))
 disnake.Asset.maxres = property(lambda self: self.with_size(4096))
 disnake.Embed.with_author = embed_with_author
 disnake.Guild.get_unlimited_invite_link = get_unlimited_invite_link

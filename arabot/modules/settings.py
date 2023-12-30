@@ -21,7 +21,7 @@ class Settings(Cog, category=Category.SETTINGS):
         db: AraDB = ctx.ara.db
         embed = disnake.Embed(description=ctx._("additional_prefix")).set_author(
             name=ctx.guild,
-            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
+            icon_url=ctx.guild.icon,
         )
 
         if prefix:
@@ -42,7 +42,7 @@ class Settings(Cog, category=Category.SETTINGS):
         db: AraDB = ctx.ara.db
         embed = disnake.Embed().set_author(
             name=ctx.guild,
-            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
+            icon_url=ctx.guild.icon and ctx.guild.icon.as_icon,
         )
 
         if enabled is not None:

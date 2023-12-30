@@ -33,10 +33,10 @@ class Userinfo(Cog, category=Category.GENERAL):
         member = member or ctx.author
         avatars = (
             disnake.Embed()
-            .set_image((member.avatar or member.default_avatar).compat)
+            .set_image(member.avatar or member.default_avatar)
             .set_footer(text=ctx._("global_avatar").format(member.display_name)),
             disnake.Embed()
-            .set_image(member.display_avatar.compat)
+            .set_image(member.display_avatar)
             .set_footer(text=ctx._("guild_avatar").format(member.display_name)),
         )
 
@@ -63,7 +63,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed()
-            .set_image(banner.maxres.compat)
+            .set_image(banner.maxres)
             .set_footer(text=ctx._("their_banner", False).format(member.display_name))
         )
 
@@ -81,7 +81,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                 url=f"https://discord.com/users/{member.id}",
                 timestamp=utcnow(),
             )
-            .set_thumbnail(url=(member.avatar or member.default_avatar).compat)
+            .set_thumbnail(url=member.avatar or member.default_avatar)
             .add_field(ctx._("created_on"), format_dt(member.created_at, "D"))
         )
         self._set_author(embed, member)
@@ -117,7 +117,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         if isinstance(user, disnake.Member):
             embed.set_footer(
                 text=user.guild.name,
-                icon_url=ctx.guild.icon and ctx.guild.icon.as_icon.compat,
+                icon_url=ctx.guild.icon and ctx.guild.icon.as_icon,
             )
             if user.guild_avatar:
                 description[1].append(f"[{ctx._('guild_avatar')}]({user.guild_avatar})")
@@ -140,7 +140,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         if user.accent_color:
             embed.color = user.accent_color
         if user.banner:
-            embed.set_image(user.banner.with_size(512).compat)
+            embed.set_image(user.banner.with_size(512))
 
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
 

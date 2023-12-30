@@ -22,7 +22,7 @@ class EmbedHelpCommand(commands.HelpCommand):
             disnake.Embed(timestamp=utcnow())
             .set_author(
                 name=ctx._("help_menu").format(bot.name),
-                icon_url=ctx.me.display_avatar.as_icon.compat,
+                icon_url=ctx.me.display_avatar.as_icon,
             )
             .set_footer(text=f"{bot.name} v{arabot.__version__}")
         )
@@ -35,7 +35,7 @@ class EmbedHelpCommand(commands.HelpCommand):
 
         help_command_repr = self.context.clean_prefix + self.invoked_with
         self.embed.description = _("embed_description").format(help_command_repr)
-        self.embed.set_thumbnail(url=bot.user.avatar.compat)
+        self.embed.set_thumbnail(url=bot.user.avatar)
 
         get_category = self.get_command_category
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
@@ -178,7 +178,7 @@ class Meta(Cog, category=Category.META):
         await ctx.send(
             embed=disnake.Embed(title=ctx._("click_here"), url=self.ara.invite_url).set_author(
                 name=ctx.ara.name,
-                icon_url=ctx.ara.user.display_avatar.as_icon.compat,
+                icon_url=ctx.ara.user.display_avatar.as_icon,
                 url=self.ara.invite_url,
             )
         )
@@ -193,7 +193,7 @@ class Meta(Cog, category=Category.META):
                     title="Bug report", description=description, timestamp=utcnow()
                 ).set_author(
                     name=reporter,
-                    icon_url=reporter.avatar and reporter.avatar.as_icon.compat,
+                    icon_url=reporter.avatar and reporter.avatar.as_icon,
                     url=f"https://discord.com/users/{reporter.id}",
                 )
             )

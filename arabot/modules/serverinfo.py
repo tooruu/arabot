@@ -20,7 +20,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
-            .set_image(ctx.guild.icon.maxres.compat)
+            .set_image(ctx.guild.icon.maxres)
             .set_footer(text=ctx.guild)
         )
 
@@ -31,7 +31,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             return
         await ctx.send(
             embed=disnake.Embed(timestamp=utcnow())
-            .set_image(ctx.guild.banner.maxres.compat)
+            .set_image(ctx.guild.banner.maxres)
             .set_footer(text=ctx._("their_banner", False).format(ctx.guild))
         )
 
@@ -59,7 +59,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
                 icon_url="https://twemoji.maxcdn.com/v/latest/72x72/1f194.png",
                 url=f"https://discord.com/channels/{guild.id}",
             )
-            .set_thumbnail(url=guild.icon and guild.icon.compat)
+            .set_thumbnail(url=guild.icon)
         )
         self._set_description(embed, guild, _)
         self._set_footer(embed, guild)
