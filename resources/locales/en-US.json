@@ -237,6 +237,7 @@
     "generic.bot": "Bot",
     "generic.cant_react_to": "Cannot react to {}'s messages",
     "generic.cant_send_to": "Cannot send messages to {}",
+    "generic.channel_not_found": "Channel not found",
     "generic.channels": "Channels",
     "generic.cooldown_expires": "Cooldown expires {}",
     "generic.country": "Country",

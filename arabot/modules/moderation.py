@@ -7,7 +7,7 @@ from disnake.ext.commands import bot_has_permissions, command, has_permissions
 from disnake.utils import format_dt
 
 from arabot.core import Ara, Category, Cog, Context, CustomEmoji
-from arabot.utils import AnyTChl
+from arabot.utils import AnyMsgChl
 
 
 class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=True)):
@@ -24,12 +24,17 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             await ctx.message.delete()
 
     @has_permissions(manage_messages=True)
-    @bot_has_permissions(manage_messages=True)
     @command()
-    async def csay(self, ctx: Context, channel: AnyTChl, *, text: str):
-        await ctx.message.delete()
-        if channel:
-            await channel.send_ping(text)
+    async def csay(self, ctx: Context, channel: AnyMsgChl, *, text: str):
+        if not channel:
+            await ctx.send_("channel_not_found", False)
+            return
+        am = disnake.AllowedMentions(users=True)
+        silent = disnake.MessageFlags(
+            suppress_notifications=ctx.message.flags.suppress_notifications
+        )
+        msg = await channel.send(text, allowed_mentions=am, flags=silent)
+        await ctx.reply(msg.jump_url)
 
     @has_permissions(moderate_members=True)
     @bot_has_permissions(moderate_members=True)

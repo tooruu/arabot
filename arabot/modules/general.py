@@ -179,7 +179,10 @@ class General(Cog, category=Category.GENERAL):
         if ref := await ctx.getch_reference_message():
             if ref.author in ctx.message.mentions:
                 am.replied_user = True
-            await ref.reply(text, allowed_mentions=am)
+            silent = disnake.MessageFlags(
+                suppress_notifications=ctx.message.flags.suppress_notifications
+            )
+            await ref.reply(text, allowed_mentions=am, flags=silent)
         else:
             await ctx.send(text, allowed_mentions=am)
 

@@ -12,16 +12,16 @@ from disnake.utils import find
 from .regexes import CUSTOM_EMOJI_RE
 
 __all__ = [
-    "AnyChl",
     "AnyEmoji",
     "AnyEmojis",
     "AnyGuild",
     "AnyMember",
     "AnyMemberOrUser",
+    "AnyMsgChl",
     "AnyRole",
-    "AnyTChl",
+    "AnyTxtChl",
     "AnyUser",
-    "AnyVChl",
+    "AnyVcChl",
     "CIEmoji",
     "CIGuild",
     "CIMember",
@@ -156,9 +156,9 @@ AnyMember = disnake.Member | CIMember | Empty
 AnyUser = disnake.User | UserFromCIMember | Empty
 AnyMemberOrUser = disnake.Member | CIMember | disnake.User | Empty
 AnyEmoji = disnake.Emoji | CIEmoji | disnake.PartialEmoji | Twemoji | Empty
-AnyTChl = disnake.TextChannel | CITextChl | Empty
-AnyVChl = disnake.VoiceChannel | CIVoiceChl | Empty
-AnyChl = AnyTChl | AnyVChl | Empty
+AnyTxtChl = disnake.TextChannel | CITextChl | Empty
+AnyVcChl = disnake.VoiceChannel | CIVoiceChl | disnake.StageChannel | Empty
+AnyMsgChl = disnake.TextChannel | CITextChl | AnyVcChl
 AnyRole = disnake.Role | CIRole | Empty
 AnyGuild = disnake.Guild | CIGuild | Empty
 

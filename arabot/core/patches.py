@@ -102,6 +102,20 @@ class Context(commands.Context):
 
     _ = l10n_from_guild_locale
 
+    def send(self, content: str | None = None, **kwargs) -> Awaitable[disnake.Message]:
+        if "flags" not in kwargs:
+            kwargs["flags"] = disnake.MessageFlags(
+                suppress_notifications=self.message.flags.suppress_notifications
+            )
+        return super().send(content, **kwargs)
+
+    def reply(self, content: str | None = None, **kwargs) -> Awaitable[disnake.Message]:
+        if "flags" not in kwargs:
+            kwargs["flags"] = disnake.MessageFlags(
+                suppress_notifications=self.message.flags.suppress_notifications
+            )
+        return super().reply(content, **kwargs)
+
     def send_(self, content: str, autofill: bool = True, **kwargs) -> Awaitable[disnake.Message]:
         return self.send(self._(content, autofill + autofill), **kwargs)
 
