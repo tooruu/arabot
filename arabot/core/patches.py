@@ -85,11 +85,6 @@ class Context(commands.Context):
         self.command.reset_cooldown(self)
         return True
 
-    reply_ping = partialmethod(
-        commands.Context.reply, allowed_mentions=disnake.AllowedMentions.all()
-    )
-    send_ping = partialmethod(commands.Context.send, allowed_mentions=disnake.AllowedMentions.all())
-
     temp_channel_mute_author = property(lambda self: self.message.temp_channel_mute_author)
 
     async def get_or_fetch_reference_message(self) -> disnake.Message | False | None:
@@ -115,6 +110,9 @@ class Context(commands.Context):
                 suppress_notifications=self.message.flags.suppress_notifications
             )
         return super().reply(content, **kwargs)
+
+    reply_ping = partialmethod(reply, allowed_mentions=disnake.AllowedMentions.all())
+    send_ping = partialmethod(send, allowed_mentions=disnake.AllowedMentions.all())
 
     def send_(self, content: str, autofill: bool = True, **kwargs) -> Awaitable[disnake.Message]:
         return self.send(self._(content, autofill + autofill), **kwargs)
