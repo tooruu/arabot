@@ -258,7 +258,11 @@ class General(Cog, category=Category.GENERAL):
         await ctx.message.delete()
         webhook = await ctx.channel.create_webhook(name=user)
         send = partial(
-            webhook.send, thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING
+            webhook.send,
+            flags=disnake.MessageFlags(
+                suppress_notifications=ctx.message.flags.suppress_notifications
+            ),
+            thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING,
         )
         await send(
             text,
