@@ -25,14 +25,14 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
     @command(aliases=["i", "img"], brief="Top search result from Google Images")
     async def image(self, ctx: Context, *, query: str):
         async with ctx.typing():
-            images = await self.fetch_images(query)
+            images = await self.fetch_images(query, ctx.channel.is_nsfw())
             async for image_file in self.filtered(images):
                 await ctx.reply(file=image_file)
                 break
             else:
                 await ctx.reply_("no_images_found")
 
-    async def fetch_images(self, query: str) -> list[dict]:
+    async def fetch_images(self, query: str, nsfw: bool = True) -> list[dict]:
         data = await self.session.fetch_json(
             self.BASE_URL,
             params={
@@ -40,9 +40,9 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
                 "cx": self.G_CSE,
                 "q": f"{query} -filetype:svg",
                 "searchType": "image",
+                "safe": "off" if nsfw else "active",
             },
         )
-
         return data.get("items", [])
 
     async def filtered(self, images: list[dict]) -> AsyncIterator[disnake.File]:
