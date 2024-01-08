@@ -118,8 +118,11 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
                 "openweather_docs/assets/img/icons/logo_60x60.png",
             )
         )
-        phase = "sunrise" if time() < weather["sys"]["sunrise"] else "sunset"
-        embed.add_field(ctx._(phase), format_dt(weather["sys"][phase], "t"))
+        sunrise, sunset = weather["sys"]["sunrise"], weather["sys"]["sunset"]
+        if sunrise < time() < sunset:
+            embed.add_field(ctx._("sunset"), format_dt(sunset, "t"))
+        else:
+            embed.add_field(ctx._("sunrise"), format_dt(sunrise, "t"))
 
         wind = str(weather["wind"]["speed"])
         if gust := weather["wind"].get("gust"):
