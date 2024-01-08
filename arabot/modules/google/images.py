@@ -1,4 +1,5 @@
 import logging
+from asyncio import TimeoutError
 from collections.abc import AsyncIterator
 from io import BytesIO
 from mimetypes import guess_extension
@@ -40,7 +41,6 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
                 "q": f"{query} -filetype:svg",
                 "searchType": "image",
             },
-            timeout=3,
         )
 
         return data.get("items", [])
@@ -52,7 +52,7 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
 
             image_url = item["link"]
             try:
-                async with self.session.get(image_url, timeout=1) as resp:
+                async with self.session.get(image_url, timeout=1.5) as resp:
                     if (
                         not resp.ok
                         or resp.content_type == SVG_MIME
@@ -60,6 +60,8 @@ class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"
                     ):
                         continue
                     image = await resp.read()
+            except TimeoutError:
+                continue
             except ClientError:
                 logging.exception("Failed image: %s", image_url)
             else:
