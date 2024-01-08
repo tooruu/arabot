@@ -8,6 +8,8 @@ from arabot.core import Ara, Category, Cog, Context
 
 
 class Faceit(Cog, category=Category.LOOKUP, keys={"FACEIT_KEY"}):
+    FACEIT_KEY: str
+
     def __init__(self, ara: Ara):
         self.ara = ara
         self.session = ClientSession(headers={"Authorization": f"Bearer {self.FACEIT_KEY}"})

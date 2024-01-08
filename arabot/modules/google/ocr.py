@@ -20,6 +20,8 @@ class OCRException(Exception):
 
 
 class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
+    G_OCR_KEY: str
+
     def __init__(self, trans: GoogleTranslate):
         self.trans = trans
 

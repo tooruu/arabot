@@ -13,6 +13,8 @@ from arabot.utils import CUSTOM_EMOJI_RE
 
 
 class GoogleTTS(Cog, category=Category.GENERAL, keys={"G_TTS_KEY"}):
+    G_TTS_KEY: str
+
     def __init__(self, session: ClientSession):
         self.session = session
         self._invalidate_voices_cache.start()

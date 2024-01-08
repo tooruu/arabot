@@ -57,6 +57,8 @@ class Source(IntEnum):
 
 
 class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
+    SAUCENAO_KEY: str
+
     def __init__(self, session: ClientSession):
         self.session = session
         self.jikan = AioJikan(session=session)

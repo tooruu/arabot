@@ -10,6 +10,8 @@ from arabot.core import Ara, Category, Cog, Context
 
 
 class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
+    WOLFRAM_ID: str
+
     def __init__(self, session: ClientSession):
         self.session = session
 

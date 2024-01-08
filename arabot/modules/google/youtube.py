@@ -5,6 +5,7 @@ from arabot.core import Category, Cog, Context
 
 
 class Youtube(Cog, category=Category.LOOKUP, keys={"G_YT_KEY"}):
+    G_YT_KEY: str
     YT_BASE_URL = "https://www.googleapis.com/youtube/v3/search"
 
     def __init__(self, session: ClientSession):

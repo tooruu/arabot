@@ -14,6 +14,8 @@ SVG_MIME = "image/svg+xml"
 
 
 class GoogleImages(Cog, category=Category.LOOKUP, keys={"G_ISEARCH_KEY", "G_CSE"}):
+    G_ISEARCH_KEY: str
+    G_CSE: str
     BASE_URL = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, session: ClientSession):

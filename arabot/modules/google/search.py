@@ -9,6 +9,8 @@ from arabot.utils import bold
 
 
 class GoogleSearch(Cog, category=Category.LOOKUP, keys={"G_SEARCH_KEY", "G_CSE"}):
+    G_SEARCH_KEY: str
+    G_CSE: str
     GSEARCH_BASE_URL = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, session: ClientSession):
