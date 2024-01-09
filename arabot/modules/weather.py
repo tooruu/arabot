@@ -1,7 +1,7 @@
 import re
 from datetime import UTC, datetime
 from time import time
-from typing import NotRequired, TypedDict
+from typing import Literal, TypedDict
 
 import disnake
 from disnake.ext.commands import command
@@ -15,15 +15,6 @@ LAT_LON_REGEX = re.compile(
     re.ASCII,
 )
 ICON_URL = "https://openweathermap.org/img/wn/{}@2x.png"
-
-
-class GeoData(TypedDict):
-    name: str
-    local_names: dict[str, str]
-    lat: float
-    lon: float
-    country: str
-    state: NotRequired[str]
 
 
 class WeatherCondition(TypedDict):
@@ -49,7 +40,10 @@ class WeatherData(TypedDict):
 
 
 class WeatherFetchError(Exception):
-    pass
+    def __init__(self, code: int, message: str):
+        super().__init__(message)
+        self.code = code
+        self.message = message
 
 
 class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
@@ -59,54 +53,49 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
     def __init__(self, ara: Ara):
         self.ara = ara
 
-    async def find_geoloc(self, location: str) -> GeoData | None:
-        data = await self.ara.session.fetch_json(
-            f"{self.API}/geo/1.0/direct",
-            params={"appid": self.OPENWEATHER_KEY, "q": location},
-        )
-        return data[0] if data else None
-
     async def fetch_weather(
-        self, lat: IntOrFloat, lon: IntOrFloat, units: str = "metric", lang: str = "en"
+        self,
+        location: str | tuple[IntOrFloat, IntOrFloat],
+        units: Literal["standard", "metric", "imperial"] = "metric",
+        lang: str = "en",
     ) -> WeatherData:
+        if isinstance(location, str):
+            location_data = {"q": location}
+        else:
+            location_data = dict(zip(("lat", "lon"), location, strict=True))
+
         data = await self.ara.session.fetch_json(
             f"{self.API}/data/2.5/weather",
-            params={
-                "appid": self.OPENWEATHER_KEY,
-                "lat": lat,
-                "lon": lon,
-                "units": units,
-                "lang": lang,
-            },
+            params={"appid": self.OPENWEATHER_KEY, "units": units, "lang": lang} | location_data,
             raise_for_status=False,
         )
-        if data["cod"] != 200:
-            raise WeatherFetchError(data["message"])
+        code = int(data["cod"])
+        if code != 200:
+            raise WeatherFetchError(code, data["message"])
         return data
 
     @command(brief="Show current weather in a city or at coordinates")
     async def weather(self, ctx: Context, *, location: str):
         if re.fullmatch(LAT_LON_REGEX, location):
-            lat, lon = map(float, location.split(","))
-        elif loc := await self.find_geoloc(location):
-            lat, lon = loc["lat"], loc["lon"]
-        else:
-            await ctx.send_("loc_not_found")
-            return
+            location = map(float, location.split(","))
 
         try:
-            weather = await self.fetch_weather(lat, lon)
+            weather = await self.fetch_weather(location)
         except WeatherFetchError as e:
-            await ctx.send(str(e).capitalize())
+            if e.code == 404:
+                await ctx.send_("loc_not_found")
+            else:
+                await ctx.send(e.message.capitalize())
             return
 
+        lat, lon = weather["coord"]["lat"], weather["coord"]["lon"]
         embed = (
             disnake.Embed(
                 title=weather["name"],
-                url=f"https://www.google.com/maps/place/{lat},{lon}",
                 description=", ".join(cond["description"] for cond in weather["weather"]),
                 timestamp=datetime.fromtimestamp(weather["dt"], tz=UTC),
             )
+            .set_author(name=f"{lat}, {lon}", url=f"https://www.google.com/maps/place/{lat},{lon}")
             .set_thumbnail(url=ICON_URL.format(weather["weather"][0]["icon"]))
             .add_field(ctx._("temperature"), f"{weather["main"]["temp"]}°C")
             .add_field(ctx._("feels_like"), f"{weather["main"]["feels_like"]}°C")
@@ -119,7 +108,9 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             )
         )
         sunrise, sunset = weather["sys"]["sunrise"], weather["sys"]["sunset"]
-        if sunrise < time() < sunset:
+        if not sunrise or not sunset:
+            embed.add_field("\u200b", "\u200b")  # Align cloudiness field to the grid
+        elif sunrise < time() < sunset:
             embed.add_field(ctx._("sunset"), format_dt(sunset, "t"))
         else:
             embed.add_field(ctx._("sunrise"), format_dt(sunrise, "t"))
@@ -129,12 +120,8 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             wind += f"-{gust}"
         embed.insert_field_at(3, ctx._("wind_speed"), f"{wind} m/s")
 
-        coords = f"{weather["coord"]["lat"]}, {weather["coord"]["lon"]}"
-        if not embed.title:
-            embed.title = coords
-        elif country := weather["sys"].get("country"):
+        if embed.title and (country := weather["sys"].get("country")):
             embed.title += f", {country}"
-            embed.set_author(name=coords)
         await ctx.send(embed=embed)
 
 
