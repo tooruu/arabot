@@ -1,13 +1,19 @@
 import re
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
+from io import BytesIO
 from time import time
-from typing import Literal, TypedDict
+from typing import NotRequired, TypedDict
 
 import disnake
+import matplotlib.pyplot as plt
 from disnake.ext.commands import command
 from disnake.utils import format_dt
+from matplotlib.axes import Axes
+from matplotlib.dates import ConciseDateFormatter, DateFormatter, DayLocator, HourLocator
+from matplotlib.ticker import MaxNLocator
 
 from arabot.core import Ara, Category, Cog, Context
+from arabot.utils import I18N
 
 type IntOrFloat = int | float
 LAT_LON_REGEX = re.compile(
@@ -24,55 +30,75 @@ class WeatherCondition(TypedDict):
     icon: str
 
 
+class APIResponse(TypedDict):
+    cod: int | str
+    message: NotRequired[str | int]
+    parameters: NotRequired[list[str]]
+
+
 class WeatherData(TypedDict):
-    coord: dict[str, IntOrFloat]
-    weather: list[WeatherCondition]
-    main: dict[str, IntOrFloat]
-    visibility: 10000
-    wind: dict[str, IntOrFloat]
-    clouds: dict[str, int]
     dt: int
+    main: dict[str, IntOrFloat]
+    weather: list[WeatherCondition]
+    clouds: dict[str, int]
+    wind: dict[str, IntOrFloat]
+    visibility: int
+
+
+class Weather(APIResponse, WeatherData):
+    coord: dict[str, IntOrFloat]
+    base: str
     sys: dict[str, int]
     timezone: int
     id: int
     name: str
-    cod: int
 
 
-class WeatherFetchError(Exception):
-    def __init__(self, code: int, message: str):
+class City(TypedDict):
+    id: int
+    name: str
+    coord: dict[str, IntOrFloat]
+    country: str
+    population: int
+    timezone: int
+    sunrise: int
+    sunset: int
+
+
+class ForecastDatapoint(WeatherData):
+    pop: IntOrFloat
+    sys: dict[str, str]
+    dt_txt: str
+
+
+class Forecast(APIResponse):
+    cnt: int
+    city: City
+    list: list[ForecastDatapoint]
+
+
+class APIFetchError(Exception):
+    def __init__(self, code: str, message: str):
         super().__init__(message)
         self.code = code
         self.message = message
 
 
-class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
+class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
     OPENWEATHER_KEY: str
-    API = "https://api.openweathermap.org"
+    API = "https://api.openweathermap.org/data/2.5"
+    CLOUDINESS = f"{__module__}.cloudiness"
+    FEELSLIKE = f"{__module__}.feels_like"
+    HUMIDITY = f"{__module__}.humidity"
+    SUNRISE = f"{__module__}.sunrise"
+    SUNSET = f"{__module__}.sunset"
+    TEMPERATURE = f"{__module__}.temperature"
+    WIND_SPEED = f"{__module__}.wind_speed"
 
     def __init__(self, ara: Ara):
         self.ara = ara
-
-    async def fetch_weather(
-        self,
-        location: str | tuple[IntOrFloat, IntOrFloat],
-        units: Literal["standard", "metric", "imperial"] = "metric",
-        lang: str = "en",
-    ) -> WeatherData:
-        if isinstance(location, str):
-            location_data = {"q": location}
-        else:
-            location_data = dict(zip(("lat", "lon"), location, strict=True))
-
-        data = await self.ara.session.fetch_json(
-            f"{self.API}/data/2.5/weather",
-            params={"appid": self.OPENWEATHER_KEY, "units": units, "lang": lang} | location_data,
-            raise_for_status=False,
-        )
-        code = int(data["cod"])
-        if code != 200:
-            raise WeatherFetchError(code, data["message"])
-        return data
+        self.fig, ax = plt.subplots(figsize=(6, 2.5), layout="constrained")
+        self.ax: Axes = ax
 
     @command(brief="Show current weather in a city or at coordinates")
     async def weather(self, ctx: Context, *, location: str):
@@ -80,9 +106,10 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             location = map(float, location.split(","))
 
         try:
-            weather = await self.fetch_weather(location)
-        except WeatherFetchError as e:
-            if e.code == 404:
+            weather: Weather = await self._openweather_fetch("/weather", location)
+            forecast: Forecast = await self._openweather_fetch("/forecast", location)
+        except APIFetchError as e:
+            if e.code == "404":
                 await ctx.send_("loc_not_found")
             else:
                 await ctx.send(e.message.capitalize())
@@ -97,10 +124,11 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             )
             .set_author(name=f"{lat}, {lon}", url=f"https://www.google.com/maps/place/{lat},{lon}")
             .set_thumbnail(url=ICON_URL.format(weather["weather"][0]["icon"]))
-            .add_field(ctx._("temperature"), f"{weather["main"]["temp"]}°C")
-            .add_field(ctx._("feels_like"), f"{weather["main"]["feels_like"]}°C")
-            .add_field(ctx._("humidity"), f"{weather["main"]["humidity"]}%")
-            .add_field(ctx._("cloudiness"), f"{weather["clouds"]["all"]}%")
+            .add_field(ctx._(WeatherCog.TEMPERATURE, False), f"{weather["main"]["temp"]}°C")
+            .add_field(ctx._(WeatherCog.FEELSLIKE, False), f"{weather["main"]["feels_like"]}°C")
+            .add_field(ctx._(WeatherCog.HUMIDITY, False), f"{weather["main"]["humidity"]}%")
+            .add_field(ctx._(WeatherCog.CLOUDINESS, False), f"{weather["clouds"]["all"]}%")
+            .set_image(file=self.get_forecast(forecast, ctx._))
             .set_footer(
                 text=ctx._("powered_by", False).format("OpenWeather"),
                 icon_url="https://docs.openweather.co.uk/themes/"
@@ -111,19 +139,89 @@ class Weather(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
         if not sunrise or not sunset:
             embed.add_field("\u200b", "\u200b")  # Align cloudiness field to the grid
         elif sunrise < time() < sunset:
-            embed.add_field(ctx._("sunset"), format_dt(sunset, "t"))
+            embed.add_field(ctx._(WeatherCog.SUNSET), format_dt(sunset, "t"))
         else:
-            embed.add_field(ctx._("sunrise"), format_dt(sunrise, "t"))
+            embed.add_field(ctx._(WeatherCog.SUNRISE), format_dt(sunrise, "t"))
 
         wind = str(weather["wind"]["speed"])
         if gust := weather["wind"].get("gust"):
             wind += f"-{gust}"
-        embed.insert_field_at(3, ctx._("wind_speed"), f"{wind} m/s")
+        embed.insert_field_at(3, ctx._(WeatherCog.WIND_SPEED), f"{wind} m/s")
 
         if embed.title and (country := weather["sys"].get("country")):
             embed.title += f", {country}"
         await ctx.send(embed=embed)
 
+    def get_forecast(self, forecast: Forecast, _: I18N) -> disnake.File:
+        self._graph_forecast(forecast, _)
+        file = self.plt_to_file()
+        self.fig.axes[1].remove()
+        self.ax.clear()
+        return file
+
+    def _graph_forecast(self, forecast: Forecast, _: I18N) -> None:
+        tz = timezone(timedelta(seconds=forecast["city"]["timezone"]))
+        dts = [datetime.fromtimestamp(f["dt"], tz=UTC) for f in forecast["list"]]
+        temps = [f["main"]["temp"] for f in forecast["list"]]
+        feels = [f["main"]["feels_like"] for f in forecast["list"]]
+        humidity = [f["main"]["humidity"] for f in forecast["list"]]
+        ax1 = self.ax
+        # Configure X axis
+        ax1.set(
+            xlabel=_("x_label").format(tz),
+            xlim=(dts[0], dts[-1]),
+            xticks=dts,
+            ylabel=f"{_(WeatherCog.TEMPERATURE)}, °C",
+        )
+        ax1.xaxis.set_major_locator(lct := DayLocator(tz=tz))
+        ax1.xaxis.set_major_formatter(ConciseDateFormatter(lct, tz, offset_formats=["%B %Y"] * 6))
+        ax1.xaxis.set_minor_locator(HourLocator(range(6, 24, 6), tz=tz))
+        ax1.xaxis.set_minor_formatter(DateFormatter("%H:%M", tz))
+        for label in ax1.get_xminorticklabels():
+            label.set(fontsize="x-small", color="grey", rotation=45)
+        ax1.grid(axis="x", alpha=0.3)
+
+        # Configure both Y axis
+        ax2: Axes = ax1.twinx()
+        ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
+        ax2.set(ylabel=f"{_(WeatherCog.HUMIDITY)}, %", ylim=(0, 100))
+
+        ax1.plot(dts, temps, "r-.", label=_(WeatherCog.TEMPERATURE, False))
+        ax1.plot(dts, feels, color="orange", alpha=0.3, label=_(WeatherCog.FEELSLIKE, False))
+        ax2.plot(dts, humidity, color="blue", alpha=0.3, label=_(WeatherCog.HUMIDITY, False))
+
+        self.fig.legend(bbox_to_anchor=(1, 1), bbox_transform=ax1.transAxes, prop={"size": "small"})
+
+    async def _openweather_fetch[T: APIResponse](
+        self,
+        endpoint: str,
+        location: str | tuple[IntOrFloat, IntOrFloat],
+        **kwargs: str | IntOrFloat,
+    ) -> T:
+        if isinstance(location, str):
+            location_data = {"q": location}
+        else:
+            location_data = dict(zip(("lat", "lon"), location, strict=True))
+
+        data: T = await self.ara.session.fetch_json(
+            self.API + endpoint,
+            params={"appid": self.OPENWEATHER_KEY, "units": "metric", **location_data, **kwargs},
+            raise_for_status=False,
+        )
+        code = str(data["cod"])
+        if code != "200":
+            raise APIFetchError(code, str(data["message"]))
+        return data
+
+    def plt_to_file(self) -> disnake.File:
+        buf = BytesIO()
+        self.fig.savefig(buf)
+        buf.seek(0)
+        return disnake.File(buf, "forecast.png")
+
+    def cog_unload(self):
+        plt.close(self.fig)
+
 
 def setup(ara: Ara):
-    ara.add_cog(Weather(ara))
+    ara.add_cog(WeatherCog(ara))
