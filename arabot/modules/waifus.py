@@ -197,6 +197,8 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
         )
 
     async def __callback(self, ctx: Context, *targets: AnyMember) -> None:
+        if ctx.channel.permissions_for(ctx.me).manage_messages:
+            await ctx.message.delete()
         method = self.wclient.nsfw if ctx.command.parent else self.wclient.sfw
         if method is self.wclient.nsfw and not ctx.channel.is_nsfw():
             await ctx.reply_(Waifus.NSFW_IN_SFW_CHANNEL, False)
