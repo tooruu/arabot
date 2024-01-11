@@ -147,7 +147,7 @@
     "arabot.modules.owner.unloaded": "Unloaded",
     "arabot.modules.ping.ping.pong": "🏓 Pong - {}ms",
     "arabot.modules.ping.plot_graph.x_label": "The last hour",
-    "arabot.modules.ping.plot_graph.y_label": "Ping (ms)",
+    "arabot.modules.ping.plot_graph.y_label": "Ping, ms",
     "arabot.modules.sauce.sauce.episode": "Episode {}",
     "arabot.modules.sauce.sauce.fetch_failed": "Failed to fetch results",
     "arabot.modules.sauce.sauce.no_image_or_link_provided": "No image or link provided",
