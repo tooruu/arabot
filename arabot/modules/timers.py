@@ -100,10 +100,6 @@ timers: dict[int, tuple[str, Timer]] = {
         "Waifus reset💖{1}",
         Timer({w: [(time(hour=h, minute=39), None) for h in range(2, 24, 3)] for w in range(1, 8)}),
     ),
-    1149235203450097694: (
-        "Claim reset💖{1}",
-        Timer({w: [(time(hour=h, minute=54), None) for h in range(2, 24, 3)] for w in range(1, 8)}),
-    ),
 }
 
 

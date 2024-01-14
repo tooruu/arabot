@@ -125,7 +125,6 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             .set_author(name=f"{lat}, {lon}", url=f"https://www.google.com/maps/place/{lat},{lon}")
             .set_thumbnail(url=ICON_URL.format(weather["weather"][0]["icon"]))
             .add_field(ctx._(WeatherCog.TEMPERATURE, False), f"{weather["main"]["temp"]}°C")
-            .add_field(ctx._(WeatherCog.FEELSLIKE, False), f"{weather["main"]["feels_like"]}°C")
             .add_field(ctx._(WeatherCog.HUMIDITY, False), f"{weather["main"]["humidity"]}%")
             .add_field(ctx._(WeatherCog.CLOUDINESS, False), f"{weather["clouds"]["all"]}%")
             .set_image(file=self.get_forecast(forecast, ctx._))
@@ -135,6 +134,11 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
                 "openweather_docs/assets/img/icons/logo_60x60.png",
             )
         )
+        wind = str(weather["wind"]["speed"])
+        if gust := weather["wind"].get("gust"):
+            wind += f"-{gust}"
+        embed.insert_field_at(1, ctx._(WeatherCog.WIND_SPEED), f"{wind} m/s")
+
         sunrise, sunset = weather["sys"]["sunrise"], weather["sys"]["sunset"]
         if not sunrise or not sunset:
             embed.add_field("\u200b", "\u200b")  # Align cloudiness field to the grid
@@ -143,10 +147,11 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
         else:
             embed.add_field(ctx._(WeatherCog.SUNRISE), format_dt(sunrise, "t"))
 
-        wind = str(weather["wind"]["speed"])
-        if gust := weather["wind"].get("gust"):
-            wind += f"-{gust}"
-        embed.insert_field_at(3, ctx._(WeatherCog.WIND_SPEED), f"{wind} m/s")
+        feels_like = weather["main"]["feels_like"]
+        if feels_like != weather["main"]["temp"]:
+            embed.insert_field_at(3, ctx._(WeatherCog.FEELSLIKE, False), f"{feels_like}°C")
+        else:
+            embed.add_field("\u200b", "\u200b")
 
         if embed.title and (country := weather["sys"].get("country")):
             embed.title += f", {country}"
