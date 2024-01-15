@@ -1,6 +1,5 @@
 [build]
-builder = "heroku"
+builder = "HEROKU"
 
 [deploy]
-startCommand = "python -bm arabot"
-restartPolicyType = "never"
+startCommand = '/bin/sh -c "prisma db push && python -m arabot"'

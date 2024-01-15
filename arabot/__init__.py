@@ -1,11 +1,9 @@
 from os import getenv
-from subprocess import run
 
 from dotenv import load_dotenv
 
 __version__ = "8.19.2"
 
-run(("prisma", "db", "push"), check=True)
 load_dotenv()
 TESTING = bool(getenv("TESTING"))
 
