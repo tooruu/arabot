@@ -10,11 +10,6 @@ from disnake.utils import async_all
 
 from .bot import Ara
 
-__all__ = [
-    "PfxlessOnCooldown",
-    "pfxless",
-]
-
 type CogMsgListener = Callable[[commands.Cog, Message], Awaitable]
 
 

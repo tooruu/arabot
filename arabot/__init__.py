@@ -3,12 +3,6 @@ from subprocess import run
 
 from dotenv import load_dotenv
 
-__all__ = [
-    "__version__",
-    "Ara",
-    "TESTING",
-]
-
 __version__ = "8.19.2"
 
 run(("prisma", "db", "push"), check=True)

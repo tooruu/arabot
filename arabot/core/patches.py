@@ -19,12 +19,6 @@ from arabot.utils import fullqualname, getkeys
 
 from .enums import Category
 
-__all__ = [
-    "Context",
-    "Cog",
-    "LocalizationStore",
-]
-
 
 class Context(commands.Context):
     bot: bot.Ara
