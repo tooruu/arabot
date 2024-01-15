@@ -103,7 +103,7 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
     @command(brief="Show current weather in a city or at coordinates")
     async def weather(self, ctx: Context, *, location: str):
         if re.fullmatch(LAT_LON_REGEX, location):
-            location = map(float, location.split(","))
+            location = tuple(map(float, location.split(",")))
 
         try:
             weather: Weather = await self._openweather_fetch("/weather", location)
@@ -203,6 +203,7 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
         location: str | tuple[IntOrFloat, IntOrFloat],
         **kwargs: str | IntOrFloat,
     ) -> T:
+        print(location)
         if isinstance(location, str):
             location_data = {"q": location}
         else:
