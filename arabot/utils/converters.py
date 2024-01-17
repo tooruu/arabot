@@ -1,5 +1,6 @@
 import re
 from collections.abc import Callable
+from itertools import chain
 from string import whitespace
 from types import UnionType
 from typing import Self
@@ -96,11 +97,9 @@ class UserFromCIMember(CIMember):
 class CIEmoji(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Emoji:
         emoji_search = arg_ci_re_search(argument)
-        guilds = ctx.bot.guilds
-        guilds.insert(0, guilds.pop(guilds.index(ctx.guild)))  # Move ctx.guild to the beginning
-        for guild in guilds:
-            if emoji := find(lambda emoji: emoji_search(emoji.name), guild.emojis):
-                return emoji
+        emojis = chain(ctx.guild.emojis, ctx.bot.emojis)
+        if emoji := find(lambda emoji: emoji_search(emoji.name), emojis):
+            return emoji
         raise commands.EmojiNotFound(argument)
 
 
