@@ -143,8 +143,8 @@ class Meta(Cog, category=Category.META):
             dirty_indicator = ""
         else:
             try:
-                commit_sha = check_output(["git", "rev-parse", "HEAD", "--"]).strip().decode()
-                dirty_indicator = ".dirty" if check_output(["git", "status", "-s"]) else ""
+                commit_sha = check_output("git rev-parse HEAD --".split(), text=True).strip()
+                dirty_indicator = ".dirty" if check_output("git status -s".split()) else ""
             except (OSError, SubprocessError):
                 return ver_str
 
@@ -160,9 +160,7 @@ class Meta(Cog, category=Category.META):
         if not self._line_count:
             await ctx.send_("couldnt_read")
             return
-        await ctx.send(
-            ctx._("consists_of").format(f"{ctx.ara.name} v{arabot.__version__}", self._line_count)
-        )
+        await ctx.send(ctx._("consists_of").format(self._get_version(), self._line_count))
 
     @commands.command(aliases=["github", "gh"], brief="Link bot's code repository")
     async def repo(self, ctx: Context):

@@ -1,7 +1,8 @@
 import logging
-import re
+import sys
 
 import disnake
+from aiohttp import ClientConnectorError
 
 from . import TESTING, Ara
 from .core import LocalizationStore
@@ -10,17 +11,9 @@ from .core import LocalizationStore
 def setup_logging() -> None:
     logging.basicConfig(
         format="%(asctime)s|%(levelname)s|%(message)s",
-        level=logging.INFO if TESTING else logging.WARNING,
+        level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-
-
-async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
-    custom_prefix = await ara.db.get_guild_prefix(msg.guild.id) or ";"
-    pfx_pattern = rf"{re.escape(custom_prefix)}\s*|ara\s+|<@!?{ara.user.id}>\s*"
-    if msg.guild.self_role:
-        pfx_pattern += rf"|<@&{msg.guild.self_role.id}>\s*"
-    return (found := re.match(pfx_pattern, msg.content, re.IGNORECASE)) and found[0]
 
 
 def create_ara(*args, **kwargs) -> Ara:
@@ -38,7 +31,6 @@ def create_ara(*args, **kwargs) -> Ara:
         activity=disnake.Activity(type=disnake.ActivityType.competing, name="McDonalds"),
         allowed_mentions=disnake.AllowedMentions.none(),
         case_insensitive=True,
-        command_prefix=prefix_manager,
         embed_color=0xE91E63,
         intents=intents,
         localization_provider=LocalizationStore(strict=True, fallback=disnake.Locale.en_US),
@@ -53,10 +45,15 @@ def create_ara(*args, **kwargs) -> Ara:
     return Ara(*args, **default_kwargs | kwargs)
 
 
-def main() -> None:
+def main() -> bool:
     setup_logging()
-    create_ara().run()
+    ara = create_ara()
+    try:
+        ara.run()
+    except (ClientConnectorError, disnake.LoginFailure):
+        return False
+    return True
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(not main())

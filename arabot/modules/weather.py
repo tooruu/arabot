@@ -203,7 +203,6 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
         location: str | tuple[IntOrFloat, IntOrFloat],
         **kwargs: str | IntOrFloat,
     ) -> T:
-        print(location)
         if isinstance(location, str):
             location_data = {"q": location}
         else:

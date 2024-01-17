@@ -8,4 +8,4 @@ load_dotenv()
 TESTING = bool(getenv("TESTING"))
 
 # Load up bot after the code above has been executed
-from .core import Ara  # noqa: E402
+from .core import Ara  # noqa: E402, F401

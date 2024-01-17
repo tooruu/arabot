@@ -305,4 +305,4 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
 
 def setup(ara: Ara):
     ara.add_cog(OwnerCommands())
-    ara.add_cog(PluginManager(ara._cogs_path))
+    ara.add_cog(PluginManager(ara._plugins_path))
