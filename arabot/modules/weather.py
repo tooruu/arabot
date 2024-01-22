@@ -179,11 +179,12 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             ylabel=f"{_(WeatherCog.TEMPERATURE)}, °C",
         )
         ax1.xaxis.set_major_locator(lct := DayLocator(tz=tz))
-        ax1.xaxis.set_major_formatter(ConciseDateFormatter(lct, tz, offset_formats=["%B %Y"] * 6))
+        major_tick_formats = ["%d\n%a"] * 6, ["%B %Y"] * 6, ["%b\n%a"] * 6
+        ax1.xaxis.set_major_formatter(ConciseDateFormatter(lct, tz, *major_tick_formats))
         ax1.xaxis.set_minor_locator(HourLocator(range(6, 24, 6), tz=tz))
-        ax1.xaxis.set_minor_formatter(DateFormatter("%H:%M", tz))
+        ax1.xaxis.set_minor_formatter(DateFormatter("%H", tz))
         for label in ax1.get_xminorticklabels():
-            label.set(fontsize="x-small", color="grey", rotation=45)
+            label.set(fontsize="x-small", color="grey")
         ax1.grid(axis="x", alpha=0.3)
 
         # Configure both Y axis
