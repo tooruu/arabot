@@ -217,9 +217,14 @@ async def temp_mute_channel_member(
 
 
 async def fetch_json(
-    self: aiohttp.ClientSession, url: str, *, method: str = "get", **kwargs
+    self: aiohttp.ClientSession,
+    url: str,
+    *,
+    method: str = "GET",
+    raise_for_status: bool = True,
+    **kwargs,
 ) -> dict | list:
-    async with self.request(method, url, **{"raise_for_status": True, **kwargs}) as resp:
+    async with self.request(method, url, raise_for_status=raise_for_status, **kwargs) as resp:
         return await resp.json()
 
 
