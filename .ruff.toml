@@ -1,5 +1,12 @@
 target-version = "py312"
 line-length = 100
+
+[format]
+docstring-code-format = true
+
+[lint]
+ignore-init-module-imports = true
+exclude = ["tools/database_editor.py"]
 select = ["ALL"]
 ignore = [
     "A003",    # builtin-attribute-shadowing
@@ -35,21 +42,6 @@ ignore = [
     "TRY003",  # raise-vanilla-args
     "TRY400",  # error-instead-of-exception
 ]
-ignore-init-module-imports = true
-
-[per-file-ignores]
-"arabot/core/__init__.py" = ["F401", "F403"]
-"arabot/utils/__init__.py" = [
-    "F401", # unused-import
-    "F403", # undefined-local-with-import-star
-]
-"arabot/modules/eval/client.py" = ["PGH001", "S307"] # Allow the use of eval
-
-[format]
-docstring-code-format = true
-
-[lint]
-exclude = ["tools/database_editor.py"]
 
 [lint.flake8-annotations]
 mypy-init-return = true
@@ -66,3 +58,11 @@ classes = ["clean_content", "pfxless"]
 
 [lint.pep8-naming]
 ignore-names = []
+
+[lint.per-file-ignores]
+"arabot/core/__init__.py" = ["F401", "F403"]
+"arabot/utils/__init__.py" = [
+    "F401", # unused-import
+    "F403", # undefined-local-with-import-star
+]
+"arabot/modules/eval/client.py" = ["S307"] # Allow the use of eval
