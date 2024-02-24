@@ -3,9 +3,9 @@ from urllib.parse import quote_plus
 from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
+from distutils import bcppcompiler
 
 from arabot.core import Category, Cog, Context
-from arabot.utils import bold
 
 
 class GoogleSearch(Cog, category=Category.LOOKUP, keys={"G_SEARCH_KEY", "G_CSE"}):
@@ -48,15 +48,18 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"G_SEARCH_KEY", "G_CSE"}
             return
 
         embed = Embed(
-            title="Google search results",
-            description="Showing top 3 search results",
+            title="Google Search",
             url=f"https://google.com/search?q={quote_plus(query)}",
         )
 
         for hit in data["items"]:
-            embed.add_field(
-                hit["link"],
-                f"{bold(hit['title'])}\n{hit['snippet']}",
-                inline=False,
-            )
+            url: str = hit["link"]
+            bc = self.generate_breadcrumbs(url)
+            embed.add_field(hit["title"], f"[{bc}]({url})\n{hit['snippet']}", inline=False)
         await ctx.reply(embed=embed)
+
+    @staticmethod
+    def generate_breadcrumbs(url: str, num_parts: int = 4) -> str:
+        breadcrumbs = url.partition("?")[0].removesuffix("/").split("/")[2 : 2 + num_parts]
+        breadcrumbs[0] = max(breadcrumbs[0].removeprefix("www.").split("."), key=len)
+        return " > ".join(s.replace("_", " ").replace("-", " ").capitalize() for s in breadcrumbs)
