@@ -2,7 +2,7 @@ from os import getenv
 
 from dotenv import load_dotenv
 
-__version__ = "8.19.6"
+__version__ = "8.19.7"
 
 load_dotenv()
 TESTING = bool(getenv("TESTING"))

@@ -1,0 +1,39 @@
+name: Tag new version
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  VERSION_PATH: arabot/__init__.py
+  VERSION_REGEX: '^\+__version__ = "(.+)"$'
+
+jobs:
+  tag:
+    name: Autotag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: ${{ env.VERSION_PATH }}
+          sparse-checkout-cone-mode: false
+          fetch-depth: 0
+
+      - name: Set credentials
+        run: |
+          git config user.name github-actions
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Tag commit
+        id: tag
+        run: |
+          LAST_TAG=$(git describe --abbrev=0)
+          VERSION=$(git diff "$LAST_TAG" HEAD "$VERSION_PATH" | sed -nr "s/$VERSION_REGEX/\1/p")
+          [ "$VERSION" ] && git tag -m "v$VERSION" "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Push tag
+        if: steps.tag.outputs.version
+        run: git push --tags

@@ -3,7 +3,6 @@ from urllib.parse import quote_plus
 from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
-from distutils import bcppcompiler
 
 from arabot.core import Category, Cog, Context
 
