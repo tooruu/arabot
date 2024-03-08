@@ -156,7 +156,7 @@ class Fun(Cog, category=Category.FUN):
                 return
             member = ctx.guild.get_member(random.choice(members).id)
         else:
-            if len(members := channel.members) <= 1:
+            if len(channel.members) <= 1:
                 await ctx.send(ctx._("no_priviliged_intent", False).format("GUILD_MEMBERS"))
                 return
             member = random.choice(channel.members)
