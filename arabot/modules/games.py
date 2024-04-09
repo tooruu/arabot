@@ -469,7 +469,7 @@ class Games(Cog, category=Category.FUN):
 
         try:
             exact_guess: disnake.Message = await asyncio.wait_for(voting(), timeout=20)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             exact_guess = False
 
         # Winner phase
@@ -539,7 +539,7 @@ class Games(Cog, category=Category.FUN):
                 votes[mentioned] += 1
                 voted.append(vote.author)
 
-        with suppress(asyncio.TimeoutError):
+        with suppress(TimeoutError):
             await asyncio.wait_for(voting(), timeout=20)
 
         # Ejection phase

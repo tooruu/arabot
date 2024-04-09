@@ -1,4 +1,3 @@
-import asyncio
 import re
 from contextlib import suppress
 
@@ -55,7 +54,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             bad_msg: disnake.Message = await ctx.ara.wait_for(
                 "message", check=bad_msg_check, timeout=300
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return
         else:
             with suppress(disnake.Forbidden):

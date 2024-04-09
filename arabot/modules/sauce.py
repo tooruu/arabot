@@ -180,7 +180,6 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
             embed.description = f"{_('parse_error')}:```yaml\n{raw_data}\n```"
         embed.set_footer(
             text=_("powered_by", False).format("SauceNAO"),
-            icon_url="https://i.imgur.com/Ynoqpam_d.png",
         )
         await ctx.reply(embed=embed)
         # Debug info

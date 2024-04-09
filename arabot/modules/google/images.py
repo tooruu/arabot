@@ -1,5 +1,4 @@
 import logging
-from asyncio import TimeoutError
 from collections.abc import AsyncIterator
 from io import BytesIO
 from mimetypes import guess_extension
