@@ -257,6 +257,7 @@ class General(Cog, category=Category.GENERAL):
 
         await ctx.message.delete()
         webhook = await self.ara.fetch_webhook("impersonate", ctx.message)
+
         send = partial(
             webhook.send,
             flags=disnake.MessageFlags(

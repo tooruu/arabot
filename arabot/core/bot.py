@@ -155,17 +155,12 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
-    async def fetch_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook | None:
-        reason = (
-            "Used for some functionality. It is safe to delete. Bot will recreate it when required."
-        )
-
-        channel = msg.channel.parent if isinstance(msg.channel, disnake.Thread) else msg.channel
-        webhooks = await channel.webhooks()
+    async def fetch_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook:
+        webhooks = await msg.channel.webhooks()
 
         return disnake.utils.get(
-            webhooks, user__id=self.user.id, name=name
-        ) or await channel.create_webhook(name=name, avatar=self.user.display_avatar, reason=reason)
+            webhooks, user=self.user, name=name
+        ) or await msg.channel.create_webhook(name=name, avatar=self.user.display_avatar)
 
     @override
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
