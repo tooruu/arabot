@@ -50,7 +50,7 @@ class clean_content(commands.clean_content):  # noqa: N801
 
 
 class Twemoji(commands.Converter):
-    base_url = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/{}.png"
+    base_url = "https://raw.githubusercontent.com/twitter/twemoji/main/assets/72x72/{}.png"
 
     def __init__(self, emoji: str):
         self.emoji = emoji.removesuffix("\N{VARIATION SELECTOR-16}") if len(emoji) == 2 else emoji
