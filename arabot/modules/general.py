@@ -5,6 +5,7 @@ from types import NoneType
 
 import disnake
 from disnake.ext import commands
+from disnake.utils import MISSING
 
 from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import (CUSTOM_EMOJI_RE, AnyEmoji, AnyEmojis, AnyMember,
@@ -248,12 +249,13 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
-        webhook = await self.ara.get_webhook("impersonate", ctx)
+        webhook = await self.ara.get_webhook("impersonate", ctx.message)
         send = partial(
             webhook.send,
             flags=disnake.MessageFlags(
                 suppress_notifications=ctx.message.flags.suppress_notifications
             ),
+            thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING,
         )
         await send(
             text,
