@@ -8,8 +8,15 @@ from disnake.ext import commands
 from disnake.utils import MISSING
 
 from arabot.core import Ara, Category, Cog, Context
-from arabot.utils import (CUSTOM_EMOJI_RE, AnyEmoji, AnyEmojis, AnyMember,
-                          AnyMemberOrUser, Twemoji, bold)
+from arabot.utils import (
+    CUSTOM_EMOJI_RE,
+    AnyEmoji,
+    AnyEmojis,
+    AnyMember,
+    AnyMemberOrUser,
+    Twemoji,
+    bold,
+)
 
 HTTP_CATS_VALID_CODES = {
     100, 101, 102,
@@ -249,7 +256,7 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
-        webhook = await self.ara.get_webhook("impersonate", ctx.message)
+        webhook = await self.ara.fetch_webhook("impersonate", ctx.message)
         send = partial(
             webhook.send,
             flags=disnake.MessageFlags(

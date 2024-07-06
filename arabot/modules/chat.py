@@ -113,7 +113,7 @@ class Chat(Cog):
 
         await msg.delete()
         someone = random.choice(msg.channel.members)
-        sender = await self.ara.get_webhook("somebody", msg)
+        sender = await self.ara.fetch_webhook("somebody", msg)
         await sender.send(
             AT_SOMEONE.sub(someone.mention, msg.content),
             username=msg.author.display_name,

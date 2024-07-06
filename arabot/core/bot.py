@@ -155,7 +155,7 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
-    async def get_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook | None:
+    async def fetch_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook | None:
         reason = (
             "Used for some functionality. It is safe to delete. Bot will recreate it when required."
         )
