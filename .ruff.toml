@@ -5,7 +5,6 @@ line-length = 100
 docstring-code-format = true
 
 [lint]
-ignore-init-module-imports = true
 exclude = ["tools/database_editor.py"]
 select = ["ALL"]
 ignore = [
