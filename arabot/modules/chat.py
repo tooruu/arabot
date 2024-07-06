@@ -113,13 +113,13 @@ class Chat(Cog):
 
         await msg.delete()
         someone = random.choice(msg.channel.members)
-        sender = await msg.channel.create_webhook(name=msg.author, avatar=msg.author.display_avatar)
+        sender = await self.ara.fetch_webhook("somebody", msg)
         await sender.send(
             AT_SOMEONE.sub(someone.mention, msg.content),
             username=msg.author.display_name,
+            avatar_url=msg.author.display_avatar,
             allowed_mentions=disnake.AllowedMentions(users=True),
         )
-        await sender.delete()
 
     @pfxless(regex="^ok$", allow_bots=True)
     async def ok(self, msg: disnake.Message):

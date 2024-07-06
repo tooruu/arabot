@@ -155,6 +155,13 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
+    async def fetch_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook:
+        webhooks = await msg.channel.webhooks()
+
+        return disnake.utils.get(
+            webhooks, user=self.user, name=name
+        ) or await msg.channel.create_webhook(name=name, avatar=self.user.display_avatar)
+
     @override
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
         match exception:

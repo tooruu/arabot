@@ -256,7 +256,8 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
-        webhook = await ctx.channel.create_webhook(name=user)
+        webhook = await self.ara.fetch_webhook("impersonate", ctx.message)
+
         send = partial(
             webhook.send,
             flags=disnake.MessageFlags(
@@ -270,7 +271,6 @@ class General(Cog, category=Category.GENERAL):
             username=WEBHOOK_RESERVED_NAMES.get(user.display_name, user.display_name),
             allowed_mentions=disnake.AllowedMentions(users=True),
         )
-        await webhook.delete()
 
 
 def setup(ara: Ara):
