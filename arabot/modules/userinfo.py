@@ -25,8 +25,8 @@ class GlobalOrGuildUserVariant(disnake.ui.View):
 
 
 class Userinfo(Cog, category=Category.GENERAL):
-    @commands.command(aliases=["a", "pfp"], brief="Show user's avatar", usage="[member]")
-    async def avatar(self, ctx: Context, *, member: AnyMember = False):
+    @commands.command(aliases=["a", "pfp"], brief="Show user's avatar", usage="[user]")
+    async def avatar(self, ctx: Context, *, member: AnyMemberOrUser = False):
         if member is None:
             await ctx.send_("user_not_found", False)
             return
@@ -40,7 +40,7 @@ class Userinfo(Cog, category=Category.GENERAL):
             .set_footer(text=ctx._("guild_avatar").format(member.display_name)),
         )
 
-        if not member.guild_avatar:
+        if not getattr(member, "guild_avatar", None):
             await ctx.send(embed=avatars[0])
             return
 
@@ -49,10 +49,10 @@ class Userinfo(Cog, category=Category.GENERAL):
     @commands.command(
         aliases=["b"],
         brief="Show user's global banner",
-        usage="[member]",
+        usage="[user]",
         extras={"note": "Due to a Discord limitation, server banners are irretrievable"},
     )
-    async def banner(self, ctx: Context, *, member: AnyMember = False):
+    async def banner(self, ctx: Context, *, member: AnyMemberOrUser = False):
         if member is None:
             await ctx.send_("user_not_found", False)
             return
@@ -68,7 +68,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         )
 
     @commands.command(
-        aliases=["user", "dox", "doxx", "whois"], brief="View user's info", usage="[member]"
+        aliases=["user", "dox", "doxx", "whois"], brief="View user's info", usage="[user]"
     )
     async def userinfo(self, ctx: Context, *, member: AnyMemberOrUser = False):
         if member is None:
