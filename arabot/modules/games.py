@@ -377,10 +377,7 @@ class TicTacToe(disnake.ui.View):
             return self.board[1][1]
 
         # Check tie
-        if all(cell for row in self.board for cell in row):
-            return True
-
-        return False
+        return all(cell for row in self.board for cell in row)
 
 
 class Games(Cog, category=Category.FUN):
