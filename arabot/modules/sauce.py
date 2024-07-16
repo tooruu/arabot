@@ -67,7 +67,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
     async def sauce(self, ctx: Context):
         _ = ctx._
         await ctx.trigger_typing()
-        image_url = await ctx.rsearch("image_url")
+        image_url = await ctx.rsearch(ctx.RSearchTarget.IMAGE_URL)
         if not image_url:
             await ctx.send_("no_image_or_link_provided")
             return

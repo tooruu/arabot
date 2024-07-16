@@ -51,7 +51,7 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         text: str | None,
         langs: list[LangCodeAndOrName],
     ) -> tuple[tuple[LangCodeAndOrName, str], tuple[LangCodeAndOrName, str]]:
-        if not text and not (text := await ctx.rsearch("content")):
+        if not text and not (text := await ctx.rsearch(ctx.RSearchTarget.CONTENT)):
             await ctx.reply_("provide_text")
             raise StopCommand
         if not source:

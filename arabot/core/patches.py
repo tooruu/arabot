@@ -6,8 +6,8 @@ import sys
 from asyncio import sleep
 from collections.abc import Awaitable, Callable, Iterable
 from contextlib import suppress
+from enum import Enum, auto
 from functools import partial, partialmethod
-from typing import Literal
 
 import aiohttp
 import disnake
@@ -27,6 +27,10 @@ class Context(commands.Context):
         super().__init__(*args, **kwargs)
         self.ara = self.bot
 
+    class RSearchTarget(Enum):
+        CONTENT = auto()
+        IMAGE_URL = auto()
+
     @property
     def argument_only(self) -> str:
         if not self.valid:
@@ -37,19 +41,19 @@ class Context(commands.Context):
             content = content.removeprefix(p).lstrip()
         return content
 
-    async def rsearch(self, target: Literal["content", "image_url"]) -> str | None:
-        if target == "content":
+    async def rsearch(self, target: RSearchTarget) -> str | None:
+        if target is self.RSearchTarget.CONTENT:
             self.message.content = ""  # We don't need current message's content
         return await self._rsearch(target)
 
-    async def _rsearch(self, target: str) -> str | None:
+    async def _rsearch(self, target: RSearchTarget) -> str | None:
         msg = self.message
         result = None
         match target:
-            case "content":
+            case self.RSearchTarget.CONTENT:
                 result = self.argument_only
 
-            case "image_url":
+            case self.RSearchTarget.IMAGE_URL:
                 if attachment := disnake.utils.find(
                     lambda a: a.content_type.startswith("image") and a.height, msg.attachments
                 ):

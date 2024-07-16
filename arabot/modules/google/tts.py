@@ -47,7 +47,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"G_TTS_KEY"}):
         langs = await self.voices()
         lang, text = self.parse_query(ctx.argument_only, langs)
 
-        if not text and not (text := await ctx.rsearch("content")):
+        if not text and not (text := await ctx.rsearch(ctx.RSearchTarget.CONTENT)):
             await ctx.send_("provide_text")
             return None
         text = await clean_content(fix_channel_mentions=True).convert(ctx, text)

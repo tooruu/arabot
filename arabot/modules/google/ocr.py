@@ -28,7 +28,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
     @command(aliases=["read"], brief="Read text from image", usage="<image or reply>")
     async def ocr(self, ctx: Context):
         await ctx.trigger_typing()
-        image_url = await ctx.rsearch("image_url")
+        image_url = await ctx.rsearch(ctx.RSearchTarget.IMAGE_URL)
         text = await self.handle_annotation(ctx, image_url)
         await ctx.send(
             embed=Embed(description=codeblock(text))
@@ -46,7 +46,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
     )
     async def ocrtranslate(self, ctx: Context):
         await ctx.trigger_typing()
-        image_url = await ctx.rsearch("image_url")
+        image_url = await ctx.rsearch(ctx.RSearchTarget.IMAGE_URL)
         text = await self.handle_annotation(ctx, image_url)
         langs = await self.trans.gtrans.languages(repr_lang=self.trans.DEFAULT_TARGET[0])
         source, target, _ = self.trans.parse_query(ctx.argument_only, langs)
@@ -61,7 +61,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
         await ctx.send(embed=embed)
 
     async def handle_annotation(self, ctx: Context, image_url: str | None) -> str:
-        if not image_url and not (image_url := await ctx.rsearch("image_url")):
+        if not image_url and not (image_url := await ctx.rsearch(ctx.RSearchTarget.IMAGE_URL)):
             await ctx.send_("no_image_or_link_provided")
             raise StopCommand
 
