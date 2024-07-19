@@ -9,8 +9,7 @@ from arabot.core import Ara, Cog, CustomEmoji, pfxless
 from arabot.utils import is_in_guild
 
 GULAG = (
-    (
-        """
+    """
 bbbbbbbbbbbbbbb
 bbbbbbbbcbbbbbb
 bbbbbccbccbbbbb
@@ -26,9 +25,7 @@ bbbcccbbbcccbbb
 bcccbccccccccbb
 bccbbbcccbbccbb
 bbbbbbbbbbbbbbb
-"""
-    )
-    .replace("b", "🅱️")
+""".replace("b", "🅱️")
     .replace("c", CustomEmoji.CommuThink)
     .split("\n\n")
 )

@@ -1,31 +1,33 @@
-from enum import Enum
+from enum import IntEnum, StrEnum, unique
 
 import disnake
 
 
-class Color(int, Enum):
-    blurple = disnake.Color.from_rgb(88, 101, 242)
-    green = disnake.Color.from_rgb(87, 242, 135)
-    yellow = disnake.Color.from_rgb(254, 231, 92)
-    fuchsia = disnake.Color.from_rgb(235, 69, 158)
-    red = disnake.Color.from_rgb(237, 66, 69)
-    black = disnake.Color.from_rgb(35, 39, 42)
+class Color(IntEnum):
+    BLURPLE = disnake.Color.from_rgb(88, 101, 242)
+    GREEN = disnake.Color.from_rgb(87, 242, 135)
+    YELLOW = disnake.Color.from_rgb(254, 231, 92)
+    FUCHSIA = disnake.Color.from_rgb(235, 69, 158)
+    RED = disnake.Color.from_rgb(237, 66, 69)
+    BLACK = disnake.Color.from_rgb(35, 39, 42)
 
 
-class CustomEmoji:
-    CommuThink = "<:ct:973587602798153760>"
-    Doubt = "<:doubt:978288495489613854>"
-    FukaWhy = "<:FukaWhy:937695447626182676>"
-    KannaGun = "<:KannaGun:1012630928687894630>"
-    KannaPat = "<:KannaPat:937695447718453248>"
-    KannaStare = "<:KannaStare:971188689428443276>"
-    KonoDioDa = "<:KonoDioDa:937687826693251102>"
-    MeiStare = "<:MeiStare:937695447932370994>"
-    TeriCelebrate = "<:TeriCelebrate:937695453506596906>"
-    TooruWeary = "<:TooruWeary:937695447487774743>"
+@unique
+class CustomEmoji(StrEnum):
+    CommuThink = "<:CommuThink:1263802912329437204>"
+    Doubt = "<:Doubt:1263802926694928394>"
+    FukaWhy = "<:FukaWhy:1263802934345334847>"
+    KannaGun = "<:KannaGun:1263802940771270768>"
+    KannaPat = "<:KannaPat:1263802948618555484>"
+    KannaStare = "<:KannaStare:1263802954356359262>"
+    KonoDioDa = "<:KonoDioDa:1263802959796502682>"
+    MeiStare = "<:MeiStare:1263802965895155774>"
+    TeriCelebrate = "<:TeriCelebrate:1263802971779629066>"
+    TooruWeary = "<:TooruWeary:1263802976997478412>"
 
 
-class Category(str, Enum):
+@unique
+class Category(StrEnum):
     NO_CATEGORY = "No category"
     GENERAL = "General"
     FUN = "Fun"
@@ -35,6 +37,3 @@ class Category(str, Enum):
     MODERATION = "Moderation"
     WAIFUS = "Reaction pictures"
     SETTINGS = "Settings"
-
-    def __str__(self) -> str:
-        return self.value

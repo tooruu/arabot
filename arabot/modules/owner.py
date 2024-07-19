@@ -157,7 +157,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
     @ext.command(name="list")
     async def ext_list(self, ctx: Context):
         trim_amount = len(Path(self.COGS_PATH).parts)
-        embed = disnake.Embed(color=Color.yellow).add_field(
+        embed = disnake.Embed(color=Color.YELLOW).add_field(
             ctx._("extensions"),
             "\n".join(module.split(".", trim_amount)[-1] for module in ctx.bot.extensions),
         )
