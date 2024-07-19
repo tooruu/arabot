@@ -117,6 +117,8 @@ class Ara(commands.Bot):
             )
 
         if app.team:
+            self.owner_id = app.team.owner_id
+            self.owner = await self.get_or_fetch_user(self.owner_id)
             self.owners = set(app.team.members)
             self.owner_ids = {m.id for m in app.team.members}
         else:
