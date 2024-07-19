@@ -14,7 +14,7 @@ class Color(IntEnum):
 
 @unique
 class CustomEmoji(StrEnum):
-    CommuThink = "<:CommuThink:1263802912329437204>"
+    CommuThink = "<:CommuThink:1263811976874692690>"
     Doubt = "<:Doubt:1263802926694928394>"
     FukaWhy = "<:FukaWhy:1263802934345334847>"
     KannaGun = "<:KannaGun:1263802940771270768>"
