@@ -383,9 +383,9 @@ class TicTacToe(disnake.ui.View):
 class Games(Cog, category=Category.FUN):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.rr_barrel: dict[int, int] = defaultdict(lambda: [1, random.randint(1, 6)])
-        self.rr_last_user: dict[int, int] = {}
-        self.rr_last_deaths: dict[int, deque[int]] = defaultdict(partial(deque, maxlen=2))
+        self.rr_barrel = defaultdict[int, list[int]](lambda: [1, random.randint(1, 6)])
+        self.rr_last_user = dict[int, int]()
+        self.rr_last_deaths = defaultdict[int, deque[int]](partial(deque, maxlen=2))
         self.russian_roulette._buckets = commands.DynamicCooldownMapping(
             self.rr_cooldown, commands.BucketType.guild
         )
