@@ -380,17 +380,17 @@ class TicTacToe(disnake.ui.View):
 
 
 class RussianRoulette:
+    CHAMBERS = 6
+    MEGA_DEATH_THRESHOLD = 3
     GAMES: ClassVar[dict[int, Self]] = {}
+    current_pos = last_shooter_id = 0
 
-    def __init__(self, chambers: int = 6, mega_bullet_deaths_threshold: int = 3):
-        self.current_pos = 0
-        self.chambers = chambers
-        self.bullet_pos = random.randint(1, chambers)
-        self.last_shooter_id = 0
-        self.last_deaths = deque[int](maxlen=mega_bullet_deaths_threshold)
+    def __init__(self) -> None:
+        self.bullet_pos = random.randint(1, self.CHAMBERS)
+        self.last_deaths = deque[int](maxlen=self.MEGA_DEATH_THRESHOLD)
 
     def __repr__(self) -> str:
-        return f"{__class__.__name__}({self.current_pos}, {self.bullet_pos})"
+        return f"Revolver({self.current_pos}, {self.bullet_pos})"
 
     @classmethod
     def get_game(cls, guild_id: int) -> Self:
@@ -399,6 +399,12 @@ class RussianRoulette:
         rev = cls.GAMES[guild_id] = cls()
         return rev
 
+    def is_next_shot_lethal(self) -> bool:
+        return self.current_pos + 1 == self.bullet_pos
+
+    def is_different_player(self, user_id: int) -> bool:
+        return self.last_shooter_id != user_id
+
     def shoot(self, user_id: int) -> bool:
         self.last_shooter_id = user_id
         self.current_pos += 1
@@ -406,23 +412,19 @@ class RussianRoulette:
             self.last_deaths.append(user_id)
         return kill
 
-    def killed(self) -> bool:
-        return self.current_pos >= self.bullet_pos
-
     def mega_killed(self) -> bool:
         return self.last_deaths.count(self.last_shooter_id) == self.last_deaths.maxlen
 
     def reload(self) -> None:
         if self.mega_killed():
             self.last_deaths.clear()
-        self.current_pos = 0
-        self.bullet_pos = random.randint(1, self.chambers)
-        self.last_shooter_id = 0
+        self.current_pos = self.last_shooter_id = 0
+        self.bullet_pos = random.randint(1, self.CHAMBERS)
 
 
 def rr_cooldown(msg: disnake.Message) -> commands.Cooldown | None:
     rev = RussianRoulette.GAMES.get(msg.guild.id)
-    if rev and rev.last_shooter_id != msg.author.id and rev.killed():
+    if rev and rev.is_different_player(msg.author.id) and rev.is_next_shot_lethal():
         return commands.Cooldown(1, Games.RR_COOLDOWN_SECS)
     return None
 
