@@ -5,7 +5,7 @@ from collections import defaultdict, deque
 from contextlib import suppress
 from functools import partial
 from itertools import product
-from typing import Literal, Never
+from typing import ClassVar, Literal, Never, Self
 
 import disnake
 from disnake.ext import commands
@@ -68,10 +68,9 @@ class Connect4Engine:
     def _check_4_in_a_row(self, last_added: int) -> bool:
         target_value = self._state[last_added]
 
-        space_right = 6 - last_added % 7
-        space_left = last_added % 7
-        space_down = 5 - last_added // 7
-        space_up = last_added // 7
+        space_up, space_left = divmod(last_added, 7)
+        space_right = 6 - space_left
+        space_down = 5 - space_up
         directions: dict[int, int] = {
             +1: space_right,
             -1: space_left,
@@ -380,42 +379,73 @@ class TicTacToe(disnake.ui.View):
         return all(cell for row in self.board for cell in row)
 
 
+class RussianRoulette:
+    GAMES: ClassVar[dict[int, Self]] = {}
+
+    def __init__(self, chambers: int = 6, mega_bullet_deaths_threshold: int = 3):
+        self.current_pos = 0
+        self.chambers = chambers
+        self.bullet_pos = random.randint(1, chambers)
+        self.last_shooter_id = 0
+        self.last_deaths = deque[int](maxlen=mega_bullet_deaths_threshold)
+
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}({self.current_pos}, {self.bullet_pos})"
+
+    @classmethod
+    def get_game(cls, guild_id: int) -> Self:
+        if rev := cls.GAMES.get(guild_id):
+            return rev
+        rev = cls.GAMES[guild_id] = cls()
+        return rev
+
+    def shoot(self, user_id: int) -> bool:
+        self.last_shooter_id = user_id
+        self.current_pos += 1
+        if kill := self.current_pos == self.bullet_pos:
+            self.last_deaths.append(user_id)
+        return kill
+
+    def killed(self) -> bool:
+        return self.current_pos >= self.bullet_pos
+
+    def mega_killed(self) -> bool:
+        return self.last_deaths.count(self.last_shooter_id) == self.last_deaths.maxlen
+
+    def reload(self) -> None:
+        if self.mega_killed():
+            self.last_deaths.clear()
+        self.current_pos = 0
+        self.bullet_pos = random.randint(1, self.chambers)
+        self.last_shooter_id = 0
+
+
+def rr_cooldown(msg: disnake.Message) -> commands.Cooldown | None:
+    rev = RussianRoulette.GAMES.get(msg.guild.id)
+    if rev and rev.last_shooter_id != msg.author.id and rev.killed():
+        return commands.Cooldown(1, 60)
+    return None
+
+
 class Games(Cog, category=Category.FUN):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.rr_barrel = defaultdict[int, list[int]](lambda: [1, random.randint(1, 6)])
-        self.rr_last_user = dict[int, int]()
-        self.rr_last_deaths = defaultdict[int, deque[int]](partial(deque, maxlen=2))
-        self.russian_roulette._buckets = commands.DynamicCooldownMapping(
-            self.rr_cooldown, commands.BucketType.guild
-        )
 
-    def rr_cooldown(self, msg: disnake.Message) -> commands.Cooldown | None:
-        if self.rr_last_user.get(msg.guild.id) != msg.author.id:
-            barrel = self.rr_barrel[msg.guild.id]
-            if barrel[0] == barrel[1]:
-                return commands.Cooldown(1, 60)
-        return None
-
+    @commands.dynamic_cooldown(rr_cooldown, commands.BucketType.guild)
     @commands.command(name="rr", brief="Russian Roulette")
     async def russian_roulette(self, ctx: Context):
-        if self.rr_last_user.get(ctx.guild.id) == ctx.author.id:
+        rev = RussianRoulette.get_game(ctx.guild.id)
+
+        if rev.last_shooter_id == ctx.author.id:
             await ctx.reply_("pass_gun")
             return
 
-        self.rr_last_user[ctx.guild.id] = ctx.author.id
-        barrel = self.rr_barrel[ctx.guild.id]
-        if barrel[0] != barrel[1]:
-            barrel[0] += 1
+        if not rev.shoot(ctx.author.id):
             await ctx.reply(f"_\\*{ctx._('click')}*_")
             return
 
-        del self.rr_barrel[ctx.guild.id]
-        del self.rr_last_user[ctx.guild.id]
-
-        last_deaths = self.rr_last_deaths[ctx.guild.id]
-        if last_deaths.count(ctx.author.id) < last_deaths.maxlen:
-            last_deaths.append(ctx.author.id)
+        if not rev.mega_killed():
+            rev.reload()
             await ctx.reply(f"***{ctx._('gunshot1')}***💥{CustomEmoji.KannaGun}")
             await ctx.send_("cooldown")
             with suppress(disnake.Forbidden):
@@ -423,7 +453,7 @@ class Games(Cog, category=Category.FUN):
             return
 
         # Same user loses 3 times in a row
-        last_deaths.clear()
+        rev.reload()
         await ctx.reply(f"💥***__{ctx._('gunshot2')}__***💥")
         await ctx.send_("cooldown")
         if await ctx.ara.db.get_guild_rr_kick(ctx.guild.id):
