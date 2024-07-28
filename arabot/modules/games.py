@@ -423,11 +423,13 @@ class RussianRoulette:
 def rr_cooldown(msg: disnake.Message) -> commands.Cooldown | None:
     rev = RussianRoulette.GAMES.get(msg.guild.id)
     if rev and rev.last_shooter_id != msg.author.id and rev.killed():
-        return commands.Cooldown(1, 60)
+        return commands.Cooldown(1, Games.RR_COOLDOWN_SECS)
     return None
 
 
 class Games(Cog, category=Category.FUN):
+    RR_COOLDOWN_SECS = 60
+
     def __init__(self, ara: Ara):
         self.ara = ara
 
@@ -449,7 +451,9 @@ class Games(Cog, category=Category.FUN):
             await ctx.reply(f"***{ctx._('gunshot1')}***💥{CustomEmoji.KannaGun}")
             await ctx.send_("cooldown")
             with suppress(disnake.Forbidden):
-                await ctx.author.timeout(duration=60, reason=ctx._("russian_roulette"))
+                await ctx.author.timeout(
+                    duration=self.RR_COOLDOWN_SECS, reason=ctx._("russian_roulette")
+                )
             return
 
         # Same user loses 3 times in a row
@@ -461,7 +465,9 @@ class Games(Cog, category=Category.FUN):
                 await ctx.author.kick(reason=ctx._("russian_roulette"))
                 return
         with suppress(disnake.Forbidden):
-            await ctx.author.timeout(duration=180, reason=ctx._("russian_roulette"))
+            await ctx.author.timeout(
+                duration=self.RR_COOLDOWN_SECS * 3, reason=ctx._("russian_roulette")
+            )
 
     @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number", usage="[max=20]")
