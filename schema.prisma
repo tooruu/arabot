@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mongodb"
+  provider = env("DATABASE_PROVIDER")
   url      = env("DATABASE_URI")
 }
 
