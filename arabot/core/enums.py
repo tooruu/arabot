@@ -29,11 +29,11 @@ class CustomEmoji(StrEnum):
 @unique
 class Category(StrEnum):
     NO_CATEGORY = "No category"
-    GENERAL = "General"
-    FUN = "Fun"
-    META = "Meta"
-    LOOKUP = "Lookup"
     COMMUNITY = "Community"
+    FUN = "Fun"
+    GENERAL = "General"
+    LOOKUP = "Lookup"
+    META = "Meta"
     MODERATION = "Moderation"
-    WAIFUS = "Reaction pictures"
     SETTINGS = "Settings"
+    WAIFUS = "Reaction pictures"

@@ -128,7 +128,7 @@ class Meta(Cog, category=Category.META):
         try:
             for file in Path("arabot").rglob("*.py"):
                 with file.open(encoding="utf8") as f:
-                    count += sum(1 for line in f if (ln := line.strip()) and not ln.startswith("#"))
+                    count += sum(bool((li := lin.strip()) and not li.startswith("#")) for lin in f)
         except OSError:
             return 0
         return count
