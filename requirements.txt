@@ -8,3 +8,4 @@ python-dotenv
 tzdata
 async-lru
 waifu-py
+uvloop
