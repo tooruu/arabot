@@ -23,7 +23,7 @@ class Ping(Cog, category=Category.META):
 
     @loop(minutes=1)
     async def store(self):
-        self.log.append(round(self.ara.latency * 1000))
+        self.log.append(round(self.ara.latency * 1000) if self.ara.latency != float("inf") else 0)
 
     @store.before_loop
     async def ensure_ready(self):
