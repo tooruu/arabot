@@ -7,10 +7,10 @@ from .abc import Evaluator
 __all__ = [
     "EvalException",
     "LocalEvalCompileException",
-    "LocalEvalExecuteException",
     "LocalEvalException",
-    "RemoteEvalException",
+    "LocalEvalExecuteException",
     "RemoteEvalBadResponse",
+    "RemoteEvalException",
 ]
 
 
@@ -32,7 +32,7 @@ class LocalEvalException(EvalException):
             if frame.filename != filename:
                 continue
             if source:
-                frame._line = source[frame.lineno - 1]
+                frame._lines = source[frame.lineno - 1]
             tb_repl_frames.append(frame)
         tb.stack = traceback.StackSummary.from_list(tb_repl_frames)
         return "".join(tb.format(chain=False))

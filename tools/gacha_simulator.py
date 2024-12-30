@@ -37,7 +37,7 @@ class ItemResolver(ItemResolverInterface):
         super().__init__(entity_provider)
         self._log = log
 
-    def resolve(self, item_id: int) -> Generator[VirtualItem, None, None]:
+    def resolve(self, item_id: int) -> Generator[VirtualItem]:
         item = get_item(self._entity_provider, item_id)
         if not item:
             self._log.warning(f"The configured item identified by '{item_id}' doesn't exist.")

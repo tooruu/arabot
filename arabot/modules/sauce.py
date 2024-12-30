@@ -161,8 +161,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
                         or data.get("eng_name")
                         or data.get("source")
                         or data.get("jp_name")
-                        or embed.url
-                        and _("post")
+                        or (embed.url and _("post"))
                     )
                     embed.description = f"{_('similarity')}: {header['similarity']}%"
                     match creator := data.get("creator"):

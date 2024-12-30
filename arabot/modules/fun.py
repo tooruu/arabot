@@ -189,11 +189,8 @@ class Fun(Cog, category=Category.FUN):
             ctx.reset_cooldown()
             await ctx.send_("too_long")
             return
-        if (
-            member == ctx.author
-            and member.guild_permissions.change_nickname
-            or ctx.author.guild_permissions.manage_nicknames
-            and ctx.author.top_role > member.top_role
+        if (member == ctx.author and member.guild_permissions.change_nickname) or (
+            ctx.author.guild_permissions.manage_nicknames and ctx.author.top_role > member.top_role
         ):  # if can rename manually
             ctx.reset_cooldown()
         elif ctx.author.top_perm_role < member.top_perm_role:

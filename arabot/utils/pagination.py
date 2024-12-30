@@ -78,10 +78,8 @@ class EmbedPaginator(disnake.ui.View):
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
         if not self._message:
             self._message = interaction.message
-        if (
-            self._author in {None, interaction.author}
-            or not self._shared
-            and interaction.component.custom_id in self._shared_button_ids
+        if self._author in {None, interaction.author} or (
+            not self._shared and interaction.component.custom_id in self._shared_button_ids
         ):
             return True
         await interaction.response.send_message(

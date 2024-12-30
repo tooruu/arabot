@@ -29,10 +29,10 @@ __all__ = [
     "CIRole",
     "CITextChl",
     "CIVoiceChl",
-    "clean_content",
     "Codeblocks",
     "Empty",
     "Twemoji",
+    "clean_content",
 ]
 
 

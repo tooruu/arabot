@@ -32,7 +32,7 @@ class ItemResolver(ItemResolverInterface):
         super().__init__(entity_provider)
         self._log = log
 
-    def resolve(self, item_id: int) -> Generator[VirtualItem, None, None]:
+    def resolve(self, item_id: int) -> Generator[VirtualItem]:
         item = get_item(self._entity_provider, item_id)
         if not item:
             self._log.warning(f"The configured item identified by '{item_id}' doesn't exist.")
@@ -118,7 +118,7 @@ class Gacha(Cog, category=Category.FUN):
         return SimplePullProvider(entity_provider, item_resolver, log)
 
     @staticmethod
-    def _format_pulls(pulls: Generator[Pull, None, None]) -> Generator[str, None, None]:
+    def _format_pulls(pulls: Generator[Pull]) -> Generator[str]:
         for pull in pulls:
             formatted_pull = pull.name
             if pull.count > 1:

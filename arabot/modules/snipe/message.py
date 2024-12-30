@@ -10,7 +10,7 @@ from arabot.utils import AnyMember
 
 
 class RawDeletedMessage:
-    __slots__ = "content", "author", "created_at", "deleted_at"
+    __slots__ = "author", "content", "created_at", "deleted_at"
 
     def __init__(self, message: Message):
         self.content = message.content

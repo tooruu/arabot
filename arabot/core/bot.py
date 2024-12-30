@@ -26,7 +26,7 @@ type MaybeCoro[T] = T | Coroutine[Any, Any, T]
 type CommandPrefix = PrefixType | Callable[[Ara, disnake.Message], MaybeCoro[PrefixType]]
 
 
-def search_directory(path: str | os.PathLike) -> Generator[str, None, None]:
+def search_directory(path: str | os.PathLike) -> Generator[str]:
     path = Path(path)
 
     if ".." in os.path.relpath(path):
@@ -119,8 +119,12 @@ class Ara(commands.Bot):
         if app.team:
             self.owner_id = app.team.owner_id
             self.owner = await self.get_or_fetch_user(self.owner_id)
-            self.owners = set(app.team.members)
-            self.owner_ids = {m.id for m in app.team.members}
+            self.owners = {
+                member
+                for member in app.team.members
+                if member.role in (disnake.TeamMemberRole.admin, disnake.TeamMemberRole.developer)
+            }
+            self.owner_ids = {m.id for m in self.owners}
         else:
             self.owner = app.owner
             self.owner_id = app.owner.id

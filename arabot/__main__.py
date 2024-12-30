@@ -27,7 +27,7 @@ def setup_logging() -> None:
 
 def create_ara(*args, **kwargs) -> Ara:
     intents = disnake.Intents(
-        emojis_and_stickers=True,
+        expressions=True,
         guild_messages=True,
         guild_reactions=True,
         guilds=True,
@@ -37,7 +37,7 @@ def create_ara(*args, **kwargs) -> Ara:
         voice_states=True,
     )
     default_kwargs = dict(
-        activity=disnake.Activity(type=disnake.ActivityType.competing, name="McDonalds"),
+        activity=disnake.Activity(type=disnake.ActivityType.competing, name="a hackathon!"),
         allowed_mentions=disnake.AllowedMentions.none(),
         case_insensitive=True,
         embed_color=0xE91E63,

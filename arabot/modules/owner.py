@@ -27,12 +27,16 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         return await ctx.ara.is_owner(ctx.author)
 
     @commands.command(usage="[activity]")
-    async def presence(self, ctx: Context, act_type: str = "", *, act_name: str = ""):
+    async def presence(
+        self, ctx: Context, act_type: str | None = None, *, act_name: str | None = None
+    ):
         acts = {
             "playing": disnake.ActivityType.playing,
             "listening": disnake.ActivityType.listening,
             "watching": disnake.ActivityType.watching,
             "competing": disnake.ActivityType.competing,
+            "custom": disnake.ActivityType.custom,
+            None: None,
         }
 
         if act_type and act_type not in acts:
@@ -43,7 +47,14 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
             await ctx.send_("no_activity")
             return
 
-        act = disnake.Activity(type=acts[act_type], name=act_name) if act_type else None
+        match acts[act_type]:
+            case None:
+                act = None
+            case disnake.ActivityType.custom:
+                act = disnake.CustomActivity(act_name)
+            case activity_type:
+                act = disnake.Activity(type=activity_type, name=act_name)
+
         await ctx.ara.change_presence(activity=act)
         await ctx.tick()
 

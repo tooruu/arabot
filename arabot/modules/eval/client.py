@@ -90,7 +90,7 @@ class LocalEval(Evaluator):
             return await self.execute(to_run)
 
     @contextmanager
-    def _lock(self, **overwrites) -> Generator[None, None, None]:
+    def _lock(self, **overwrites) -> Generator[None]:
         """Set overwrites on self and then resets to initial state."""
         backup = self.__dict__.copy()
         self.__dict__ |= overwrites

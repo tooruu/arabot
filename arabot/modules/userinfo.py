@@ -92,11 +92,9 @@ class Userinfo(Cog, category=Category.GENERAL):
     def _set_author(embed: disnake.Embed, user: disnake.abc.User | disnake.Member) -> None:
         username, global_name, nickname = user.name, user.global_name, getattr(user, "nick", None)
         if (
-            not global_name
-            and not nickname
+            (not global_name and not nickname)
             or username == global_name == nickname
-            or username in (global_name, nickname)
-            and None in (global_name, nickname)
+            or (username in (global_name, nickname) and None in (global_name, nickname))
         ):
             return
         author_info = ("@" if user.discriminator == "0" else "") + str(user)
@@ -257,16 +255,10 @@ class Userinfo(Cog, category=Category.GENERAL):
     def _set_images_if_any(
         embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify
     ) -> None:
-        if isinstance(activity, disnake.Spotify) and activity.album_cover_url:
-            embed.set_thumbnail(activity.album_cover_url)
-        elif thumbnail := getattr(activity, "large_image_url", None):
-            embed.set_thumbnail(fix_media_proxy_url(thumbnail))
-
-
-def fix_media_proxy_url(asset_url: str) -> str:  # Remove in disnake 2.10
-    if "/mp:" not in asset_url:
-        return asset_url
-    return "https://media.discordapp.net/" + asset_url.partition("/mp:")[2].removesuffix(".png")
+        embed.set_thumbnail(
+            (isinstance(activity, disnake.Spotify) and activity.album_cover_url)
+            or activity.large_image_url
+        )
 
 
 def setup(ara: Ara):
