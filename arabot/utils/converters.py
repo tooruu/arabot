@@ -1,5 +1,5 @@
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from itertools import chain
 from string import whitespace
 from types import UnionType
@@ -20,6 +20,8 @@ __all__ = [
     "AnyMemberOrUser",
     "AnyMsgChl",
     "AnyRole",
+    "AnySound",
+    "AnySounds",
     "AnyTxtChl",
     "AnyUser",
     "AnyVcChl",
@@ -36,7 +38,9 @@ __all__ = [
 ]
 
 
-arg_ci_re_search = lambda arg: re.compile(re.escape(arg), re.IGNORECASE).search
+def fuzzy_search(seq: Iterable, attr: str, arg: str) -> Callable:
+    arg_ci_re_search = re.compile(re.escape(arg), re.IGNORECASE).search
+    return find(lambda obj: arg_ci_re_search(getattr(obj, attr)), seq)
 
 
 class clean_content(commands.clean_content):  # noqa: N801
@@ -77,10 +81,10 @@ class Twemoji(commands.Converter):
 
 class CIMember(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Member:
-        member_search = arg_ci_re_search(argument)
-        if found := find(
-            lambda member: member_search(member.display_name), ctx.guild.members
-        ) or find(lambda member: member_search(member.name), ctx.guild.members):
+        if found := (
+            fuzzy_search(ctx.guild.members, "display_name", argument)
+            or fuzzy_search(ctx.guild.members, "name", argument)
+        ):
             return found
         raise commands.MemberNotFound(argument)
 
@@ -96,35 +100,39 @@ class UserFromCIMember(CIMember):
 
 class CIEmoji(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Emoji:
-        emoji_search = arg_ci_re_search(argument)
         emojis = chain(ctx.guild.emojis, ctx.bot.emojis)
-        if emoji := find(lambda emoji: emoji_search(emoji.name), emojis):
+        if emoji := fuzzy_search(emojis, "name", argument):
             return emoji
         raise commands.EmojiNotFound(argument)
 
 
 class CITextChl(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.TextChannel:
-        t_channel_search = arg_ci_re_search(argument)
-        if found := find(lambda channel: t_channel_search(channel.name), ctx.guild.text_channels):
+        if found := fuzzy_search(ctx.guild.text_channels, "name", argument):
             return found
         raise commands.ChannelNotFound(argument)
 
 
 class CIVoiceChl(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.VoiceChannel:
-        v_channel_search = arg_ci_re_search(argument)
-        if found := find(lambda channel: v_channel_search(channel.name), ctx.guild.voice_channels):
+        if found := fuzzy_search(ctx.guild.voice_channels, "name", argument):
             return found
         raise commands.ChannelNotFound(argument)
 
 
 class CIRole(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Role:
-        role_search = arg_ci_re_search(argument)
-        if found := find(lambda role: role_search(role.name), ctx.guild.roles):
+        if found := fuzzy_search(ctx.guild.roles, "name", argument):
             return found
         raise commands.RoleNotFound(argument)
+
+
+class CISound(commands.Converter):
+    async def convert(self, ctx: commands.Context, argument: str) -> disnake.GuildSoundboardSound:
+        sounds = chain(ctx.guild.soundboard_sounds, ctx.bot.soundboard_sounds)
+        if sound := fuzzy_search(sounds, "name", argument):
+            return sound
+        raise commands.GuildSoundboardSoundNotFound(argument)
 
 
 class Empty(commands.Converter):
@@ -145,8 +153,7 @@ class Codeblocks(commands.Converter):
 
 class CIGuild(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> disnake.Guild:
-        guild_search = arg_ci_re_search(argument)
-        if found := find(lambda guild: guild_search(guild.name), ctx.bot.guilds):
+        if found := find(ctx.bot.guild, "name", argument):
             return found
         raise commands.GuildNotFound(argument)
 
@@ -160,6 +167,7 @@ AnyVcChl = disnake.VoiceChannel | CIVoiceChl | disnake.StageChannel | Empty
 AnyMsgChl = disnake.TextChannel | CITextChl | AnyVcChl
 AnyRole = disnake.Role | CIRole | Empty
 AnyGuild = disnake.Guild | CIGuild | Empty
+AnySound = disnake.GuildSoundboardSound | CISound | Empty
 
 
 async def convert_union[T, T2: str](
@@ -182,3 +190,8 @@ class AnyEmojis(commands.Converter):
         argument = argument.replace("<", " <").replace(">", "> ")
         argument = re.sub(r"(?<!<a)(?<!<):(?!\d{17,20}>)", " ", argument, flags=re.ASCII)
         return [await convert_union(ctx, arg, AnyEmoji) for arg in argument.split()]
+
+
+class AnySounds(commands.Converter):
+    async def convert(self, ctx: commands.Context, argument: str) -> list[AnySound]:
+        return [await convert_union(ctx, arg, AnySound) for arg in argument.split()]

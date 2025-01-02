@@ -14,6 +14,7 @@ from arabot.utils import (
     AnyEmojis,
     AnyMember,
     AnyMemberOrUser,
+    AnySounds,
     Twemoji,
     bold,
 )
@@ -65,6 +66,19 @@ class General(Cog, category=Category.GENERAL):
                 )
             )
         )
+
+    @commands.command(brief="Show original files of soundboard sounds", usage="<sounds...>")
+    async def sound(self, ctx: Context, *, sounds: AnySounds = False):
+        if sounds is False:
+            await ctx.reply_("specify_sounds")
+            return
+        filtered_sounds: list[disnake.SoundboardSound] = (
+            list(dict.fromkeys(s for s in sounds if s)) if sounds else []
+        )
+        if not filtered_sounds:
+            await ctx.reply_("not_found", False)
+            return
+        await ctx.send(files=[await s.to_file(filename=f"{s.name}.ogg") for s in filtered_sounds])
 
     @commands.command(aliases=["r"], brief="React to a message", usage="<emojis...>")
     async def react(self, ctx: Context, *, emojis: AnyEmojis = False):
