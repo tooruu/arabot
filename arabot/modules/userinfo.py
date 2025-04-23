@@ -165,11 +165,16 @@ class Userinfo(Cog, category=Category.GENERAL):
         name = body = ""
         match activity:
             case disnake.CustomActivity():
+                text = (
+                    activity.name
+                    if activity.name and activity.name != "Custom Status"
+                    else "\u200b"
+                )
                 if activity.emoji:
                     icon_url = (activity.emoji.url or Twemoji(activity.emoji.name).url) + "?size=32"
                 else:
                     icon_url = None
-                embed.set_footer(text=activity.name or "\u200b", icon_url=icon_url)
+                embed.set_footer(text=text, icon_url=icon_url)
                 return
             case disnake.Spotify():
                 embed.color = activity.color
