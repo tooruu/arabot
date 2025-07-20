@@ -10,7 +10,7 @@ from arabot.core import Ara, Category, Cog, Context
 from arabot.utils import I18N, AnyMember, AnyMemberOrUser, Twemoji
 
 
-class GlobalOrGuildUserVariant(disnake.ui.View):
+class GlobalOrGuildEmbedVariant(disnake.ui.View):
     def __init__(self, embeds: tuple[disnake.Embed, disnake.Embed]):
         super().__init__(timeout=None)
         self.embeds = embeds
@@ -44,28 +44,61 @@ class Userinfo(Cog, category=Category.GENERAL):
             await ctx.send(embed=avatars[0])
             return
 
-        await ctx.send(embed=avatars[1], view=GlobalOrGuildUserVariant(avatars))
+        await ctx.send(embed=avatars[1], view=GlobalOrGuildEmbedVariant(avatars))
 
-    @commands.command(
-        aliases=["b"],
-        brief="Show user's global banner",
-        usage="[user]",
-        extras={"note": "Due to a Discord limitation, server banners are irretrievable"},
-    )
-    async def banner(self, ctx: Context, *, member: AnyMemberOrUser = False):
+    @commands.command(aliases=["deco"], brief="Show user's avatar decoration", usage="[user]")
+    async def decoration(self, ctx: Context, *, member: AnyMemberOrUser = False):
         if member is None:
             await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
-        banner = (await ctx.ara.fetch_user(member.id)).banner
-        if not banner:
-            await ctx.send_("no_banner")
+        if not member.display_avatar_decoration:
+            await ctx.send(ctx._("no_deco").format(member.display_name))
             return
-        await ctx.send(
-            embed=disnake.Embed()
-            .set_image(banner.maxres)
-            .set_footer(text=ctx._("their_banner", False).format(member.display_name))
+        decorations = (
+            disnake.Embed()
+            .set_image(member.avatar_decoration)
+            .set_footer(text=ctx._("global_deco").format(member.display_name)),
+            disnake.Embed()
+            .set_image(member.display_avatar_decoration)
+            .set_footer(text=ctx._("guild_deco").format(member.display_name)),
         )
+
+        if not getattr(member, "guild_avatar_decoration", None):
+            await ctx.send(embed=decorations[0])
+        elif not member.avatar_decoration:
+            await ctx.send(embed=decorations[1])
+        else:
+            await ctx.send(embed=decorations[1], view=GlobalOrGuildEmbedVariant(decorations))
+
+    @commands.command(aliases=["b"], brief="Show user's banner", usage="[user]")
+    async def banner(self, ctx: Context, *, member: AnyMemberOrUser = False):
+        if member is None:
+            await ctx.send_("user_not_found", False)
+            return
+
+        member = member or ctx.author
+        global_banner = (await ctx.ara.fetch_user(member.id)).banner
+
+        if not global_banner and not member.guild_banner:
+            await ctx.send(ctx._("no_banner").format(member.display_name))
+            return
+
+        banners = (
+            disnake.Embed()
+            .set_image(global_banner)
+            .set_footer(text=ctx._("global_banner").format(member.display_name)),
+            disnake.Embed()
+            .set_image(member.guild_banner)
+            .set_footer(text=ctx._("guild_banner").format(member.display_name)),
+        )
+
+        if not member.guild_banner:
+            await ctx.send(embed=banners[0])
+        elif not global_banner:
+            await ctx.send(embed=banners[1])
+        else:
+            await ctx.send(embed=banners[1], view=GlobalOrGuildEmbedVariant(banners))
 
     @commands.command(
         aliases=["user", "dox", "doxx", "whois"], brief="View user's info", usage="[user]"

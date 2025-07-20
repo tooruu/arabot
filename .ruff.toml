@@ -11,7 +11,6 @@ ignore = [
     "A003",    # builtin-attribute-shadowing
     "ANN002",  # missing-type-args
     "ANN003",  # missing-type-kwargs
-    "ANN1",    # flake8-annotations Method Annotations
     "ANN201",  # missing-return-type-undocumented-public-function
     "ARG002",  # unused-method-argument
     "BLE",     # flake8-blind-except
@@ -35,7 +34,6 @@ ignore = [
     "S603",    # subprocess-without-shell-equals-true
     "S607",    # start-process-with-partial-path
     "SLF",     # flake8-self
-    "TCH",     # flake8-type-checking
     "TD002",   # missing-todo-author
     "TD003",   # missing-todo-link
     "TRY003",  # raise-vanilla-args

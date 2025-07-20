@@ -9,3 +9,4 @@ tzdata
 async-lru
 waifu-py
 uvloop
+# winloop
