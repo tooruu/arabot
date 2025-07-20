@@ -1,5 +1,0 @@
-[build]
-builder = "HEROKU"
-
-[deploy]
-startCommand = '/bin/sh -c "prisma db push && python -m arabot"'

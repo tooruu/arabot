@@ -1,0 +1,22 @@
+{
+    "$schema": "https://railway.com/railway.schema.json",
+    "build": {
+        "nixpacksPlan": {
+            "phases": {
+                "setup": {
+                    "nixLibs": [
+                        "...",
+                        "libopus"
+                    ],
+                    "nixPkgs": [
+                        "...",
+                        "ffmpeg"
+                    ]
+                }
+            }
+        }
+    },
+    "deploy": {
+        "startCommand": "prisma db push && python -m arabot"
+    }
+}
