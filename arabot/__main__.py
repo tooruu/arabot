@@ -7,7 +7,7 @@ import disnake
 from aiohttp import ClientConnectorError
 
 from . import TESTING, Ara
-from .core import LocalizationStore
+from .core import LocalizationStore, StderrHandler, StdoutHandler
 
 if find_spec("uvloop"):
     from uvloop import EventLoopPolicy  # type: ignore[import-not-found]
@@ -17,11 +17,16 @@ else:
     from asyncio import DefaultEventLoopPolicy as EventLoopPolicy
 
 
-def setup_logging() -> None:
+def setup_logging(level: int) -> None:
+    handlers = [StderrHandler()]
+    if level < logging.WARNING:
+        handlers.append(StdoutHandler(level))
+
     logging.basicConfig(
-        format="%(asctime)s|%(levelname)s|%(message)s",
-        level=logging.INFO,
-        datefmt="%Y-%m-%d %H:%M:%S",
+        format="%(asctime)s|%(levelname)8s|%(message)s",
+        level=logging.NOTSET,
+        datefmt="%Y-%m-%dT%H:%M:%SZ",
+        handlers=handlers,
     )
 
 
@@ -55,7 +60,7 @@ def create_ara(*args, **kwargs) -> Ara:
 
 
 def main() -> bool:
-    setup_logging()
+    setup_logging(logging.WARNING)
     set_event_loop_policy(EventLoopPolicy())
 
     ara = create_ara()
