@@ -21,3 +21,4 @@ class StderrHandler(logging.StreamHandler):
     def __init__(self) -> None:
         super().__init__(sys.stderr)
         self.setLevel(logging.WARNING)
+        self.addFilter(lambda record: not record.message.startswith("We are being rate limited."))
