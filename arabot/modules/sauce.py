@@ -185,7 +185,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
         logging.debug(image_url)
         data |= header
         raw_data = "\n".join(f"{k}: {v}" for k, v in data.items())
-        logging.debug(raw_data, end="\n\n")
+        logging.debug(raw_data)
 
 
 def setup(ara: Ara):
