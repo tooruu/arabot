@@ -11,6 +11,7 @@ from jikanpy import AioJikan
 from arabot.core import Ara, Category, Cog, Context
 
 
+# https://saucenao.com/tools/examples/api/index_details.txt
 class Source(IntEnum):
     hmags = 0
     hanime = 1
@@ -80,6 +81,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
                 "db": 999,
                 "numres": 1,
                 "url": image_url,
+                "hide": 0 if ctx.channel.is_nsfw() else 3,
             },
         )
         if nao_json["header"]["status"]:
