@@ -1,6 +1,6 @@
 import logging
 import sys
-from asyncio import set_event_loop_policy
+from asyncio import new_event_loop, set_event_loop, set_event_loop_policy
 from importlib.util import find_spec
 
 import disnake
@@ -62,8 +62,9 @@ def create_ara(*args, **kwargs) -> Ara:
 def main() -> bool:
     setup_logging(logging.WARNING)
     set_event_loop_policy(EventLoopPolicy())
+    set_event_loop(loop := new_event_loop())
 
-    ara = create_ara()
+    ara = create_ara(loop=loop)
     try:
         ara.run()
     except (ClientConnectorError, disnake.LoginFailure):
