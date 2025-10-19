@@ -1,4 +1,4 @@
-name: Tag new version
+name: CI/CD Pipeline
 
 on:
   push:
@@ -11,7 +11,7 @@ env:
 
 jobs:
   tag:
-    name: Autotag
+    name: Tag new version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout commit
@@ -37,3 +37,11 @@ jobs:
       - name: Push tag
         if: steps.tag.outputs.version
         run: git push --tags
+  deploy:
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: railway redeploy -s=${{ vars.RAILWAY_SERVICE_ID }} -y
