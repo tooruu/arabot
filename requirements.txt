@@ -3,10 +3,10 @@ prisma
 jikanpy-v4
 matplotlib
 numpy
-git+https://github.com/rexor12/gacha.py.git
+./resources/gacha_py-2.0.0-py3-none-any.whl
 python-dotenv
 tzdata
 async-lru
 waifu-py
-uvloop
-# winloop
+uvloop; sys_platform != "win32"
+winloop; sys_platform == "win32"
