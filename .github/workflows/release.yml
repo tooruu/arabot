@@ -62,9 +62,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker images
-        id: build
         uses: docker/build-push-action@v6
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         with:
+          secret-envs: database-url=DATABASE_URL
           push: true
           provenance: mode=max
           sbom: true

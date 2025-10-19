@@ -1,1 +1,1 @@
-docker build --secret=id=.env -t tooruu/arabot .
+docker build --secret=id=database-url,env=DATABASE_URL -t tooruu/arabot .
