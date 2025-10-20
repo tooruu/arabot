@@ -7,12 +7,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN apk update && apk add \
     openssl \
+    opus \
     ffmpeg
 
 COPY resources/gacha_py-2.0.0-py3-none-any.whl resources/
 COPY requirements.txt schema.prisma ./
-RUN pip install -r requirements.txt
 
+RUN pip install -r requirements.txt
 RUN --mount=type=secret,id=database-url,env=DATABASE_URL,required=true \
     prisma db push
 
