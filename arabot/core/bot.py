@@ -207,6 +207,8 @@ class Ara(commands.Bot):
             case commands.CommandNotFound():
                 pass
             case _:
+                if isinstance(exception, commands.CommandInvokeError):
+                    exception = exception.original
                 logging.error("Unhandled exception", exc_info=exception)
                 await context.reply_("unknown_error")
                 if not TESTING:
