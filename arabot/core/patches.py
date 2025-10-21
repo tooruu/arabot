@@ -353,17 +353,3 @@ async def identify_mobile(self: disnake.gateway.DiscordWebSocket) -> None:
 
 
 disnake.gateway.DiscordWebSocket.identify = identify_mobile
-
-with suppress(OSError):
-    # ctypes.util.find_library doesn't work on Alpine Linux
-    disnake.opus._lib = disnake.opus.libopus_loader("libopus.so.0")
-
-
-def get_opus_version() -> str:
-    if not disnake.opus.is_loaded() and not disnake.opus._load_default():
-        raise disnake.opus.OpusNotLoaded
-
-    return disnake.opus._lib.opus_get_version_string().decode("utf-8")
-
-
-disnake.opus._OpusStruct.get_opus_version = get_opus_version
