@@ -30,8 +30,7 @@ jobs:
       - name: Tag commit
         id: tag
         run: |
-          LAST_TAG=$(git describe --abbrev=0)
-          VERSION=$(git diff "$LAST_TAG" HEAD "$VERSION_PATH" | sed -nr "s/$VERSION_REGEX/\1/p")
+          VERSION=$(git diff ${{ github.event.before }} HEAD "$VERSION_PATH" | sed -nr "s/$VERSION_REGEX/\1/p")
           [ "$VERSION" ] && git tag -m "v$VERSION" "$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
@@ -65,16 +64,24 @@ jobs:
         uses: docker/build-push-action@v6
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          dockerhub_repository: ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
+          version: ${{ needs.tag-commit.outputs.version }}
         with:
           secret-envs: database-url=DATABASE_URL
           push: true
           provenance: mode=max
           sbom: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/arabot:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/arabot:${{ needs.tag-commit.outputs.version }}
+            ${{ env.dockerhub_repository }}:latest
+            ${{ env.dockerhub_repository }}:${{ env.version }}
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ needs.tag-commit.outputs.version }}
+            ghcr.io/${{ github.repository }}:${{ env.version }}
+          annotations: |
+            org.opencontainers.image.title=AraBot
+            org.opencontainers.image.authors="${{ github.event.repository.owner.url }}"
+            org.opencontainers.image.version="${{ env.version }}"
+            org.opencontainers.image.source="${{ github.repositoryUrl }}"
+            org.opencontainers.image.url="https://hub.docker.com/repository/docker/${{ env.dockerhub_repository }}/tags/${{ env.version }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
