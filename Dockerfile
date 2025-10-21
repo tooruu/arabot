@@ -21,7 +21,7 @@ RUN mv /root/.cache/prisma-python/binaries/*/*/node_modules/prisma/query-engine-
     rm -rf \
     /root/.cache \
     /root/.npm \
-    /tmp \
+    /tmp/* \
     /app/requirements.txt \
     /app/schema.prisma
 

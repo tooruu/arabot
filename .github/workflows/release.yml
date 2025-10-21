@@ -66,6 +66,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v6
         env:
@@ -73,6 +76,7 @@ jobs:
           dockerhub_repository: ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
           version: ${{ needs.tag-commit.outputs.version }}
         with:
+          context: .
           secret-envs: database-url=DATABASE_URL
           push: true
           provenance: mode=max
