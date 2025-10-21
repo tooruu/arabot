@@ -90,13 +90,3 @@ jobs:
             org.opencontainers.image.url=https://hub.docker.com/repository/docker/${{ env.dockerhub_repository }}/tags/${{ env.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  deploy:
-    name: Trigger redeploy on Railway
-    needs: build-and-push-image
-    runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
-    steps:
-      - run: railway redeploy -s ${{ vars.RAILWAY_SERVICE_ID }} -y
