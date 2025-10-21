@@ -5,6 +5,10 @@ from time import time
 from typing import NotRequired, TypedDict
 
 import disnake
+import matplotlib as mpl
+
+mpl.use("agg")
+
 import matplotlib.pyplot as plt
 from disnake.ext.commands import command
 from disnake.utils import format_dt
@@ -124,9 +128,9 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             )
             .set_author(name=f"{lat}, {lon}", url=f"https://www.google.com/maps/place/{lat},{lon}")
             .set_thumbnail(url=ICON_URL.format(weather["weather"][0]["icon"]))
-            .add_field(ctx._(WeatherCog.TEMPERATURE, False), f"{weather["main"]["temp"]}°C")
-            .add_field(ctx._(WeatherCog.HUMIDITY, False), f"{weather["main"]["humidity"]}%")
-            .add_field(ctx._(WeatherCog.CLOUDINESS, False), f"{weather["clouds"]["all"]}%")
+            .add_field(ctx._(WeatherCog.TEMPERATURE, False), f"{weather['main']['temp']}°C")
+            .add_field(ctx._(WeatherCog.HUMIDITY, False), f"{weather['main']['humidity']}%")
+            .add_field(ctx._(WeatherCog.CLOUDINESS, False), f"{weather['clouds']['all']}%")
             .set_image(file=self.get_forecast(forecast, ctx._))
             .set_footer(
                 text=ctx._("powered_by", False).format("OpenWeather"),
