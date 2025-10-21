@@ -1,2 +1,2 @@
-docker rm arabot
-docker run --env-file=.env --name arabot tooruu/arabot
+docker rm --force arabot
+docker run --env-file=.env --name arabot -it tooruu/arabot:test %*

@@ -1,20 +1,22 @@
+# Docker
+.dockerignore
 Dockerfile
 compose.yaml
 
+# Generated
 **/__pycache__
-.env
+**/.ruff_cache
+.vscode
 .venv
-.ruff_cache
 .git
 
-.vscode
-**/*.code-workspace
-
-.ruff.toml
-LICENSE*
-TERMS_OF_SERVICE*
-tools
+# Meta
 .github
-.dockerignore
+tools
+LICENSE*
+README*
+TERMS_OF_SERVICE*
+.env
 .gitignore
+.ruff.toml
 dev-requirements.txt
