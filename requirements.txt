@@ -3,7 +3,7 @@ prisma
 jikanpy-v4
 matplotlib
 numpy
-./resources/gacha_py-2.0.0-py3-none-any.whl
+https://github.com/tooruu/arabot/raw/5554272/resources/gacha_py-2.0.0-py3-none-any.whl
 python-dotenv
 tzdata
 async-lru
