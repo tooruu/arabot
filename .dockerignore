@@ -18,5 +18,3 @@ README*
 TERMS_OF_SERVICE*
 .env
 .gitignore
-.ruff.toml
-dev-requirements.txt

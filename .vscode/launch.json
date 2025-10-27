@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Debug AraBot",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "arabot",
             "justMyCode": true
