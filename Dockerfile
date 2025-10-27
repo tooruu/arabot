@@ -10,10 +10,10 @@ RUN apk update --no-cache && apk add --no-cache \
     opus \
     ffmpeg
 
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock schema.prisma ./
+
 RUN uv sync --locked --no-cache
 
-COPY schema.prisma ./
 RUN --mount=type=secret,id=database-url,env=DATABASE_URL,required=true \
     uv run prisma db push
 
@@ -27,5 +27,5 @@ RUN mv /root/.cache/prisma-python/binaries/*/*/node_modules/prisma/query-engine-
     /app/uv.lock \
     /app/schema.prisma
 
-COPY --exclude=schema.prisma --exclude=pyproject.toml --exclude=uv.lock . .
+COPY --exclude=pyproject.toml --exclude=uv.lock --exclude=schema.prisma . .
 CMD ["uv", "run", "-m", "arabot"]
