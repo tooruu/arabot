@@ -1,7 +1,7 @@
 
 [project]
 name = "arabot"
-version = "8.23.8"
+version = "8.24.0"
 requires-python = ">=3.13"
 dependencies = [
     "disnake[speed,voice]~=2.12.0",
