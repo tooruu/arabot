@@ -206,6 +206,7 @@
     "arabot.plugins.snipe.nickname.nicksnipe.empty": "No nicknames found for {}",
     "arabot.plugins.snipe.nickname.nicksnipe.unknown_time": "Sometime in the past",
     "arabot.plugins.snipe.reaction.on_reaction_remove.sniped_reaction": "Sniped reaction",
+    "arabot.plugins.transcription.transcribe.audio_not_found": "No audio or link provided",
     "arabot.plugins.urban.urban.definition_not_found": "Definition for {} not found",
     "arabot.plugins.userinfo._add_activity.competing": "Competing in {}",
     "arabot.plugins.userinfo._add_activity.custom": "Custom status",

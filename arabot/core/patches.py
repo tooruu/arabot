@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ctypes
 import logging
 import re
 import sys
@@ -31,6 +30,7 @@ class Context(commands.Context):
     class RSearchTarget(Enum):
         CONTENT = auto()
         IMAGE_URL = auto()
+        AUDIO_VIDEO_URL = auto()
 
     @property
     def argument_only(self) -> str:
@@ -65,6 +65,14 @@ class Context(commands.Context):
                     result = self.argument_only
                 elif msg.stickers:
                     result = msg.stickers[0].url
+
+            case self.RSearchTarget.AUDIO_VIDEO_URL:
+                if attachment := disnake.utils.find(
+                    lambda a: a.content_type.startswith(("audio", "video")), msg.attachments
+                ):
+                    result = attachment.url
+                elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", self.argument_only):
+                    result = self.argument_only
 
         if result:
             return result

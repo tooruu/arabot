@@ -176,7 +176,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
 
     @commands.command(
-        aliases=["s", "st", "activity", "act"], brief="View user's activity", usage="[member]"
+        aliases=["s", "activity", "act"], brief="View user's activity", usage="[member]"
     )
     async def status(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
