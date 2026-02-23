@@ -143,8 +143,8 @@ class Meta(Cog, category=Category.META):
             dirty_indicator = ""
         else:
             try:
-                commit_sha = check_output("git rev-parse HEAD --".split(), text=True).strip()
-                dirty_indicator = ".dirty" if check_output("git status -s".split()) else ""
+                commit_sha = check_output(["git", "rev-parse", "HEAD", "--"], text=True).strip()
+                dirty_indicator = ".dirty" if check_output(["git", "status", "-s"]) else ""
             except (OSError, SubprocessError):
                 return ver_str
 

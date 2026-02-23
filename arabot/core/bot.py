@@ -68,7 +68,7 @@ class Ara(commands.Bot):
         self,
         *args,
         embed_color: int | disnake.Color | None = None,
-        plugins_path: str | os.PathLike = "arabot/modules",
+        plugins_path: str | os.PathLike = "arabot/plugins",
         l10n_path: str | os.PathLike = "resources/locales",
         token: str | None = None,
         command_prefix: CommandPrefix | None = prefix_manager,
@@ -146,6 +146,7 @@ class Ara(commands.Bot):
     ) -> CTX:
         return await super().get_context(message, cls=cls)
 
+    @override
     def load_extensions(self) -> None:
         trim_amount = len(self._plugins_path.parts)
         for module in search_directory(self._plugins_path):
@@ -161,7 +162,9 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
-    async def fetch_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook:
+    async def fetch_or_create_imposter_webhook(
+        self, name: str, msg: disnake.Message
+    ) -> disnake.Webhook:
         webhooks = await msg.channel.webhooks()
 
         return disnake.utils.get(

@@ -270,7 +270,7 @@ class General(Cog, category=Category.GENERAL):
             return
 
         await ctx.message.delete()
-        webhook = await self.ara.fetch_webhook("impersonate", ctx.message)
+        webhook = await self.ara.fetch_or_create_imposter_webhook("impersonate", ctx.message)
 
         send = partial(
             webhook.send,

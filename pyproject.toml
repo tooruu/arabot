@@ -94,4 +94,4 @@ ignore-names = []
     "F401", # unused-import
     "F403", # undefined-local-with-import-star
 ]
-"arabot/modules/eval/client.py" = ["S307"] # Allow the use of eval
+"arabot/plugins/eval/client.py" = ["S307"] # Allow the use of eval
