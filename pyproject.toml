@@ -1,7 +1,7 @@
 
 [project]
 name = "arabot"
-version = "8.24.0"
+version = "0.0.0"
 requires-python = ">=3.13"
 dependencies = [
     "disnake[speed,voice]~=2.12.0",
@@ -28,6 +28,8 @@ dev = [
 [tool.uv.sources]
 gacha-py = { url = "https://github.com/rexor12/gacha.py/releases/download/1.0.4/gacha.py-1.0.4-py3-none-any.whl" }
 
+[tool.uv]
+package = false
 
 [tool.ruff]
 target-version = "py313"
