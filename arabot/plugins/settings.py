@@ -1,12 +1,15 @@
 import disnake
 from disnake.ext import commands
 
-from arabot.core import Ara, AraDB, Category, Cog, Context
+from arabot.core import Ara, Category, Cog, Context, SettingKey
+from arabot.core.database import Setting
 from arabot.utils import bold, mono
 
 
 class Settings(Cog, category=Category.SETTINGS):
-    @commands.group(aliases=["set"], brief="Various bot settings", invoke_without_command=True)
+    @commands.group(
+        aliases=["set", "cfg", "config", "setting"], brief="Various bot settings", invoke_without_command=True
+    )
     async def settings(self, ctx: Context):
         await ctx.send(
             embed=disnake.Embed().add_field(
@@ -18,17 +21,15 @@ class Settings(Cog, category=Category.SETTINGS):
     @commands.has_permissions(manage_guild=True)
     @settings.command(brief="View or set bot's prefix for this server")
     async def prefix(self, ctx: Context, prefix: str | None = None):
-        db: AraDB = ctx.ara.db
         embed = disnake.Embed(description=ctx._("additional_prefix")).set_author(
             name=ctx.guild,
             icon_url=ctx.guild.icon,
         )
 
         if prefix:
-            prefix = prefix.strip()
-            await db.set_guild_prefix(ctx.guild.id, prefix)
+            prefix = await Setting.set(SettingKey.PREFIX, prefix.strip(), ctx.guild.id)
         else:
-            prefix = await db.get_guild_prefix(ctx.guild.id) or ";"
+            prefix = await Setting.get(SettingKey.PREFIX, ctx.guild.id) or ";"
 
         embed.title = f"{ctx._('title')}: {bold(mono(prefix))}"
         await ctx.send(embed=embed)
@@ -39,16 +40,15 @@ class Settings(Cog, category=Category.SETTINGS):
         extras={"note": "Kicks after 3 consecutive losses"},
     )
     async def rrkick(self, ctx: Context, enabled: bool | None = None):
-        db: AraDB = ctx.ara.db
         embed = disnake.Embed().set_author(
             name=ctx.guild,
             icon_url=ctx.guild.icon and ctx.guild.icon.as_icon,
         )
 
-        if enabled is not None:
-            await db.set_guild_rr_kick(ctx.guild.id, enabled)
-        elif (enabled := await db.get_guild_rr_kick(ctx.guild.id)) is None:
-            enabled = False
+        if enabled is None:
+            enabled = await Setting.get(SettingKey.RR_KICK, ctx.guild.id)
+        else:
+            enabled = await Setting.set(SettingKey.RR_KICK, enabled, ctx.guild.id)
 
         embed.title = f"{ctx._('title')}: {'✅' if enabled else '❌'}"
         await ctx.send(embed=embed)

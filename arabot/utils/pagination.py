@@ -82,9 +82,7 @@ class EmbedPaginator(disnake.ui.View):
             not self._shared and interaction.component.custom_id in self._shared_button_ids
         ):
             return True
-        await interaction.response.send_message(
-            interaction._("interaction_not_allowed"), ephemeral=True
-        )
+        await interaction.response.send_message(interaction._("interaction_not_allowed"), ephemeral=True)
         return False
 
     async def on_timeout(self):

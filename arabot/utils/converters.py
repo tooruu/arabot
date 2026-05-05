@@ -10,32 +10,7 @@ from aiohttp import ClientSession
 from disnake.ext import commands
 from disnake.utils import find
 
-from .regexes import CUSTOM_EMOJI_RE
-
-__all__ = [
-    "AnyEmoji",
-    "AnyEmojis",
-    "AnyGuild",
-    "AnyMember",
-    "AnyMemberOrUser",
-    "AnyMsgChl",
-    "AnyRole",
-    "AnySound",
-    "AnySounds",
-    "AnyTxtChl",
-    "AnyUser",
-    "AnyVcChl",
-    "CIEmoji",
-    "CIGuild",
-    "CIMember",
-    "CIRole",
-    "CITextChl",
-    "CIVoiceChl",
-    "Codeblocks",
-    "Empty",
-    "Twemoji",
-    "clean_content",
-]
+from arabot.utils.regexes import CUSTOM_EMOJI_RE
 
 
 def fuzzy_search(seq: Iterable, attr: str, arg: str) -> Callable:
@@ -142,13 +117,8 @@ class Empty(commands.Converter):
 
 class Codeblocks(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> list[tuple[str, str]]:
-        blocks: list[str] = re.findall(
-            r"```(?:([+\w-]+)\n+|\n*)(.*?)\n*```|`(.*?)`", argument, re.DOTALL
-        )
-        return [
-            (lang, (codeblock or inlineblock).strip(whitespace))
-            for lang, codeblock, inlineblock in blocks
-        ]
+        blocks: list[str] = re.findall(r"```(?:([+\w-]+)\n+|\n*)(.*?)\n*```|`(.*?)`", argument, re.DOTALL)
+        return [(lang, (codeblock or inlineblock).strip(whitespace)) for lang, codeblock, inlineblock in blocks]
 
 
 class CIGuild(commands.Converter):
@@ -170,12 +140,8 @@ AnyGuild = disnake.Guild | CIGuild | Empty
 AnySound = disnake.GuildSoundboardSound | CISound | Empty
 
 
-async def convert_union[T, T2: str](
-    ctx: commands.Context, argument: T2, union: UnionType
-) -> T | None:
-    converters: tuple[
-        type[T | commands.Converter[T]] | commands.Converter[T] | Callable[[T2], T], ...
-    ] = union.__args__
+async def convert_union[T, T2: str](ctx: commands.Context, argument: T2, union: UnionType) -> T | None:
+    converters: tuple[type[T | commands.Converter[T]] | commands.Converter[T] | Callable[[T2], T], ...] = union.__args__
     parameter = ctx.current_parameter
     for converter in converters:
         try:

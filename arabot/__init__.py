@@ -1,11 +1,3 @@
-from os import getenv
+from arabot.core import Ara
 
-from dotenv import load_dotenv
-
-__version__ = "8.24.0"
-
-load_dotenv()
-TESTING = bool(getenv("TESTING"))
-
-# Load up bot after the code above has been executed
-from .core import Ara  # noqa: E402, F401
+__version__ = "9.0.0"

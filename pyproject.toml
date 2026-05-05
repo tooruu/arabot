@@ -2,21 +2,23 @@
 [project]
 name = "arabot"
 version = "0.0.0"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "disnake[speed,voice]~=2.12.0",
-    "prisma",
+    "aiodns<4",                          # Fixes "Could not contact DNS servers" in Python venv
     "jikanpy-v4",
     "matplotlib",
     "numpy",
     "gacha-py",
-    "python-dotenv",
     "tzdata",
     "async-lru",
     "waifu-py",
     "uvloop ; sys_platform != 'win32'",
     "winloop ; sys_platform == 'win32'",
     "pyscribest",
+    "pydantic-settings",
+    "psycopg[binary]",
+    "sqlalchemy",
 ]
 license = "MPL-2.0"
 
@@ -32,8 +34,8 @@ gacha-py = { url = "https://github.com/rexor12/gacha.py/releases/download/1.0.4/
 package = false
 
 [tool.ruff]
-target-version = "py313"
-line-length = 100
+target-version = "py314"
+line-length = 120
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -72,7 +74,13 @@ ignore = [
     "TD003",   # missing-todo-link
     "TRY003",  # raise-vanilla-args
     "TRY400",  # error-instead-of-exception
-    "TRY400",  # error-instead-of-exception
+]
+fixable = [
+    "RUF022", # unsorted-dunder-all
+]
+unfixable = [
+    "COM819", # prohibited-trailing-comma
+    "F401",   # unused-import
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -87,14 +95,11 @@ banned-from = ["json", "orjson"]
 
 [tool.ruff.lint.isort]
 classes = ["clean_content", "pfxless"]
+known-local-folder = ["arabot.plugins"]
 
 [tool.ruff.lint.pep8-naming]
 ignore-names = []
 
 [tool.ruff.lint.per-file-ignores]
-"arabot/core/__init__.py" = ["F401", "F403"]
-"arabot/utils/__init__.py" = [
-    "F401", # unused-import
-    "F403", # undefined-local-with-import-star
-]
-"arabot/plugins/eval/client.py" = ["S307"] # Allow the use of eval
+"__init__.py" = ["F401"]                   # unused-import
+"arabot/plugins/eval/client.py" = ["S307"] # suspicious-eval-usage

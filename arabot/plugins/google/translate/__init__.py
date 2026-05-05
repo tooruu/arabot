@@ -8,7 +8,7 @@ from disnake.utils import escape_markdown, find
 
 from arabot.core import Category, Cog, Context, StopCommand
 
-from .client import LangCodeAndOrName, TranslationClient
+from arabot.plugins.google.translate.client import LangCodeAndOrName, TranslationClient
 
 
 class GoogleTranslate(Cog, category=Category.LOOKUP):
@@ -33,13 +33,10 @@ class GoogleTranslate(Cog, category=Category.LOOKUP):
         await ctx.send(
             embed=Embed()
             .add_field(self.format_lang(source), escape_markdown(text)[:1024])
-            .add_field(
-                self.format_lang(target), escape_markdown(translated_text)[:1024], inline=False
-            )
+            .add_field(self.format_lang(target), escape_markdown(translated_text)[:1024], inline=False)
             .set_footer(
                 text="Google Cloud Translation",
-                icon_url="https://gitlab.com/uploads/-/system"
-                "/project/avatar/12400259/Cloud_Translation_API.png",
+                icon_url="https://gitlab.com/uploads/-/system/project/avatar/12400259/Cloud_Translation_API.png",
             )
         )
 

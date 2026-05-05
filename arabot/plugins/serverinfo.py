@@ -19,9 +19,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
             await ctx.send_("no_icon")
             return
         await ctx.send(
-            embed=disnake.Embed(timestamp=utcnow())
-            .set_image(ctx.guild.icon.maxres)
-            .set_footer(text=ctx.guild)
+            embed=disnake.Embed(timestamp=utcnow()).set_image(ctx.guild.icon.maxres).set_footer(text=ctx.guild)
         )
 
     @commands.command(aliases=["sb"], brief="Show server's banner")
@@ -42,7 +40,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
         elif guild is None:
             try:
                 guild = await ctx.bot.fetch_guild_preview(int(ctx.argument_only))
-            except (ValueError, disnake.NotFound):
+            except ValueError, disnake.NotFound:
                 await ctx.send_("guild_not_found")
                 return
         elif guild.unavailable:
@@ -51,12 +49,10 @@ class Serverinfo(Cog, category=Category.GENERAL):
 
         _ = ctx._
         embed = (
-            disnake.Embed(
-                title=guild.name, url=f"https://discord.com/channels/{guild.id}", timestamp=utcnow()
-            )
+            disnake.Embed(title=guild.name, url=f"https://discord.com/channels/{guild.id}", timestamp=utcnow())
             .set_author(
                 name=guild.id,
-                icon_url="https://twemoji.maxcdn.com/v/latest/72x72/1f194.png",
+                icon_url="https://cdn.jsdelivr.net/gh/jdecked/twemoji/assets/72x72/1f194.png",
                 url=f"https://discord.com/channels/{guild.id}",
             )
             .set_thumbnail(url=guild.icon)
@@ -79,17 +75,13 @@ class Serverinfo(Cog, category=Category.GENERAL):
                 continue
             embed.add_field(
                 name,
-                re.sub(
-                    r"^(.*?(?:(?=<t)|(?<!<t):))(.+)$", r"\1**\2**", "\n".join(values), flags=re.M
-                ),
+                re.sub(r"^(.*?(?:(?=<t)|(?<!<t):))(.+)$", r"\1**\2**", "\n".join(values), flags=re.MULTILINE),
             )
 
         await ctx.send_ping(embed=embed)
 
     @staticmethod
-    def _set_description(
-        embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview, _: I18N
-    ) -> None:
+    def _set_description(embed: disnake.Embed, guild: disnake.Guild | disnake.GuildPreview, _: I18N) -> None:
         assets = []
         if isinstance(guild, disnake.Guild):
             if guild.vanity_url_code:
@@ -167,16 +159,12 @@ class Serverinfo(Cog, category=Category.GENERAL):
             return
         admin_count = sum(not m.bot and m.guild_permissions.administrator for m in guild.members)
         field_values.append(f"{_('admins')}: {admin_count}")
-        field_values.append(
-            f"{_('verification_level')}: {_(f'verification_level_{guild.verification_level}')}"
-        )
+        field_values.append(f"{_('verification_level')}: {_(f'verification_level_{guild.verification_level}')}")
         field_values.append(_(f"nsfw_filter_{guild.explicit_content_filter}"))
         field_values.append("2FA: " + _("2fa_required" if guild.mfa_level else "2fa_not_required"))
 
     @staticmethod
-    def _set_field_emojis_stickers(
-        field_values: list, guild: disnake.Guild | disnake.GuildPreview, _: I18N
-    ) -> None:
+    def _set_field_emojis_stickers(field_values: list, guild: disnake.Guild | disnake.GuildPreview, _: I18N) -> None:
         if e_count := len(guild.emojis):
             e_animated_count = sum(e.animated for e in guild.emojis)
             e_static_count = e_count - e_animated_count
@@ -197,9 +185,7 @@ class Serverinfo(Cog, category=Category.GENERAL):
         s_static_count = sum(map(is_static_sticker, guild.stickers))
         s_animated_count = s_count - s_static_count
         s_static_available_count = sum(is_static_sticker(s) and s.available for s in guild.stickers)
-        s_animated_available_count = sum(
-            not is_static_sticker(s) and s.available for s in guild.stickers
-        )
+        s_animated_available_count = sum(not is_static_sticker(s) and s.available for s in guild.stickers)
 
         if e_count:
             field_values.append(f"**{_('stickers', False)}**")

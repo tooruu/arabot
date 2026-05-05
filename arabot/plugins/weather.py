@@ -16,7 +16,7 @@ from matplotlib.axes import Axes
 from matplotlib.dates import ConciseDateFormatter, DateFormatter, DayLocator, HourLocator
 from matplotlib.ticker import MaxNLocator
 
-from arabot.core import Ara, Category, Cog, Context
+from arabot.core import Ara, Category, Cog, Config, Context
 from arabot.utils import I18N
 
 type IntOrFloat = int | float
@@ -88,8 +88,7 @@ class APIFetchError(Exception):
         self.message = message
 
 
-class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
-    OPENWEATHER_KEY: str
+class WeatherCog(Cog, category=Category.GENERAL):
     API = "https://api.openweathermap.org/data/2.5"
     CLOUDINESS = f"{__module__}.cloudiness"
     FEELSLIKE = f"{__module__}.feels_like"
@@ -134,8 +133,7 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
             .set_image(file=self.get_forecast(forecast, ctx._))
             .set_footer(
                 text=ctx._("powered_by", False).format("OpenWeather"),
-                icon_url="https://docs.openweather.co.uk/themes/"
-                "openweather_docs/assets/img/icons/logo_60x60.png",
+                icon_url="https://docs.openweather.co.uk/themes/openweather_docs/assets/img/icons/logo_60x60.png",
             )
         )
         wind = str(weather["wind"]["speed"])
@@ -215,7 +213,7 @@ class WeatherCog(Cog, category=Category.GENERAL, keys={"OPENWEATHER_KEY"}):
 
         data: T = await self.ara.session.fetch_json(
             self.API + endpoint,
-            params={"appid": self.OPENWEATHER_KEY, "units": "metric", **location_data, **kwargs},
+            params={"appid": Config.openweather_key, "units": "metric", **location_data, **kwargs},
             raise_for_status=False,
         )
         code = str(data["cod"])

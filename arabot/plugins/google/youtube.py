@@ -1,11 +1,10 @@
 from aiohttp import ClientSession
 from disnake.ext.commands import command
 
-from arabot.core import Category, Cog, Context
+from arabot.core import Category, Cog, Config, Context
 
 
-class Youtube(Cog, category=Category.LOOKUP, keys={"G_YT_KEY"}):
-    G_YT_KEY: str
+class Youtube(Cog, category=Category.LOOKUP):
     YT_BASE_URL = "https://www.googleapis.com/youtube/v3/search"
 
     def __init__(self, session: ClientSession):
@@ -16,7 +15,7 @@ class Youtube(Cog, category=Category.LOOKUP, keys={"G_YT_KEY"}):
         data = await self.session.fetch_json(
             self.YT_BASE_URL,
             params={
-                "key": self.G_YT_KEY,
+                "key": Config.g_yt_key,
                 "q": query,
                 "maxResults": 1,
                 "type": "video",
@@ -24,7 +23,5 @@ class Youtube(Cog, category=Category.LOOKUP, keys={"G_YT_KEY"}):
             },
         )
         await ctx.reply(
-            "https://youtu.be/" + data["items"][0]["id"]["videoId"]
-            if data.get("items")
-            else ctx._("no_videos_found")
+            "https://youtu.be/" + data["items"][0]["id"]["videoId"] if data.get("items") else ctx._("no_videos_found")
         )

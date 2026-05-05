@@ -5,10 +5,10 @@ from disnake import Embed
 from disnake.ext.commands import command
 from disnake.utils import escape_markdown
 
-from arabot.core import Category, Cog, Context, StopCommand
+from arabot.core import Category, Cog, Config, Context, StopCommand
 from arabot.utils import codeblock
 
-from .translate import GoogleTranslate
+from arabot.plugins.google.translate import GoogleTranslate
 
 
 class OCRException(Exception):
@@ -19,9 +19,7 @@ class OCRException(Exception):
         self.message = message
 
 
-class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
-    G_OCR_KEY: str
-
+class GoogleOCR(Cog, category=Category.LOOKUP):
     def __init__(self, trans: GoogleTranslate):
         self.trans = trans
 
@@ -55,9 +53,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
         embed = Embed().set_thumbnail(url=image_url)
         if source[0] != target[0]:
             embed.add_field(self.trans.format_lang(source), escape_markdown(text)[:1024])
-        embed.add_field(
-            self.trans.format_lang(target), escape_markdown(trans_text)[:1024], inline=False
-        )
+        embed.add_field(self.trans.format_lang(target), escape_markdown(trans_text)[:1024], inline=False)
         await ctx.send(embed=embed)
 
     async def handle_annotation(self, ctx: Context, image_url: str | None) -> str:
@@ -89,7 +85,7 @@ class GoogleOCR(Cog, category=Category.LOOKUP, keys={"G_OCR_KEY"}):
 
     async def annotate(self, image: str | bytes) -> str | None:
         data = await self.trans.gtrans.session.fetch_json(  # lol
-            f"https://vision.googleapis.com/v1/images:annotate?key={self.G_OCR_KEY}",
+            f"https://vision.googleapis.com/v1/images:annotate?key={Config.g_ocr_key}",
             method="post",
             json={
                 "requests": [

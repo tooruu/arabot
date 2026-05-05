@@ -55,9 +55,7 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇼", "🇭", "🇴", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.FukaWhy:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_response(
-                inter._("no_perms_to", False).format("add reactions")
-            )
+            await inter.edit_original_response(inter._("no_perms_to", False).format("add reactions"))
         except disnake.NotFound:
             await inter.edit_original_response(inter._(Fun.MESSAGE_DELETED, False))
         else:
@@ -84,9 +82,7 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇮", "🇦", "🇸", "🇰", "🇪", "🇩", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_response(
-                inter._("no_perms_to", False).format("add reactions")
-            )
+            await inter.edit_original_response(inter._("no_perms_to", False).format("add reactions"))
         except disnake.NotFound:
             await inter.edit_original_response(inter._(Fun.MESSAGE_DELETED, False))
         else:
@@ -113,9 +109,7 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇼", "🇭", "🇴", "🇨", "🇦", "🇷", "🇪", "🇸", CustomEmoji.TooruWeary:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_response(
-                inter._("no_perms_to", False).format("add reactions")
-            )
+            await inter.edit_original_response(inter._("no_perms_to", False).format("add reactions"))
         else:
             await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED, False))
 
@@ -140,15 +134,11 @@ class Fun(Cog, category=Category.FUN):
             for i in "🇮", "🇨", "🇦", "🇷", "🇪", CustomEmoji.MeiStare:
                 await msg.add_reaction(i)
         except disnake.Forbidden:
-            await inter.edit_original_response(
-                inter._("no_perms_to", False).format("add reactions")
-            )
+            await inter.edit_original_response(inter._("no_perms_to", False).format("add reactions"))
         else:
             await inter.edit_original_response(inter._(Fun.REACTIONS_ADDED))
 
-    @commands.command(
-        aliases=["whom", "whose", "who's", "who’s", "whos"], brief="Shows a random person"
-    )
+    @commands.command(aliases=["whom", "whose", "who's", "who’s", "whos"], brief="Shows a random person")
     async def who(self, ctx: Context):
         if isinstance(channel := ctx.channel, disnake.Thread):
             if len(members := await channel.fetch_members()) <= 1:
@@ -247,9 +237,7 @@ class Fun(Cog, category=Category.FUN):
             return
 
         if reaction := disnake.utils.find(lambda r: str(r) == CustomEmoji.Doubt, msg_x.reactions):
-            await msg_x.reply(
-                ctx._("people_doubted").format(reaction.count - 1, msg_x.author.mention)
-            )
+            await msg_x.reply(ctx._("people_doubted").format(reaction.count - 1, msg_x.author.mention))
         else:
             await msg_x.reply(ctx._("doubts_cleared"))
 
@@ -262,7 +250,7 @@ class Fun(Cog, category=Category.FUN):
             return
         member = member or ctx.author
         size = round(self.rng.triangular(1, 15, 25))
-        pp = f"3{'='*(size-1)}D"
+        pp = f"3{'=' * (size - 1)}D"
         await ctx.send(ctx._("pp").format(member.mention, size, pp))
 
     @commands.cooldown(1, 1800, commands.BucketType.member)

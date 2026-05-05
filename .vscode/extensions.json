@@ -2,7 +2,6 @@
   "recommendations": [
     "ms-python.python",
     "detachhead.basedpyright",
-    "charliermarsh.ruff",
-    "prisma.prisma"
+    "charliermarsh.ruff"
   ]
 }

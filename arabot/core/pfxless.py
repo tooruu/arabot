@@ -2,13 +2,16 @@ import functools
 import random
 import re
 from collections.abc import Awaitable, Callable
-from numbers import Number
+from typing import TYPE_CHECKING
 
 from disnake import Message
 from disnake.ext import commands
 from disnake.utils import async_all
 
-from .bot import Ara
+if TYPE_CHECKING:
+    from numbers import Number
+
+    from arabot.core.bot import Ara
 
 type CogMsgListener = Callable[[commands.Cog, Message], Awaitable]
 
@@ -103,9 +106,7 @@ class pfxless:  # noqa: N801
             and self.chance > random.random()
         )
 
-    async def _check_message(
-        self, msg: Message, pfx_factory: Callable[[Message], Awaitable]
-    ) -> bool:
+    async def _check_message(self, msg: Message, pfx_factory: Callable[[Message], Awaitable]) -> bool:
         return (
             (self.allow_prefix or not await pfx_factory(msg))
             and (self.allow_bots or not msg.author.bot)

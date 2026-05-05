@@ -22,6 +22,7 @@ class StderrHandler(logging.StreamHandler):
         super().__init__(sys.stderr)
         self.setLevel(logging.WARNING)
         self.addFilter(
-            lambda record: record.msg
-            != 'We are being rate limited. Retrying in %.2f seconds. Handled under the bucket "%s"'
+            lambda record: (
+                record.msg != 'We are being rate limited. Retrying in %.2f seconds. Handled under the bucket "%s"'
+            )
         )

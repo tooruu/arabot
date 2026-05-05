@@ -39,15 +39,11 @@ class ItemResolver(ItemResolverInterface):
             return
         item_type = get_item_type(self._entity_provider, item.item_type_id)
         if not item_type:
-            self._log.warning(
-                f"The configured item type identified by '{item.item_type_id}' doesn't exist."
-            )
+            self._log.warning(f"The configured item type identified by '{item.item_type_id}' doesn't exist.")
             return
         item_rank = get_item_rank(self._entity_provider, item.rank_id)
         if not item_rank:
-            self._log.warning(
-                f"The configured item rank identified by '{item.rank_id}' doesn't exist."
-            )
+            self._log.warning(f"The configured item rank identified by '{item.rank_id}' doesn't exist.")
             return
         if item_type.name == "Stigmata" and not item.name.endswith(STIGMATA_PARTS_FULL):
             item_names = [f"{item.name} ({part})" for part in STIGMATA_PARTS]
@@ -88,9 +84,7 @@ class Gacha(Cog, category=Category.FUN):
                 ]
                 await ctx.send(ctx._("available_supplies") + ":\n" + "\n".join(pools))
                 return True
-            case BadArgument() if last_param.name in str(
-                error
-            ) and last_param.annotation.__name__ in str(error):
+            case BadArgument() if last_param.name in str(error) and last_param.annotation.__name__ in str(error):
                 if self.gacha.is_on_cooldown(ctx):
                     remaining = time_in(self.gacha.get_cooldown_retry_after(ctx))
                     await ctx.reply(ctx._("cooldown_expires", False).format(remaining))

@@ -10,8 +10,8 @@ from typing import Any, TextIO
 
 from aiohttp import ClientSession
 
-from . import errors
-from .abc import Evaluator
+from arabot.plugins.eval import errors
+from arabot.plugins.eval.abc import Evaluator
 
 
 class stdin_from(_RedirectStream):  # noqa: N801

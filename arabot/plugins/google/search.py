@@ -4,12 +4,10 @@ from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
 
-from arabot.core import Category, Cog, Context
+from arabot.core import Category, Cog, Config, Context
 
 
-class GoogleSearch(Cog, category=Category.LOOKUP, keys={"G_SEARCH_KEY", "G_CSE"}):
-    G_SEARCH_KEY: str
-    G_CSE: str
+class GoogleSearch(Cog, category=Category.LOOKUP):
     GSEARCH_BASE_URL = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, session: ClientSession):
@@ -20,23 +18,21 @@ class GoogleSearch(Cog, category=Category.LOOKUP, keys={"G_SEARCH_KEY", "G_CSE"}
         json = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
             params={
-                "key": self.G_SEARCH_KEY,
-                "cx": self.G_CSE,
+                "key": Config.g_search_key,
+                "cx": Config.g_cse,
                 "q": query,
                 "num": 1,
             },
         )
-        await ctx.reply(
-            json["items"][0]["link"] if json.get("items") else ctx._("no_results", False)
-        )
+        await ctx.reply(json["items"][0]["link"] if json.get("items") else ctx._("no_results", False))
 
     @command(aliases=["g3"], brief="Show top 3 Google Search results")
     async def google3(self, ctx: Context, *, query: str):
         data = await self.session.fetch_json(
             self.GSEARCH_BASE_URL,
             params={
-                "key": self.G_SEARCH_KEY,
-                "cx": self.G_CSE,
+                "key": Config.g_search_key,
+                "cx": Config.g_cse,
                 "q": query,
                 "num": 3,
             },

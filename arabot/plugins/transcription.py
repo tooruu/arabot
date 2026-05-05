@@ -3,14 +3,13 @@ from elevenlabs import AsyncElevenLabs
 from pyscribe import atranscribe
 
 from arabot.core import Ara, Category, Cog, Context
+from arabot.core.config import Config
 
 
-class Transcription(Cog, category=Category.GENERAL, keys={"ELEVENLABS_API_KEY"}):
-    ELEVENLABS_API_KEY: str
-
+class Transcription(Cog, category=Category.GENERAL):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.client = AsyncElevenLabs(api_key=self.ELEVENLABS_API_KEY)
+        self.client = AsyncElevenLabs(api_key=Config.elevenlabs_api_key)
 
     @command(aliases=["stt"], brief="Transcribe audio", usage="<audio>")
     async def transcribe(self, ctx: Context):

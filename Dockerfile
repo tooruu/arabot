@@ -1,31 +1,27 @@
-FROM ghcr.io/astral-sh/uv:python3.13-alpine
+FROM ghcr.io/astral-sh/uv:python3.14-alpine
 
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1
 
 RUN apk update --no-cache && apk add --no-cache \
     openssl \
     opus \
     ffmpeg
 
-COPY pyproject.toml uv.lock schema.prisma ./
-
+COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-cache
 
-RUN --mount=type=secret,id=database-url,env=DATABASE_URL,required=true \
-    uv run prisma db push
-
-RUN mv /root/.cache/prisma-python/binaries/*/*/node_modules/prisma/query-engine-* \
-    prisma-query-engine-linux-musl && \
-    rm -rf \
+RUN rm -rf \
     /root/.cache \
     /root/.npm \
     /tmp/* \
     /app/pyproject.toml \
-    /app/uv.lock \
-    /app/schema.prisma
+    /app/uv.lock
 
-COPY --exclude=pyproject.toml --exclude=uv.lock --exclude=schema.prisma . .
+COPY arabot arabot
+COPY resources resources
+
 CMD ["uv", "run", "-m", "arabot"]

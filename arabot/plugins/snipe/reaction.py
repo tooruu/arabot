@@ -24,21 +24,13 @@ class ReactionSnipe(Cog):
     async def on_reaction_add(self, reaction: Reaction, user: User):
         if await reaction.users().get(bot=True):
             return
-        on_cd = (
-            self._cache.setdefault(user.id, {})
-            .setdefault(reaction.message.id, {})
-            .get(hash(reaction), [False])[0]
-        )
+        on_cd = self._cache.setdefault(user.id, {}).setdefault(reaction.message.id, {}).get(hash(reaction), [False])[0]
         self._cache[user.id][reaction.message.id][hash(reaction)] = on_cd, utcnow()
 
     @Cog.listener()
     async def on_reaction_remove(self, reaction: Reaction, user: User):
         now = utcnow()
-        on_cd, reacted_at = (
-            self._cache.get(user.id, {})
-            .get(reaction.message.id, {})
-            .get(hash(reaction), [None, None])
-        )
+        on_cd, reacted_at = self._cache.get(user.id, {}).get(reaction.message.id, {}).get(hash(reaction), [None, None])
         has_bot_reaction = await reaction.users().get(bot=True)
         within_threshold = reacted_at and now - reacted_at <= self.THRESHOLD
 
@@ -47,9 +39,7 @@ class ReactionSnipe(Cog):
 
         # rate limit the reaction
         self._cache[user.id][reaction.message.id][hash(reaction)] = True, now
-        embed: Embed = (
-            Embed().set_footer(text=self._("sniped_reaction", reaction.message)).with_author(user)
-        )
+        embed: Embed = Embed().set_footer(text=self._("sniped_reaction", reaction.message)).with_author(user)
         if isinstance(reaction.emoji, str):
             twemoji = Twemoji(reaction.emoji)
             if not await twemoji.read(self.ara.session, ensure_only=True):

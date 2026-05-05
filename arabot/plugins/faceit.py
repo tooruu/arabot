@@ -4,15 +4,13 @@ from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
 
-from arabot.core import Ara, Category, Cog, Context
+from arabot.core import Ara, Category, Cog, Config, Context
 
 
-class Faceit(Cog, category=Category.LOOKUP, keys={"FACEIT_KEY"}):
-    FACEIT_KEY: str
-
+class Faceit(Cog, category=Category.LOOKUP):
     def __init__(self, ara: Ara):
         self.ara = ara
-        self.session = ClientSession(headers={"Authorization": f"Bearer {self.FACEIT_KEY}"})
+        self.session = ClientSession(headers={"Authorization": f"Bearer {Config.faceit_key}"})
 
     @command(brief="View player's FACEIT profile")
     async def faceit(self, ctx: Context, nickname: str):
@@ -27,16 +25,15 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"FACEIT_KEY"}):
         )
 
         steam_link = (
-            f"[{ctx._('steam_profile', False)}]"
-            f"(https://www.steamcommunity.com/profiles/{player['steam_id_64']})"
+            f"[{ctx._('steam_profile', False)}](https://www.steamcommunity.com/profiles/{player['steam_id_64']})"
         )
         country = player["country"].upper()
         friends = len(player["friends_ids"])
         try:
-            last_infraction = datetime.strptime(
-                player["last_infraction_date"], "%a %b %d %H:%M:%S %Z %Y"
-            ).replace(tzinfo=UTC)
-        except (KeyError, ValueError):
+            last_infraction = datetime.strptime(player["last_infraction_date"], "%a %b %d %H:%M:%S %Z %Y").replace(
+                tzinfo=UTC
+            )
+        except KeyError, ValueError:
             last_infraction = ""
         else:
             last_infraction = f" | {ctx._('last_infraction')}: {last_infraction:%d %b %Y}"
@@ -45,8 +42,8 @@ class Faceit(Cog, category=Category.LOOKUP, keys={"FACEIT_KEY"}):
             Embed(
                 color=0xFF5500,
                 description=f"""{steam_link}
-{ctx._('country', False)}: {country} | {ctx._('friends', False)}: {friends}{last_infraction}
-{ctx._('membership_type')}: {player["membership_type"]}""",
+{ctx._("country", False)}: {country} | {ctx._("friends", False)}: {friends}{last_infraction}
+{ctx._("membership_type")}: {player["membership_type"]}""",
             )
             .set_author(name=player["nickname"], url=player["faceit_url"].format(lang="en"))
             .set_thumbnail(url=player["avatar"])

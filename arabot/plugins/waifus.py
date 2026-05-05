@@ -221,7 +221,7 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
         embed = disnake.Embed(title=reaction_name.title())
         try:
             image_url = await method(reaction_name)
-        except (APIException, ClientResponseError):
+        except APIException, ClientResponseError:
             embed.set_footer(text=context._("image_failed"))
         else:
             embed.set_footer(text=context._("powered_by", False).format("waifu.pics"))
@@ -245,14 +245,10 @@ class Waifus(Cog, category=Category.WAIFUS, metaclass=WaifuCommandsMeta):
                     if menstr.index("{target}") > menstr.index("{author}"):
                         description = menstr.replace("{target}", "themselves")
                     else:
-                        description = menstr.replace("{author}", "themselves").replace(
-                            "{target}", "{author}"
-                        )
+                        description = menstr.replace("{author}", "themselves").replace("{target}", "{author}")
             case _ if reaction_data.get("protect_bot") and context.me in targets:
                 description = (
-                    reaction_data["mentions"]
-                    .replace("{author}", context.me.mention)
-                    .replace("{target}", "{author}")
+                    reaction_data["mentions"].replace("{author}", context.me.mention).replace("{target}", "{author}")
                 )
             case _:
                 if context.author in targets:

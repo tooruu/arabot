@@ -16,9 +16,7 @@ class NicknameSnipe(Cog, category=Category.FUN):
 
     def __init__(self, ara: Ara):
         self.ara = ara
-        self._cache: dict[int, dict[int, list[tuple[str, datetime]]]] = defaultdict(
-            lambda: defaultdict(list)
-        )
+        self._cache: dict[int, dict[int, list[tuple[str, datetime]]]] = defaultdict(lambda: defaultdict(list))
         self.purge_cache.start()
 
     @Cog.listener()

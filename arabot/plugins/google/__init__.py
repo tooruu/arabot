@@ -1,18 +1,16 @@
-from os import getenv
+from arabot.core import Ara, Config
 
-from arabot import Ara
-
-from .images import GoogleImages
-from .ocr import GoogleOCR
-from .search import GoogleSearch
-from .translate import GoogleTranslate, TranslationClient
-from .tts import GoogleTTS
-from .youtube import Youtube
+from arabot.plugins.google.images import GoogleImages
+from arabot.plugins.google.ocr import GoogleOCR
+from arabot.plugins.google.search import GoogleSearch
+from arabot.plugins.google.translate import GoogleTranslate, TranslationClient
+from arabot.plugins.google.tts import GoogleTTS
+from arabot.plugins.google.youtube import Youtube
 
 
 def setup(ara: Ara):
     session = ara.session
-    trans_client = TranslationClient(getenv("G_TRANS_KEY"), session)
+    trans_client = TranslationClient(Config.g_trans_key, session)
     trans = GoogleTranslate(trans_client)
     ara.add_cog(trans)
     ara.add_cog(GoogleOCR(trans))

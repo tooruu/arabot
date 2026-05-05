@@ -27,9 +27,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         return await ctx.ara.is_owner(ctx.author)
 
     @commands.command(usage="[activity]")
-    async def presence(
-        self, ctx: Context, act_type: str | None = None, *, act_name: str | None = None
-    ):
+    async def presence(self, ctx: Context, act_type: str | None = None, *, act_name: str | None = None):
         acts = {
             "playing": disnake.ActivityType.playing,
             "listening": disnake.ActivityType.listening,
@@ -91,15 +89,9 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
         if (
             bucket_item
             and buckets.type.name.lower() not in type(bucket_item).__name__.lower()
-            and not (
-                buckets.type is commands.BucketType.user and isinstance(bucket_item, disnake.Member)
-            )
+            and not (buckets.type is commands.BucketType.user and isinstance(bucket_item, disnake.Member))
         ):
-            await ctx.send(
-                ctx._("bucket_doesnt_match_argument").format(
-                    buckets.type.name, type(bucket_item).__name__
-                )
-            )
+            await ctx.send(ctx._("bucket_doesnt_match_argument").format(buckets.type.name, type(bucket_item).__name__))
             return
 
         fake_msg = FakeObj()
@@ -124,9 +116,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
                     ctx.channel if isinstance(ctx.channel, PrivateChannel) else ctx.author.top_role
                 )
             case commands.BucketType.category:
-                fake_msg.channel = (
-                    FakeObj(category=bucket_item) if bucket_item else ctx.channel.category
-                )
+                fake_msg.channel = FakeObj(category=bucket_item) if bucket_item else ctx.channel.category
                 bucket_item = bucket_item or ctx.channel.category or ctx.channel
 
         if bucket := buckets.get_bucket(fake_msg):
@@ -271,9 +261,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         await self._do_action_group_format_embed_send(disable, cmds, statuses, ctx)
 
     @staticmethod
-    def group_by_exc_raised[T](
-        action: Callable[[T], Any], arguments: Iterable[T]
-    ) -> dict[Exception | None, T]:
+    def group_by_exc_raised[T](action: Callable[[T], Any], arguments: Iterable[T]) -> dict[Exception | None, T]:
         mapping = defaultdict(list)
         for arg in arguments:
             try:
@@ -293,9 +281,7 @@ class PluginManager(Cog, command_attrs=dict(hidden=True)):
         return embed
 
     @staticmethod
-    def merge_dict_values[T, T2: str, T3](
-        key_val: dict[T, T2], key_repr: dict[T, T3]
-    ) -> dict[T3, T2]:
+    def merge_dict_values[T, T2: str, T3](key_val: dict[T, T2], key_repr: dict[T, T3]) -> dict[T3, T2]:
         return {key_repr[key]: val for key, val in key_val.items() if val}
 
     async def _do_action_group_format_embed_send[T](

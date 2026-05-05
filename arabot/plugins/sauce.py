@@ -8,7 +8,7 @@ from disnake.ext.commands import command
 from disnake.utils import escape_markdown
 from jikanpy import AioJikan
 
-from arabot.core import Ara, Category, Cog, Context
+from arabot.core import Ara, Category, Cog, Config, Context
 
 
 # https://saucenao.com/tools/examples/api/index_details.txt
@@ -57,9 +57,7 @@ class Source(IntEnum):
     FurryNetwork = 42
 
 
-class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
-    SAUCENAO_KEY: str
-
+class Sauce(Cog, category=Category.LOOKUP):
     def __init__(self, session: ClientSession):
         self.session = session
         self.jikan = AioJikan(session=session)
@@ -77,7 +75,7 @@ class Sauce(Cog, category=Category.LOOKUP, keys={"SAUCENAO_KEY"}):
             "https://saucenao.com/search.php",
             params={
                 "output_type": 2,
-                "api_key": self.SAUCENAO_KEY,
+                "api_key": Config.saucenao_key,
                 "db": 999,
                 "numres": 1,
                 "url": image_url,

@@ -2,16 +2,7 @@ import re
 import traceback
 from collections.abc import Sequence
 
-from .abc import Evaluator
-
-__all__ = [
-    "EvalException",
-    "LocalEvalCompileException",
-    "LocalEvalException",
-    "LocalEvalExecuteException",
-    "RemoteEvalBadResponse",
-    "RemoteEvalException",
-]
+from arabot.plugins.eval.abc import Evaluator
 
 
 class EvalException(Exception):

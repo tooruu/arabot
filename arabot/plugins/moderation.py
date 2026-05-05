@@ -29,9 +29,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             await ctx.send_("channel_not_found", False)
             return
         am = disnake.AllowedMentions(users=True)
-        silent = disnake.MessageFlags(
-            suppress_notifications=ctx.message.flags.suppress_notifications
-        )
+        silent = disnake.MessageFlags(suppress_notifications=ctx.message.flags.suppress_notifications)
         msg = await channel.send(text, allowed_mentions=am, flags=silent)
         await ctx.reply(msg.jump_url)
 
@@ -51,9 +49,7 @@ class Moderation(Cog, category=Category.MODERATION, command_attrs=dict(hidden=Tr
             )
 
         try:
-            bad_msg: disnake.Message = await ctx.ara.wait_for(
-                "message", check=bad_msg_check, timeout=300
-            )
+            bad_msg: disnake.Message = await ctx.ara.wait_for("message", check=bad_msg_check, timeout=300)
         except TimeoutError:
             return
         else:

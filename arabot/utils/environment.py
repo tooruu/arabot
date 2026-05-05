@@ -1,4 +1,3 @@
-import os
 import platform
 import sys
 from collections.abc import Callable
@@ -49,18 +48,3 @@ Python version: {sys.version}
 {disnake.__title__.title()} version: {disnake.__version__}
 Bot version: {arabot.__version__}
 """
-
-
-class MissingEnvVar(Exception):
-    def __init__(self, key_name: str):
-        super().__init__(f"Couldn't retrieve {key_name!r} from environment")
-        self.key_name = key_name
-
-
-def getkeys(*key_names: str) -> tuple[str, ...]:
-    keys = list[str]()
-    for key_name in key_names:
-        if not (key := os.getenv(key_name)):
-            raise MissingEnvVar(key_name)
-        keys.append(key)
-    return tuple(keys)

@@ -11,10 +11,11 @@ from aiohttp import ClientResponseError
 from disnake.ext import commands
 
 from arabot.core import Ara, Category, Cog, Context
+from arabot.core.database import get_db_session
 from arabot.utils import Codeblocks, codeblock
 
-from . import errors
-from .client import LocalEval, RemoteEval
+from arabot.plugins.eval import errors
+from arabot.plugins.eval.client import LocalEval, RemoteEval
 
 
 class Eval(Cog, category=Category.GENERAL):
@@ -40,7 +41,7 @@ class Eval(Cog, category=Category.GENERAL):
                 bot=ctx.bot,
                 channel=ctx.channel,
                 ctx=ctx,
-                db=ctx.ara.db,
+                db=get_db_session,
                 guild=ctx.guild,
                 me=ctx.author,
                 message=ctx.message,
@@ -72,8 +73,7 @@ class Eval(Cog, category=Category.GENERAL):
             evaluator = RemoteEval(session=ctx.ara.session, stdin=inputlines)
             result.set_footer(
                 text=ctx._("powered_by", False).format("Piston"),
-                icon_url="https://raw.githubusercontent.com"
-                "/tooruu/arabot/master/resources/piston.png",
+                icon_url="https://raw.githubusercontent.com/tooruu/arabot/master/resources/piston.png",
             )
 
         append_codeblock = partial(self.embed_add_codeblock_with_warnings, result, lang="py")

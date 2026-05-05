@@ -1,4 +1,4 @@
-from enum import IntEnum, StrEnum, unique
+from enum import Enum, IntEnum, StrEnum, auto, unique
 
 import disnake
 
@@ -37,3 +37,8 @@ class Category(StrEnum):
     MODERATION = "Moderation"
     SETTINGS = "Settings"
     WAIFUS = "Reaction pictures"
+
+
+class SettingKey(Enum):
+    PREFIX = auto()
+    RR_KICK = auto()

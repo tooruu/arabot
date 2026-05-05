@@ -1,5 +1,5 @@
-import re as _re
-from collections.abc import Iterable as _Iterable
+import re
+from collections.abc import Iterable
 
 
 def bold(s: str) -> str:
@@ -35,8 +35,8 @@ def unping(s: str) -> str:
 
 
 def replacechars(s: str, chars: str, rep: str = "") -> str:
-    return _re.sub(f"[{_re.escape(chars)}]", rep, s)
+    return re.sub(f"[{re.escape(chars)}]", rep, s)
 
 
-def humanjoin(s: _Iterable[str], /) -> str:
+def humanjoin(s: Iterable[str], /) -> str:
     return " and ".join(", ".join(s).rsplit(", ", 1))

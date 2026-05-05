@@ -1,12 +1,9 @@
-import typing as _t
-from datetime import timedelta as _timedelta
+from datetime import timedelta
 
-from disnake import utils as _utils
-
-DiscordDT = _t.NewType("DiscordDT", str)
+from disnake import utils
 
 
-def strfdelta(delta: _timedelta) -> str:
+def strfdelta(delta: timedelta) -> str:
     days = delta.days
     hours = delta.seconds // 3600
     minutes = delta.seconds % 3600 // 60
@@ -20,5 +17,5 @@ def strfdelta(delta: _timedelta) -> str:
     return time_left.strip()
 
 
-def time_in(seconds: float, fmt: str = "R") -> DiscordDT:
-    return _utils.format_dt(_utils.utcnow() + _timedelta(seconds=seconds), fmt)
+def time_in(seconds: float, fmt: str = "R") -> str:
+    return utils.format_dt(utils.utcnow() + timedelta(seconds=seconds), fmt)

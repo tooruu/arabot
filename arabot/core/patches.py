@@ -1,27 +1,29 @@
-from __future__ import annotations
-
 import logging
 import re
 import sys
 from asyncio import sleep
-from collections.abc import Awaitable, Callable, Iterable
 from contextlib import suppress
 from enum import Enum, auto
 from functools import partial, partialmethod
+from typing import TYPE_CHECKING
 
 import aiohttp
 import disnake
 import disnake.gateway
 from disnake.ext import commands
 
-from arabot.core import bot
+from arabot.core.enums import Category
 from arabot.utils import fullqualname, getkeys
 
-from .enums import Category
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable, Iterable
+
+    from arabot.core.bot import Ara
 
 
 class Context(commands.Context):
-    bot: bot.Ara
+    ara: Ara
+    bot: Ara
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -106,16 +108,12 @@ class Context(commands.Context):
 
     def send(self, content: str | None = None, **kwargs) -> Awaitable[disnake.Message]:
         if "flags" not in kwargs:
-            kwargs["flags"] = disnake.MessageFlags(
-                suppress_notifications=self.message.flags.suppress_notifications
-            )
+            kwargs["flags"] = disnake.MessageFlags(suppress_notifications=self.message.flags.suppress_notifications)
         return super().send(content, **kwargs)
 
     def reply(self, content: str | None = None, **kwargs) -> Awaitable[disnake.Message]:
         if "flags" not in kwargs:
-            kwargs["flags"] = disnake.MessageFlags(
-                suppress_notifications=self.message.flags.suppress_notifications
-            )
+            kwargs["flags"] = disnake.MessageFlags(suppress_notifications=self.message.flags.suppress_notifications)
         return super().reply(content, **kwargs)
 
     reply_ping = partialmethod(reply, allowed_mentions=disnake.AllowedMentions.all())
@@ -127,24 +125,16 @@ class Context(commands.Context):
     def reply_(self, content: str, autofill: bool = True, **kwargs) -> Awaitable[disnake.Message]:
         return self.reply(self._(content, autofill + autofill), **kwargs)
 
-    def send_ping_(
-        self, content: str, autofill: bool = True, **kwargs
-    ) -> Awaitable[disnake.Message]:
+    def send_ping_(self, content: str, autofill: bool = True, **kwargs) -> Awaitable[disnake.Message]:
         return self.send_ping(self._(content, autofill + autofill), **kwargs)
 
-    def reply_ping_(
-        self, content: str, autofill: bool = True, **kwargs
-    ) -> Awaitable[disnake.Message]:
+    def reply_ping_(self, content: str, autofill: bool = True, **kwargs) -> Awaitable[disnake.Message]:
         return self.reply_ping(self._(content, autofill + autofill), **kwargs)
 
 
 class Cog(commands.Cog):
-    def __init_subclass__(
-        cls, category: Category = Category.NO_CATEGORY, keys: Iterable[str] = (), **kwargs
-    ) -> None:
+    def __init_subclass__(cls, category: Category = Category.NO_CATEGORY, **kwargs) -> None:
         cls.category = category
-        for key_name, key in zip(keys, getkeys(*keys), strict=True):
-            setattr(cls, key_name, key)
         super().__init_subclass__(**kwargs)
 
 
@@ -210,9 +200,7 @@ async def temp_mute_channel_member(
             if isinstance(success_msg, str):
                 success_msg = partial(self.send_ping, success_msg)
             elif success_msg is True:
-                success_msg = partial(
-                    self.send_ping, f"{member.mention} has been muted for {duration:.0f} seconds"
-                )
+                success_msg = partial(self.send_ping, f"{member.mention} has been muted for {duration:.0f} seconds")
             await success_msg()
         await sleep(duration)
     except disnake.Forbidden:
@@ -224,9 +212,7 @@ async def temp_mute_channel_member(
             await failure_msg()
     finally:
         with suppress(disnake.Forbidden):
-            await self.set_permissions(
-                member, overwrite=None if old_perms.is_empty() else old_perms, reason=reason
-            )
+            await self.set_permissions(member, overwrite=None if old_perms.is_empty() else old_perms, reason=reason)
 
 
 async def fetch_json(
@@ -288,7 +274,7 @@ def presence_count(self: disnake.Guild) -> int:
 async def message_green_tick(self: disnake.Message) -> bool:
     try:
         await self.add_reaction("✅")
-    except (disnake.HTTPException, disnake.Forbidden):
+    except disnake.HTTPException, disnake.Forbidden:
         return False
     return True
 
@@ -296,7 +282,7 @@ async def message_green_tick(self: disnake.Message) -> bool:
 async def message_blue_tick(self: disnake.Message) -> bool:
     try:
         await self.add_reaction("☑️")
-    except (disnake.HTTPException, disnake.Forbidden):
+    except disnake.HTTPException, disnake.Forbidden:
         return False
     return True
 
@@ -317,12 +303,8 @@ disnake.Member.top_perm_role = property(top_perm_role)
 disnake.Message.get_or_fetch_reference_message = get_or_fetch_reference_message
 disnake.Message.getch_reference_message = get_or_fetch_reference_message
 disnake.Message.reply = partialmethod(disnake.Message.reply, fail_if_not_exists=False)
-disnake.Message.reply_ping = partialmethod(
-    disnake.Message.reply, allowed_mentions=disnake.AllowedMentions.all()
-)
-disnake.Message.temp_channel_mute_author = property(
-    lambda self: partial(self.channel.temp_mute_member, self.author)
-)
+disnake.Message.reply_ping = partialmethod(disnake.Message.reply, allowed_mentions=disnake.AllowedMentions.all())
+disnake.Message.temp_channel_mute_author = property(lambda self: partial(self.channel.temp_mute_member, self.author))
 disnake.Message.blue_tick = message_blue_tick
 disnake.Message.tick = message_green_tick
 disnake.Thread.create_webhook = property(lambda self: self.parent.create_webhook)

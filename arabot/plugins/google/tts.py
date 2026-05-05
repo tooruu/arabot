@@ -8,13 +8,11 @@ from disnake import File, PCMAudio
 from disnake.ext import tasks
 from disnake.ext.commands import clean_content, command
 
-from arabot.core import Category, Cog, Context
+from arabot.core import Category, Cog, Config, Context
 from arabot.utils import CUSTOM_EMOJI_RE
 
 
-class GoogleTTS(Cog, category=Category.GENERAL, keys={"G_TTS_KEY"}):
-    G_TTS_KEY: str
-
+class GoogleTTS(Cog, category=Category.GENERAL):
     def __init__(self, session: ClientSession):
         self.session = session
         self._invalidate_voices_cache.start()
@@ -85,7 +83,7 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"G_TTS_KEY"}):
         data = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/text:synthesize",
             method="post",
-            params={"key": self.G_TTS_KEY},
+            params={"key": Config.g_tts_key},
             json={
                 "input": {"text": text},
                 "voice": {"languageCode": lang},
@@ -101,14 +99,14 @@ class GoogleTTS(Cog, category=Category.GENERAL, keys={"G_TTS_KEY"}):
     async def voices(self, language_code: str | None = None) -> list[dict]:
         data: dict[str, list[dict]] = await self.session.fetch_json(
             "https://texttospeech.googleapis.com/v1/voices",
-            params={"key": self.G_TTS_KEY, "languageCode": language_code or ""},
+            params={"key": Config.g_tts_key, "languageCode": language_code or ""},
         )
         return data["voices"]
 
     async def detect_language(self, text: str) -> str | None:
         data: dict[str, dict[str, list[list[dict]]]] = await self.session.fetch_json(
             "https://translation.googleapis.com/language/translate/v2/detect",
-            params={"key": self.G_TTS_KEY, "q": text},
+            params={"key": Config.g_tts_key, "q": text},
         )
         lang = data["data"]["detections"][0][0]["language"]
         return lang if lang != "und" else None

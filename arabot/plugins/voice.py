@@ -5,11 +5,7 @@ from random import choice
 import disnake
 
 from arabot.core import Ara, Cog, pfxless
-from arabot.utils import (
-    author_in_voice_channel,
-    bot_not_speaking_in_guild,
-    can_someone_hear_in_author_channel,
-)
+from arabot.utils import author_in_voice_channel, bot_not_speaking_in_guild, can_someone_hear_in_author_channel
 
 
 class Voice(Cog):

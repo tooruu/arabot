@@ -7,8 +7,8 @@ import disnake
 from disnake.ext import commands
 from disnake.utils import utcnow
 
-import arabot
-from arabot.core import Ara, Category, Cog, Context
+from arabot import __version__
+from arabot.core import Ara, Category, Cog, Config, Context
 from arabot.utils import I18N, bold, codeblock, mono
 
 
@@ -24,12 +24,10 @@ class EmbedHelpCommand(commands.HelpCommand):
                 name=ctx._("help_menu").format(bot.name),
                 icon_url=ctx.me.display_avatar.as_icon,
             )
-            .set_footer(text=f"{bot.name} v{arabot.__version__}")
+            .set_footer(text=f"{bot.name} v{__version__}")
         )
 
-    async def send_bot_help(
-        self, mapping: dict[commands.Cog | None, list[commands.Command]]
-    ) -> None:
+    async def send_bot_help(self, mapping: dict[commands.Cog | None, list[commands.Command]]) -> None:
         bot: Ara = self.context.bot
         _: I18N = self.context._
 
@@ -50,9 +48,7 @@ class EmbedHelpCommand(commands.HelpCommand):
                 if len(commands_field + command_repr) > 1024:
                     break
                 commands_field += f"{command_repr} "
-            self.embed.add_field(
-                bold(_(category.name.lower())), commands_field[:-1] or _("no_commands")
-            )
+            self.embed.add_field(bold(_(category.name.lower())), commands_field[:-1] or _("no_commands"))
         await self.get_destination().send(embed=self.embed)
 
     async def send_command_help(self, command: commands.Command) -> None:
@@ -77,14 +73,10 @@ class EmbedHelpCommand(commands.HelpCommand):
         if command.aliases:
             self.embed.add_field(_("aliases"), " ".join(map(mono, sorted(command.aliases))))
         usage = f"{self.context.clean_prefix}{command} {command.signature}".rstrip()
-        self.embed.add_field(
-            _("usage"), mono(usage) + "\n" + self.get_usage_explanation(command), inline=False
-        )
+        self.embed.add_field(_("usage"), mono(usage) + "\n" + self.get_usage_explanation(command), inline=False)
 
     def get_command_category(self, command: commands.Command) -> Category:
-        return command.extras.get("category") or getattr(
-            command.cog, "category", Category.NO_CATEGORY
-        )
+        return command.extras.get("category") or getattr(command.cog, "category", Category.NO_CATEGORY)
 
     def get_usage_explanation(self, command: commands.Command) -> str:
         _ = self.context._
@@ -117,9 +109,7 @@ class Meta(Cog, category=Category.META):
 
     def _setup_help_command(self) -> None:
         self._orig_help_command = self.ara.help_command
-        self.ara.help_command = EmbedHelpCommand(
-            aliases=["halp", "h", "commands"], brief="Shows bot or command help"
-        )
+        self.ara.help_command = EmbedHelpCommand(aliases=["halp", "h", "commands"], brief="Shows bot or command help")
         self.ara.help_command.cog = self
 
     @staticmethod
@@ -134,9 +124,9 @@ class Meta(Cog, category=Category.META):
         return count
 
     def _get_version(self) -> str:
-        ver_str = f"{self.ara.name} v{arabot.__version__}"
+        ver_str = f"{self.ara.name} v{__version__}"
 
-        if not arabot.TESTING:
+        if not Config.debug_mode:
             return ver_str
 
         if commit_sha := getenv("HEROKU_SLUG_COMMIT") or getenv("RAILWAY_GIT_COMMIT_SHA"):
@@ -145,7 +135,7 @@ class Meta(Cog, category=Category.META):
             try:
                 commit_sha = check_output(["git", "rev-parse", "HEAD", "--"], text=True).strip()
                 dirty_indicator = ".dirty" if check_output(["git", "status", "-s"]) else ""
-            except (OSError, SubprocessError):
+            except OSError, SubprocessError:
                 return ver_str
 
         return f"{ver_str}+{commit_sha[:7]}{dirty_indicator}" if commit_sha else ver_str
@@ -187,9 +177,7 @@ class Meta(Cog, category=Category.META):
         reporter = ctx.author
         try:
             await ctx.ara.owner.send(
-                embed=disnake.Embed(
-                    title="Bug report", description=description, timestamp=utcnow()
-                ).set_author(
+                embed=disnake.Embed(title="Bug report", description=description, timestamp=utcnow()).set_author(
                     name=reporter,
                     icon_url=reporter.avatar and reporter.avatar.as_icon,
                     url=f"https://discord.com/users/{reporter.id}",

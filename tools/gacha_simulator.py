@@ -44,15 +44,11 @@ class ItemResolver(ItemResolverInterface):
             return
         item_type = get_item_type(self._entity_provider, item.item_type_id)
         if not item_type:
-            self._log.warning(
-                f"The configured item type identified by '{item.item_type_id}' doesn't exist."
-            )
+            self._log.warning(f"The configured item type identified by '{item.item_type_id}' doesn't exist.")
             return
         item_rank = get_item_rank(self._entity_provider, item.rank_id)
         if not item_rank:
-            self._log.warning(
-                f"The configured item rank identified by '{item.rank_id}' doesn't exist."
-            )
+            self._log.warning(f"The configured item rank identified by '{item.rank_id}' doesn't exist.")
             return
         if item_type.name == "Stigmata" and not item.name.endswith(STIGMATA_PARTS_FULL):
             item_names = [f"{item.name} ({part})" for part in STIGMATA_PARTS]
@@ -109,14 +105,10 @@ class GachaSimulator:
             return
         pulls = self._pull_provider.pull(supply_type, pull_count)
         if consolidate:
-            pulls = GachaSimulator._aggregate(
-                pulls, {}, lambda c, p: GachaSimulator._consolidate(c, p)
-            ).values()
+            pulls = GachaSimulator._aggregate(pulls, {}, lambda c, p: GachaSimulator._consolidate(c, p)).values()
         if sort:
             pulls = sorted(pulls, key=lambda pull: pull.name)
-        formatted_pulls = [
-            f'{pull.name} x{pull.count}{" (Rare)" if pull.is_rare else ""}' for pull in pulls
-        ]
+        formatted_pulls = [f"{pull.name} x{pull.count}{' (Rare)' if pull.is_rare else ''}" for pull in pulls]
 
         logging.info(
             "The supply '%s' provided the following items %s",

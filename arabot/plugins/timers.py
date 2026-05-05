@@ -17,8 +17,7 @@ HYLTZ = ZoneInfo("Etc/GMT-8")
 class Timer:
     def __init__(self, schedule: dict[int, list[tuple[time, str]]], tz: tzinfo = UTC):
         self.sched = {
-            wkday: sorted((t.replace(tzinfo=tz), s) for t, s in times)
-            for wkday, times in sorted(schedule.items())
+            wkday: sorted((t.replace(tzinfo=tz), s) for t, s in times) for wkday, times in sorted(schedule.items())
         }
         self.tznow = partial(datetime.now, tz)
 
@@ -50,9 +49,7 @@ class Timer:
     def status(self) -> str | None:
         next_phase = self.next_phase
         return next(
-            status_name
-            for when, status_name in self.sched[next_phase.isoweekday()]
-            if when == next_phase.timetz()
+            status_name for when, status_name in self.sched[next_phase.isoweekday()] if when == next_phase.timetz()
         )
 
 

@@ -1,17 +1,19 @@
 from urllib.parse import quote_plus
 
-import orjson
+try:
+    import orjson as json
+except ImportError:
+    import json
+
 from aiohttp import ClientSession
 from disnake import Embed
 from disnake.ext.commands import command
 from disnake.utils import escape_markdown
 
-from arabot.core import Ara, Category, Cog, Context
+from arabot.core import Ara, Category, Cog, Config, Context
 
 
-class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
-    WOLFRAM_ID: str
-
+class Wolfram(Cog, category=Category.LOOKUP):
     def __init__(self, session: ClientSession):
         self.session = session
 
@@ -25,11 +27,11 @@ class Wolfram(Cog, category=Category.LOOKUP, keys={"WOLFRAM_ID"}):
                 "input": question,
                 "format": "plaintext",
                 "output": "json",
-                "appid": self.WOLFRAM_ID,
+                "appid": Config.wolfram_id,
                 "units": "metric",
             },
         ) as r:
-            wa = orjson.loads(await r.text())["queryresult"]
+            wa = json.loads(await r.text())["queryresult"]
         embed = Embed(
             color=0xF4684C,
             title=escape_markdown(question),

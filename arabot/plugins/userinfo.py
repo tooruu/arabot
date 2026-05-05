@@ -100,9 +100,7 @@ class Userinfo(Cog, category=Category.GENERAL):
         else:
             await ctx.send(embed=banners[1], view=GlobalOrGuildEmbedVariant(banners))
 
-    @commands.command(
-        aliases=["user", "dox", "doxx", "whois"], brief="View user's info", usage="[user]"
-    )
+    @commands.command(aliases=["user", "dox", "doxx", "whois"], brief="View user's info", usage="[user]")
     async def userinfo(self, ctx: Context, *, member: AnyMemberOrUser = False):
         if member is None:
             await ctx.send_("user_not_found", False)
@@ -175,9 +173,7 @@ class Userinfo(Cog, category=Category.GENERAL):
 
         embed.description = "\n".join(", ".join(description[line]) for line in sorted(description))
 
-    @commands.command(
-        aliases=["s", "activity", "act"], brief="View user's activity", usage="[member]"
-    )
+    @commands.command(aliases=["s", "activity", "act"], brief="View user's activity", usage="[member]")
     async def status(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
             await ctx.send_("user_not_found", False)
@@ -192,17 +188,11 @@ class Userinfo(Cog, category=Category.GENERAL):
         await ctx.send(embed=embed)
 
     @staticmethod
-    def _add_activity(
-        embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify, _: I18N
-    ) -> None:
+    def _add_activity(embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify, _: I18N) -> None:
         name = body = ""
         match activity:
             case disnake.CustomActivity():
-                text = (
-                    activity.name
-                    if activity.name and activity.name != "Custom Status"
-                    else "\u200b"
-                )
+                text = activity.name if activity.name and activity.name != "Custom Status" else "\u200b"
                 if activity.emoji:
                     icon_url = (activity.emoji.url or Twemoji(activity.emoji.name).url) + "?size=32"
                 else:
@@ -222,9 +212,7 @@ class Userinfo(Cog, category=Category.GENERAL):
                 else:
                     body = activity.name
             case disnake.Activity(
-                type=disnake.ActivityType.playing
-                | disnake.ActivityType.watching
-                | disnake.ActivityType.competing
+                type=disnake.ActivityType.playing | disnake.ActivityType.watching | disnake.ActivityType.competing
             ):
                 party = ""
                 if party_size := activity.party.get("size"):
@@ -290,12 +278,9 @@ class Userinfo(Cog, category=Category.GENERAL):
             )
 
     @staticmethod
-    def _set_images_if_any(
-        embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify
-    ) -> None:
+    def _set_images_if_any(embed: disnake.Embed, activity: disnake.BaseActivity | disnake.Spotify) -> None:
         embed.set_thumbnail(
-            (isinstance(activity, disnake.Spotify) and activity.album_cover_url)
-            or activity.large_image_url
+            (isinstance(activity, disnake.Spotify) and activity.album_cover_url) or activity.large_image_url
         )
 
 

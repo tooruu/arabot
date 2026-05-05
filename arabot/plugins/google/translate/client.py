@@ -17,9 +17,7 @@ class TranslationClient:
         self._invalidate_language_cache.start()
 
     async def _api(self, method: str, **params: dict[str, Any]) -> dict[str, Any]:
-        return await self.session.fetch_json(
-            f"{self.BASE_URL}/{method.strip('/')}", params={"key": self.key} | params
-        )
+        return await self.session.fetch_json(f"{self.BASE_URL}/{method.strip('/')}", params={"key": self.key} | params)
 
     async def translate(
         self,

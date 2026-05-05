@@ -10,7 +10,8 @@ from typing import ClassVar, Literal, Never, Self
 import disnake
 from disnake.ext import commands
 
-from arabot.core import Ara, Category, Cog, Context, CustomEmoji
+from arabot.core import Ara, Category, Cog, Context, CustomEmoji, SettingKey
+from arabot.core.database import Setting
 from arabot.utils import AnyMember
 
 CANT_PLAY_VS_SELF = f"{__name__}.cant_play_vs_self"
@@ -102,9 +103,7 @@ class Connect4Engine:
 
 
 class Connect4Game(Connect4Engine):
-    def __init__(
-        self, player1: disnake.Member, player2: disnake.Member, p1_token: str, p2_token: str
-    ):
+    def __init__(self, player1: disnake.Member, player2: disnake.Member, p1_token: str, p2_token: str):
         self.player1 = player1
         self.player2 = player2
         self.tokens = (BACKGROUND, p1_token, p2_token)
@@ -206,18 +205,14 @@ class Connect4(Cog, category=Category.FUN):
             winner = game.player2.display_name
             footer = "game_won_by"
 
-        await message.edit(
-            embed=game.get_embed(custom_footer=self._(footer, message).format(winner))
-        )
+        await message.edit(embed=game.get_embed(custom_footer=self._(footer, message).format(winner)))
         del self.active_games[message.id]
 
     async def cancel_invite(self, message: disnake.Message) -> None:
         await message.delete()
         del self.waiting_games[message.id]
 
-    async def cancel_game(
-        self, game: Connect4Game, message: disnake.Message, user: disnake.Member
-    ) -> None:
+    async def cancel_game(self, game: Connect4Game, message: disnake.Message, user: disnake.Member) -> None:
         await message.clear_reactions()
         footer = self._("game_cancelled_by", message)
         await message.edit(embed=game.get_embed(custom_footer=footer.format(user.display_name)))
@@ -283,9 +278,7 @@ class TicTacToeButton(disnake.ui.Button):
         if view.board[self.y][self.x] is not None:
             return
 
-        notify_wrong_turn = partial(
-            inter.response.send_message, "It's not your turn!", ephemeral=True
-        )
+        notify_wrong_turn = partial(inter.response.send_message, "It's not your turn!", ephemeral=True)
         if view.current_player is None:
             if view.p1 is None:
                 if inter.author == view.p2:
@@ -331,16 +324,12 @@ class TicTacToeButton(disnake.ui.Button):
                 child.disabled = True
             view.stop()
 
-        await inter.response.edit_message(
-            content, view=view, allowed_mentions=disnake.AllowedMentions.all()
-        )
+        await inter.response.edit_message(content, view=view, allowed_mentions=disnake.AllowedMentions.all())
 
         if loser:
             with suppress(disnake.Forbidden):
                 await loser.timeout(duration=60, reason=inter._("loser"))
-                await inter.message.reply_ping(
-                    inter._("user_muted_1m", False).format(loser.mention)
-                )
+                await inter.message.reply_ping(inter._("user_muted_1m", False).format(loser.mention))
 
 
 class TicTacToe(disnake.ui.View):
@@ -453,23 +442,19 @@ class Games(Cog, category=Category.FUN):
             await ctx.reply(f"***{ctx._('gunshot1')}***💥{CustomEmoji.KannaGun}")
             await ctx.send_("cooldown")
             with suppress(disnake.Forbidden):
-                await ctx.author.timeout(
-                    duration=self.RR_COOLDOWN_SECS, reason=ctx._("russian_roulette")
-                )
+                await ctx.author.timeout(duration=self.RR_COOLDOWN_SECS, reason=ctx._("russian_roulette"))
             return
 
         # Same user loses 3 times in a row
         rev.reload()
         await ctx.reply(f"💥***__{ctx._('gunshot2')}__***💥")
         await ctx.send_("cooldown")
-        if await ctx.ara.db.get_guild_rr_kick(ctx.guild.id):
+        if await Setting.get(SettingKey.RR_KICK, ctx.guild.id):
             with suppress(disnake.Forbidden):
                 await ctx.author.kick(reason=ctx._("russian_roulette"))
                 return
         with suppress(disnake.Forbidden):
-            await ctx.author.timeout(
-                duration=self.RR_COOLDOWN_SECS * 3, reason=ctx._("russian_roulette")
-            )
+            await ctx.author.timeout(duration=self.RR_COOLDOWN_SECS * 3, reason=ctx._("russian_roulette"))
 
     @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number", usage="[max=20]")
@@ -477,7 +462,7 @@ class Games(Cog, category=Category.FUN):
         # Initializing
         try:
             ceiling = max(abs(int(ceiling[-1])), 2)
-        except (ValueError, IndexError):
+        except ValueError, IndexError:
             ceiling = 20
         number = random.randint(1, ceiling)
         await ctx.send(ctx._("guess").format(ceiling))
@@ -488,10 +473,7 @@ class Games(Cog, category=Category.FUN):
         def is_valid_guess(vote: disnake.Message) -> bool:
             if vote.channel == ctx.channel and vote.author not in guesses:
                 with suppress(ValueError):
-                    return (
-                        int(vote.content) not in guesses.values()
-                        and 1 <= int(vote.content) <= ceiling
-                    )
+                    return int(vote.content) not in guesses.values() and 1 <= int(vote.content) <= ceiling
             return False
 
         async def voting() -> Literal[True]:
@@ -513,9 +495,7 @@ class Games(Cog, category=Category.FUN):
             await ctx.send_(NO_WINNER, False)
             return
         winner = min(guesses, key=lambda m: abs(guesses[m] - number))
-        message = ctx._("exact_guess" if exact_guess else "close_guess").format(
-            winner.mention, number
-        )
+        message = ctx._("exact_guess" if exact_guess else "close_guess").format(winner.mention, number)
         try:
             await winner.timeout(duration=60, reason=ctx._("guessed"))
         except disnake.Forbidden:
@@ -607,9 +587,7 @@ class Games(Cog, category=Category.FUN):
         players = [ctx.author, opponent or None]
         random.shuffle(players)
         first = players[0]
-        await ctx.send_ping(
-            ctx._("goes_first").format(getattr(first, "mention", "X")), view=TicTacToe(*players)
-        )
+        await ctx.send_ping(ctx._("goes_first").format(getattr(first, "mention", "X")), view=TicTacToe(*players))
 
 
 def setup(ara: Ara):

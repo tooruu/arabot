@@ -106,8 +106,7 @@ class DatabaseEditor:
     def add_pool(self, options: Options) -> bool:
         if len(options.names) < 2:
             raise ValueError(
-                "The code and the name must be specified. "
-                'Eg. gacha_editor.py addpool ex "Expansion Battlesuit"'
+                'The code and the name must be specified. Eg. gacha_editor.py addpool ex "Expansion Battlesuit"'
             )
         table = self.database.setdefault(TABLE_POOLS, {})
         if table.get(options.names[0]) is not None:
@@ -170,28 +169,21 @@ class DatabaseEditor:
                 continue
             if item_id in item_list:
                 self._log(
-                    f"Item '{name}' is already added to the pool with "
-                    "the same rate, hence it won't be added again."
+                    f"Item '{name}' is already added to the pool with the same rate, hence it won't be added again."
                 )
                 continue
             for descriptor_index, descriptor in enumerate(loot_table):
                 other_item_list: list[str] = descriptor.get("items", [])
                 if item_id in other_item_list:
                     other_item_list.remove(item_id)
-                    self._log(
-                        f"Item '{name}' has been removed with "
-                        f"drop rate {descriptor.get('rate', 0.0)}."
-                    )
+                    self._log(f"Item '{name}' has been removed with drop rate {descriptor.get('rate', 0.0)}.")
                     if len(other_item_list) == 0:
                         loot_table.pop(descriptor_index)
                     break
             item_list.append(item_id)
             has_changed = True
             self._log(f"Added item '{name}' to the pool with drop rate {rate}.")
-        self._log(
-            f"There are currently {len(item_list)} items "
-            f"in the pool '{options.pool}' with rate {rate}."
-        )
+        self._log(f"There are currently {len(item_list)} items in the pool '{options.pool}' with rate {rate}.")
         self._validate_pool_total_rate(options.pool)
         return has_changed and len(item_list) > 0
 
@@ -280,10 +272,7 @@ class DatabaseEditor:
     # database_editor.py clonepool foca focb "Focused Supply B"
     def clone_pool(self, options: Options) -> bool:
         if len(options.names) != 3:
-            raise ValueError(
-                "You must specify the source and the target "
-                "pool identifiers, and the target pool name."
-            )
+            raise ValueError("You must specify the source and the target pool identifiers, and the target pool name.")
         pools = self.database.setdefault(TABLE_POOLS, {})
         pool_id = self._find_id_by_field(TABLE_POOLS, "code", options.names[0])
         pool = pools.get(pool_id)
@@ -294,9 +283,7 @@ class DatabaseEditor:
         new_pool["code"] = options.names[1]
         new_pool_id = self._get_next_id(TABLE_POOLS)
         self.database[TABLE_POOLS][new_pool_id] = new_pool
-        self._log(
-            f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'."
-        )
+        self._log(f"Pool '{options.names[1]}' has been created with the identifier '{new_pool_id}'.")
         return True
 
     @staticmethod
@@ -336,11 +323,7 @@ class DatabaseEditor:
 
         If ``is_exact`` is set to ``True``, only exact matches are returned.
         """
-        predicate = (
-            lambda text: text == field_value
-            if is_exact
-            else field_value.casefold() in text.casefold()
-        )
+        predicate = lambda text: text == field_value if is_exact else field_value.casefold() in text.casefold()
         for key, item in self.database.setdefault(table_name, {}).items():
             if predicate(item.get(field_name, "")):
                 yield key
@@ -353,9 +336,7 @@ class DatabaseEditor:
         is_exact: bool = True,
         default_value: str | None = None,
     ) -> str | None:
-        return next(
-            self._find_ids_by_field(table_name, field_name, field_value, is_exact), default_value
-        )
+        return next(self._find_ids_by_field(table_name, field_name, field_value, is_exact), default_value)
 
     def _find_item_id(self, item_name: str) -> str:
         """Find the unique identifier of the item with the specified name."""
@@ -367,9 +348,7 @@ class DatabaseEditor:
         """
         # TODO: Mark valkyries with "is_awakened": True
         # so it's easier to find the matching frag/soul.
-        return self._find_item_id(f"{valkyrie_name} fragment") or self._find_item_id(
-            f"{valkyrie_name} soul"
-        )
+        return self._find_item_id(f"{valkyrie_name} fragment") or self._find_item_id(f"{valkyrie_name} soul")
 
     def _validate_pool_total_rate(self, pool_code: str) -> None:
         """Validate the total drop rate of the pool identified by the specified ``pool_code``."""
@@ -402,30 +381,18 @@ class DatabaseEditor:
             return False
         new_item_id = self._find_item_id(new_item_name)
         if new_item_id is None:
-            self._log(
-                f"The item '{new_item_name}' doesn't exist, hence "
-                "it won't replace the item '{old_item_name}'."
-            )
+            self._log(f"The item '{new_item_name}' doesn't exist, hence it won't replace the item '{{old_item_name}}'.")
             return False
         if self._replace_pool_item_internal(loot_table, old_item_id, new_item_id):
-            self._log(
-                f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'."
-            )
+            self._log(f"The item '{old_item_name}' has been replaced by the item '{new_item_name}'.")
             return True
-        self._log(
-            f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced."
-        )
+        self._log(f"The item '{old_item_name}' cannot be found in the pool, hence it won't be replaced.")
         return False
 
-    def _replace_pool_valkyrie_fragment(
-        self, loot_table: dict, old_valkyrie_name: str, new_valkyrie_name: str
-    ) -> bool:
+    def _replace_pool_valkyrie_fragment(self, loot_table: dict, old_valkyrie_name: str, new_valkyrie_name: str) -> bool:
         old_item_id = self._find_valkyrie_fragment_id(old_valkyrie_name)
         if old_item_id is None:
-            self._log(
-                f"The fragment for item '{old_valkyrie_name}' "
-                "doesn't exist, hence it won't be replaced."
-            )
+            self._log(f"The fragment for item '{old_valkyrie_name}' doesn't exist, hence it won't be replaced.")
             return False
         new_item_id = self._find_valkyrie_fragment_id(new_valkyrie_name)
         if new_item_id is None:
@@ -441,8 +408,7 @@ class DatabaseEditor:
             )
             return True
         self._log(
-            f"The fragment of valkyrie '{old_valkyrie_name}' cannot "
-            "be found in the pool, hence it won't be replaced."
+            f"The fragment of valkyrie '{old_valkyrie_name}' cannot be found in the pool, hence it won't be replaced."
         )
         return False
 
@@ -522,9 +488,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--type", default="0")  # Item type
     parser.add_argument("--rank", default=None)  # Item rank
-    parser.add_argument(
-        "--single", action="store_const", const=True
-    )  # Is single (non-set) stigmata?
+    parser.add_argument("--single", action="store_const", const=True)  # Is single (non-set) stigmata?
     parser.add_argument("--awakened", action="store_const", const=True)  # Is awakened valkyrie?
     parser.add_argument("--field", default=None)  # Field name
     parser.add_argument("--pool", default=None)  # Pool ID

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import os
 import re
@@ -15,12 +13,12 @@ from disnake.ext import commands
 from disnake.ext.commands.bot_base import PrefixType
 from disnake.utils import oauth_url, utcnow
 
-from arabot import TESTING
-from arabot.utils import MissingEnvVar, codeblock, mono, system_info, time_in
-
-from .database import AraDB
-from .errors import StopCommand
-from .patches import Context, LocalizationStore
+from arabot.core.config import Config
+from arabot.core.database import Setting, init_db
+from arabot.core.enums import SettingKey
+from arabot.core.errors import StopCommand
+from arabot.core.patches import Context, LocalizationStore
+from arabot.utils import codeblock, mono, system_info, time_in
 
 type MaybeCoro[T] = T | Coroutine[Any, Any, T]
 type CommandPrefix = PrefixType | Callable[[Ara, disnake.Message], MaybeCoro[PrefixType]]
@@ -52,7 +50,7 @@ def search_directory(path: str | os.PathLike) -> Generator[str]:
 
 
 async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
-    custom_prefix = await ara.db.get_guild_prefix(msg.guild.id) or ";"
+    custom_prefix = await Setting.get(SettingKey.PREFIX, msg.guild.id) or ";"
     quantifier = "+" if custom_prefix[-1].isalpha() else "*"
     pfx_pattern = rf"{re.escape(custom_prefix)}\s{quantifier}|ara\s+|<@!?{ara.user.id}>\s*"
     if msg.guild.self_role:
@@ -61,7 +59,6 @@ async def prefix_manager(ara: Ara, msg: disnake.Message) -> str | None:
 
 
 class Ara(commands.Bot):
-    db: AraDB
     i18n: LocalizationStore
 
     def __init__(
@@ -82,9 +79,7 @@ class Ara(commands.Bot):
 
     @override
     async def login(self) -> None:
-        if not (token := self.http.token or os.getenv("TOKEN")):
-            logging.critical("Missing initializer argument 'token' or environment variable 'TOKEN'")
-            raise MissingEnvVar("TOKEN")
+        token = self.http.token or Config.token
 
         try:
             await super().login(token)
@@ -94,7 +89,7 @@ class Ara(commands.Bot):
                 raise disnake.LoginFailure(e) from e
             raise
         except aiohttp.ClientConnectorError:
-            logging.critical("No internet connection")
+            logging.critical("Connection error", exc_info=True)
             raise
 
     @override
@@ -131,19 +126,14 @@ class Ara(commands.Bot):
 
     @override
     async def start(self) -> None:
-        async with (
-            aiohttp.ClientSession() as self.session,
-            AraDB() as self.db,
-        ):
+        async with aiohttp.ClientSession() as self.session, init_db():
             self.i18n.load(self._l10n_path)
             await self.login()
             self.load_extensions()
             await self.connect()
 
     @override
-    async def get_context[CTX: commands.Context](
-        self, message: disnake.Message, *, cls: type[CTX] = Context
-    ) -> CTX:
+    async def get_context[CTX: commands.Context](self, message: disnake.Message, *, cls: type[CTX] = Context) -> CTX:
         return await super().get_context(message, cls=cls)
 
     @override
@@ -162,14 +152,12 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
-    async def fetch_or_create_imposter_webhook(
-        self, name: str, msg: disnake.Message
-    ) -> disnake.Webhook:
+    async def fetch_or_create_imposter_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook:
         webhooks = await msg.channel.webhooks()
 
-        return disnake.utils.get(
-            webhooks, user=self.user, name=name
-        ) or await msg.channel.create_webhook(name=name, avatar=self.user.display_avatar)
+        return disnake.utils.get(webhooks, user=self.user, name=name) or await msg.channel.create_webhook(
+            name=name, avatar=self.user.display_avatar
+        )
 
     @override
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
@@ -179,9 +167,9 @@ class Ara(commands.Bot):
                 await context.reply(context._("cooldown_expires", False).format(remaining))
             case commands.DisabledCommand():
                 await context.reply_("command_disabled")
-            case commands.CommandInvokeError(
-                original=aiohttp.ClientResponseError(status=status)
-            ) if context.cog.qualified_name.startswith(("Google", "Youtube")):
+            case commands.CommandInvokeError(original=aiohttp.ClientResponseError(status=status)) if (
+                context.cog.qualified_name.startswith(("Google", "Youtube"))
+            ):
                 match status:
                     case 403:
                         await context.reply(
@@ -190,9 +178,7 @@ class Ara(commands.Bot):
                             )
                         )
                     case 429:
-                        await context.send(
-                            context._("today_quota_exceeded").format(mono(context.invoked_with))
-                        )
+                        await context.send(context._("today_quota_exceeded").format(mono(context.invoked_with)))
             case commands.MissingRequiredArgument():
                 await context.send_help(context.command)
             case commands.UserInputError():
@@ -214,7 +200,7 @@ class Ara(commands.Bot):
                     exception = exception.original
                 logging.error("Unhandled exception", exc_info=exception)
                 await context.reply_("unknown_error")
-                if not TESTING:
+                if not Config.debug_mode:
                     await self.owner.send(
                         embed=disnake.Embed(
                             title=context.command,

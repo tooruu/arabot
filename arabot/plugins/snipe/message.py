@@ -79,10 +79,7 @@ class MessageSnipe(Cog, category=Category.FUN):
         group_start = msg_pool[0].created_at
 
         for msg in msg_pool:
-            if (
-                msg.author != last_sender
-                or (msg.created_at - group_tail).seconds >= self.GROUP_AGE_THRESHOLD
-            ):
+            if msg.author != last_sender or (msg.created_at - group_tail).seconds >= self.GROUP_AGE_THRESHOLD:
                 field_name = f"{last_sender.display_name}, {format_dt(group_start, 'R')}:"
                 msg_group = "\n".join(msg_group)[-1024:]
                 embed.add_field(field_name, msg_group, inline=False)

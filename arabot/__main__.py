@@ -1,21 +1,13 @@
 import logging
 import sys
-from asyncio import new_event_loop, set_event_loop, set_event_loop_policy
+from asyncio import set_event_loop
 from contextlib import suppress
-from importlib.util import find_spec
 
 import disnake
 from aiohttp import ClientConnectorError
 
-from . import TESTING, Ara
-from .core import LocalizationStore, StderrHandler, StdoutHandler
-
-if find_spec("uvloop"):
-    from uvloop import EventLoopPolicy  # type: ignore[import-not-found]
-elif find_spec("winloop"):
-    from winloop import EventLoopPolicy  # type: ignore[import-not-found]
-else:
-    from asyncio import DefaultEventLoopPolicy as EventLoopPolicy
+from arabot.core import Ara, Config, LocalizationStore, new_event_loop
+from arabot.core.logging import StderrHandler, StdoutHandler
 
 
 def setup_logging(level: int) -> None:
@@ -43,7 +35,7 @@ def create_ara(*args, **kwargs) -> Ara:
         voice_states=True,
     )
     default_kwargs = dict(
-        activity=disnake.Activity(type=disnake.ActivityType.competing, name="a hackathon!"),
+        activity=disnake.Activity(type=disnake.ActivityType.watching, name="727🎪"),
         allowed_mentions=disnake.AllowedMentions.none(),
         case_insensitive=True,
         embed_color=0xE91E63,
@@ -51,7 +43,7 @@ def create_ara(*args, **kwargs) -> Ara:
         localization_provider=LocalizationStore(strict=True, fallback=disnake.Locale.en_US),
         max_messages=10_000,
     )
-    if TESTING:
+    if Config.debug_mode:
         default_kwargs.update(
             reload=True,
             test_guilds=[954134299119091772],
@@ -60,9 +52,8 @@ def create_ara(*args, **kwargs) -> Ara:
     return Ara(*args, **default_kwargs | kwargs)
 
 
-def main() -> bool:
+def main() -> int:
     setup_logging(logging.WARNING)
-    set_event_loop_policy(EventLoopPolicy())
     set_event_loop(loop := new_event_loop())
 
     with suppress(OSError):
@@ -72,10 +63,10 @@ def main() -> bool:
     ara = create_ara(loop=loop)
     try:
         ara.run()
-    except (ClientConnectorError, disnake.LoginFailure):
-        return False
-    return True
+    except ClientConnectorError, disnake.LoginFailure:
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(not main())
+    sys.exit(main())

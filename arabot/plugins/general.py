@@ -72,9 +72,7 @@ class General(Cog, category=Category.GENERAL):
         if sounds is False:
             await ctx.reply_("specify_sounds")
             return
-        filtered_sounds: list[disnake.SoundboardSound] = (
-            list(dict.fromkeys(s for s in sounds if s)) if sounds else []
-        )
+        filtered_sounds: list[disnake.SoundboardSound] = list(dict.fromkeys(s for s in sounds if s)) if sounds else []
         if not filtered_sounds:
             await ctx.reply_("not_found", False)
             return
@@ -193,9 +191,7 @@ class General(Cog, category=Category.GENERAL):
         if ref := await ctx.getch_reference_message():
             if ref.author in ctx.message.mentions:
                 am.replied_user = True
-            silent = disnake.MessageFlags(
-                suppress_notifications=ctx.message.flags.suppress_notifications
-            )
+            silent = disnake.MessageFlags(suppress_notifications=ctx.message.flags.suppress_notifications)
             await ref.reply(text, allowed_mentions=am, flags=silent)
         else:
             await ctx.send(text, allowed_mentions=am)
@@ -205,9 +201,7 @@ class General(Cog, category=Category.GENERAL):
         answer = random.choice(("yes", "no"))
         await ctx.reply(f"🎱 | {ctx._(answer, False)}")
 
-    @commands.command(
-        aliases=["pick"], brief="Make a choice for you", usage="<option 1>|<option 2>|..."
-    )
+    @commands.command(aliases=["pick"], brief="Make a choice for you", usage="<option 1>|<option 2>|...")
     async def choose(self, ctx: Context, *, options: str):
         options = options.split("|")
         if len(options) < 2:
@@ -274,9 +268,7 @@ class General(Cog, category=Category.GENERAL):
 
         send = partial(
             webhook.send,
-            flags=disnake.MessageFlags(
-                suppress_notifications=ctx.message.flags.suppress_notifications
-            ),
+            flags=disnake.MessageFlags(suppress_notifications=ctx.message.flags.suppress_notifications),
             thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING,
         )
         await send(
