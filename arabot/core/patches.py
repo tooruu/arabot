@@ -13,10 +13,10 @@ import disnake.gateway
 from disnake.ext import commands
 
 from arabot.core.enums import Category
-from arabot.utils import fullqualname, getkeys
+from arabot.utils import fullqualname
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable, Iterable
+    from collections.abc import Awaitable, Callable
 
     from arabot.core.bot import Ara
 
