@@ -11,8 +11,7 @@ class Config(BaseSettings):
 
     token: str
     database_url: str
-    api_proxy: str
-    debug_mode: bool
+    debug_mode: bool = False
 
     g_search_key: str
     g_isearch_key: str
