@@ -152,10 +152,10 @@ class Ara(commands.Bot):
             else:
                 logging.info("Loaded %s", short)
 
-    async def fetch_or_create_imposter_webhook(self, name: str, msg: disnake.Message) -> disnake.Webhook:
-        webhooks = await msg.channel.webhooks()
+    async def fetch_or_create_imposter_webhook(self, name: str, chl: disnake.TextChannel) -> disnake.Webhook:
+        webhooks = await chl.webhooks()
 
-        return disnake.utils.get(webhooks, user=self.user, name=name) or await msg.channel.create_webhook(
+        return disnake.utils.get(webhooks, user=self.user, name=name) or await chl.create_webhook(
             name=name, avatar=self.user.display_avatar
         )
 

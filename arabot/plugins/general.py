@@ -28,8 +28,6 @@ HTTP_CATS_VALID_CODES = {
     500, 501, 502, 503, 504, 506, 507, 508, 509, 510, 511, 521, 523, 525, 599,
 }  # fmt: skip
 
-WEBHOOK_RESERVED_NAMES = {"everyone": "everyоne", "here": "hеrе"}
-
 
 class General(Cog, category=Category.GENERAL):
     NOT_ENOUGH_OPTIONS = f"{__module__}.not_enough_options"
@@ -267,21 +265,46 @@ class General(Cog, category=Category.GENERAL):
         if not user:
             await ctx.reply_("user_not_found", False)
             return
+        if user.display_name in {"everyone", "here"}:
+            await ctx.reply("nuhuh")
+            return
 
         await ctx.message.delete()
-        webhook = await self.ara.fetch_or_create_imposter_webhook("impersonate", ctx.message)
+        webhook = await self.ara.fetch_or_create_imposter_webhook("impersonate", ctx.channel)
 
-        send = partial(
-            webhook.send,
+        await webhook.send(
+            text,
+            avatar_url=user.display_avatar,
+            username=user.display_name,
+            allowed_mentions=disnake.AllowedMentions(users=True),
             flags=disnake.MessageFlags(suppress_notifications=ctx.message.flags.suppress_notifications),
             thread=ctx.channel if isinstance(ctx.channel, disnake.Thread) else MISSING,
         )
-        await send(
+
+    @commands.bot_has_permissions(manage_webhooks=True)
+    @commands.slash_command(
+        name="impersonate",
+        description="Pretend to be somebody else",
+        extras={"note": "Cannot ping roles"},
+    )
+    async def impersonate_slash(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User, text: str):
+        if user.display_name in {"everyone", "here"}:
+            await inter.send("Names 'everyone' and 'here' are not allowed", ephemeral=True)
+            return
+        if not inter.channel.permissions_for(inter.me).manage_webhooks:
+            await inter.send(inter._("no_perms_to", False).format("manage webhooks"), ephemeral=True)
+            return
+
+        webhook = await self.ara.fetch_or_create_imposter_webhook("impersonate", inter.channel)
+
+        await webhook.send(
             text,
             avatar_url=user.display_avatar,
-            username=WEBHOOK_RESERVED_NAMES.get(user.display_name, user.display_name),
+            username=user.display_name,
             allowed_mentions=disnake.AllowedMentions(users=True),
+            thread=inter.channel if isinstance(inter.channel, disnake.Thread) else MISSING,
         )
+        await inter.response.send_message("Message sent", ephemeral=True, delete_after=3)
 
 
 def setup(ara: Ara):
