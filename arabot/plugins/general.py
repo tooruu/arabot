@@ -83,7 +83,9 @@ class General(Cog, category=Category.GENERAL):
         if emojis is False:
             await ctx.reply_("specify_emojis")
             return
-        emojis = [e for e in emojis if not isinstance(e, disnake.PartialEmoji | NoneType)]
+        emojis: list[disnake.Emoji | Twemoji] = [
+            e for e in emojis if not isinstance(e, disnake.PartialEmoji | NoneType)
+        ]
         if not emojis:
             await ctx.reply_("emoji_not_found")
             return
@@ -97,7 +99,10 @@ class General(Cog, category=Category.GENERAL):
 
         try:
             for emoji in emojis:
-                await ref_msg.add_reaction(emoji.emoji if isinstance(emoji, Twemoji) else emoji)
+                if isinstance(emoji, Twemoji):
+                    await ref_msg.add_reaction(emoji.emoji)
+                elif emoji.is_usable():
+                    await ref_msg.add_reaction(emoji)
         except disnake.Forbidden:
             await ctx.reply_ping_(ctx._("cant_react_to", False).format(ref_msg.author.mention))
 
