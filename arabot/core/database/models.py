@@ -16,7 +16,7 @@ type Json = dict | list | str | int | bool | None
 class Setting(Model, SerialPK):
     __table_args__ = (UniqueConstraint("key", "guild_id"),)
 
-    key: Mapped[str] = mapped_column(nullable=False)
+    key: Mapped[SettingKey] = mapped_column(nullable=False)
     value: Mapped[Json] = mapped_column(JSONB, nullable=False)
     guild_id: Mapped[int | None] = mapped_column(UnsignedInt64, default=None)
 

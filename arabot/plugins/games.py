@@ -449,12 +449,11 @@ class Games(Cog, category=Category.FUN):
         rev.reload()
         await ctx.reply(f"💥***__{ctx._('gunshot2')}__***💥")
         await ctx.send_("cooldown")
-        if await Setting.get(SettingKey.RR_KICK, ctx.guild.id):
-            with suppress(disnake.Forbidden):
-                await ctx.author.kick(reason=ctx._("russian_roulette"))
-                return
         with suppress(disnake.Forbidden):
-            await ctx.author.timeout(duration=self.RR_COOLDOWN_SECS * 3, reason=ctx._("russian_roulette"))
+            if await Setting.get(SettingKey.RR_KICK, ctx.guild.id):
+                await ctx.author.kick(reason=ctx._("russian_roulette"))
+            else:
+                await ctx.author.timeout(duration=self.RR_COOLDOWN_SECS * 3, reason=ctx._("russian_roulette"))
 
     @commands.max_concurrency(1, commands.BucketType.channel)
     @commands.command(brief="Guess a number", usage="[max=20]")
