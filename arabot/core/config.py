@@ -25,3 +25,4 @@ class Config(BaseSettings):
     g_ocr_key: str
     openweather_key: str
     elevenlabs_api_key: str
+    piston_key: str

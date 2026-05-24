@@ -10,6 +10,8 @@ from typing import Any, TextIO
 
 from aiohttp import ClientSession
 
+from arabot.core import Config
+
 from arabot.plugins.eval import errors
 from arabot.plugins.eval.abc import Evaluator
 
@@ -26,13 +28,14 @@ class RemoteEval(Evaluator):
         self.stdin = stdin
 
     async def fetch_response(self, code: str, *, stdin: str | None = None):
+        headers = {"Authorization": Config.piston_key}
         options = {
             "language": "python",
             "version": "3",
             "files": [{"name": self.TB_FILENAME, "content": code}],
             "stdin": stdin or self.stdin,
         }
-        async with self.session.post(self.API, json=options) as response:
+        async with self.session.post(self.API, headers=headers, json=options) as response:
             metadata = await response.json()
 
         if "message" in metadata:

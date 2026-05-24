@@ -47,12 +47,7 @@ class RemoteEvalException(EvalException):
         self.exit_code = exit_code
 
     def format(self, *, filename: str = Evaluator.TB_FILENAME) -> str:
-        return re.sub(
-            r'(?<=^ {2}File ")/piston/jobs/[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}/[^/]+?(?=")',
-            filename,
-            self.error,
-            flags=re.ASCII | re.MULTILINE,
-        )
+        return self.error.replace("/box/submission/<repl>", filename)
 
 
 class RemoteEvalBadResponse(Exception):
