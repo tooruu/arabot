@@ -53,7 +53,7 @@ def create_ara(*args, **kwargs) -> Ara:
 
 
 def main() -> int:
-    setup_logging(logging.WARNING)
+    setup_logging(logging.INFO if Config.debug_mode else logging.WARNING)
     set_event_loop(loop := new_event_loop())
 
     with suppress(OSError):

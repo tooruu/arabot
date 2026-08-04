@@ -26,3 +26,4 @@ class Config(BaseSettings):
     openweather_key: str
     elevenlabs_api_key: str
     piston_key: str
+    nvidia_api_key: str

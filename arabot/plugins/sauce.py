@@ -117,7 +117,7 @@ class Sauce(Cog, category=Category.LOOKUP):
                         embed.description += f" | {_('score')}: {mal_json['score']}"
                         synopsis = escape_markdown(mal_json["synopsis"].partition(" [")[0])
                         if len(synopsis) > (maxlen := 600):
-                            synopsis = ".".join(synopsis[:maxlen].split(".")[:-1]) + "..."
+                            synopsis = ".".join(synopsis[:maxlen].rsplit(".", maxsplit=2)[:-1]) + "..."
                         embed.set_image(mal_json["images"]["webp"]["image_url"])
                         embed.add_field(_("synopsis"), synopsis)
                         embed.set_thumbnail(url=header["thumbnail"])

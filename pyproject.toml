@@ -52,6 +52,7 @@ ignore = [
     "BLE",     # flake8-blind-except
     "C90",     # mccabe
     "COM812",  # missing-trailing-comma
+    "CPY",     # flake8-copyright
     "D1",      # pydocstyle Missing Docstrings
     "D203",    # one-blank-line-before-class
     "D205",    # blank-line-after-summary
