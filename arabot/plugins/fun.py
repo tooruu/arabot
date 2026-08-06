@@ -254,16 +254,16 @@ class Fun(Cog, category=Category.FUN):
         await ctx.send(ctx._("pp").format(member.mention, size, pp))
 
     @commands.cooldown(1, 1800, commands.BucketType.member)
-    @commands.command(brief="Find out someone's vg depth", usage="[member]")
-    async def vv(self, ctx: Context, *, member: AnyMember = False):
+    @commands.command(brief="Find out someone's vg width", usage="[member]")
+    async def vw(self, ctx: Context, *, member: AnyMember = False):
         if member is None:
             ctx.reset_cooldown()
             await ctx.send_("user_not_found", False)
             return
         member = member or ctx.author
-        depth = round(self.rng.triangular(1, 12, 22))
-        vg = f"({{{'ô':^{depth}}}})"
-        await ctx.send(ctx._("vg").format(member.mention, depth, vg))
+        width = round(self.rng.triangular(1, 12, 22))
+        vg = f"({{{'ô':^{width}}}})"
+        await ctx.send(ctx._("vg").format(member.mention, width, vg))
 
 
 def setup(ara: Ara):
