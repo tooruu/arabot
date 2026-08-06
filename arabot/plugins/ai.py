@@ -5,6 +5,7 @@ from pathlib import Path
 from time import time
 from typing import Literal, NotRequired, TypedDict
 
+import disnake
 from disnake.ext.commands import command
 from yarl import URL
 
@@ -78,20 +79,21 @@ class Ai(Cog, category=Category.GENERAL):
             "Authorization": f"Bearer {Config.nvidia_api_key}",
             "Accept": "application/json",
         }
-        self.context = defaultdict[int, list[NimPrompt]](list)
+        self.context = defaultdict[int, list[tuple[int, NimPrompt]]](list)
 
         instructions = Path("resources/llm-instructions.md").read_text(encoding="utf-8")
         self.instructions = NimPrompt(role="system", content=instructions)
 
     @command(brief="Prompt LLM with text, replies and images", help=HELP_TEXT, usage="<prompt and/or media>")
     async def ai(self, ctx: Context):
-        prompt = self.ctx_to_prompt(ctx)
-        if not prompt:
+        ctx.message.content = ctx.argument_only.strip()
+        nim_prompt = self.msg_to_prompt(ctx.message)
+        if not nim_prompt:
             await ctx.send_help(ctx.command)
             return
 
-        history = list(filter(None, map(self.prune_expired_media, self.context[ctx.channel.id][-18:])))
-        messages = [self.instructions, *history, prompt]
+        history, reply_chain = await self.get_clean_history(ctx)
+        messages = [self.instructions, *history, *(p for _, p in reply_chain), nim_prompt]
 
         payload = {
             "messages": messages,
@@ -112,28 +114,68 @@ class Ai(Cog, category=Category.GENERAL):
         logging.debug("AI payload: %r\nAI response: %r", payload, data)
 
         answer: str = data["choices"][0]["message"]["content"]
-
         ai_response = NimPrompt(role="assistant", content=answer)
-        self.context[ctx.channel.id] = [self.instructions, *history[-17:], prompt, ai_response]
 
         if len(answer) > (maxlen := 1997):
             answer = ".".join(answer[:maxlen].rsplit(".", maxsplit=2)[:-1]) + "..."
 
-        await ctx.reply(answer, mention_author=True)
+        reply_msg = await ctx.reply(answer, mention_author=True)
 
-    @staticmethod
-    def ctx_to_prompt(ctx: Context) -> NimPrompt | None:
+        memory = self.context[ctx.channel.id]
+        memory.extend(reply_chain)  # TODO: Don't append existing messages
+        memory.append((ctx.message.id, nim_prompt))
+        memory.append((reply_msg.id, ai_response))
+
+        self.context[ctx.channel.id] = memory[-18:]
+
+        log = "\n".join(
+            f"{i}: {m['content'] if isinstance(m['content'], str) else m['content'][0]['text']}"
+            for i, m in self.context[ctx.channel.id]
+        )
+        logging.info(f"\n{log}\n")
+
+    async def get_clean_history(self, ctx: Context) -> tuple[list[NimPrompt], list[tuple[int, NimPrompt]]]:
+        raw_history = self.context[ctx.channel.id][-18:]
+        history: list[NimPrompt] = []
+        history_ids = set[int]()
+
+        for msg_id, prompt in raw_history:
+            if pruned := self.prune_expired_media(prompt):
+                history.append(pruned)
+                history_ids.add(msg_id)
+
+        reply_chain: list[tuple[int, NimPrompt]] = []
+        current_msg = ctx.message
+
+        for _ in range(3):
+            if not (ref := current_msg.reference) or not (ref_msg_id := ref.message_id) or ref in history_ids:
+                break
+
+            try:
+                ref_msg = ref.cached_message or await ctx.channel.fetch_message(ref_msg_id)
+            except disnake.HTTPException:
+                break
+
+            if ref_prompt := self.msg_to_prompt(ref_msg):
+                reply_chain.insert(0, (ref_msg_id, ref_prompt))
+                history_ids.add(ref_msg_id)
+
+            current_msg = ref_msg
+
+        return history, reply_chain
+
+    def msg_to_prompt(self, msg: disnake.Message) -> NimPrompt | None:
+        if msg.author == self.ara.user:
+            return NimPrompt(role="assistant", content=msg.content) if msg.content else None
+
         items: list[NimInput] = []
-
-        if prompt := ctx.argument_only.strip():
-            item = NimInputText(
-                type=NimInputType.TEXT,
-                text=f"[{ctx.author.id}|{ctx.author.global_name or ctx.author.name}]:{prompt}",
-            )
+        if msg.content:
+            author_name = msg.author.global_name or msg.author.name
+            item = NimInputText(type=NimInputType.TEXT, text=f"[{msg.author.id}|{author_name}]:{msg.content}")
             items.append(item)
 
-        for att in ctx.message.attachments:
-            if att.content_type.startswith("image/"):
+        for att in msg.attachments:
+            if att.content_type and att.content_type.startswith("image/"):
                 item = NimInputImageUrl(type=NimInputType.IMAGE_URL, image_url=NimInputUrl(url=att.url))
                 items.append(item)
 
@@ -144,7 +186,8 @@ class Ai(Cog, category=Category.GENERAL):
         if isinstance(item["content"], str):
             return item
 
-        for idx, input_item in enumerate(item["content"]):
+        for idx in range(len(item["content"]) - 1, -1, -1):
+            input_item = item["content"][idx]
             match input_item["type"]:
                 case NimInputType.AUDIO_URL:
                     url = input_item["audio_url"]["url"]

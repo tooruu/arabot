@@ -58,7 +58,7 @@ class Context(commands.Context):
 
             case self.RSearchTarget.IMAGE_URL:
                 if attachment := disnake.utils.find(
-                    lambda a: a.content_type.startswith("image") and a.height, msg.attachments
+                    lambda a: a.content_type and a.content_type.startswith("image") and a.height, msg.attachments
                 ):
                     result = attachment.url
                 elif embed := disnake.utils.find(lambda e: e.image.url, msg.embeds):
@@ -70,7 +70,7 @@ class Context(commands.Context):
 
             case self.RSearchTarget.AUDIO_VIDEO_URL:
                 if attachment := disnake.utils.find(
-                    lambda a: a.content_type.startswith(("audio", "video")), msg.attachments
+                    lambda a: a.content_type and a.content_type.startswith(("audio", "video")), msg.attachments
                 ):
                     result = attachment.url
                 elif re.fullmatch(r"https?://(-\.)?([^\s/?\.#]+\.?)+(/\S*)?", self.argument_only):
@@ -241,7 +241,7 @@ async def connect_play_disconnect(
 
 
 async def get_or_fetch_reference_message(self: disnake.Message) -> disnake.Message | False | None:
-    if not (ref := self.reference):
+    if not (ref := self.reference) or not ref.message_id:
         return False
     with suppress(disnake.HTTPException):
         return ref.cached_message or await self.channel.fetch_message(ref.message_id)

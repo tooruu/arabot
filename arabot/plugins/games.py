@@ -224,7 +224,7 @@ class Connect4(Cog, category=Category.FUN):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: disnake.Reaction, user: disnake.abc.User) -> None:
-        if user.id == self.ara.user.id:
+        if user == self.ara.user:
             return
         if reaction.message.id in self.waiting_games:
             message, player1, p1_token = self.waiting_games[reaction.message.id]
