@@ -1,15 +1,64 @@
 import logging
 from collections import defaultdict
-from typing import ClassVar, Literal, TypedDict
+from enum import StrEnum
+from time import time
+from typing import ClassVar, Literal, NotRequired, TypedDict
 
 from disnake.ext.commands import command
+from yarl import URL
 
 from arabot.core import Ara, Category, Cog, Config, Context
 
 
+class NimInputType(StrEnum):
+    INPUT_AUDIO = "input_audio"
+    AUDIO_URL = "audio_url"
+    VIDEO_URL = "video_url"
+    IMAGE_URL = "image_url"
+    TEXT = "text"
+
+
+class NimInputBase[T: NimInputType](TypedDict):
+    type: T
+
+
+class NimInputUrl(TypedDict):
+    url: str
+
+
+class NimInputAudioObject(TypedDict):
+    data: str
+    format: Literal["wav", "mp3"]
+
+
+class NimInputAudio(NimInputBase[NimInputType.INPUT_AUDIO]):
+    input_audio: NimInputAudioObject
+
+
+class NimInputAudioUrl(NimInputBase[NimInputType.AUDIO_URL]):
+    audio_url: NimInputUrl
+
+
+class NimInputVideoUrl(NimInputBase[NimInputType.VIDEO_URL]):
+    video_url: NimInputUrl
+    start_offset: NotRequired[int | None]
+    duration: NotRequired[int | None]
+
+
+class NimInputImageUrl(NimInputBase[NimInputType.IMAGE_URL]):
+    image_url: NimInputUrl
+
+
+class NimInputText(NimInputBase[NimInputType.TEXT]):
+    text: str
+
+
+type NimInput = NimInputAudio | NimInputAudioUrl | NimInputVideoUrl | NimInputImageUrl | NimInputText
+
+
 class AiContextItem(TypedDict):
     role: Literal["system", "assistant", "user"]
-    content: str | list[dict[str, str | dict[str, str]]]
+    content: str | list[NimInput]
 
 
 class Ai(Cog, category=Category.GENERAL):
@@ -63,7 +112,7 @@ class Ai(Cog, category=Category.GENERAL):
     @command(brief="Prompt LLM with text, replies and images")
     async def ai(self, ctx: Context, *, prompt: str):
         async with ctx.typing():
-            history = self.context[ctx.channel.id][-18:]
+            history = list(filter(None, map(self.prune_expired_media, self.context[ctx.channel.id][-18:])))
             user_msg = self.prompt_to_context(ctx, prompt)
             messages = [self.INSTRUCTIONS, *history, user_msg]
 
@@ -87,7 +136,7 @@ class Ai(Cog, category=Category.GENERAL):
             assistant_msg: AiContextItem = {"role": "assistant", "content": answer}
             self.context[ctx.channel.id] = [self.INSTRUCTIONS, *history[-17:], user_msg, assistant_msg]
 
-            if len(answer) > (maxlen := 2000):
+            if len(answer) > (maxlen := 1997):
                 answer = ".".join(answer[:maxlen].rsplit(".", maxsplit=2)[:-1]) + "..."
 
             await ctx.reply(answer, mention_author=True)
@@ -95,7 +144,7 @@ class Ai(Cog, category=Category.GENERAL):
     @staticmethod
     def prompt_to_context(ctx: Context, prompt: str) -> AiContextItem:
         if images := [a.url for a in ctx.message.attachments if a.content_type.startswith("image/")]:
-            content = [
+            content: list[NimInput] = [
                 {"type": "text", "text": prompt},
                 *({"type": "image_url", "image_url": {"url": image_url}} for image_url in images),
             ]
@@ -103,6 +152,30 @@ class Ai(Cog, category=Category.GENERAL):
             content = prompt
 
         return {"role": "user", "content": content}
+
+    @staticmethod
+    def prune_expired_media(item: AiContextItem) -> AiContextItem | None:
+        if isinstance(item["content"], str):
+            return item
+
+        for idx, input_item in enumerate(item["content"]):
+            match input_item["type"]:
+                case NimInputType.AUDIO_URL:
+                    url = input_item["audio_url"]["url"]
+                case NimInputType.VIDEO_URL:
+                    url = input_item["video_url"]["url"]
+                case NimInputType.IMAGE_URL:
+                    url = input_item["image_url"]["url"]
+                case _:
+                    continue
+
+            url = URL(url)
+            if "ex" not in url.query or int(url.query["ex"], base=16) > time():
+                continue
+
+            del item["content"][idx]
+
+        return item if item["content"] else None
 
 
 def setup(ara: Ara):
