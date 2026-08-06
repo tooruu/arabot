@@ -128,12 +128,6 @@ class Ai(Cog, category=Category.GENERAL):
 
         self.context[ctx.channel.id] = memory[-18:]
 
-        log = "\n".join(
-            f"{i}: {m['content'] if isinstance(m['content'], str) else m['content'][0]['text']}"
-            for i, m in self.context[ctx.channel.id]
-        )
-        logging.info(f"\n{log}\n")
-
     async def get_clean_history(self, ctx: Context) -> tuple[list[NimPrompt], list[tuple[int, NimPrompt]]]:
         raw_history = self.context[ctx.channel.id][-18:]
         history: list[NimPrompt] = []
