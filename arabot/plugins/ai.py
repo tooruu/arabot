@@ -102,11 +102,20 @@ class Ai(Cog, category=Category.GENERAL):
             "reasoning_budget": 4000,
             "stream": False,
         }
-        async with (
-            ctx.typing(),
-            self.ara.session.post(self.API_URL, headers=self.headers, json=payload, timeout=60) as response,
-        ):
-            data = await response.json()
+        try:
+            async with (
+                ctx.typing(),
+                self.ara.session.post(self.API_URL, headers=self.headers, json=payload, timeout=60) as response,
+            ):
+                data = await response.json()
+        except TimeoutError:
+            await ctx.reply_("response_timeout")
+            return
+
+        if response.status == 503:
+            await ctx.reply_("service_unavailable")
+            return
+
         if not response.ok:
             logging.error("AI payload: %r\nAI response: %r", payload, data)
             response.raise_for_status()

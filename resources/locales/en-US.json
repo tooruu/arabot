@@ -4,6 +4,8 @@
     "arabot.core.bot.on_command_error.invalid_argument": "Invalid argument",
     "arabot.core.bot.on_command_error.today_quota_exceeded": "Sorry, I've exceeded today's quota for {}",
     "arabot.core.bot.on_command_error.unknown_error": "An error occurred",
+    "arabot.plugins.ai.ai.service_unavailable": "Service unavailable. Try again.",
+    "arabot.plugins.ai.ai.response_timeout": "Response is taking too long. Try something else.",
     "arabot.plugins.chat.cry.uncry": "don't cry",
     "arabot.plugins.chat.who.ur_mom": "ur mom",
     "arabot.plugins.eval.python.connection_error": "Connection error ⚠️",
