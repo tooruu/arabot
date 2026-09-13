@@ -391,6 +391,14 @@ class RussianRoulette:
     def is_different_player(self, user_id: int) -> bool:
         return self.last_shooter_id != user_id
 
+    def format_cylinder(self) -> str:
+        remaining = self.CHAMBERS - self.current_pos
+        chambers = ["⚫"] * self.current_pos + ["❔"] * remaining
+        if self.current_pos == self.bullet_pos:
+            chambers[self.current_pos - 1] = "💥"
+            chambers[self.current_pos :] = ["⚫"] * remaining
+        return "".join(chambers)
+
     def shoot(self, user_id: int) -> bool:
         self.last_shooter_id = user_id
         self.current_pos += 1
@@ -421,26 +429,26 @@ class Games(Cog, category=Category.FUN):
 
         if rev.last_shooter_id == ctx.author.id:
             ctx.reset_cooldown()
-            await ctx.reply_("pass_gun")
+            await ctx.reply(f"{ctx._('pass_gun')}\n{rev.format_cylinder()}")
             return
 
         if not rev.shoot(ctx.author.id):
             ctx.reset_cooldown()
-            await ctx.reply(f"_\\*{ctx._('click')}*_")
+            await ctx.reply(f"_\\*{ctx._('click')}*_\n{rev.format_cylinder()}")
             return
 
         if not rev.mega_killed():
+            cylindr = rev.format_cylinder()
             rev.reload()
-            await ctx.reply(f"***{ctx._('gunshot1')}***💥{CustomEmoji.KannaGun}")
-            await ctx.send_("cooldown")
+            await ctx.reply(f"## ***{ctx._('gunshot1')}*** {CustomEmoji.KannaGun}\n{cylindr}\n\n-# {ctx._('cooldown')}")
             with suppress(disnake.Forbidden):
                 await ctx.author.timeout(duration=self.RR_COOLDOWN_SECS, reason=ctx._("russian_roulette"))
             return
 
         # Same user loses 3 times in a row
+        cylindr = rev.format_cylinder()
         rev.reload()
-        await ctx.reply(f"💥***__{ctx._('gunshot2')}__***💥")
-        await ctx.send_("cooldown")
+        await ctx.reply(f"# 🩸***__{ctx._('gunshot2')}__*** 💀\n{cylindr}\n\n-# {ctx._('cooldown')}")
         with suppress(disnake.Forbidden):
             if await Setting.get(SettingKey.RR_KICK, ctx.guild.id):
                 await ctx.author.kick(reason=ctx._("russian_roulette"))
