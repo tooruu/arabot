@@ -91,7 +91,7 @@ class OwnerCommands(Cog, command_attrs=dict(hidden=True)):
             and buckets.type.name.lower() not in type(bucket_item).__name__.lower()
             and not (buckets.type is commands.BucketType.user and isinstance(bucket_item, disnake.Member))
         ):
-            await ctx.send(ctx._("bucket_doesnt_match_argument").format(buckets.type.name, type(bucket_item).__name__))
+            await ctx.send(ctx._("bucket_doesnt_match_arg").format(buckets.type.name, type(bucket_item).__name__))
             return
 
         fake_msg = FakeObj()
