@@ -388,9 +388,6 @@ class RussianRoulette:
         rev = cls.GAMES[guild_id] = cls()
         return rev
 
-    def is_next_shot_lethal(self) -> bool:
-        return self.current_pos + 1 == self.bullet_pos
-
     def is_different_player(self, user_id: int) -> bool:
         return self.last_shooter_id != user_id
 
@@ -411,29 +408,24 @@ class RussianRoulette:
         self.bullet_pos = random.randint(1, self.CHAMBERS)
 
 
-def rr_cooldown(msg: disnake.Message) -> commands.Cooldown | None:
-    rev = RussianRoulette.GAMES.get(msg.guild.id)
-    if rev and rev.is_different_player(msg.author.id) and rev.is_next_shot_lethal():
-        return commands.Cooldown(1, Games.RR_COOLDOWN_SECS)
-    return None
-
-
 class Games(Cog, category=Category.FUN):
     RR_COOLDOWN_SECS = 60
 
     def __init__(self, ara: Ara):
         self.ara = ara
 
-    @commands.dynamic_cooldown(rr_cooldown, commands.BucketType.guild)
+    @commands.cooldown(1, RR_COOLDOWN_SECS, commands.BucketType.guild)
     @commands.command(name="rr", brief="Russian Roulette")
     async def russian_roulette(self, ctx: Context):
         rev = RussianRoulette.get_game(ctx.guild.id)
 
         if rev.last_shooter_id == ctx.author.id:
+            ctx.reset_cooldown()
             await ctx.reply_("pass_gun")
             return
 
         if not rev.shoot(ctx.author.id):
+            ctx.reset_cooldown()
             await ctx.reply(f"_\\*{ctx._('click')}*_")
             return
 
