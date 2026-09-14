@@ -49,12 +49,20 @@ class pfxless:  # noqa: N801
         allow_prefix: bool = False,  # allow messages starting with bot prefix
         allow_bots: bool = False,  # allow bot message authors
         plain_text_only: bool = True,  # excludes matches inside emojis, mentions, etc.
+        permission_key: str | None = None,
+        guild_only: bool = False,
+        variants: tuple[str, ...] = (),
+        delegates_to: str | None = None,
     ):
         self.enabled = enabled
         self.chance = chance
         self.allow_prefix = allow_prefix
         self.allow_bots = allow_bots
         self.plain_text_only = plain_text_only
+        self.permission_key = permission_key
+        self.guild_only = guild_only
+        self.variants = variants
+        self.delegates_to = delegates_to
 
         match regex:
             case str() | None:
@@ -86,27 +94,40 @@ class pfxless:  # noqa: N801
         @functools.wraps(coro)
         @copy_dpy_attrs_from(coro)
         async def wrapper(cog: commands.Cog, msg: Message) -> None:
-            if not (wrapper.enabled and await self.prepare(msg, cog.ara)):
+            if not wrapper.enabled or not msg.guild:
                 return
             try:
-                await coro(cog, msg)
-            finally:
-                if wrapper.__commands_max_concurrency__:
-                    await wrapper.__commands_max_concurrency__.release(msg)
+                if not await self.prepare(msg, cog.ara):
+                    return
+                try:
+                    await coro(cog, msg)
+                finally:
+                    if wrapper.__commands_max_concurrency__:
+                        await wrapper.__commands_max_concurrency__.release(msg)
+            except commands.CheckFailure, commands.DisabledCommand:
+                # Permission lookup failures are logged by the permission service.
+                return
 
         wrapper.enabled = self.enabled
+        wrapper.__pfxless__ = self
         return wrapper
 
-    async def prepare(self, msg: Message, ara: Ara) -> bool:  # TODO: remove dependency on bot
-        return (
-            await self._check_message(msg, functools.partial(ara.command_prefix, ara))
-            and await self._run_checks(msg)
-            and await self._check_concurrency(msg)
-            and self._check_cooldown(msg)
-            and self.chance > random.random()
-        )
+    async def prepare(self, msg: Message, ara: Ara) -> bool:
+        match = await self._check_message(msg, functools.partial(ara.command_prefix, ara))
+        if not match:
+            return False
+        await ara.permissions.check_event(self, msg, match)
+        if not await self._run_checks(msg) or not await self._check_concurrency(msg):
+            return False
+        prepared = False
+        try:
+            prepared = self._check_cooldown(msg) and self.chance > random.random()
+            return prepared
+        finally:
+            if not prepared and self.event.__commands_max_concurrency__:
+                await self.event.__commands_max_concurrency__.release(msg)
 
-    async def _check_message(self, msg: Message, pfx_factory: Callable[[Message], Awaitable]) -> bool:
+    async def _check_message(self, msg: Message, pfx_factory: Callable[[Message], Awaitable]) -> re.Match | bool | None:
         return (
             (self.allow_prefix or not await pfx_factory(msg))
             and (self.allow_bots or not msg.author.bot)
