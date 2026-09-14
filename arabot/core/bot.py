@@ -2,6 +2,7 @@ import logging
 import os
 import re
 from collections.abc import Callable, Coroutine, Generator
+from copy import copy
 from pathlib import Path
 from pkgutil import iter_modules
 from traceback import format_exception
@@ -18,10 +19,18 @@ from arabot.core.database import Setting, init_db
 from arabot.core.enums import SettingKey
 from arabot.core.errors import StopCommand
 from arabot.core.patches import Context, LocalizationStore
+from arabot.core.permissions import (
+    PermissionConfigurationError,
+    PermissionDenied,
+    PermissionService,
+    PermissionUnavailable,
+)
 from arabot.utils import codeblock, mono, system_info, time_in
 
 type MaybeCoro[T] = T | Coroutine[Any, Any, T]
 type CommandPrefix = PrefixType | Callable[[Ara, disnake.Message], MaybeCoro[PrefixType]]
+
+logger = logging.getLogger(__name__)
 
 
 def search_directory(path: str | os.PathLike) -> Generator[str]:
@@ -76,6 +85,62 @@ class Ara(commands.Bot):
         self._plugins_path = Path(plugins_path)
         self._l10n_path = l10n_path
         disnake.Embed.set_default_color(embed_color)
+        self.permissions = PermissionService(self)
+        self.add_check(self.permissions.prefix_check)
+        self.add_check(self.permissions.prefix_check, call_once=True)
+        self.add_app_command_check(self.permissions.slash_check, slash_commands=True)
+        self.add_app_command_check(self.permissions.slash_check, slash_commands=True, call_once=True)
+
+    def refresh_permissions(self) -> None:
+        if hasattr(self, "permissions"):
+            self.permissions.registry.refresh()
+
+    @override
+    def add_cog(self, cog: commands.Cog, *, override: bool = False) -> None:
+        super().add_cog(cog, override=override)
+        self.refresh_permissions()
+
+    @override
+    def remove_cog(self, name: str) -> commands.Cog | None:
+        cog = super().remove_cog(name)
+        self.refresh_permissions()
+        return cog
+
+    @override
+    def add_command(self, command: commands.Command) -> None:
+        super().add_command(command)
+        self.refresh_permissions()
+
+    @override
+    def remove_command(self, name: str) -> commands.Command | None:
+        command = super().remove_command(name)
+        self.refresh_permissions()
+        return command
+
+    @override
+    def add_slash_command(self, command: commands.InvokableSlashCommand) -> None:
+        super().add_slash_command(command)
+        self.refresh_permissions()
+
+    @override
+    def remove_slash_command(self, name: str) -> commands.InvokableSlashCommand | None:
+        command = super().remove_slash_command(name)
+        self.refresh_permissions()
+        return command
+
+    @override
+    async def invoke(self, ctx: Context) -> None:
+        # Discover the leaf without consuming the parser used by disnake itself.
+        command = ctx.command
+        view = copy(ctx.view)
+        while isinstance(command, commands.Group):
+            view.skip_ws()
+            child = command.all_commands.get(view.get_word())
+            if child is None:
+                break
+            command = child
+        ctx.permission_command = command
+        await super().invoke(ctx)
 
     @override
     async def login(self) -> None:
@@ -84,12 +149,12 @@ class Ara(commands.Bot):
         try:
             await super().login(token)
         except (disnake.LoginFailure, TypeError) as e:
-            logging.critical("Invalid token %r", token)
+            logger.critical("Invalid token %r", token)
             if isinstance(e, TypeError):
                 raise disnake.LoginFailure(e) from e
             raise
         except aiohttp.ClientConnectorError:
-            logging.critical("Connection error", exc_info=True)
+            logger.critical("Connection error", exc_info=True)
             raise
 
     @override
@@ -128,6 +193,7 @@ class Ara(commands.Bot):
     async def start(self) -> None:
         async with aiohttp.ClientSession() as self.session, init_db():
             self.i18n.load(self._l10n_path)
+            await self.permissions.initialize()
             await self.login()
             self.load_extensions()
             await self.connect()
@@ -144,13 +210,13 @@ class Ara(commands.Bot):
             try:
                 self.load_extension(module)
             except commands.ExtensionFailed as e:
-                logging.error("Failed to load %s", short, exc_info=e.original)
+                logger.error("Failed to load %s", short, exc_info=e.original)
             except commands.NoEntryPointError:
-                logging.error("No entry point in %s", short)
+                logger.error("No entry point in %s", short)
             except commands.ExtensionNotFound:
-                logging.error("Module not found: %s", short)
+                logger.error("Module not found: %s", short)
             else:
-                logging.info("Loaded %s", short)
+                logger.info("Loaded %s", short)
 
     async def fetch_or_create_imposter_webhook(self, name: str, chl: disnake.TextChannel) -> disnake.Webhook:
         webhooks = await chl.webhooks()
@@ -162,6 +228,12 @@ class Ara(commands.Bot):
     @override
     async def on_command_error(self, context: Context, exception: disnake.DiscordException) -> None:
         match exception:
+            case PermissionDenied():
+                await context.reply_("permission_denied", False)
+            case PermissionUnavailable():
+                await context.reply_("permissions_unavailable", False)
+            case PermissionConfigurationError():
+                await context.reply(str(exception))
             case commands.CommandOnCooldown(retry_after=retry_after):
                 remaining = time_in(retry_after)
                 await context.reply(context._("cooldown_expires", False).format(remaining))
@@ -198,8 +270,8 @@ class Ara(commands.Bot):
             case _:
                 if isinstance(exception, commands.CommandInvokeError):
                     exception = exception.original
-                logging.error("Unhandled exception", exc_info=exception)
-                await context.reply_("unknown_error")
+                logger.error("Unhandled exception", exc_info=exception)
+                await context.reply_("unknown_error", False)
                 if not Config.debug_mode:
                     await self.owner.send(
                         embed=disnake.Embed(
@@ -209,5 +281,36 @@ class Ara(commands.Bot):
                         ).set_author(name="Error", url=context.message.jump_url)
                     )
 
+    async def on_slash_command_error(
+        self, inter: disnake.ApplicationCommandInteraction, exception: commands.CommandError
+    ) -> None:
+        if isinstance(exception, commands.CommandInvokeError):
+            exception = exception.original
+        match exception:
+            case PermissionDenied():
+                message = inter._("permission_denied", 0)
+            case PermissionUnavailable():
+                message = inter._("permissions_unavailable", 0)
+            case commands.DisabledCommand():
+                message = inter._("command_disabled", 0)
+            case PermissionConfigurationError() | commands.CheckFailure() | commands.UserInputError():
+                message = str(exception) or inter._("permission_denied", 0)
+            case commands.CommandOnCooldown(retry_after=retry_after):
+                message = inter._("cooldown_expires", 0).format(time_in(retry_after))
+            case _:
+                logger.error("Unhandled slash command exception", exc_info=exception)
+                message = inter._("unknown_error", 0)
+        if inter.response.is_done():
+            try:
+                original = await inter.original_response()
+            except disnake.NotFound:
+                original = None
+            if original and original.flags.ephemeral:
+                await inter.edit_original_response(content=message, embed=None, view=None)
+            else:
+                await inter.followup.send(message, ephemeral=True)
+        else:
+            await inter.response.send_message(message, ephemeral=True)
+
     async def on_ready(self) -> None:
-        logging.info(system_info())
+        logger.info(system_info())

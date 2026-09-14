@@ -102,7 +102,8 @@ class Context(commands.Context):
     getch_reference_message = get_or_fetch_reference_message
 
     def l10n_from_guild_locale(self, key: str, scope_depth: int = 1) -> str | None:
-        return self.ara.i18n.getl(key, self.guild.preferred_locale, scope_depth + (scope_depth > 0))
+        locale = self.guild.preferred_locale if self.guild else getattr(self, "locale", None) or disnake.Locale.en_US
+        return self.ara.i18n.getl(key, locale, scope_depth + (scope_depth > 0))
 
     _ = l10n_from_guild_locale
 
@@ -233,7 +234,7 @@ async def connect_play_disconnect(
     try:
         vc = await self.connect()
     except Exception:
-        logging.warning("Could not connect to voice channel %r", self)
+        logging.getLogger(__name__).warning("Could not connect to voice channel %r", self)
         return
 
     disconnect = lambda _: vc.loop.create_task(vc.disconnect(force=force_disconnect))

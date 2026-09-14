@@ -1,5 +1,5 @@
 import re
-from os import listdir
+from pathlib import Path
 from random import choice
 
 import disnake
@@ -12,15 +12,16 @@ class Voice(Cog):
     def __init__(self, ara: Ara):
         self.ara = ara
 
-    MISC_OGG_DIR = "resources/ogg/misc"
-    MISC_OGG_REGEX = rf"\b{'|'.join(re.escape(f[:-4]) for f in listdir(MISC_OGG_DIR))}\b"
-    GACHI_OGG_DIR = "resources/ogg/gachi"
-    GACHI_OGG_FILES = listdir(GACHI_OGG_DIR)
+    MISC_OGG_DIR = Path("resources/ogg/misc")
+    MISC_SOUNDS = tuple(path.stem.casefold() for path in MISC_OGG_DIR.iterdir() if path.suffix.lower() == ".ogg")
+    MISC_OGG_REGEX = rf"\b{'|'.join(re.escape(name) for name in MISC_SOUNDS)}\b"
+    GACHI_OGG_DIR = Path("resources/ogg/gachi")
+    GACHI_OGG_FILES = tuple(path.name for path in GACHI_OGG_DIR.iterdir() if path.suffix.lower() == ".ogg")
 
     @can_someone_hear_in_author_channel
     @author_in_voice_channel
     @bot_not_speaking_in_guild
-    @pfxless(regex=MISC_OGG_REGEX)
+    @pfxless(regex=MISC_OGG_REGEX, variants=MISC_SOUNDS, guild_only=True)
     async def misc_voice(self, msg: disnake.Message):
         filename = re.search(self.MISC_OGG_REGEX, msg.content, re.IGNORECASE)[0] + ".ogg"
         audio = disnake.FFmpegOpusAudio(f"{self.MISC_OGG_DIR}/{filename.lower()}")
@@ -29,7 +30,7 @@ class Voice(Cog):
     @can_someone_hear_in_author_channel
     @author_in_voice_channel
     @bot_not_speaking_in_guild
-    @pfxless()
+    @pfxless(guild_only=True)
     async def gachi(self, msg: disnake.Message):
         filename = choice(self.GACHI_OGG_FILES)
         audio = disnake.FFmpegOpusAudio(f"{self.GACHI_OGG_DIR}/{filename}")

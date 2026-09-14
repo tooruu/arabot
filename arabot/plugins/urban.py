@@ -54,11 +54,10 @@ class Urban(Cog, category=Category.LOOKUP):
         data = await self.ara.session.fetch_json(self.BASE_URL, params={"term": query})
         return data.get("list")
 
-    @pfxless(regex=rf"{QUERY_PREFIX}((?:(?!{WORDS_IGNORE}).)*?)\??$")
+    @pfxless(regex=rf"{QUERY_PREFIX}((?:(?!{WORDS_IGNORE}).)*?)\??$", delegates_to="urban")
     async def urban_listener(self, msg: Message):
-        if self.urban.enabled:
-            term = re.search(rf"{self.QUERY_PREFIX}(.*?)\??$", msg.content, re.IGNORECASE)[1]
-            await self.urban(await self.ara.get_context(msg), term=term)
+        term = re.search(rf"{self.QUERY_PREFIX}(.*?)\??$", msg.content, re.IGNORECASE)[1]
+        await self.ara.permissions.invoke_from_event(msg, self.urban, term=term)
 
     async def cog_load(self):
         await self.ara.wait_until_ready()

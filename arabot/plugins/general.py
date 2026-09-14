@@ -1,6 +1,5 @@
 import random
 import re
-from functools import partial
 from types import NoneType
 
 import disnake
@@ -253,11 +252,11 @@ class General(Cog, category=Category.GENERAL):
     @commands.command(
         aliases=["imp"],
         brief="Pretend to be somebody else",
-        extras={"note": "Cannot ping roles"},
+        extras={"note": "Cannot ping roles", "permission_key": "command:impersonate"},
     )
     async def impersonate(self, ctx: Context, user: AnyMemberOrUser, *, text: str):
         if user == ctx.me:
-            await self.say(ctx, text=text)
+            await self.ara.permissions.invoke_command(ctx, self.say, text=text)
             return
         if not ctx.channel.permissions_for(ctx.me).manage_webhooks:
             await ctx.send(ctx._("no_perms_to", False).format("manage webhooks"))
@@ -285,7 +284,7 @@ class General(Cog, category=Category.GENERAL):
     @commands.slash_command(
         name="impersonate",
         description="Pretend to be somebody else",
-        extras={"note": "Cannot ping roles"},
+        extras={"note": "Cannot ping roles", "permission_key": "command:impersonate"},
     )
     async def impersonate_slash(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User, text: str):
         if user.display_name in {"everyone", "here"}:
