@@ -7,6 +7,22 @@
             "request": "launch",
             "module": "arabot",
             "justMyCode": true
+        },
+        {
+            "name": "Attach to Docker",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/app"
+                }
+            ],
+            "justMyCode": true
         }
     ]
 }

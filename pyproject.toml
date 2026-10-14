@@ -18,12 +18,14 @@ dependencies = [
     "pyscribest",
     "pydantic-settings",
     "psycopg[binary]",
-    "sqlalchemy",
+    "sqlalchemy[asyncio]~=2.1.0",
+    "alembic~=1.20.0",
 ]
 license = "MPL-2.0"
 
 [dependency-groups]
 dev = [
+    "debugpy",
     "ruff",
 ]
 
@@ -104,3 +106,13 @@ ignore-names = []
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]                   # unused-import
 "arabot/plugins/eval/client.py" = ["S307"] # suspicious-eval-usage
+
+[tool.alembic]
+script_location = "%(here)s/alembic"
+prepend_sys_path = ["."]
+
+[[tool.alembic.post_write_hooks]]
+name = "ruff"
+type = "module"
+module = "ruff"
+options = "format REVISION_SCRIPT_FILENAME"

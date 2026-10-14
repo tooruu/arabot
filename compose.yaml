@@ -1,0 +1,47 @@
+services:
+  database:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: arabot
+      POSTGRES_PASSWORD: arabot
+      POSTGRES_DB: arabot
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ CMD, pg_isready, -d, arabot, -U, arabot ]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  bot:
+    depends_on:
+      database:
+        condition: service_healthy
+    image: tooruu/arabot:dev
+    build: .
+    pull_policy: build
+    env_file: .env
+    environment:
+      DEBUG_MODE: true
+      DATABASE_URL: postgresql+psycopg://arabot:arabot@database:5432/arabot
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./arabot:/app/arabot
+      - ./alembic:/app/alembic
+      - ./resources:/app/resources
+    pre_start:
+      - command: [ alembic, upgrade, head ]
+    command: [ debugpy, --listen, 0.0.0.0:5678, -m, arabot ]
+    ports:
+      - 127.0.0.1:5678:5678
+    develop:
+      watch:
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./uv.lock
+
+volumes:
+  postgres_data:

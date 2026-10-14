@@ -9,11 +9,11 @@ from sqlalchemy.orm import relationship as base_relationship
 static_relationship = partial(base_relationship, lazy="raise")
 
 
-class SerialPK:
+class SerialPK(MappedAsDataclass):
     id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True, init=False, repr=False)
 
 
-class Model(DeclarativeBase, MappedAsDataclass, AsyncAttrs, kw_only=True):
+class Model(MappedAsDataclass, DeclarativeBase, AsyncAttrs, kw_only=True):
     @declared_attr.directive
     def __tablename__(cls) -> str:
         name = re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()

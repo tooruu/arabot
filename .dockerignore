@@ -6,15 +6,22 @@ compose.yaml
 # Generated
 **/__pycache__
 **/.ruff_cache
-.vscode
-.venv
-.git
+*.pyc
+*.pyo
+*.pyd
+.vscode/
+.venv/
+.git/
+.python-version
 
 # Meta
 .github
-tools
+/tools/
 LICENSE*
 README*
 TERMS_OF_SERVICE*
 .env
+.env.*
 .gitignore
+/tests/
+/docs/

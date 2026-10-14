@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def init_db(drop: bool = False) -> AsyncGenerator[AsyncEngine]:
+async def init_db() -> AsyncGenerator[AsyncEngine]:
     global LocalSessionFactory
 
     url = make_url(Config.database_url)
@@ -47,11 +47,6 @@ async def init_db(drop: bool = False) -> AsyncGenerator[AsyncEngine]:
             cursor.execute("PRAGMA synchronous=NORMAL")
             cursor.execute("PRAGMA foreign_keys=ON")
             cursor.close()
-
-    async with engine.begin() as conn:
-        if drop:
-            await conn.run_sync(Model.metadata.drop_all)
-        await conn.run_sync(Model.metadata.create_all)
 
     try:
         yield engine
