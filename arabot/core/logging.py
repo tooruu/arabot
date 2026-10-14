@@ -2,6 +2,19 @@ import logging
 import sys
 
 
+def setup_logging(level: int) -> None:
+    handlers = [StderrHandler()]
+    if level < logging.WARNING:
+        handlers.append(StdoutHandler(level))
+
+    logging.basicConfig(
+        format="%(asctime)s|%(name)s|%(levelname)s|%(message)s",
+        level=logging.NOTSET,
+        datefmt="%Y-%m-%dT%H:%M:%SZ",
+        handlers=handlers,
+    )
+
+
 class ThresholdFilter(logging.Filter):
     def __init__(self, min_level: int):
         super().__init__()

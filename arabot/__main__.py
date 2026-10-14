@@ -6,21 +6,7 @@ from contextlib import suppress
 import disnake
 from aiohttp import ClientConnectorError
 
-from arabot.core import Ara, Config, LocalizationStore, new_event_loop
-from arabot.core.logging import StderrHandler, StdoutHandler
-
-
-def setup_logging(level: int) -> None:
-    handlers = [StderrHandler()]
-    if level < logging.WARNING:
-        handlers.append(StdoutHandler(level))
-
-    logging.basicConfig(
-        format="%(asctime)s|%(levelname)8s|%(message)s",
-        level=logging.NOTSET,
-        datefmt="%Y-%m-%dT%H:%M:%SZ",
-        handlers=handlers,
-    )
+from arabot.core import Ara, Config, LocalizationStore, new_event_loop, setup_logging
 
 
 def create_ara(*args, **kwargs) -> Ara:

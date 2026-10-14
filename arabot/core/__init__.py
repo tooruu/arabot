@@ -18,6 +18,9 @@ from arabot.core.enums import (
 from arabot.core.errors import (
     StopCommand,
 )
+from arabot.core.logging import (
+    setup_logging,
+)
 from arabot.core.patches import (
     Cog,
     Context,
