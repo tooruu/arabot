@@ -33,4 +33,4 @@ WORKDIR /app
 
 COPY --from=builder --chown=appuser:appgroup /app /app
 
-CMD ["arabot"]
+CMD ["python", "-m", "arabot"]
